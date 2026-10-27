@@ -34,3 +34,25 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   position: absolute;
   inset: -5px -2px;
 }
+
+/* Room card: what the programme includes — one compact wrapping row, each item kept on one line */
+.page .room-incl {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #3e4b44;
+}
+.page .room-incl li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.page .room-incl svg {
+  flex: none;
+}
