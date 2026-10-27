@@ -22,8 +22,10 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
         <div
           style={{
             position: 'relative',
-            flex: '0 0 300px',
-            minHeight: '210px',
+            flex: '0 0 200px',
+            width: '200px',
+            height: '200px',
+            alignSelf: 'flex-start',
             margin: '14px 0 14px 14px',
             borderRadius: '2px',
             overflow: 'hidden',

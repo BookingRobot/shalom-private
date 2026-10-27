@@ -1536,8 +1536,9 @@ export default function ResultsPage() {
                     <Link
                       to="/hotel"
                       style={{
-                        flex: '0 0 310px',
-                        minHeight: '230px',
+                        flex: '0 0 400px',
+                        maxWidth: 'calc(100% - 28px)',
+                        minHeight: '240px',
                         position: 'relative',
                         display: 'block',
                         margin: '14px 0 14px 14px',
