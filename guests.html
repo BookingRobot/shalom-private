@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Шаг 2 из 3 — данные гостей</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+body{margin:0;background:#F4F1EA;color:#1C2620;font-family:Manrope,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.5}
+*{box-sizing:border-box}
+a{color:#1F5F4A}a:hover{color:#143F31}
+h1,h2,h3{font-family:Lora,Georgia,"Times New Roman",serif;margin:0;line-height:1.2;font-weight:600}
+input,select,button,textarea{font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 28px;border-radius:2px;font-weight:700;font-size:19px;cursor:pointer;text-decoration:none;border:2px solid transparent;white-space:nowrap}
+.btn-primary{background:#1F5F4A;color:#fff}.btn-primary:hover{background:#174B3A;color:#fff}
+.btn-secondary{background:#fff;color:#1F5F4A;border-color:#1F5F4A}.btn-secondary:hover{background:#EEF5F1;color:#143F31}
+.input{min-height:56px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;background:#fff;font-size:18px;width:100%;appearance:none;-webkit-appearance:none}
+.input:focus{outline:3px solid #9CC9B5;border-color:#1F5F4A}
+.input::placeholder{color:#8A968F}
+.lbl{font-weight:700;font-size:16px;color:#3E4B44}
+.hint{font-size:15px;color:#6B776F}
+.card{background:#fff;border:1px solid #E3DED2;border-radius:3px}
+.step{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#6B776F}
+.step .num{width:36px;height:36px;border-radius:2px;border:2px solid #CFC9BB;display:flex;align-items:center;justify-content:center;font-weight:800;background:#fff}
+.step.on{color:#1F5F4A}.step.on .num{background:#1F5F4A;border-color:#1F5F4A;color:#fff}
+.step.done{color:#1C2620}.step.done .num{background:#EEF5F1;border-color:#1F5F4A;color:#1F5F4A}
+.seg{display:flex;border:2px solid #CFC9BB;border-radius:2px;overflow:hidden;background:#fff}
+.seg label{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;cursor:pointer;font-weight:700;font-size:17px}
+.seg label input{width:22px;height:22px;accent-color:#1F5F4A;margin:0}
+.chk{display:flex;align-items:center;gap:14px;min-height:48px;cursor:pointer;font-size:17px}
+.chk input{width:26px;height:26px;accent-color:#1F5F4A;margin:0;flex:none}
+.datebtn{text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600}
+.datebtn:hover{border-color:#1F5F4A}
+.pstep{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#6B776F}
+.pstep .n{width:34px;height:34px;border-radius:2px;border:2px solid #CFC9BB;display:flex;align-items:center;justify-content:center;background:#fff}
+.pstep.on{color:#1F5F4A}.pstep.on .n{background:#1F5F4A;border-color:#1F5F4A;color:#fff}
+.pstep.done{color:#1C2620}.pstep.done .n{background:#EEF5F1;border-color:#1F5F4A;color:#1F5F4A}
+.pick{min-height:60px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;font-weight:700;font-size:22px;cursor:pointer;color:#1C2620}
+.pick:hover{border-color:#1F5F4A;background:#EEF5F1}
+.pick.on{border-color:#1F5F4A;background:#1F5F4A;color:#fff}
+.pick:disabled{opacity:.35;cursor:default}
+.navbtn{width:56px;height:56px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.navbtn:hover{border-color:#1F5F4A}
+.wd{font-size:14px;font-weight:700;color:#6B776F;text-align:center;padding:4px 0}
+</style>
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+
+<div style="display:flex;flex-direction:column;min-height:400px">
+
+<header style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:0 24px;min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <a href="main.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#1C2620">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="#1F5F4A"></rect><path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA"></path></svg>
+      <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:700">Санатории Литвы</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <span style="font-size:16px;color:#3E4B44">Нужна помощь с заказом?</span>
+      <a href="tel:+37060000000" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#1C2620;font-weight:800;font-size:20px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"></path></svg>
+        +370&nbsp;600 00000
+      </a>
+    </div>
+  </div>
+</header>
+
+<div style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <div class="step done"><span class="num">✓</span>Номер</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step done"><span class="num">✓</span>Трансфер</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step on"><span class="num">3</span>Гости</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step"><span class="num">4</span>Рейсы</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step"><span class="num">5</span>Оплата</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step" style="gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A968F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Готово</div>
+    </div>
+</div>
+
+<div style="max-width:1180px;margin:0 auto;padding:32px 24px 56px;width:100%;display:flex;flex-wrap:wrap;gap:24px;align-items:start">
+
+  <form action="flights.html" style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h1 style="font-size:36px">Кто едет в санаторий?</h1>
+      <p style="margin:0;color:#3E4B44;font-size:18px">Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для карты лечения.</p>
+    </div>
+
+    <!-- Guest 1 -->
+    <section class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="width:44px;height:44px;border-radius:2px;background:#1F5F4A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px">1</span>
+        <h2 style="font-size:24px">Первый гость — он же контактное лицо</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:18px">
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g1fn">Имя</label><input id="g1fn" class="input" type="text" placeholder="Например: Mikhail" autocomplete="given-name"></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g1ln">Фамилия</label><input id="g1ln" class="input" type="text" placeholder="Например: Levin" autocomplete="family-name"></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g1dob">Дата рождения</label><button type="button" id="g1dob" class="input datebtn" onClick="{{openDob1}}" style="color:{{dob1Color}}">{{dob1}}</button><span class="hint">Нужна врачу санатория</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Пол</span>
+          <div class="seg"><label><input type="radio" name="g1sex" checked>Мужской</label><label style="border-left:2px solid #CFC9BB"><input type="radio" name="g1sex">Женский</label></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g1ph">Мобильный телефон</label>
+          <div style="display:flex;gap:8px">
+            <div style="position:relative;flex:none;width:210px"><select class="input" aria-label="Страна и код" style="padding-right:40px;font-weight:700"><option selected>+972 · Израиль</option><option>+370 · Литва</option><option>+1 · США и Канада</option><option>+49 · Германия</option><option>+44 · Великобритания</option><option>+33 · Франция</option><option>+371 · Латвия</option><option>+372 · Эстония</option><option>+48 · Польша</option><option>+7 · Россия</option><option>+380 · Украина</option><option>+375 · Беларусь</option><option>+7 · Казахстан</option><option>+995 · Грузия</option><option>+374 · Армения</option><option>+373 · Молдова</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="position:absolute;right:12px;top:19px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg></div>
+            <input id="g1ph" class="input" type="tel" placeholder="50&nbsp;123 4567" autocomplete="tel-national" inputmode="numeric">
+          </div>
+          <span class="hint">Сюда напишем в WhatsApp подтверждение и детали трансфера</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g1em">Электронная почта</label><input id="g1em" class="input" type="email" placeholder="name@gmail.com" autocomplete="email"><span class="hint">Пришлём подтверждение и ссылку на оплату</span></div>
+      </div>
+    </section>
+
+    <!-- Guest 2 -->
+    <section class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="width:44px;height:44px;border-radius:2px;background:#1F5F4A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px">2</span>
+        <h2 style="font-size:24px">Второй гость</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:18px">
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g2fn">Имя</label><input id="g2fn" class="input" type="text" placeholder="Например: Irina"></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g2ln">Фамилия</label><input id="g2ln" class="input" type="text" placeholder="Например: Levina"></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="g2dob">Дата рождения</label><button type="button" id="g2dob" class="input datebtn" onClick="{{openDob2}}" style="color:{{dob2Color}}">{{dob2}}</button></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">Пол</span>
+          <div class="seg"><label><input type="radio" name="g2sex">Мужской</label><label style="border-left:2px solid #CFC9BB"><input type="radio" name="g2sex" checked>Женский</label></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wishes -->
+    <section class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:16px">
+      <h2 style="font-size:24px">Пожелания к заезду</h2>
+      <p style="margin:0;color:#3E4B44;font-size:17px">Не обязательно, но санаторию полезно знать заранее.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:4px 24px">
+        <label class="chk"><input type="checkbox">Номер на нижнем этаже</label>
+        <label class="chk"><input type="checkbox">Номер на верхнем этаже</label>
+        <label class="chk"><input type="checkbox">Приедем на автомобиле, нужна парковка</label>
+        <label class="chk"><input type="checkbox">Интересуют экскурсии (Вильнюс, Тракай, Каунас)</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label class="lbl" for="notes">Что ещё нам важно знать</label>
+        <textarea id="notes" class="input" rows="3" placeholder="Например: ограниченная подвижность, диета, хотим номера рядом с друзьями…" style="padding:14px 16px;min-height:110px;resize:vertical"></textarea>
+      </div>
+    </section>
+
+    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:8px">
+      <a class="btn btn-secondary" href="transfer.html">← Назад к трансферу</a>
+      <a class="btn btn-primary" href="flights.html" style="min-height:64px;font-size:21px;padding:0 40px">Далее: оплата аванса →</a>
+    </div>
+  </form>
+
+  <aside class="card" style="flex:1 1 300px;max-width:360px;padding:0;overflow:hidden;position:sticky;top:16px">
+    <img src="assets/1efd1efc34d4137ff98a8658a068afc5.jpg" alt="" style="width:100%;height:160px;object-fit:cover;display:block">
+    <div style="padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div style="font-weight:800;font-size:20px">Санаторий Эгле Комфорт</div>
+        <div style="font-size:16px;color:#3E4B44">Друскининкай · ★★★★</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;border-top:1px solid #E3DED2;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Даты</span><strong>9–18 ноября · 9 ночей</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Номер</span><strong>Двухместный</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Программа</span><strong>«Миди», 3 процедуры</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Гости</span><strong>2 взрослых</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Трансфер</span><strong>из аэропорта Вильнюса, туда и обратно</strong></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;border-top:1px solid #E3DED2;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Проживание и лечение</span><strong>2&nbsp;138&nbsp;€</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Трансфер групповой, туда и обратно</span><strong>120&nbsp;€</strong></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:2px solid #1C2620;padding-top:12px">
+        <span style="font-weight:800;font-size:18px">Итого</span><span style="font-weight:800;font-size:28px">2&nbsp;258&nbsp;€</span>
+      </div>
+      <div style="font-size:15px;color:#3E4B44;background:#F4F1EA;border-radius:2px;padding:10px 12px">Сейчас к оплате только аванс 4 % — <strong>86&nbsp;€</strong>. Остальное — в санатории при заезде.</div>
+    </div>
+  </aside>
+</div>
+
+<footer style="background:#1C2620;color:#D9E2DC;margin-top:auto">
+  <div style="max-width:1180px;margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:16px">
+    <div>Санатории Литвы · консультация на русском 24/7 · WhatsApp +370&nbsp;600 00000</div>
+    <div style="display:flex;gap:24px"><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Как оплатить</a><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Условия отмены</a></div>
+  </div>
+</footer>
+
+</div>
+
+<!-- Date-of-birth picker: year → month → day, tuned for 55+ guests -->
+<template data-if="{{dobOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto">
+  <div role="dialog" aria-modal="true" aria-labelledby="dobTitle" style="background:#fff;border-radius:2px;width:min(760px,100%);display:flex;flex-direction:column;gap:20px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 id="dobTitle" style="font-size:30px">Дата рождения — {{dobWho}}</h2>
+        <span style="font-size:17px;color:#3E4B44">{{dobHint}}</span>
+      </div>
+      <button type="button" class="btn btn-secondary" onClick="{{closeDob}}" style="min-height:48px;font-size:16px;padding:0 18px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Закрыть</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;padding:12px 16px;background:#F4F1EA;border-radius:2px">
+      <button type="button" class="pstep {{stYearCls}}" onClick="{{goYear}}" style="background:none;border:none;padding:0;cursor:pointer"><span class="n">1</span>Год{{yearPicked}}</button>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      <button type="button" class="pstep {{stMonthCls}}" onClick="{{goMonth}}" disabled="{{monthOff}}" style="background:none;border:none;padding:0;cursor:pointer"><span class="n">2</span>Месяц{{monthPicked}}</button>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      <div class="pstep {{stDayCls}}"><span class="n">3</span>День{{dayPicked}}</div>
+    </div>
+
+    <template data-if="{{stepYear}}">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button type="button" class="navbtn" onClick="{{yearsPrev}}" aria-label="Более ранние годы"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg></button>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+          <div style="text-align:center;font-family:Lora,Georgia,serif;font-size:22px;font-weight:600">{{yearsTitle}}</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+            <template data-for="{{years}}" data-as="y"><button type="button" class="pick {{y.cls}}" onClick="{{y.pick}}">{{y.t}}</button></template>
+          </div>
+        </div>
+        <button type="button" class="navbtn" onClick="{{yearsNext}}" aria-label="Более поздние годы"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
+      </div>
+    </template>
+
+    <template data-if="{{stepMonth}}">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <template data-for="{{months}}" data-as="m"><button type="button" class="pick {{m.cls}}" onClick="{{m.pick}}" style="font-size:20px">{{m.t}}</button></template>
+      </div>
+    </template>
+
+    <template data-if="{{stepDay}}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center;font-family:Lora,Georgia,serif;font-size:22px;font-weight:600">{{dayTitle}}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+          <div class="wd">Пн</div><div class="wd">Вт</div><div class="wd">Ср</div><div class="wd">Чт</div><div class="wd">Пт</div><div class="wd">Сб</div><div class="wd">Вс</div>
+          <template data-for="{{days}}" data-as="d"><button type="button" class="pick {{d.cls}}" onClick="{{d.pick}}" disabled="{{d.off}}" style="min-height:54px;border-color:{{d.border}}">{{d.t}}</button></template>
+        </div>
+      </div>
+    </template>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:16px">
+      <span style="font-size:18px">Выбрано: <strong>{{dobSummary}}</strong></span>
+      <div style="display:flex;gap:12px">
+        <button type="button" class="btn btn-secondary" onClick="{{dobBack}}" disabled="{{backOff}}">← Назад</button>
+        <button type="button" class="btn btn-primary" onClick="{{dobDone}}" disabled="{{doneOff}}" style="min-height:56px;font-size:18px;padding:0 32px">Готово</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<!-- Sticky help button + support pop-up (same on every page) -->
+<button type="button" onClick="{{helpOpenFn}}" aria-haspopup="dialog" style="position:fixed;right:24px;bottom:{{helpBottom}};z-index:40;display:flex;align-items:center;gap:10px;min-height:60px;padding:0 22px 0 16px;border:none;border-radius:30px;background:#1F5F4A;color:#fff;font:700 18px Manrope,'Segoe UI',Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(18,34,27,.35)">
+  <span style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+  Свяжитесь со мной
+</button>
+<template data-if="{{helpOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:70;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;font-family:Manrope,'Segoe UI',Arial,sans-serif;color:#1C2620">
+  <div role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="background:#fff;border-radius:2px;width:min(720px,100%);display:flex;flex-direction:column;gap:18px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <span style="width:52px;height:52px;border-radius:50%;background:#EEF5F1;display:flex;align-items:center;justify-content:center;flex:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:2px"><h2 id="helpTitle" style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:600;margin:0;line-height:1.2">Свяжитесь со мной</h2><span style="font-size:16px;color:#3E4B44">Ответим на русском в течение 2 часов (9:00–20:00)</span></div>
+      </div>
+      <button type="button" onClick="{{helpCloseFn}}" aria-label="Закрыть" style="width:48px;height:48px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C2620" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+
+    <template data-if="{{helpForm}}">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Имя</span><input type="text" placeholder="Например: Михаил" autocomplete="name" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">E-mail</span><input type="email" placeholder="name@gmail.com" autocomplete="email" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Телефон</span>
+        <span style="display:flex;gap:8px"><select aria-label="Код страны" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:700 17px Manrope,sans-serif;background:#fff;flex:none;width:170px"><option>+972 · Израиль</option><option>+370 · Литва</option><option>+1 · США</option><option>+49 · Германия</option><option>+7 · Россия</option><option>+380 · Украина</option></select><input type="tel" inputmode="numeric" placeholder="50 123 4567" autocomplete="tel-national" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></span>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Ваш вопрос</span><textarea rows="3" placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?" style="min-height:100px;border:2px solid #CFC9BB;border-radius:2px;padding:12px 16px;font:500 17px Manrope,sans-serif;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+
+      <div style="display:flex;flex-direction:column;gap:12px;background:#F7F5F0;border:1px solid #E3DED2;border-radius:2px;padding:14px 16px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:16px">Если уже знаете — так мы поможем быстрее</strong><span style="font-size:14px;color:#6B776F">не обязательно</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Заезд, примерно</span><input type="date" value="{{helpIn}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Выезд, примерно</span><input type="date" value="{{helpOut}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1"><span style="font-weight:700;font-size:15px;color:#3E4B44">Куда хотите поехать</span>
+            <select style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;background:#fff">
+              <template data-for="{{helpDests}}" data-as="hd"><option value="{{hd.v}}" selected="{{hd.sel}}">{{hd.t}}</option></template>
+            </select>
+          </label>
+        </div>
+        <template data-if="{{helpPrefilled}}"><span style="font-size:14px;color:#1F5F4A;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>Заполнили по вашему поиску — можно изменить</span></template>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <span style="font-size:14px;color:#6B776F;max-width:340px">Нужно указать имя и телефон или e-mail. Данные используем только для ответа.</span>
+        <button type="button" onClick="{{helpSendFn}}" style="min-height:58px;padding:0 30px;border:none;border-radius:2px;background:#1F5F4A;color:#fff;font:700 19px Manrope,sans-serif;cursor:pointer">Отправить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:14px;font-size:16px">
+        <span style="color:#3E4B44">Или сразу:</span>
+        <a href="https://wa.me/37060000000" style="font-weight:700;color:#1F5F4A">WhatsApp</a>
+        <a href="tel:+37060000000" style="font-weight:700;color:#1F5F4A;white-space:nowrap">+370&nbsp;600 00000</a>
+      </div>
+    </div>
+    </template>
+
+    <template data-if="{{helpSent}}">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 4px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#1F5F4A;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></span>
+      <strong style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:600">Спасибо! Мы скоро свяжемся с вами</strong>
+      <span style="font-size:17px;color:#3E4B44">Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.</span>
+      <button type="button" onClick="{{helpCloseFn}}" style="min-height:54px;padding:0 26px;border:2px solid #1F5F4A;border-radius:2px;background:#fff;color:#1F5F4A;font:700 18px Manrope,sans-serif;cursor:pointer">Вернуться</button>
+    </div>
+    </template>
+  </div>
+</div>
+</template>
+</template>
+<script src="dc-lite.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { dob: {}, pk: null };
+  }
+  renderVals() {
+    return { ...this._rv(), ...this.helpVals() };
+  }
+  // ---- Support pop-up: same on every page; dates/destination prefilled from the page when known ----
+  helpVals() {
+    const st = this.state || {};
+    const CTX = { hotel: 'Санаторий Эгле Комфорт, Друскининкай', in: '2026-11-09', out: '2026-11-18' };
+    const iso = d => d.toISOString().slice(0, 10);
+    let hin = st.in || st.checkin || CTX.in || '', hout = st.out || CTX.out || '';
+    if (!st.out && st.checkin) { const d = new Date(st.checkin + 'T00:00:00Z'); hout = iso(new Date(d.getTime() + (st.nights || 9) * 86400000)); }
+    const DEST = [['', 'Ещё не знаю — подскажите'], ['druskininkai', 'Друскининкай'], ['birstonas', 'Бирштонас'], ['palanga', 'Паланга'], ['anyksciai', 'Аникщяй']];
+    if (CTX.hotel) DEST.splice(2, 0, ['hotel', CTX.hotel]);
+    const sel = CTX.hotel ? 'hotel' : (CTX.dest || '');
+    const hs = st.help || 'closed';
+    return {
+      helpOpen: hs !== 'closed', helpForm: hs === 'form', helpSent: hs === 'sent',
+      helpOpenFn: () => this.setState({ help: 'form' }), helpCloseFn: () => this.setState({ help: 'closed' }), helpSendFn: () => this.setState({ help: 'sent' }),
+      helpIn: hin, helpOut: hout, helpPrefilled: !!(hin || sel),
+      helpDests: DEST.map(([v, t]) => ({ v, t, sel: v === sel })),
+      helpBottom: CTX.bottom || '24px'
+    };
+  }
+  _rv() {
+    const st = this.state || {};
+    const dob = st.dob || {};
+    const pk = st.pk; // { g: 'g1'|'g2', step: 'year'|'month'|'day', y, m, d, from }
+    const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const MONTHS_N = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    const fmtDob = v => v ? v.d + ' ' + MONTHS[v.m] + ' ' + v.y : 'Выберите дату';
+    const set = patch => this.setState({ pk: { ...pk, ...patch } });
+    // Years: 20 per screen; opens around the 1960s, the typical birth decade of our guests
+    const open = g => () => { const v = dob[g]; this.setState({ pk: { g, step: 'year', y: v ? v.y : null, m: v ? v.m : null, d: v ? v.d : null, from: v ? Math.floor(v.y / 10) * 10 - 10 : 1950 } }); };
+    const vals = {
+      dob1: fmtDob(dob.g1), dob2: fmtDob(dob.g2), dob1Color: dob.g1 ? '#1C2620' : '#8A968F', dob2Color: dob.g2 ? '#1C2620' : '#8A968F',
+      openDob1: open('g1'), openDob2: open('g2'),
+      dobOpen: !!pk, closeDob: () => this.setState({ pk: null })
+    };
+    if (!pk) return { ...vals, dobWho: '', dobHint: '', stYearCls: '', stMonthCls: '', stDayCls: '', yearPicked: '', monthPicked: '', dayPicked: '', monthOff: true, stepYear: false, stepMonth: false, stepDay: false, years: [], months: [], days: [], yearsTitle: '', dayTitle: '', dobSummary: '', backOff: true, doneOff: true, goYear: () => {}, goMonth: () => {}, yearsPrev: () => {}, yearsNext: () => {}, dobBack: () => {}, dobDone: () => {} };
+    const from = pk.from ?? 1950;
+    const years = []; for (let y = from; y < from + 20; y++) years.push({ t: String(y), cls: y === pk.y ? 'on' : '', pick: () => set({ y, step: 'month', d: null }) });
+    const months = MONTHS_N.map((t, i) => ({ t, cls: i === pk.m ? 'on' : '', pick: () => set({ m: i, step: 'day', d: null }) }));
+    const days = [];
+    if (pk.y != null && pk.m != null) {
+      const first = new Date(Date.UTC(pk.y, pk.m, 1)); const lead = (first.getUTCDay() + 6) % 7; const n = new Date(Date.UTC(pk.y, pk.m + 1, 0)).getUTCDate();
+      for (let i = 0; i < lead; i++) days.push({ t: '', cls: '', off: true, border: 'transparent', pick: () => {} });
+      for (let d = 1; d <= n; d++) days.push({ t: String(d), cls: d === pk.d ? 'on' : '', off: false, border: '#CFC9BB', pick: () => set({ d }) });
+    }
+    const complete = pk.y != null && pk.m != null && pk.d != null;
+    const step = pk.step;
+    return {
+      ...vals,
+      dobWho: pk.g === 'g1' ? 'первый гость' : 'второй гость',
+      dobHint: step === 'year' ? 'Сначала выберите год рождения' : step === 'month' ? 'Теперь выберите месяц' : 'И наконец — день',
+      stYearCls: step === 'year' ? 'on' : pk.y != null ? 'done' : '', stMonthCls: step === 'month' ? 'on' : pk.m != null ? 'done' : '', stDayCls: step === 'day' ? 'on' : pk.d != null ? 'done' : '',
+      yearPicked: pk.y != null ? ': ' + pk.y : '', monthPicked: pk.m != null ? ': ' + MONTHS_N[pk.m].toLowerCase() : '', dayPicked: pk.d != null ? ': ' + pk.d : '',
+      monthOff: pk.y == null,
+      goYear: () => set({ step: 'year' }), goMonth: () => { if (pk.y != null) set({ step: 'month' }); },
+      stepYear: step === 'year', stepMonth: step === 'month', stepDay: step === 'day',
+      years, yearsTitle: from + '–' + (from + 19), yearsPrev: () => set({ from: from - 20 }), yearsNext: () => { if (from + 20 <= 2026) set({ from: from + 20 }); },
+      months, days, dayTitle: pk.y != null && pk.m != null ? MONTHS_N[pk.m] + ' ' + pk.y : '',
+      dobSummary: complete ? pk.d + ' ' + MONTHS[pk.m] + ' ' + pk.y : [pk.y, pk.m != null ? MONTHS_N[pk.m].toLowerCase() : null, pk.d].filter(x => x != null).join(' · ') || '—',
+      backOff: step === 'year', dobBack: () => set({ step: step === 'day' ? 'month' : 'year' }),
+      doneOff: !complete, dobDone: () => { if (complete) this.setState({ dob: { ...dob, [pk.g]: { y: pk.y, m: pk.m, d: pk.d } }, pk: null }); }
+    };
+  }
+}
+DC.mount(Component);
+</script>
+</body>
+</html>
