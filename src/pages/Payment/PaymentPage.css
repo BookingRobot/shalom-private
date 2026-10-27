@@ -204,23 +204,6 @@
   border-radius: 2px;
 }
 
-/* Payment method cards */
-.pg-payment .method-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.pg-payment .method-title {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-.pg-payment .method-text {
-  font-size: 16px;
-  line-height: 1.45;
-  color: #3e4b44;
-}
-
 @media (max-width: 480px) {
   .pg-payment .choice {
     padding: 14px;
