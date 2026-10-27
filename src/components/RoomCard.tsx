@@ -1,6 +1,23 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
+/** What every programme in a room offer includes — shown as one compact row of icon + label. */
+const ROOM_INCL = [
+  {
+    t: 'Консультация врача',
+    d: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4',
+  },
+  { t: 'Питание 3 раза в день', d: 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8' },
+  {
+    t: 'Бассейн и сауны',
+    d: 'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6',
+  },
+  {
+    t: 'Процедуры ежедневно',
+    d: 'M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0',
+  },
+];
+
 /**
  * Room offer card (sanatorium page and search results): photo, room facts,
  * price for the stay or "busy on your dates", programmes for this room.
@@ -96,88 +113,26 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           <h3 style={{ fontSize: '22px', color: o.nameColor }}>{o.short}</h3>
           <div style={{ fontSize: '15px', color: '#3E4B44' }}>{o.roomLine}</div>
           <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>{o.progLine}</div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4,minmax(0,1fr))',
-              gap: '10px 18px',
-              marginTop: '8px',
-            }}
-          >
-            <div className="ico2">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4" />
-              </svg>
-              Консультация
-              <br />
-              врача
-            </div>
-            <div className="ico2">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8" />
-              </svg>
-              Питание
-              <br />3 раза в день
-            </div>
-            <div className="ico2">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6" />
-              </svg>
-              Бассейн и сауны
-            </div>
-            <div className="ico2">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
-              </svg>
-              Процедуры
-              <br />
-              ежедневно
-            </div>
-          </div>
+          <ul className="room-incl" aria-label="Входит в программу">
+            {ROOM_INCL.map((it) => (
+              <li key={it.t}>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1F5F4A"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d={it.d} />
+                </svg>
+                {it.t}
+              </li>
+            ))}
+          </ul>
         </div>
         <div
           style={{
