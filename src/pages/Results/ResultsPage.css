@@ -341,6 +341,9 @@
 @media (max-width: 480px) {
   /* keep the indent small on phones */
   .pg-results .rooms-indent {
-    padding-left: 30px !important;
+    padding-left: 26px !important;
+  }
+  .pg-results .rooms-guide {
+    left: 10px !important;
   }
 }

@@ -1745,6 +1745,7 @@ export default function ResultsPage() {
                   {h.open ? (
                     <>
                       <div
+                        className="rooms-indent"
                         style={{
                           position: 'relative',
                           padding: '14px 14px 18px 48px',
@@ -1758,6 +1759,7 @@ export default function ResultsPage() {
                         {/* rooms of this sanatorium: indented with a guide line so the next sanatorium is not mistaken for a room */}
                         <span
                           aria-hidden="true"
+                          className="rooms-guide"
                           style={{
                             position: 'absolute',
                             left: '24px',
