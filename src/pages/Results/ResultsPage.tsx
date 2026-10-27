@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -925,44 +926,7 @@ export default function ResultsPage() {
                   <label className="lbl" htmlFor="guests">
                     Гости
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 21a8 8 0 0 1 16 0" />
-                    </svg>
-                    <select id="guests" className="input sinput">
-                      <option>2 взрослых</option>
-                      <option>1 взрослый</option>
-                      <option>2 взрослых, 1 ребёнок</option>
-                      <option>2 взрослых, 2 ребёнка</option>
-                      <option>3 взрослых</option>
-                      <option>4 взрослых</option>
-                    </select>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      aria-hidden="true"
-                      style={{ position: 'absolute', right: '12px', top: '16px', pointerEvents: 'none' }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
+                  <GuestsPicker inputClass="input sinput" />
                 </div>
                 <Link className="btn btn-primary" to="/results" style={{ minHeight: '50px' }}>
                   <svg

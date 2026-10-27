@@ -56,3 +56,82 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .room-incl svg {
   flex: none;
 }
+
+/* Guests picker pop-over (search forms): +/− steppers for adults and children */
+.page .gp-pop {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max(100%, 290px);
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border: 1px solid #cfc9bb;
+  border-radius: 3px;
+  box-shadow: 0 12px 32px rgba(28, 38, 32, 0.18);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #1c2620;
+  text-align: left;
+}
+.page .gp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.page .gp-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.page .gp-name strong {
+  font-size: 17px;
+}
+.page .gp-name span {
+  font-size: 14px;
+  color: #5e6862;
+}
+.page .gp-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.page .gp-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #1f5f4a;
+  border-radius: 50%;
+  background: #fff;
+  color: #1f5f4a;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page .gp-btn:hover:not(:disabled) {
+  background: #eef5f1;
+}
+.page .gp-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.page .gp-num {
+  min-width: 22px;
+  text-align: center;
+  font-size: 19px;
+}
+.page .gp-sep {
+  height: 1px;
+  background: #e3ded2;
+}
+.page .gp-done {
+  min-height: 44px;
+  font-size: 16px;
+}

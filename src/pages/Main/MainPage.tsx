@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
@@ -7,7 +8,7 @@ import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
 import { isFlightDay } from '../../data/flights';
 import { api } from '../../api';
-import { GUEST_OPTIONS, RESORTS, guestsKey, parseGuests } from '../../data/search';
+import { RESORTS } from '../../data/search';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -140,8 +141,6 @@ class MainLogic extends PageLogic {
       dest: booking.dest,
       destOptions: RESORTS,
       setDest: (e) => update({ dest: e.target.value }),
-      guests: guestsKey(booking),
-      setGuests: (e) => update(parseGuests(e.target.value)),
       inLabel: longDate(inD),
       outLabel: longDate(outD),
       nightsLabel: curNights + ' ' + nightsWord(curNights),
@@ -381,43 +380,7 @@ export default function MainPage() {
                   <label className="lbl" htmlFor="guests">
                     Гости
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 21a8 8 0 0 1 16 0" />
-                    </svg>
-                    <select id="guests" className="input" value={v.guests} onChange={v.setGuests}>
-                      {GUEST_OPTIONS.map((g) => (
-                        <option key={g.value} value={g.value}>
-                          {g.label}
-                        </option>
-                      ))}
-                    </select>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      aria-hidden="true"
-                      style={{ position: 'absolute', right: '12px', top: '16px', pointerEvents: 'none' }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
+                  <GuestsPicker inputClass="input" />
                 </div>
                 <Link className="btn btn-primary" to="/results" style={{ minHeight: '50px' }}>
                   <svg
