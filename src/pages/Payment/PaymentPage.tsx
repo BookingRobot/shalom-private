@@ -292,17 +292,6 @@ export default function PaymentPage() {
                       </svg>
                       Защищённая форма оплаты
                     </span>
-                    <span
-                      style={{
-                        fontSize: '16px',
-                        fontWeight: '700',
-                        color: '#5E6862',
-                        textTransform: 'uppercase',
-                        letterSpacing: '.04em',
-                      }}
-                    >
-                      [iframe Tranzila]
-                    </span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
