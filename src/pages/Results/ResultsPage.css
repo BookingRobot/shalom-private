@@ -337,3 +337,10 @@
   border-radius: 2px;
   display: inline-block;
 }
+
+@media (max-width: 480px) {
+  /* keep the indent small on phones */
+  .pg-results .rooms-indent {
+    padding-left: 30px !important;
+  }
+}
