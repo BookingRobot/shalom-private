@@ -11,7 +11,7 @@ type Tone = 'light' | 'dark';
  *   <HeaderBar><Brand /><MainNav active="resorts" /><PhoneLink /></HeaderBar>
  */
 export function HeaderBar({
-  minHeight = 72,
+  minHeight = 64,
   tone = 'light',
   children,
 }: {
@@ -45,8 +45,8 @@ export function HeaderBar({
 
 /** Logo + site name, links to the home page. */
 export function Brand({
-  logo = 38,
-  size = 23,
+  logo = 32,
+  size = 21,
   gap = 12,
   tone = 'light',
   name = SITE_NAME,
@@ -121,8 +121,8 @@ export function MainNav({
 
 /** Clickable phone number. */
 export function PhoneLink({
-  size = 20,
-  icon = 22,
+  size = 18,
+  icon = 20,
   gap = 10,
   tone = 'light',
 }: {

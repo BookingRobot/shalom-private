@@ -302,8 +302,8 @@ export default function FlightsPage() {
   return (
     <div className="page pg-flights">
       <div dir={v.dir} style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} name={v.t?.brand} />
+        <HeaderBar>
+          <Brand name={v.t?.brand} />
           <HeaderAside>
             <span style={{ display: 'flex', gap: '4px' }} aria-label="Язык / Language">
               {(v.langs || []).map((l: any) => (
@@ -318,7 +318,7 @@ export default function FlightsPage() {
                 </button>
               ))}
             </span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         <CheckoutSteps
@@ -387,12 +387,12 @@ export default function FlightsPage() {
                   </svg>
                 </div>
                 <div style={{ flex: '1 1 520px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <h1 style={{ fontSize: '34px' }}>{v.t?.offTitle}</h1>
-                  <p style={{ margin: '0', fontSize: '19px' }}>{v.t?.offLead}</p>
+                  <h1 style={{ fontSize: '32px' }}>{v.t?.offTitle}</h1>
+                  <p style={{ margin: '0', fontSize: '18px' }}>{v.t?.offLead}</p>
                 </div>
               </section>
               <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <h2 style={{ fontSize: '30px' }}>{v.t?.qTitle}</h2>
+                <h2 style={{ fontSize: '26px' }}>{v.t?.qTitle}</h2>
                 <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44' }}>{v.t?.qLead}</p>
                 <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'stretch' }}>
                   <div
@@ -453,18 +453,18 @@ export default function FlightsPage() {
                       <span
                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.15' }}
                       >
-                        <strong style={{ fontSize: '30px', whiteSpace: 'nowrap' }}>+{v.fTotal}</strong>
+                        <strong style={{ fontSize: '26px', whiteSpace: 'nowrap' }}>+{v.fTotal}</strong>
                         <span style={{ fontSize: '14px', color: '#D9E2DC' }}>{v.t?.forTwo}</span>
                       </span>
                     </div>
-                    <h3 style={{ fontSize: '28px', color: '#fff' }}>{v.t?.yTitle}</h3>
+                    <h3 style={{ fontSize: '24px', color: '#fff' }}>{v.t?.yTitle}</h3>
                     <p style={{ margin: '0', fontSize: '17px', color: '#E6F0EA', flex: '1' }}>{v.yText}</p>{' '}
                     <button
                       type="button"
                       onClick={v.pickYes}
                       style={{
                         minHeight: '64px',
-                        font: '800 20px Manrope,sans-serif',
+                        font: '800 18px Manrope,sans-serif',
                         width: '100%',
                         border: 'none',
                         borderRadius: '2px',
@@ -503,13 +503,13 @@ export default function FlightsPage() {
                         <path d="M3 7h18v10H3zM15 7v10M7 11h4M7 14h3" />
                       </svg>
                     </div>
-                    <h3 style={{ fontSize: '21px' }}>{v.t?.nTitle}</h3>
+                    <h3 style={{ fontSize: '20px' }}>{v.t?.nTitle}</h3>
                     <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44', flex: '1' }}>{v.t?.nText}</p>{' '}
                     <button
                       type="button"
                       className={`btn ${v.noBtn ?? ''}`}
                       onClick={v.pickNo}
-                      style={{ minHeight: '54px', fontSize: '17px', width: '100%' }}
+                      style={{ minHeight: '48px', fontSize: '17px', width: '100%' }}
                     >
                       {v.noLabel}
                     </button>
@@ -531,7 +531,7 @@ export default function FlightsPage() {
                       }}
                     >
                       <span style={{ fontSize: '17px' }}>{v.decisionLine}</span>
-                      <Link className="btn btn-primary" to="/payment" style={{ minHeight: '58px', fontSize: '19px' }}>
+                      <Link className="btn btn-primary" to="/payment" style={{ minHeight: '50px', fontSize: '18px' }}>
                         {v.t?.toPay} →
                       </Link>
                     </div>
@@ -591,7 +591,7 @@ export default function FlightsPage() {
                     {v.t?.offFlights}
                   </span>
                   <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
-                    <strong style={{ fontSize: '30px', color: '#1C2620', whiteSpace: 'nowrap' }}>{v.fPpp}</strong>
+                    <strong style={{ fontSize: '26px', color: '#1C2620', whiteSpace: 'nowrap' }}>{v.fPpp}</strong>
                     <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.t?.offPpp}</span>
                   </span>
                 </div>{' '}
@@ -658,8 +658,8 @@ export default function FlightsPage() {
                         <div
                           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '110px' }}
                         >
-                          <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.from}</strong>
-                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.dep}</span>
+                          <strong style={{ fontSize: '26px', lineHeight: '1' }}>{g.from}</strong>
+                          <span style={{ fontSize: '20px', fontWeight: '800', color: '#1F5F4A' }}>{g.dep}</span>
                           <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
                           <span style={{ fontSize: '14px', color: '#5E6862' }}>{g.fromCity}</span>
                         </div>
@@ -692,8 +692,8 @@ export default function FlightsPage() {
                         <div
                           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '110px' }}
                         >
-                          <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.to}</strong>
-                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.arr}</span>
+                          <strong style={{ fontSize: '26px', lineHeight: '1' }}>{g.to}</strong>
+                          <span style={{ fontSize: '20px', fontWeight: '800', color: '#1F5F4A' }}>{g.arr}</span>
                           <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
                           <span style={{ fontSize: '14px', color: '#5E6862' }}>{g.toCity}</span>
                         </div>
@@ -805,8 +805,8 @@ export default function FlightsPage() {
                   </svg>
                 </div>
                 <div style={{ flex: '1 1 520px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <h1 style={{ fontSize: '34px' }}>{v.t?.title}</h1>
-                  <p style={{ margin: '0', fontSize: '19px', color: '#1C2620' }}>{v.t?.lead}</p>
+                  <h1 style={{ fontSize: '32px' }}>{v.t?.title}</h1>
+                  <p style={{ margin: '0', fontSize: '18px', color: '#1C2620' }}>{v.t?.lead}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '4px' }}>
                     {(v.dateChips || []).map((d: any, _i0: number) => (
                       <Fragment key={_i0}>
@@ -859,12 +859,12 @@ export default function FlightsPage() {
                       <path d="m5 12 5 5L20 7" />
                     </svg>
                   </div>
-                  <h2 style={{ fontSize: '26px' }}>{v.t?.aTitle}</h2>
+                  <h2 style={{ fontSize: '23px' }}>{v.t?.aTitle}</h2>
                   <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44', flex: '1' }}>{v.t?.aText}</p>{' '}
                   <Link
                     className="btn btn-primary"
                     to="/payment"
-                    style={{ minHeight: '60px', fontSize: '19px', marginTop: '6px' }}
+                    style={{ minHeight: '52px', fontSize: '18px', marginTop: '6px' }}
                   >
                     {v.t?.aBtn} →
                   </Link>
@@ -896,7 +896,7 @@ export default function FlightsPage() {
                       <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
                     </svg>
                   </div>
-                  <h2 style={{ fontSize: '26px' }}>{v.t?.bTitle}</h2>
+                  <h2 style={{ fontSize: '23px' }}>{v.t?.bTitle}</h2>
                   <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44', flex: '1' }}>{v.t?.bText}</p>{' '}
                   {v.bIdle ? (
                     <>
@@ -904,7 +904,7 @@ export default function FlightsPage() {
                         type="button"
                         className="btn btn-secondary"
                         onClick={v.openB}
-                        style={{ minHeight: '60px', fontSize: '19px', marginTop: '6px', width: '100%' }}
+                        style={{ minHeight: '52px', fontSize: '18px', marginTop: '6px', width: '100%' }}
                       >
                         {v.t?.bBtn}
                       </button>
@@ -936,7 +936,7 @@ export default function FlightsPage() {
                     flexWrap: 'wrap',
                   }}
                 >
-                  <h2 style={{ fontSize: '26px' }}>{v.t?.fTitle}</h2>
+                  <h2 style={{ fontSize: '23px' }}>{v.t?.fTitle}</h2>
                   <button
                     type="button"
                     onClick={v.closeB}
@@ -1035,7 +1035,7 @@ export default function FlightsPage() {
                     type="button"
                     className="btn btn-primary"
                     onClick={v.sendB}
-                    style={{ minHeight: '60px', fontSize: '19px' }}
+                    style={{ minHeight: '52px', fontSize: '18px' }}
                   >
                     {v.t?.fSend}
                   </button>
@@ -1085,7 +1085,7 @@ export default function FlightsPage() {
                   </svg>
                 </div>
                 <div style={{ flex: '1 1 420px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <h2 style={{ fontSize: '26px' }}>{v.t?.okTitle}</h2>
+                  <h2 style={{ fontSize: '23px' }}>{v.t?.okTitle}</h2>
                   <p style={{ margin: '0', fontSize: '17px' }}>{v.okText}</p>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
                     <Link className="btn btn-primary" to="/payment">
@@ -1129,10 +1129,10 @@ export default function FlightsPage() {
                   <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
                 </svg>
                 <div style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 style={{ fontSize: '26px' }}>{v.t?.goodTitle}</h2>
+                  <h2 style={{ fontSize: '23px' }}>{v.t?.goodTitle}</h2>
                   <span style={{ fontSize: '17px' }}>{v.goodText}</span>
                 </div>
-                <Link className="btn btn-primary" to="/payment" style={{ minHeight: '60px', fontSize: '19px' }}>
+                <Link className="btn btn-primary" to="/payment" style={{ minHeight: '52px', fontSize: '18px' }}>
                   {v.t?.goodBtn} →
                 </Link>
               </section>
@@ -1208,10 +1208,10 @@ export default function FlightsPage() {
               >
                 {v.t?.kept}
               </span>
-              <strong style={{ fontSize: '19px' }}>Эгле Комфорт ★★★★ · {v.rangeLabel}</strong>
+              <strong style={{ fontSize: '18px' }}>Эгле Комфорт ★★★★ · {v.rangeLabel}</strong>
               <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.t?.keptLine}</span>
             </div>
-            <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.orderTotal}</strong>
+            <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>{v.orderTotal}</strong>
           </section>
         </div>
         <SiteFooter
@@ -1262,7 +1262,7 @@ export default function FlightsPage() {
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="fcTitle" style={{ fontSize: '30px' }}>
+                  <h2 id="fcTitle" style={{ fontSize: '26px' }}>
                     {v.t?.calTitle}
                   </h2>
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.calHint}</span>
@@ -1313,13 +1313,13 @@ export default function FlightsPage() {
                   paddingTop: '16px',
                 }}
               >
-                <strong style={{ fontSize: '19px' }}>{v.selLine}</strong>
+                <strong style={{ fontSize: '18px' }}>{v.selLine}</strong>
                 <button
                   type="button"
                   className="btn btn-primary"
                   onClick={v.applyCal}
                   disabled={!!v.applyOff}
-                  style={{ minHeight: '56px', fontSize: '18px' }}
+                  style={{ minHeight: '50px', fontSize: '18px' }}
                 >
                   {v.t?.apply}
                 </button>

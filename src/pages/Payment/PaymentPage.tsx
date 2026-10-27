@@ -99,8 +99,8 @@ export default function PaymentPage() {
   return (
     <div className="page pg-payment">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <HeaderAside>
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', color: '#3E4B44' }}>
               <svg
@@ -119,7 +119,7 @@ export default function PaymentPage() {
               </svg>
               Защищённая оплата
             </span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         <CheckoutSteps current={5} />
@@ -143,7 +143,7 @@ export default function PaymentPage() {
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '38px' }}>Как вам удобнее оплатить?</h1>
+              <h1 style={{ fontSize: '32px' }}>Как вам удобнее оплатить?</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
                 Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
               </p>
@@ -153,7 +153,7 @@ export default function PaymentPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <h2 style={{ fontSize: '28px' }}>Сумма к оплате сейчас</h2>
+              <h2 style={{ fontSize: '24px' }}>Сумма к оплате сейчас</h2>
               <div
                 style={{
                   display: 'grid',
@@ -240,7 +240,7 @@ export default function PaymentPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}
             >
-              <h2 style={{ fontSize: '28px' }}>Способ оплаты</h2>
+              <h2 style={{ fontSize: '24px' }}>Способ оплаты</h2>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <button
                   type="button"
@@ -381,7 +381,7 @@ export default function PaymentPage() {
                               display: 'flex',
                               alignItems: 'center',
                               color: '#6B776F',
-                              fontSize: '20px',
+                              fontSize: '18px',
                               letterSpacing: '.06em',
                             }}
                           >
@@ -392,7 +392,7 @@ export default function PaymentPage() {
                           <span className="lbl">Срок</span>
                           <div
                             className="input"
-                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '20px' }}
+                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
                           >
                             ММ / ГГ
                           </div>
@@ -401,7 +401,7 @@ export default function PaymentPage() {
                           <span className="lbl">CVV</span>
                           <div
                             className="input"
-                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '20px' }}
+                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
                           >
                             •••
                           </div>
@@ -523,7 +523,7 @@ export default function PaymentPage() {
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: '1 1 300px' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
-                              <strong style={{ fontSize: '22px' }}>
+                              <strong style={{ fontSize: '20px' }}>
                                 К оплате в Bit: <span style={{ whiteSpace: 'nowrap' }}>{v.bitIls}</span>
                               </strong>
                               <span style={{ fontSize: '16px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
@@ -606,7 +606,7 @@ export default function PaymentPage() {
                   flexWrap: 'wrap',
                 }}
               >
-                <h2 style={{ fontSize: '28px' }}>Если планы изменятся</h2>
+                <h2 style={{ fontSize: '24px' }}>Если планы изменятся</h2>
                 <Link to="/rules" style={{ fontWeight: '700', fontSize: '16px' }}>
                   Полные условия бронирования →
                 </Link>
@@ -718,7 +718,7 @@ export default function PaymentPage() {
               <Link
                 className="btn btn-primary"
                 to="/done"
-                style={{ minHeight: '68px', fontSize: '22px', padding: '0 44px' }}
+                style={{ minHeight: '68px', fontSize: '20px', padding: '0 44px' }}
               >
                 {' '}
                 <svg
@@ -775,7 +775,7 @@ export default function PaymentPage() {
                   }}
                 >
                   <span>Платите сейчас</span>
-                  <strong style={{ fontSize: '28px', fontWeight: '800', whiteSpace: 'nowrap' }}>{v.amount}</strong>
+                  <strong style={{ fontSize: '24px', fontWeight: '800', whiteSpace: 'nowrap' }}>{v.amount}</strong>
                 </div>
                 <div style={{ fontSize: '16px', lineHeight: '1.5', color: '#3E4B44' }}>{v.rest}</div>
               </div>

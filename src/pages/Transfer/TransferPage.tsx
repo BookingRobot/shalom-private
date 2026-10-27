@@ -164,11 +164,11 @@ export default function TransferPage() {
   return (
     <div className="page pg-transfer">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <HeaderAside>
             <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         {/* Steps */}
@@ -188,7 +188,7 @@ export default function TransferPage() {
           {/* Main column */}
           <div style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '36px' }}>Нужен ли вам трансфер до санатория?</h1>
+              <h1 style={{ fontSize: '32px' }}>Нужен ли вам трансфер до санатория?</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
                 Встретим с табличкой, поможем с багажом и довезём прямо до стойки регистрации санатория «Эгле Комфорт» в
                 Друскининкай.
@@ -207,7 +207,7 @@ export default function TransferPage() {
                   <i />
                 </span>{' '}
                 <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '20px' }}>Да, нужен трансфер</strong>
+                  <strong style={{ fontSize: '18px' }}>Да, нужен трансфер</strong>
                   <span style={{ color: '#3E4B44', fontSize: '16px' }}>
                     Заберём из аэропорта, с вокзала или от отеля
                   </span>
@@ -219,7 +219,7 @@ export default function TransferPage() {
                   <i />
                 </span>{' '}
                 <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '20px' }}>Нет, доберусь сам</strong>
+                  <strong style={{ fontSize: '18px' }}>Нет, доберусь сам</strong>
                   <span style={{ color: '#3E4B44', fontSize: '16px' }}>На машине или общественным транспортом</span>
                 </span>{' '}
               </button>
@@ -269,7 +269,7 @@ export default function TransferPage() {
                       >
                         <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                       </svg>
-                      <h2 id="noTitle" style={{ fontSize: '26px' }}>
+                      <h2 id="noTitle" style={{ fontSize: '23px' }}>
                         Вы уверены, что доберётесь сами?
                       </h2>
                     </div>
@@ -298,7 +298,7 @@ export default function TransferPage() {
                         type="button"
                         className="btn btn-primary"
                         onClick={v.keepTransfer}
-                        style={{ minHeight: '60px', fontSize: '19px' }}
+                        style={{ minHeight: '52px', fontSize: '18px' }}
                       >
                         Нет, добавить трансфер
                       </button>
@@ -531,7 +531,7 @@ export default function TransferPage() {
                     ) : null}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h2 style={{ fontSize: '26px' }}>Откуда вас забрать {v.inDay}?</h2>
+                    <h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>
                     <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
                       Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2 часов.
                     </p>
@@ -556,7 +556,7 @@ export default function TransferPage() {
                             <i />
                           </span>{' '}
                           <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <strong style={{ fontSize: '19px' }}>{c.from}</strong>
+                            <strong style={{ fontSize: '18px' }}>{c.from}</strong>
                             <span style={{ color: '#3E4B44', fontSize: '15px' }}>{c.info}</span>
                           </span>{' '}
                         </button>
@@ -690,7 +690,7 @@ export default function TransferPage() {
                       </span>
                       <span style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 300px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <strong style={{ fontSize: '21px' }}>Групповой трансфер</strong>
+                          <strong style={{ fontSize: '20px' }}>Групповой трансфер</strong>
                           <span
                             style={{
                               background: '#1F5F4A',
@@ -720,7 +720,7 @@ export default function TransferPage() {
                           flex: '0 0 auto',
                         }}
                       >
-                        <strong style={{ fontSize: '28px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
+                        <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
                         <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
                           с человека, в одну сторону
                         </span>
@@ -768,7 +768,7 @@ export default function TransferPage() {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '14px',
-                        minHeight: '60px',
+                        minHeight: '52px',
                         padding: '12px 16px',
                         border: `2px solid ${v.indBorder ?? ''}`,
                         background: '#fff',
@@ -839,11 +839,11 @@ export default function TransferPage() {
                                     />
                                   </span>
                                   <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                    <strong style={{ fontSize: '19px' }}>{k.name}</strong>
+                                    <strong style={{ fontSize: '18px' }}>{k.name}</strong>
                                     <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
                                   </span>
                                 </span>{' '}
-                                <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>
+                                <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>
                                   {k.price}&nbsp;€
                                 </strong>{' '}
                               </button>
@@ -885,7 +885,7 @@ export default function TransferPage() {
                         style={{ width: '26px', height: '26px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
                       />
                       <span>
-                        <strong style={{ fontSize: '20px' }}>
+                        <strong style={{ fontSize: '18px' }}>
                           Обратный трансфер {v.outDay}, {v.outWeekday}
                         </strong>
                         <br />
@@ -954,7 +954,7 @@ export default function TransferPage() {
                                         type="button"
                                         className={`choice ${c.cls ?? ''}`}
                                         onClick={c.pick}
-                                        style={{ minHeight: '56px', padding: '12px 16px' }}
+                                        style={{ minHeight: '50px', padding: '12px 16px' }}
                                       >
                                         {' '}
                                         <span className={`radio ${c.cls ?? ''}`}>
@@ -1091,7 +1091,7 @@ export default function TransferPage() {
                     borderColor: '#C8DED3',
                   }}
                 >
-                  <div style={{ fontWeight: '800', fontSize: '19px' }}>Хорошо, трансфер не добавляем</div>
+                  <div style={{ fontWeight: '800', fontSize: '18px' }}>Хорошо, трансфер не добавляем</div>
                   <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
                     Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно
                     добавить позже — просто позвоните.
@@ -1114,7 +1114,7 @@ export default function TransferPage() {
               <Link
                 className="btn btn-primary"
                 to="/guests"
-                style={{ minHeight: '64px', fontSize: '21px', padding: '0 40px' }}
+                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
               >
                 Далее: данные гостей →
               </Link>

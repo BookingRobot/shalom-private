@@ -449,7 +449,7 @@ export default function HotelPage() {
         <HeaderBar>
           <Brand />
           <MainNav />
-          <PhoneLink size={19} />
+          <PhoneLink />
         </HeaderBar>
         <div
           style={{
@@ -476,8 +476,8 @@ export default function HotelPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <h1 style={{ fontSize: '40px' }}>Санаторий Эгле Комфорт</h1>
-                <span style={{ color: '#8A6500', fontSize: '22px', letterSpacing: '1px' }} aria-label="4 звезды">
+                <h1 style={{ fontSize: '32px' }}>Санаторий Эгле Комфорт</h1>
+                <span style={{ color: '#8A6500', fontSize: '20px', letterSpacing: '1px' }} aria-label="4 звезды">
                   ★★★★
                 </span>
               </div>
@@ -701,7 +701,7 @@ export default function HotelPage() {
                     borderBottom: '1px solid rgba(255,255,255,.12)',
                   }}
                 >
-                  <div style={{ color: '#fff', fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '600' }}>
+                  <div style={{ color: '#fff', fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '600' }}>
                     Санаторий Эгле Комфорт — все фото ({v.photoCount})
                   </div>
                   <button
@@ -896,7 +896,7 @@ export default function HotelPage() {
                     >
                       Ваши даты
                     </span>
-                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', lineHeight: '1.15' }}>
+                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', lineHeight: '1.15' }}>
                       {v.dateRange}
                     </strong>
                   </div>
@@ -929,7 +929,7 @@ export default function HotelPage() {
                 </button>
               </div>
               <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
-                <h2 style={{ fontSize: '32px' }}>Выберите номер</h2>
+                <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
                 <div style={{ fontSize: '16px', color: '#3E4B44' }}>
                   Цена за весь заезд для двух гостей — с самой доступной программой. Программу можно улучшить внутри
                   карточки номера.
@@ -1478,7 +1478,7 @@ export default function HotelPage() {
                           <span
                             style={{
                               fontFamily: 'Lora,Georgia,serif',
-                              fontSize: '30px',
+                              fontSize: '26px',
                               fontWeight: '600',
                               lineHeight: '1',
                               color: '#1C2620',
@@ -1542,7 +1542,7 @@ export default function HotelPage() {
                           <span
                             style={{
                               fontFamily: 'Lora,Georgia,serif',
-                              fontSize: '30px',
+                              fontSize: '26px',
                               fontWeight: '600',
                               lineHeight: '1',
                               color: '#1C2620',
@@ -1731,7 +1731,7 @@ export default function HotelPage() {
                   <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
                 </svg>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '21px' }}>
+                  <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>
                     Поможем выбрать программу
                   </strong>
                   <span style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -1764,7 +1764,7 @@ export default function HotelPage() {
                   <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
                 </svg>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none' }}>
+                  <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '18px', textDecoration: 'none' }}>
                     +370&nbsp;600 00000
                   </a>
                   <span style={{ fontSize: '14px', color: '#3E4B44' }}>
@@ -1813,7 +1813,7 @@ export default function HotelPage() {
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '32px' }}>
+                  <h2 id="calTitle" style={{ fontSize: '28px' }}>
                     Когда дешевле? Выберите даты
                   </h2>
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>
@@ -2033,7 +2033,7 @@ export default function HotelPage() {
                   className="btn btn-primary"
                   onClick={v.applyCal}
                   disabled={!!v.applyOff}
-                  style={{ minHeight: '56px', fontSize: '18px', padding: '0 32px' }}
+                  style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                 >
                   Применить новые даты
                 </button>

@@ -810,7 +810,7 @@ export default function ResultsPage() {
         <HeaderBar>
           <Brand />
           <MainNav active="resorts" />
-          <PhoneLink size={19} />
+          <PhoneLink />
         </HeaderBar>
         {/* Search band: same picker as on the home page */}
         <section style={{ background: '#1F5F4A' }}>
@@ -1008,7 +1008,7 @@ export default function ResultsPage() {
             <Link to="/">Главная</Link> › Друскининкай
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h1 style={{ fontSize: '40px' }}>Санатории Друскининкая</h1>
+            <h1 style={{ fontSize: '32px' }}>Санатории Друскининкая</h1>
             <div style={{ fontSize: '17px', color: '#3E4B44' }}>
               {v.dateRange} · {v.nightsLabel} · 2 взрослых
             </div>
@@ -1046,7 +1046,7 @@ export default function ResultsPage() {
                     <circle cx="18" cy="17" r="2" />
                   </svg>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ fontSize: '24px' }}>Уточните выбор</h2>
+                    <h2 style={{ fontSize: '22px' }}>Уточните выбор</h2>
                     <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.appliedSummary}</span>
                   </div>
                 </div>
@@ -1090,7 +1090,7 @@ export default function ResultsPage() {
                   style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <h2 style={{ fontSize: '28px' }}>Уточните выбор</h2>
+                    <h2 style={{ fontSize: '24px' }}>Уточните выбор</h2>
                     <span style={{ fontSize: '16px', color: '#3E4B44' }}>Отметьте, что для вас важно</span>
                   </div>
                   <button type="button" className="acc" onClick={v.closeF} style={{ minHeight: '40px' }}>
@@ -1149,7 +1149,7 @@ export default function ResultsPage() {
                         type="button"
                         className="acc"
                         onClick={v.toggleMore}
-                        style={{ fontSize: '19px', fontFamily: 'Lora,Georgia,serif', color: '#1C2620', gap: '12px' }}
+                        style={{ fontSize: '18px', fontFamily: 'Lora,Georgia,serif', color: '#1C2620', gap: '12px' }}
                       >
                         <span>Дополнительные фильтры</span>
                         <svg
@@ -1395,7 +1395,7 @@ export default function ResultsPage() {
                     type="button"
                     className="btn btn-primary"
                     onClick={v.apply}
-                    style={{ minHeight: '54px', fontSize: '18px', padding: '0 28px' }}
+                    style={{ minHeight: '48px', fontSize: '18px', padding: '0 22px' }}
                   >
                     {v.applyLabel}
                   </button>
@@ -1474,7 +1474,7 @@ export default function ResultsPage() {
               flexWrap: 'wrap',
             }}
           >
-            <h2 style={{ fontSize: '28px' }}>{v.foundLabel}</h2>
+            <h2 style={{ fontSize: '24px' }}>{v.foundLabel}</h2>
             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', color: '#3E4B44' }}>
               Сортировка:
               <select
@@ -1511,7 +1511,7 @@ export default function ResultsPage() {
                     alignItems: 'flex-start',
                   }}
                 >
-                  <div style={{ fontWeight: '800', fontSize: '22px' }}>По этим условиям ничего не нашлось</div>
+                  <div style={{ fontWeight: '800', fontSize: '20px' }}>По этим условиям ничего не нашлось</div>
                   <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
                     Снимите одно из условий — или позвоните, подберём вручную.
                   </p>
@@ -1564,7 +1564,7 @@ export default function ResultsPage() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
-                        <h2 style={{ fontSize: '26px' }}>
+                        <h2 style={{ fontSize: '23px' }}>
                           <Link to="/hotel" style={{ textDecoration: 'none', color: '#1C2620' }}>
                             {h.name}
                           </Link>
@@ -1601,7 +1601,7 @@ export default function ResultsPage() {
                         >
                           <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
                         </svg>
-                        <span style={{ fontSize: '20px', fontWeight: '800', color: '#1C2620', lineHeight: '1.15' }}>
+                        <span style={{ fontSize: '18px', fontWeight: '800', color: '#1C2620', lineHeight: '1.15' }}>
                           {h.procT}
                         </span>
                       </div>
@@ -1679,7 +1679,7 @@ export default function ResultsPage() {
                     >
                       <span
                         style={{
-                          fontSize: '32px',
+                          fontSize: '28px',
                           fontWeight: '800',
                           color: '#1C2620',
                           whiteSpace: 'nowrap',
@@ -1814,7 +1814,7 @@ export default function ResultsPage() {
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h2 style={{ fontSize: '28px', color: '#3E4B44' }}>Нет свободных мест на ваши даты · {v.soldCount}</h2>
+                <h2 style={{ fontSize: '24px', color: '#3E4B44' }}>Нет свободных мест на ваши даты · {v.soldCount}</h2>
                 <span style={{ fontSize: '16px', color: '#5E6862' }}>
                   На {v.dateRange} эти санатории заняты. Описание можно посмотреть, а забронировать — на другие даты.
                 </span>
@@ -1886,7 +1886,7 @@ export default function ResultsPage() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
-                      <h3 style={{ fontSize: '23px', color: '#3E4B44' }}>
+                      <h3 style={{ fontSize: '20px', color: '#3E4B44' }}>
                         <Link to="/hotel" style={{ color: '#3E4B44', textDecoration: 'none' }}>
                           {u.name}
                         </Link>
@@ -1987,7 +1987,7 @@ export default function ResultsPage() {
                 <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '21px' }}>Поможем выбрать</strong>
+                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>Поможем выбрать</strong>
                 <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                   Подскажем, какой санаторий подойдёт именно вам
                 </span>
@@ -2018,7 +2018,7 @@ export default function ResultsPage() {
                 <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none' }}>
+                <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '18px', textDecoration: 'none' }}>
                   +370&nbsp;600 00000
                 </a>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>
@@ -2067,10 +2067,10 @@ export default function ResultsPage() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '38px' }}>
+                  <h2 id="calTitle" style={{ fontSize: '32px' }}>
                     Выберите дату заезда
                   </h2>
-                  <div style={{ fontSize: '24px', color: '#1C2620' }}>{v.cal?.hotelName}</div>
+                  <div style={{ fontSize: '22px', color: '#1C2620' }}>{v.cal?.hotelName}</div>
                 </div>
                 <button
                   type="button"
@@ -2082,7 +2082,7 @@ export default function ResultsPage() {
                     border: 'none',
                     background: 'none',
                     cursor: 'pointer',
-                    fontSize: '30px',
+                    fontSize: '26px',
                     lineHeight: '1',
                     color: '#1C2620',
                   }}
@@ -2113,7 +2113,7 @@ export default function ResultsPage() {
                   background: '#EEF5F1',
                   borderRadius: '2px',
                   padding: '12px 16px',
-                  fontSize: '19px',
+                  fontSize: '18px',
                   color: '#1F5F4A',
                   fontWeight: '700',
                 }}
@@ -2138,7 +2138,7 @@ export default function ResultsPage() {
                 <div
                   style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '8px' }}
                 >
-                  <div style={{ fontSize: '24px', fontWeight: '800' }}>Средняя цена за 1 человека в сутки</div>
+                  <div style={{ fontSize: '22px', fontWeight: '800' }}>Средняя цена за 1 человека в сутки</div>
                   <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-6px' }}>
                     При заезде в выбранный день на {v.nightsLabel}.
                   </div>
@@ -2166,12 +2166,12 @@ export default function ResultsPage() {
                           background: '#fff',
                           cursor: 'pointer',
                           borderRadius: '2px',
-                          fontSize: '22px',
+                          fontSize: '20px',
                         }}
                       >
                         ‹
                       </button>
-                      <div style={{ fontSize: '24px', fontWeight: '800' }}>{v.cal?.monthTitle}</div>
+                      <div style={{ fontSize: '22px', fontWeight: '800' }}>{v.cal?.monthTitle}</div>
                       <button
                         type="button"
                         onClick={v.calNext}
@@ -2183,7 +2183,7 @@ export default function ResultsPage() {
                           background: '#fff',
                           cursor: 'pointer',
                           borderRadius: '2px',
-                          fontSize: '22px',
+                          fontSize: '20px',
                         }}
                       >
                         ›
@@ -2232,7 +2232,7 @@ export default function ResultsPage() {
                             }}
                           >
                             <span style={{ fontSize: '15px', color: '#3E4B44' }}>{c.day}</span>
-                            <span style={{ fontSize: '20px', fontWeight: '800', color: c.color }}>{c.text}</span>
+                            <span style={{ fontSize: '18px', fontWeight: '800', color: c.color }}>{c.text}</span>
                             <span style={{ fontSize: '14px', color: '#1F5F4A', fontWeight: '700' }}>{c.sub}</span>
                             {c.fly ? (
                               <>
@@ -2375,7 +2375,7 @@ export default function ResultsPage() {
                   }}
                 >
                   <div
-                    style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '30px', fontWeight: '600', color: '#1F5F4A' }}
+                    style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '26px', fontWeight: '600', color: '#1F5F4A' }}
                   >
                     Новые даты
                   </div>
@@ -2392,16 +2392,16 @@ export default function ResultsPage() {
                     <div style={{ display: 'flex', gap: '24px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '14px', color: '#3E4B44' }}>Заезд</span>
-                        <strong style={{ fontSize: '21px' }}>{v.cal?.newIn}</strong>
+                        <strong style={{ fontSize: '20px' }}>{v.cal?.newIn}</strong>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '14px', color: '#3E4B44' }}>Выезд</span>
-                        <strong style={{ fontSize: '21px' }}>{v.cal?.newOut}</strong>
+                        <strong style={{ fontSize: '20px' }}>{v.cal?.newOut}</strong>
                       </div>
                     </div>
                     <div style={{ fontSize: '16px' }}>2 взрослых · {v.nightsLabel}</div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontSize: '44px', fontWeight: '800', lineHeight: '1' }}>
+                      <span style={{ fontSize: '32px', fontWeight: '800', lineHeight: '1' }}>
                         {v.cal?.newPpn}&nbsp;€
                       </span>
                       <span style={{ fontSize: '18px', fontWeight: '700' }}>/ чел. в сутки</span>
@@ -2415,7 +2415,7 @@ export default function ResultsPage() {
                       }}
                     >
                       <span style={{ fontSize: '16px' }}>За весь отдых</span>
-                      <strong style={{ fontSize: '36px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
+                      <strong style={{ fontSize: '32px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
                     </div>
                     <div style={{ background: '#F4F1EA', borderRadius: '2px', padding: '10px 12px', fontSize: '16px' }}>
                       На ваши даты — <strong>{v.cal?.curTotal}&nbsp;€</strong>
@@ -2484,7 +2484,7 @@ export default function ResultsPage() {
                     type="button"
                     className="btn btn-primary"
                     onClick={v.calApply}
-                    style={{ minHeight: '64px', fontSize: '22px', padding: '0 40px' }}
+                    style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
                   >
                     Применить {v.cal?.newRange}
                   </button>
@@ -2528,7 +2528,7 @@ export default function ResultsPage() {
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="sCalTitle" style={{ fontSize: '32px' }}>
+                  <h2 id="sCalTitle" style={{ fontSize: '28px' }}>
                     Выберите даты поездки
                   </h2>
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.sCalHint}</span>
@@ -2676,7 +2676,7 @@ export default function ResultsPage() {
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Заезд</span>
-                    <strong style={{ fontSize: '20px' }}>{v.sSelIn}</strong>
+                    <strong style={{ fontSize: '18px' }}>{v.sSelIn}</strong>
                   </div>
                   <svg
                     width="26"
@@ -2693,11 +2693,11 @@ export default function ResultsPage() {
                   </svg>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Выезд</span>
-                    <strong style={{ fontSize: '20px' }}>{v.sSelOut}</strong>
+                    <strong style={{ fontSize: '18px' }}>{v.sSelOut}</strong>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '20px', color: '#1F5F4A' }}>{v.sSelNights}</strong>
+                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.sSelNights}</strong>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -2709,7 +2709,7 @@ export default function ResultsPage() {
                     className="btn btn-primary"
                     onClick={v.sApplyCal}
                     disabled={!!v.sApplyOff}
-                    style={{ minHeight: '56px', fontSize: '18px', padding: '0 32px' }}
+                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
                     Подтвердить даты
                   </button>

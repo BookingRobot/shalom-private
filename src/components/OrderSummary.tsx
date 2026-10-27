@@ -56,7 +56,7 @@ export function OrderSummary({
       />{' '}
       <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ fontWeight: '800', fontSize: '20px' }}>Санаторий Эгле Комфорт</div>
+          <div style={{ fontWeight: '800', fontSize: '18px' }}>Санаторий Эгле Комфорт</div>
           <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
         </div>
         <div style={section}>
@@ -87,7 +87,7 @@ export function OrderSummary({
           }}
         >
           <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-          <span style={{ fontWeight: '800', fontSize: '30px', whiteSpace: 'nowrap' }}>{total}</span>
+          <span style={{ fontWeight: '800', fontSize: '26px', whiteSpace: 'nowrap' }}>{total}</span>
         </div>
         {footer}
       </div>

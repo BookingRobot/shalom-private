@@ -17,7 +17,7 @@ const HELP_CTX: HelpContextInfo = {
   hotel: 'Санаторий Эгле Комфорт, Друскининкай',
   in: '2026-11-09',
   out: '2026-11-18',
-  bottom: '120px',
+  bottom: '96px',
 };
 
 class RoomsLogic extends PageLogic {
@@ -46,6 +46,7 @@ class RoomsLogic extends PageLogic {
     const total = sel.price + SELECTED_ROOM_PRICE.add;
     return {
       guestsLabel: guestsLabel(booking),
+      includedName: ROOM_PROGRAMS[0].name,
       dateRange: stayRange(booking.checkin, booking.checkout) + ' ' + toD(booking.checkout).getUTCFullYear(),
       nightsLabel: NIGHTS + ' ' + nightsWord(NIGHTS),
       progs: ROOM_PROGRAMS.map((p, i) => {
@@ -66,9 +67,8 @@ class RoomsLogic extends PageLogic {
               pl: /^—/.test(l) ? '14px' : '0',
               mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
             })),
-          deltaLabel: i === 0 ? 'Уже в цене номера' : 'Улучшение',
+          included: i === 0,
           delta: i === 0 ? 'Включена' : '+' + eur(d),
-          deltaColor: i === 0 ? '#1F5F4A' : '#1C2620',
           total: eur(t),
           ppn: eur(Math.round(t / NIGHTS / PERS)),
           border: on ? '#1F5F4A' : '#E3DED2',
@@ -104,11 +104,11 @@ export default function RoomsPage() {
   return (
     <div className="page pg-rooms">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <HeaderAside>
             <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         {/* Steps */}
@@ -129,10 +129,9 @@ export default function RoomsPage() {
             <Link to="/hotel">Эгле Комфорт</Link> › Номер и программа
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <h1 style={{ fontSize: '38px' }}>Хотите улучшить программу?</h1>
+            <h1 style={{ fontSize: '30px' }}>Номер и программа</h1>
             <p style={{ margin: '0', fontSize: '18px', color: '#3E4B44' }}>
-              Номер выбран. Самая доступная программа уже включена — если хотите больше процедур или полный пансион,
-              выберите улучшение ниже.
+              {v.includedName} уже включена. При желании выберите другую.
             </p>
           </div>
           {/* Chosen room */}
@@ -171,7 +170,7 @@ export default function RoomsPage() {
               >
                 Ваш номер
               </span>
-              <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px' }}>Двухместный номер</strong>
+              <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>Двухместный номер</strong>
               <span style={{ fontSize: '16px', color: '#3E4B44' }}>
                 Санаторий Эгле Комфорт ★★★★ · 17–18 м² · 2 отдельные кровати · балкон
               </span>
@@ -220,10 +219,10 @@ export default function RoomsPage() {
                       gap: '12px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <svg
-                        width="34"
-                        height="34"
+                        width="26"
+                        height="26"
                         viewBox="-1 -1 26 26"
                         fill="none"
                         stroke="#1F5F4A"
@@ -235,10 +234,8 @@ export default function RoomsPage() {
                       >
                         <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
                       </svg>
-                      <h2 style={{ fontSize: '26px' }}>{p.name}</h2>
-                      <span className="pill">{p.tag}</span>
+                      <h2 style={{ fontSize: '22px' }}>{p.name}</h2>
                     </div>
-                    <div style={{ fontSize: '16px', color: '#3E4B44' }}>{p.sub}</div>
                     <div
                       style={{
                         display: 'grid',
@@ -257,13 +254,13 @@ export default function RoomsPage() {
                               display: 'flex',
                               flexDirection: 'column',
                               gap: '4px',
-                              minHeight: '104px',
+                              minHeight: '92px',
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <svg
-                                width="28"
-                                height="28"
+                                width="22"
+                                height="22"
                                 viewBox="-1 -1 26 26"
                                 fill="none"
                                 stroke="#1F5F4A"
@@ -278,7 +275,7 @@ export default function RoomsPage() {
                               <span
                                 style={{
                                   fontFamily: 'Lora,Georgia,serif',
-                                  fontSize: '32px',
+                                  fontSize: '22px',
                                   fontWeight: '700',
                                   lineHeight: '1',
                                   color: '#1F5F4A',
@@ -287,8 +284,8 @@ export default function RoomsPage() {
                                 {v.big}
                               </span>
                             </div>
-                            <strong style={{ fontSize: '15px', lineHeight: '1.2' }}>{v.label}</strong>
-                            <span style={{ fontSize: '14px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
+                            <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.25' }}>{v.label}</span>
+                            <span style={{ fontSize: '15px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
                           </div>
                         </Fragment>
                       ))}
@@ -306,26 +303,23 @@ export default function RoomsPage() {
                       justifyContent: 'center',
                     }}
                   >
-                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#3E4B44' }}>{p.deltaLabel}</span>
-                    <span
-                      style={{
-                        fontSize: '30px',
-                        fontWeight: '800',
-                        lineHeight: '1.1',
-                        whiteSpace: 'nowrap',
-                        color: p.deltaColor,
-                      }}
-                    >
-                      {p.delta}
+                    {p.included ? (
+                      <span className="status-tag">✓ Включена в цену</span>
+                    ) : (
+                      <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                        Доплата <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{p.delta}</strong>
+                      </span>
+                    )}
+                    <span style={{ fontSize: '16px', color: '#3E4B44', marginTop: '8px' }}>Итого за заезд</span>
+                    <span style={{ fontSize: '26px', fontWeight: '800', lineHeight: '1.15', whiteSpace: 'nowrap' }}>
+                      {p.total}
                     </span>
-                    <span style={{ fontSize: '15px', marginTop: '6px' }}>Итого за заезд:</span>
-                    <span style={{ fontSize: '22px', fontWeight: '800', whiteSpace: 'nowrap' }}>{p.total}</span>
-                    <span style={{ fontSize: '14px', color: '#5E6862' }}>≈ {p.ppn} / чел. в сутки</span>
+                    <span style={{ fontSize: '15px', color: '#5E6862' }}>≈ {p.ppn} / чел. в сутки</span>
                     <button
                       type="button"
                       className={`btn ${p.btnCls ?? ''}`}
                       onClick={p.pick}
-                      style={{ minHeight: '50px', fontSize: '16px', marginTop: '10px', padding: '0 16px' }}
+                      style={{ minHeight: '48px', fontSize: '17px', marginTop: '10px', padding: '0 16px' }}
                     >
                       {p.btnLabel}
                     </button>
@@ -508,32 +502,32 @@ export default function RoomsPage() {
             style={{
               maxWidth: '1180px',
               margin: '0 auto',
-              padding: '14px 24px',
+              padding: '8px 24px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '20px',
+              gap: '8px 20px',
               flexWrap: 'wrap',
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.sumLine}</span>
-              <span style={{ display: 'flex', alignItems: 'baseline', gap: '14px', flexWrap: 'wrap' }}>
-                <strong style={{ fontSize: '28px', whiteSpace: 'nowrap' }}>{v.sumTotal}</strong>
+              <span style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+                <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>{v.sumTotal}</strong>
                 <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                   сейчас только аванс <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{v.sumAdv}</strong>,
                   остальное при заезде
                 </span>
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link className="btn btn-secondary" to="/hotel">
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <Link className="btn btn-secondary" to="/hotel" style={{ minHeight: '46px', fontSize: '17px' }}>
                 ← К номерам
               </Link>
               <Link
                 className="btn btn-primary"
                 to="/transfer"
-                style={{ minHeight: '60px', fontSize: '20px', padding: '0 34px' }}
+                style={{ minHeight: '46px', fontSize: '17px', padding: '0 24px' }}
               >
                 Далее: трансфер →
               </Link>

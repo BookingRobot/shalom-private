@@ -25,10 +25,10 @@ export function CheckoutSteps({
         style={{
           maxWidth: '1180px',
           margin: '0 auto',
-          padding: compact ? '12px 24px' : '16px 24px',
+          padding: compact ? '10px 24px' : '10px 24px',
           display: 'flex',
           alignItems: 'center',
-          gap: compact ? '18px' : '28px',
+          gap: compact ? '18px' : '22px',
           flexWrap: 'wrap',
         }}
       >

@@ -18,8 +18,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 56px;
-  padding: 0 28px;
+  min-height: 50px;
+  padding: 0 22px;
   border-radius: 2px;
   font-weight: 700;
   font-size: 18px;
@@ -51,7 +51,7 @@
   border-radius: 2px;
 }
 .pg-flights .input {
-  min-height: 54px;
+  min-height: 48px;
   border: 2px solid #cfc9bb;
   border-radius: 2px;
   padding: 0 16px;

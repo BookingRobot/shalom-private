@@ -23,10 +23,10 @@ export default function RulesPage() {
   return (
     <div className="page pg-rules">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <MainNav gap={32} active="rules" />
-          <PhoneLink icon={24} />
+          <PhoneLink />
         </HeaderBar>
         <div
           style={{
@@ -43,8 +43,8 @@ export default function RulesPage() {
             <div style={{ fontSize: '16px', color: '#3E4B44' }}>
               <Link to="/">Главная</Link> › Условия
             </div>
-            <h1 style={{ fontSize: '40px' }}>Условия бронирования, оплаты и отмены</h1>
-            <p style={{ color: '#3E4B44', fontSize: '19px' }}>
+            <h1 style={{ fontSize: '32px' }}>Условия бронирования, оплаты и отмены</h1>
+            <p style={{ color: '#3E4B44', fontSize: '18px' }}>
               Простыми словами — что происходит после заказа, сколько и когда платить, и что будет, если планы
               изменятся.
             </p>
@@ -64,7 +64,7 @@ export default function RulesPage() {
                 className="card"
                 style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <h2 style={{ fontSize: '26px' }}>1. Как проходит заказ</h2>
+                <h2 style={{ fontSize: '23px' }}>1. Как проходит заказ</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="row" style={{ borderTop: 'none' }}>
                     <b>Вы оформляете заказ</b>
@@ -95,7 +95,7 @@ export default function RulesPage() {
                 className="card"
                 style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <h2 style={{ fontSize: '26px' }}>2. Оплата</h2>
+                <h2 style={{ fontSize: '23px' }}>2. Оплата</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="row" style={{ borderTop: 'none' }}>
                     <b>Аванс</b>
@@ -142,7 +142,7 @@ export default function RulesPage() {
                   border: '2px solid #1F5F4A',
                 }}
               >
-                <h2 style={{ fontSize: '26px' }}>3. Отмена и перенос</h2>
+                <h2 style={{ fontSize: '23px' }}>3. Отмена и перенос</h2>
                 <p style={{ color: '#3E4B44' }}>
                   Сроки считаются от даты заезда. Отменить или перенести можно одним звонком или сообщением.
                 </p>
@@ -196,7 +196,7 @@ export default function RulesPage() {
                 className="card"
                 style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <h2 style={{ fontSize: '26px' }}>4. Заезд и проживание</h2>
+                <h2 style={{ fontSize: '23px' }}>4. Заезд и проживание</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div className="row" style={{ borderTop: 'none' }}>
                     <b>Заезд и выезд</b>
@@ -229,7 +229,7 @@ export default function RulesPage() {
                 className="card"
                 style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <h2 style={{ fontSize: '26px' }}>5. Ваши данные</h2>
+                <h2 style={{ fontSize: '23px' }}>5. Ваши данные</h2>
                 <p>
                   Имена, даты рождения и контакты гостей передаём только санаторию и перевозчику — для регистрации,
                   лечения и трансфера. Храним их <span className="ph">[срок]</span> и удаляем по вашей просьбе. Данные
@@ -248,7 +248,7 @@ export default function RulesPage() {
                   borderColor: '#C8DED3',
                 }}
               >
-                <h2 style={{ fontSize: '26px' }}>6. Как с нами связаться</h2>
+                <h2 style={{ fontSize: '23px' }}>6. Как с нами связаться</h2>
                 <p>Отвечаем на русском языке круглосуточно. Звоните, пишите в WhatsApp или на почту.</p>
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                   <a className="btn btn-primary" href="tel:+37060000000">
