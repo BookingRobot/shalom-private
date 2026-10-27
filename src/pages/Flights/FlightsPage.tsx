@@ -1,0 +1,1933 @@
+import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
+import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
+import { usePageTitle } from '../../lib/usePageTitle';
+import './FlightsPage.css';
+
+const HELP_CTX: HelpContextInfo = {
+  hotel: 'Санаторий Эгле Комфорт, Друскининкай',
+  in: '2026-11-09',
+  out: '2026-11-18',
+};
+
+class FlightsLogic extends PageLogic {
+  constructor(props?: any) {
+    super(props);
+    this.state = { lang: 'ru', b: 'idle', ch: 'wa', tm: 'day', in: '2026-11-09', out: '2026-11-18', cal: false };
+  }
+  renderVals() {
+    return this._rv();
+  }
+  _rv() {
+    // ---- Localisation-ready strings (ru / en / he) ----
+    const T = {
+      ru: {
+        brand: 'Санатории Литвы',
+        offTitle: 'Отлично! В ваши даты есть прямые рейсы',
+        offLead:
+          'Вылет и возвращение совпадают с датами заезда и выезда. Можем сразу добавить эти билеты в заказ — трансфер встретит вас прямо у самолёта.',
+        offFlights: 'Рейсы в ваши даты',
+        offPpp: 'туда и обратно, на 1 человека',
+        offDirect: 'прямой',
+        offCharter: 'ЧАРТЕР',
+        offHand: 'Ручная кладь 8 кг',
+        offBag: 'Багаж 20 кг',
+        offMeal: 'Без питания на борту',
+        offAirline: 'Israir',
+        there: 'Туда',
+        back: 'Обратно',
+        seats: 'осталось {n} мест',
+        qTitle: 'Добавить эти авиабилеты в ваш заказ?',
+        qLead: 'Выберите один вариант — на цену и даты санатория это не влияет.',
+        yTitle: 'Да, забронируйте мне эти рейсы',
+        yText:
+          'Рейсы {a} и {b} для {g} гостей. Имена возьмём из данных, которые вы указали. Билеты пришлём на почту и в WhatsApp.',
+        yBtn: 'Да, добавить билеты в заказ',
+        yBtnOn: '✓ Билеты добавлены',
+        recBadge: 'РЕКОМЕНДУЕМ',
+        forTwo: 'за 2 гостей, туда и обратно',
+        detailsHead: 'Подробно о рейсах',
+        nTitle: 'Нет, билеты у меня уже есть',
+        nText:
+          'Я покупаю билеты сам(а) или лечу другим рейсом. Номер рейса можно сообщить позже — трансфер встретит вас по нему.',
+        nBtn: 'Продолжить без билетов',
+        nBtnOn: '✓ Без билетов',
+        decYes: 'Билеты на 2 гостей добавлены: +{p}. Итого заказ: {t}.',
+        decNo: 'Без авиабилетов. Итого заказ: {t}.',
+        toPay: 'Перейти к оплате',
+        offNote:
+          'Цена билетов фиксируется в момент оформления. Места на чартерных рейсах ограничены. [ПРИМЕР ДАННЫХ — ИЗ СИСТЕМЫ БРОНИРОВАНИЯ РЕЙСОВ]',
+        demoNo: 'даты без рейсов',
+        demoYes: 'даты с рейсами',
+        sRoom: 'Номер',
+        sTransfer: 'Трансфер',
+        sGuests: 'Гости',
+        sPay: 'Оплата',
+        sFlights: 'Рейсы',
+        sDone: 'Готово',
+        title: 'В выбранные даты наша авиакомпания-партнёр не летает',
+        lead: 'Это не значит, что поехать нельзя! Вы можете выбрать рейсы других авиакомпаний, прилететь через другие аэропорты или организовать дорогу самостоятельно. Мы просто хотим убедиться, что вы об этом знаете.',
+        arrive: 'Заезд',
+        depart: 'Выезд',
+        noFlight: 'рейса нет',
+        hasFlight: 'есть рейс',
+        flightDays:
+          'Наша авиакомпания-партнёр летает Тель-Авив ⇄ Вильнюс по вторникам, четвергам и воскресеньям. Ближайшие дни с рейсами: ',
+        aTitle: 'Всё в порядке, моя поездка спланирована!',
+        aText:
+          'Я знаю, что в эти даты рейсов этой авиакомпании нет. Позабочусь о дороге сам или у меня уже есть другие билеты.',
+        aBtn: 'Продолжить бронирование',
+        bTitle: 'Не уверен насчёт рейсов. Хочу поговорить.',
+        bText: 'Пусть со мной свяжется ваш консультант и поможет разобраться с вариантами поездки.',
+        bBtn: 'Свяжитесь со мной',
+        cLink: 'Хочу выбрать даты, в которые есть рейсы',
+        fTitle: 'Как с вами связаться?',
+        fCancel: 'Отмена',
+        fName: 'Ваше имя',
+        fPhone: 'Телефон',
+        fHow: 'Удобнее всего',
+        fWhen: 'Когда позвонить (время Израиля)',
+        fNote: 'Комментарий (не обязательно)',
+        fNotePh: 'Например: летим из Хайфы, рассматриваем Варшаву',
+        fKeep: 'Ваш заказ сохранён: даты, номер и программа не изменятся.',
+        fSend: 'Отправить запрос',
+        chWa: 'WhatsApp',
+        chCall: 'Звонок',
+        chMail: 'E-mail',
+        tmMorning: 'Утром',
+        tmDay: 'Днём',
+        tmEvening: 'Вечером',
+        okTitle: 'Спасибо! Мы свяжемся с вами',
+        okText: 'Консультант напишет вам в {ch} {tm} — в течение 2 часов в рабочее время (9:00–20:00). Заказ сохранён.',
+        okPay: 'Всё равно продолжить к оплате',
+        okWait: 'Подождать консультанта',
+        goodTitle: 'Отлично — в эти даты есть рейсы',
+        goodText: 'Новые даты: {range}. Цена пересчитана при оплате.',
+        goodBtn: 'Продолжить с новыми датами',
+        kept: 'Ваш заказ сохранён',
+        keptLine: 'Двухместный номер · программа «Миди» · 2 взрослых · групповой трансфер',
+        calTitle: 'Выберите даты с рейсами',
+        calHintIn: 'Нажмите день заезда — лучше с ✈',
+        calHintOut: 'Теперь день выезда',
+        calHintDone: 'Можно поменять: нажмите новый день заезда',
+        lgPicked: 'выбрано',
+        lgFly: 'есть рейс из Израиля',
+        lgNoFly: 'рейса нет',
+        lgPast: 'недоступно',
+        close: 'Закрыть',
+        apply: 'Подтвердить даты',
+        nights: 'ночей',
+        rules: 'Условия',
+        wd: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+        months: [
+          'января',
+          'февраля',
+          'марта',
+          'апреля',
+          'мая',
+          'июня',
+          'июля',
+          'августа',
+          'сентября',
+          'октября',
+          'ноября',
+          'декабря',
+        ],
+        monthsN: [
+          'Январь',
+          'Февраль',
+          'Март',
+          'Апрель',
+          'Май',
+          'Июнь',
+          'Июль',
+          'Август',
+          'Сентябрь',
+          'Октябрь',
+          'Ноябрь',
+          'Декабрь',
+        ],
+        wdShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
+      },
+      en: {
+        brand: 'Lithuania Sanatoriums',
+        offTitle: 'Great! There are direct flights on your dates',
+        offLead:
+          'Departure and return match your check-in and check-out dates. We can add these tickets to your booking right away — the transfer will meet you at the plane.',
+        offFlights: 'Flights on your dates',
+        offPpp: 'round trip, per person',
+        offDirect: 'direct',
+        offCharter: 'CHARTER',
+        offHand: 'Hand luggage 8 kg',
+        offBag: 'Checked bag 20 kg',
+        offMeal: 'No meal on board',
+        offAirline: 'Israir',
+        there: 'Outbound',
+        back: 'Return',
+        seats: '{n} seats left',
+        qTitle: 'Add these flights to your booking?',
+        qLead: 'Choose one option — it doesn’t change the sanatorium price or dates.',
+        yTitle: 'Yes, book these flights for me',
+        yText:
+          'Flights {a} and {b} for {g} guests. We’ll use the names you entered. Tickets will be sent by e-mail and WhatsApp.',
+        yBtn: 'Yes, add tickets to my booking',
+        yBtnOn: '✓ Tickets added',
+        recBadge: 'RECOMMENDED',
+        forTwo: 'for 2 guests, round trip',
+        detailsHead: 'Flight details',
+        nTitle: 'No, I already have tickets',
+        nText:
+          'I’m buying tickets myself or flying another route. You can send us the flight number later — the transfer will meet you by it.',
+        nBtn: 'Continue without tickets',
+        nBtnOn: '✓ Without tickets',
+        decYes: 'Tickets for 2 guests added: +{p}. Booking total: {t}.',
+        decNo: 'No flight tickets. Booking total: {t}.',
+        toPay: 'Go to payment',
+        offNote:
+          'The ticket price is fixed when booked. Charter seats are limited. [SAMPLE DATA — FROM THE FLIGHT BOOKING SYSTEM]',
+        demoNo: 'dates without flights',
+        demoYes: 'dates with flights',
+        sRoom: 'Room',
+        sTransfer: 'Transfer',
+        sGuests: 'Guests',
+        sPay: 'Payment',
+        sFlights: 'Flights',
+        sDone: 'Done',
+        title: 'Our partner airline does not fly on your selected dates',
+        lead: 'This doesn’t mean you can’t travel! You can choose flights with other airlines, arrive via other airports, or arrange the journey yourself. We just want to make sure you know.',
+        arrive: 'Check-in',
+        depart: 'Check-out',
+        noFlight: 'no flight',
+        hasFlight: 'flight available',
+        flightDays:
+          'Our partner airline flies Tel Aviv ⇄ Vilnius on Tuesdays, Thursdays and Sundays. Nearest flight days: ',
+        aTitle: 'All good, my trip is planned!',
+        aText:
+          'I know this airline doesn’t fly on these dates. I’ll arrange the journey myself or I already have other flights.',
+        aBtn: 'Continue booking',
+        bTitle: 'Not sure about flights. I’d like to talk.',
+        bText: 'I’d like your consultant to contact me and help me work out the travel options.',
+        bBtn: 'Contact me',
+        cLink: 'I want to choose dates with flights',
+        fTitle: 'How can we reach you?',
+        fCancel: 'Cancel',
+        fName: 'Your name',
+        fPhone: 'Phone',
+        fHow: 'Preferred channel',
+        fWhen: 'When to call (Israel time)',
+        fNote: 'Comment (optional)',
+        fNotePh: 'E.g. flying from Haifa, considering Warsaw',
+        fKeep: 'Your booking is saved: dates, room and programme stay the same.',
+        fSend: 'Send request',
+        chWa: 'WhatsApp',
+        chCall: 'Phone call',
+        chMail: 'E-mail',
+        tmMorning: 'Morning',
+        tmDay: 'Afternoon',
+        tmEvening: 'Evening',
+        okTitle: 'Thank you! We’ll be in touch',
+        okText:
+          'A consultant will contact you via {ch} ({tm}) within 2 working hours (9:00–20:00). Your booking is saved.',
+        okPay: 'Continue to payment anyway',
+        okWait: 'Wait for the consultant',
+        goodTitle: 'Great — there are flights on these dates',
+        goodText: 'New dates: {range}. The price is recalculated at payment.',
+        goodBtn: 'Continue with new dates',
+        kept: 'Your booking is saved',
+        keptLine: 'Double room · “Midi” programme · 2 adults · group transfer',
+        calTitle: 'Choose dates with flights',
+        calHintIn: 'Tap the check-in day — ideally one with ✈',
+        calHintOut: 'Now the check-out day',
+        calHintDone: 'To change, tap a new check-in day',
+        lgPicked: 'selected',
+        lgFly: 'flight from Israel',
+        lgNoFly: 'no flight',
+        lgPast: 'unavailable',
+        close: 'Close',
+        apply: 'Confirm dates',
+        nights: 'nights',
+        rules: 'Terms',
+        wd: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+        months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        monthsN: [
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ],
+        wdShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      },
+      he: {
+        brand: 'בתי הבראה בליטא',
+        offTitle: 'מצוין! יש טיסות ישירות בתאריכים שלכם',
+        offLead:
+          'ההמראה והחזרה תואמות את תאריכי ההגעה והעזיבה. נוכל להוסיף את הכרטיסים להזמנה כבר עכשיו — ההסעה תחכה לכם בשדה התעופה.',
+        offFlights: 'טיסות בתאריכים שלכם',
+        offPpp: 'הלוך ושוב, לנוסע',
+        offDirect: 'ישירה',
+        offCharter: 'שכר',
+        offHand: 'כבודת יד 8 ק״ג',
+        offBag: 'מזוודה 20 ק״ג',
+        offMeal: 'ללא ארוחה בטיסה',
+        offAirline: 'ישראייר',
+        there: 'הלוך',
+        back: 'חזור',
+        seats: 'נותרו {n} מקומות',
+        qTitle: 'להוסיף את כרטיסי הטיסה להזמנה?',
+        qLead: 'בחרו אפשרות אחת — היא לא משנה את המחיר או התאריכים של בית ההבראה.',
+        yTitle: 'כן, הזמינו לי את הטיסות האלה',
+        yText: 'טיסות {a} ו-{b} עבור {g} אורחים. נשתמש בשמות שמילאתם. הכרטיסים יישלחו בדוא״ל ובוואטסאפ.',
+        yBtn: 'כן, להוסיף כרטיסים להזמנה',
+        yBtnOn: '✓ הכרטיסים נוספו',
+        recBadge: 'מומלץ',
+        forTwo: 'ל-2 אורחים, הלוך ושוב',
+        detailsHead: 'פרטי הטיסות',
+        nTitle: 'לא, כבר יש לי כרטיסים',
+        nText: 'אני קונה כרטיסים בעצמי או טס בטיסה אחרת. אפשר לשלוח לנו את מספר הטיסה מאוחר יותר — ההסעה תחכה לפיו.',
+        nBtn: 'להמשיך בלי כרטיסים',
+        nBtnOn: '✓ בלי כרטיסים',
+        decYes: 'נוספו כרטיסים ל-2 אורחים: ‎+{p}. סך ההזמנה: {t}.',
+        decNo: 'בלי כרטיסי טיסה. סך ההזמנה: {t}.',
+        toPay: 'מעבר לתשלום',
+        offNote: 'מחיר הכרטיס נקבע ברגע ההזמנה. מספר המקומות בטיסות שכר מוגבל. [נתוני דוגמה — ממערכת הזמנת הטיסות]',
+        demoNo: 'תאריכים בלי טיסות',
+        demoYes: 'תאריכים עם טיסות',
+        sRoom: 'חדר',
+        sTransfer: 'הסעה',
+        sGuests: 'אורחים',
+        sPay: 'תשלום',
+        sFlights: 'טיסות',
+        sDone: 'סיום',
+        title: 'חברת התעופה השותפה שלנו אינה טסה בתאריכים שבחרתם',
+        lead: 'זה לא אומר שאי אפשר לנסוע! אפשר לבחור טיסות של חברות אחרות, להגיע דרך שדות תעופה אחרים או לארגן את הנסיעה בעצמכם. אנחנו רק רוצים לוודא שאתם יודעים על כך.',
+        arrive: 'הגעה',
+        depart: 'עזיבה',
+        noFlight: 'אין טיסה',
+        hasFlight: 'יש טיסה',
+        flightDays: 'חברת התעופה השותפה שלנו טסה תל אביב ⇄ וילנה בימי שלישי, חמישי וראשון. ימי הטיסה הקרובים: ',
+        aTitle: 'הכול בסדר, הנסיעה שלי מתוכננת!',
+        aText: 'אני יודע/ת שאין טיסות של חברה זו בתאריכים האלה. אדאג לנסיעה בעצמי או שכבר יש לי טיסות אחרות.',
+        aBtn: 'להמשיך בהזמנה',
+        bTitle: 'לא בטוח/ה לגבי הטיסות. רוצה לדבר.',
+        bText: 'אשמח שנציג/ה שלכם יחזור אליי ויעזור לבדוק את אפשרויות הנסיעה.',
+        bBtn: 'צרו איתי קשר',
+        cLink: 'אני רוצה לבחור תאריכים שיש בהם טיסות',
+        fTitle: 'איך ליצור איתכם קשר?',
+        fCancel: 'ביטול',
+        fName: 'שם',
+        fPhone: 'טלפון',
+        fHow: 'ערוץ מועדף',
+        fWhen: 'מתי להתקשר (שעון ישראל)',
+        fNote: 'הערה (לא חובה)',
+        fNotePh: 'לדוגמה: טסים מחיפה, שוקלים את ורשה',
+        fKeep: 'ההזמנה שלכם נשמרה: התאריכים, החדר והתוכנית לא ישתנו.',
+        fSend: 'שליחת בקשה',
+        chWa: 'WhatsApp',
+        chCall: 'שיחת טלפון',
+        chMail: 'דוא״ל',
+        tmMorning: 'בבוקר',
+        tmDay: 'בצהריים',
+        tmEvening: 'בערב',
+        okTitle: 'תודה! ניצור איתכם קשר',
+        okText: 'נציג/ה יפנה אליכם ב-{ch} ({tm}) תוך שעתיים בשעות הפעילות (9:00–20:00). ההזמנה נשמרה.',
+        okPay: 'להמשיך לתשלום בכל זאת',
+        okWait: 'לחכות לנציג',
+        goodTitle: 'מצוין — יש טיסות בתאריכים האלה',
+        goodText: 'תאריכים חדשים: {range}. המחיר יחושב מחדש בתשלום.',
+        goodBtn: 'להמשיך עם התאריכים החדשים',
+        kept: 'ההזמנה שלכם נשמרה',
+        keptLine: 'חדר זוגי · תוכנית „מידי“ · 2 מבוגרים · הסעה קבוצתית',
+        calTitle: 'בחרו תאריכים עם טיסות',
+        calHintIn: 'לחצו על יום ההגעה — עדיף עם ✈',
+        calHintOut: 'עכשיו יום העזיבה',
+        calHintDone: 'לשינוי לחצו על יום הגעה חדש',
+        lgPicked: 'נבחר',
+        lgFly: 'יש טיסה מישראל',
+        lgNoFly: 'אין טיסה',
+        lgPast: 'לא זמין',
+        close: 'סגירה',
+        apply: 'אישור התאריכים',
+        nights: 'לילות',
+        rules: 'תנאים',
+        wd: ['ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳', 'א׳'],
+        months: [
+          'בינואר',
+          'בפברואר',
+          'במרץ',
+          'באפריל',
+          'במאי',
+          'ביוני',
+          'ביולי',
+          'באוגוסט',
+          'בספטמבר',
+          'באוקטובר',
+          'בנובמבר',
+          'בדצמבר',
+        ],
+        monthsN: [
+          'ינואר',
+          'פברואר',
+          'מרץ',
+          'אפריל',
+          'מאי',
+          'יוני',
+          'יולי',
+          'אוגוסט',
+          'ספטמבר',
+          'אוקטובר',
+          'נובמבר',
+          'דצמבר',
+        ],
+        wdShort: ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'],
+      },
+    };
+    const st = this.state;
+    const L = T[st.lang] ? st.lang : 'ru';
+    const t = T[L];
+    const FLY = [0, 2, 4]; // Sun, Tue, Thu — partner airline schedule [ПОДТВЕРДИТЬ]
+    const DAY = 86400000,
+      TODAY = new Date('2026-10-27T00:00:00Z');
+    const toD = (s) => new Date(s + 'T00:00:00Z'),
+      iso = (d) => d.toISOString().slice(0, 10),
+      addD = (d, n) => new Date(d.getTime() + n * DAY);
+    const fly = (d) => FLY.includes(d.getUTCDay());
+    const fmtD = (d) => d.getUTCDate() + ' ' + t.months[d.getUTCMonth()] + ' (' + t.wdShort[d.getUTCDay()] + ')';
+    const inD = toD(st.in),
+      outD = toD(st.out);
+    const nights = Math.round((outD - inD) / DAY);
+    const range =
+      inD.getUTCDate() +
+      ' ' +
+      t.months[inD.getUTCMonth()] +
+      ' – ' +
+      outD.getUTCDate() +
+      ' ' +
+      t.months[outD.getUTCMonth()] +
+      ' · ' +
+      nights +
+      ' ' +
+      t.nights;
+    const nearest = (d) => {
+      const r = [];
+      for (let k = 1; k <= 3 && r.length < 2; k++) {
+        [addD(d, -k), addD(d, k)].forEach((x) => {
+          if (fly(x) && r.length < 2 && x >= TODAY) r.push(x);
+        });
+      }
+      return r
+        .sort((a, b) => a - b)
+        .map(fmtD)
+        .join(', ');
+    };
+    const chip = (label, d) => {
+      const ok = fly(d);
+      return {
+        label,
+        date: fmtD(d),
+        state: ok ? '✈ ' + t.hasFlight : t.noFlight,
+        color: ok ? '#1F5F4A' : '#8A5A00',
+        bg: ok ? '#EEF5F1' : '#FFF6E3',
+        bd: ok ? '#C8DED3' : '#F0DDB8',
+      };
+    };
+    const allOk = fly(inD) && fly(outD);
+    const changed = false; // matching dates now lead to the flight offer view
+    const GUESTS = 2,
+      PPP = 389,
+      BASE_TOTAL = 2258; // [ПРИМЕР] ticket price per person round trip
+    const fmtN = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0€';
+    const dd = (d) =>
+      String(d.getUTCDate()).padStart(2, '0') +
+      '.' +
+      String(d.getUTCMonth() + 1).padStart(2, '0') +
+      '.' +
+      d.getUTCFullYear() +
+      ' (' +
+      t.wdShort[d.getUTCDay()] +
+      ')';
+    const tk = st.tk || null;
+    const ordTotal = BASE_TOTAL + (tk === 'yes' ? PPP * GUESTS : 0);
+    const b = st.b || 'idle';
+    const CH = [
+        ['wa', t.chWa],
+        ['call', t.chCall],
+        ['mail', t.chMail],
+      ],
+      TM = [
+        ['morning', t.tmMorning],
+        ['day', t.tmDay],
+        ['evening', t.tmEvening],
+      ];
+    // ---- calendar ----
+    const sel = st.sel || { in: st.in, out: st.out };
+    const sIn = sel.in ? toD(sel.in) : null,
+      sOut = sel.out ? toD(sel.out) : null;
+    const m0 = st.m ?? inD.getUTCMonth(),
+      y0 = st.y ?? inD.getUTCFullYear();
+    const pick = (date) => () => {
+      const k = iso(date);
+      if (!sel.in || sel.out) this.setState({ sel: { in: k, out: null } });
+      else if (date > toD(sel.in)) this.setState({ sel: { in: sel.in, out: k } });
+      else this.setState({ sel: { in: k, out: null } });
+    };
+    const cells = (y, m) => {
+      const first = new Date(Date.UTC(y, m, 1)),
+        lead = (first.getUTCDay() + 6) % 7,
+        days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(),
+        out = [];
+      for (let i = 0; i < lead; i++)
+        out.push({
+          day: '',
+          sub: '',
+          fly: false,
+          bg: 'transparent',
+          border: 'transparent',
+          color: '#1C2620',
+          subColor: '#3E4B44',
+          planeColor: '#1F5F4A',
+          off: true,
+          cursor: 'default',
+          aria: '',
+          pick: () => {},
+        });
+      for (let d = 1; d <= days; d++) {
+        const date = new Date(Date.UTC(y, m, d)),
+          past = date < TODAY,
+          f = fly(date) && !past;
+        const isIn = sIn && iso(date) === iso(sIn),
+          isOut = sOut && iso(date) === iso(sOut),
+          between = sIn && sOut && date > sIn && date < sOut;
+        let bg = past ? '#E8E6E1' : f ? '#E9F4EC' : '#fff',
+          border = f ? '#9CC9B5' : '#E3DED2',
+          color = past ? '#9AA39E' : '#1C2620',
+          subColor = '#1F5F4A',
+          planeColor = '#1F5F4A';
+        if (between) {
+          bg = past ? bg : '#F4F8F5';
+        }
+        if (isIn || isOut) {
+          bg = '#1F5F4A';
+          border = '#1F5F4A';
+          color = '#fff';
+          subColor = '#D9E2DC';
+          planeColor = '#fff';
+        }
+        out.push({
+          day: d,
+          sub: isIn ? t.arrive : isOut ? t.depart : f ? '✈' : '',
+          fly: f,
+          bg,
+          border,
+          color,
+          subColor,
+          planeColor,
+          off: past,
+          cursor: past ? 'not-allowed' : 'pointer',
+          aria: d + ' ' + t.months[m] + (f ? ', ' + t.lgFly : ''),
+          pick: pick(date),
+        });
+      }
+      return out;
+    };
+    const m1 = (m0 + 1) % 12,
+      y1 = m0 === 11 ? y0 + 1 : y0;
+    const selN = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
+    return {
+      t,
+      dir: L === 'he' ? 'rtl' : 'ltr',
+      langs: [
+        ['ru', 'RU'],
+        ['en', 'EN'],
+        ['he', 'HE'],
+      ].map(([k, l]) => ({ t: l, cls: k === L ? 'on' : '', pick: () => this.setState({ lang: k }) })),
+      showNotice: !allOk,
+      showOffer: allOk,
+      demo: [
+        ['no', t.demoNo, '2026-11-09', '2026-11-18'],
+        ['yes', t.demoYes, '2026-11-10', '2026-11-19'],
+      ].map(([k, l, a, b2]) => ({
+        t: l,
+        cls: (k === 'yes') === allOk ? 'on' : '',
+        pick: () => this.setState({ in: a, out: b2, tk: null }),
+      })),
+      fPpp: fmtN(PPP),
+      fTotal: fmtN(PPP * GUESTS),
+      legs: [
+        {
+          dir: t.there,
+          icon: 'M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z',
+          iconBg: '#EEF5F1',
+          from: 'TLV',
+          fromCity: L === 'he' ? 'תל אביב' : L === 'en' ? 'Tel Aviv' : 'Тель-Авив',
+          to: 'VNO',
+          toCity: L === 'he' ? 'וילנה' : L === 'en' ? 'Vilnius' : 'Вильнюс',
+          dep: '13:05',
+          arr: '17:20',
+          date: dd(inD),
+          dur: L === 'ru' ? '4 ч 15 мин' : '4h 15m',
+          no: 'IZ 2549',
+          seats: t.seats.replace('{n}', 9),
+          plane: 'Airbus A320',
+        },
+        {
+          dir: t.back,
+          icon: 'M2 20h20M3 10l1.5-.5 2.5 2.5 3.5-.9L7.6 6l2-.5 5 5.5 4.7 1.2a2 2 0 0 1-1 3.9L3 12z',
+          iconBg: '#E8EEF8',
+          from: 'VNO',
+          fromCity: L === 'he' ? 'וילנה' : L === 'en' ? 'Vilnius' : 'Вильнюс',
+          to: 'TLV',
+          toCity: L === 'he' ? 'תל אביב' : L === 'en' ? 'Tel Aviv' : 'Тель-Авив',
+          dep: '18:40',
+          arr: '22:40',
+          date: dd(outD),
+          dur: L === 'ru' ? '4 ч 00 мин' : '4h 00m',
+          no: 'IZ 2550',
+          seats: t.seats.replace('{n}', 9),
+          plane: 'Airbus A320',
+        },
+      ],
+      yText: t.yText.replace('{a}', 'IZ 2549').replace('{b}', 'IZ 2550').replace('{g}', GUESTS),
+      yesCls: tk === 'yes' ? 'on' : '',
+      noCls: tk === 'no' ? 'on' : '',
+      yesBtn: tk === 'yes' ? 'btn-primary' : 'btn-secondary',
+      noBtn: tk === 'no' ? 'btn-primary' : 'btn-secondary',
+      yesLabel: tk === 'yes' ? t.yBtnOn : t.yBtn,
+      noLabel: tk === 'no' ? t.nBtnOn : t.nBtn,
+      pickYes: () => this.setState({ tk: 'yes' }),
+      pickNo: () => this.setState({ tk: 'no' }),
+      decided: !!tk,
+      decisionLine:
+        tk === 'yes'
+          ? t.decYes.replace('{p}', fmtN(PPP * GUESTS)).replace('{t}', fmtN(ordTotal))
+          : t.decNo.replace('{t}', fmtN(ordTotal)),
+      orderTotal: fmtN(ordTotal),
+      datesOkOld: false,
+      dateChips: [chip(t.arrive, inD), chip(t.depart, outD)],
+      flightDaysLine:
+        t.flightDays + [!fly(inD) ? nearest(inD) : null, !fly(outD) ? nearest(outD) : null].filter(Boolean).join(' · '),
+      rangeLabel: range,
+      bIdle: b === 'idle',
+      bForm: b === 'form' && !changed,
+      bSent: b === 'sent' && !changed,
+      bCls: b === 'form' ? 'on' : '',
+      openB: () => this.setState({ b: 'form' }),
+      closeB: () => this.setState({ b: 'idle' }),
+      sendB: () => this.setState({ b: 'sent' }),
+      channels: CH.map(([k, l]) => ({ t: l, cls: k === st.ch ? 'on' : '', pick: () => this.setState({ ch: k }) })),
+      times: TM.map(([k, l]) => ({ t: l, cls: k === st.tm ? 'on' : '', pick: () => this.setState({ tm: k }) })),
+      okText: t.okText
+        .replace('{ch}', (CH.find((c) => c[0] === st.ch) || CH[0])[1])
+        .replace('{tm}', (TM.find((c) => c[0] === st.tm) || TM[1])[1].toLowerCase()),
+      datesOk: changed,
+      goodText: t.goodText.replace('{range}', range),
+      calOpen: !!st.cal,
+      openCal: () =>
+        this.setState({ cal: true, sel: { in: st.in, out: st.out }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
+      closeCal: () => this.setState({ cal: false }),
+      calPrev: () => {
+        const m = m0 - 1;
+        this.setState({ m: (m + 12) % 12, y: m < 0 ? y0 - 1 : y0 });
+      },
+      calNext: () => {
+        const m = m0 + 1;
+        this.setState({ m: m % 12, y: m > 11 ? y0 + 1 : y0 });
+      },
+      wds: t.wd.map((x) => ({ t: x })),
+      months: [
+        { title: t.monthsN[m0] + ' ' + y0, cells: cells(y0, m0) },
+        { title: t.monthsN[m1] + ' ' + y1, cells: cells(y1, m1) },
+      ],
+      calHint: !sIn ? t.calHintIn : !sOut ? t.calHintOut : t.calHintDone,
+      selLine: sIn ? fmtD(sIn) + (sOut ? ' → ' + fmtD(sOut) + ' · ' + selN + ' ' + t.nights : ' → …') : '—',
+      applyOff: !selN,
+      applyCal: () => {
+        if (selN) this.setState({ in: iso(sIn), out: iso(sOut), cal: false, tk: null });
+      },
+    };
+  }
+}
+
+export default function FlightsPage() {
+  usePageTitle('Проверка рейсов');
+  const [v, logic] = usePageLogic(FlightsLogic);
+  return (
+    <div className="page pg-flights">
+      <div dir={v.dir} style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+        <header style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
+          <div
+            style={{
+              maxWidth: '1180px',
+              margin: '0 auto',
+              padding: '0 24px',
+              minHeight: '84px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Link
+              to="/"
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: '#1C2620' }}
+            >
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
+                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
+              </svg>
+              <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', fontWeight: '700' }}>
+                {v.t?.brand}
+              </span>
+            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <span style={{ display: 'flex', gap: '4px' }} aria-label="Язык / Language">
+                {(v.langs || []).map((l: any, _i0: number) => (
+                  <Fragment key={_i0}>
+                    <button type="button" className={`lang ${l.cls ?? ''}`} onClick={l.pick}>
+                      {l.t}
+                    </button>
+                  </Fragment>
+                ))}
+              </span>
+              <a
+                href="tel:+37060000000"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  textDecoration: 'none',
+                  color: '#1C2620',
+                  fontWeight: '800',
+                  fontSize: '20px',
+                }}
+                dir="ltr"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1F5F4A"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
+                </svg>
+                +370&nbsp;600 00000
+              </a>
+            </div>
+          </div>
+        </header>
+        <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
+          <div
+            style={{
+              maxWidth: '1180px',
+              margin: '0 auto',
+              padding: '16px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '28px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div className="step done">
+              <span className="num">✓</span>
+              {v.t?.sRoom}
+            </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#CFC9BB"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <div className="step done">
+              <span className="num">✓</span>
+              {v.t?.sTransfer}
+            </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#CFC9BB"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <div className="step done">
+              <span className="num">✓</span>
+              {v.t?.sGuests}
+            </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#CFC9BB"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <div className="step on">
+              <span className="num">4</span>
+              {v.t?.sFlights}
+            </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#CFC9BB"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <div className="step">
+              <span className="num">5</span>
+              {v.t?.sPay}
+            </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#CFC9BB"
+              strokeWidth="2.5"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <div className="step" style={{ gap: '8px' }}>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8A968F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+              </svg>
+              {v.t?.sDone}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            maxWidth: '1180px',
+            margin: '0 auto',
+            padding: '32px 24px 56px',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '22px',
+          }}
+        >
+          {/* Prototype-only switch between the two cases */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flexWrap: 'wrap',
+              fontSize: '14px',
+              color: '#6B776F',
+            }}
+          >
+            <span style={{ fontWeight: '700' }}>[Прототип] Показать вариант:</span>
+            {(v.demo || []).map((d: any, _i0: number) => (
+              <Fragment key={_i0}>
+                <button type="button" className={`lang ${d.cls ?? ''}`} onClick={d.pick} style={{ fontSize: '13px' }}>
+                  {d.t}
+                </button>
+              </Fragment>
+            ))}
+          </div>
+          {/* Dates match the partner airline: offer the flights */}
+          {v.showOffer ? (
+            <>
+              <section style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                <div
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    borderRadius: '50%',
+                    background: '#1F5F4A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 'none',
+                  }}
+                >
+                  <svg
+                    width="38"
+                    height="38"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                  </svg>
+                </div>
+                <div style={{ flex: '1 1 520px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <h1 style={{ fontSize: '34px' }}>{v.t?.offTitle}</h1>
+                  <p style={{ margin: '0', fontSize: '19px' }}>{v.t?.offLead}</p>
+                </div>
+              </section>
+              <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <h2 style={{ fontSize: '30px' }}>{v.t?.qTitle}</h2>
+                <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44' }}>{v.t?.qLead}</p>
+                <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+                  <div
+                    className={`opt ${v.yesCls ?? ''}`}
+                    style={{
+                      flex: '3 1 440px',
+                      background: '#1F5F4A',
+                      borderColor: '#1F5F4A',
+                      color: '#fff',
+                      boxShadow: '0 10px 26px rgba(31,95,74,.28)',
+                      position: 'relative',
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-14px',
+                        left: '22px',
+                        background: '#C9893A',
+                        color: '#fff',
+                        fontSize: '13px',
+                        fontWeight: '800',
+                        padding: '5px 12px',
+                        borderRadius: '2px',
+                        letterSpacing: '.02em',
+                      }}
+                    >
+                      {v.t?.recBadge}
+                    </span>{' '}
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}
+                    >
+                      <div
+                        style={{
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '50%',
+                          background: 'rgba(255,255,255,.18)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <svg
+                          width="30"
+                          height="30"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                        </svg>
+                      </div>
+                      <span
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.15' }}
+                      >
+                        <strong style={{ fontSize: '30px', whiteSpace: 'nowrap' }}>+{v.fTotal}</strong>
+                        <span style={{ fontSize: '14px', color: '#D9E2DC' }}>{v.t?.forTwo}</span>
+                      </span>
+                    </div>
+                    <h3 style={{ fontSize: '28px', color: '#fff' }}>{v.t?.yTitle}</h3>
+                    <p style={{ margin: '0', fontSize: '17px', color: '#E6F0EA', flex: '1' }}>{v.yText}</p>{' '}
+                    <button
+                      type="button"
+                      onClick={v.pickYes}
+                      style={{
+                        minHeight: '64px',
+                        font: '800 20px Manrope,sans-serif',
+                        width: '100%',
+                        border: 'none',
+                        borderRadius: '2px',
+                        background: '#fff',
+                        color: '#1F5F4A',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {v.yesLabel}
+                    </button>
+                  </div>
+                  <div className={`opt ${v.noCls ?? ''}`} style={{ flex: '2 1 300px', padding: '20px 22px' }}>
+                    <div
+                      style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '50%',
+                        background: '#EEF5F1',
+                        border: '2px solid #1F5F4A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#1F5F4A"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 7h18v10H3zM15 7v10M7 11h4M7 14h3" />
+                      </svg>
+                    </div>
+                    <h3 style={{ fontSize: '21px' }}>{v.t?.nTitle}</h3>
+                    <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44', flex: '1' }}>{v.t?.nText}</p>{' '}
+                    <button
+                      type="button"
+                      className={`btn ${v.noBtn ?? ''}`}
+                      onClick={v.pickNo}
+                      style={{ minHeight: '54px', fontSize: '17px', width: '100%' }}
+                    >
+                      {v.noLabel}
+                    </button>
+                  </div>
+                </div>
+                {v.decided ? (
+                  <>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '16px',
+                        flexWrap: 'wrap',
+                        background: '#EEF5F1',
+                        border: '2px solid #1F5F4A',
+                        borderRadius: '2px',
+                        padding: '16px 20px',
+                      }}
+                    >
+                      <span style={{ fontSize: '17px' }}>{v.decisionLine}</span>
+                      <Link className="btn btn-primary" to="/payment" style={{ minHeight: '58px', fontSize: '19px' }}>
+                        {v.t?.toPay} →
+                      </Link>
+                    </div>
+                  </>
+                ) : null}
+                <span style={{ fontSize: '14px', color: '#6B776F' }}>{v.t?.offNote}</span>
+              </section>
+              <section className="card" style={{ overflow: 'hidden' }}>
+                <div
+                  style={{
+                    padding: '14px 22px 0',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: '#6B776F',
+                    textTransform: 'uppercase',
+                    letterSpacing: '.04em',
+                  }}
+                >
+                  {v.t?.detailsHead}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '16px',
+                    flexWrap: 'wrap',
+                    padding: '16px 22px',
+                    background: '#F7F5F0',
+                    borderBottom: '1px solid #E3DED2',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      fontWeight: '800',
+                      fontSize: '18px',
+                      color: '#1F5F4A',
+                    }}
+                  >
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m8 12 3 3 5-6" />
+                    </svg>
+                    {v.t?.offFlights}
+                  </span>
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
+                    <strong style={{ fontSize: '30px', color: '#1C2620', whiteSpace: 'nowrap' }}>{v.fPpp}</strong>
+                    <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.t?.offPpp}</span>
+                  </span>
+                </div>{' '}
+                {(v.legs || []).map((g: any, _i0: number) => (
+                  <Fragment key={_i0}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '20px',
+                        flexWrap: 'wrap',
+                        padding: '20px 22px',
+                        borderBottom: '1px dashed #E3DED2',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '4px',
+                          width: '84px',
+                          flex: 'none',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: '52px',
+                            height: '52px',
+                            borderRadius: '50%',
+                            background: g.iconBg,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <svg
+                            width="26"
+                            height="26"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d={g.icon} />
+                          </svg>
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: '800',
+                            color: '#3E4B44',
+                            textTransform: 'uppercase',
+                            letterSpacing: '.04em',
+                          }}
+                        >
+                          {g.dir}
+                        </span>
+                      </div>
+                      <div style={{ flex: '1 1 520px', display: 'flex', alignItems: 'center', gap: '14px' }} dir="ltr">
+                        <div
+                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '110px' }}
+                        >
+                          <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.from}</strong>
+                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.dep}</span>
+                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
+                          <span style={{ fontSize: '13px', color: '#6B776F' }}>{g.fromCity}</span>
+                        </div>
+                        <div
+                          style={{
+                            flex: '1',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '4px',
+                            minWidth: '120px',
+                          }}
+                        >
+                          <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#CFC9BB' }} />
+                            <span style={{ flex: '1', height: '2px', background: '#E3DED2' }} />
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#1F5F4A" aria-hidden="true">
+                              <path
+                                d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"
+                                transform="rotate(90 12 12)"
+                              />
+                            </svg>
+                            <span style={{ flex: '1', height: '2px', background: '#E3DED2' }} />
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#CFC9BB' }} />
+                          </div>
+                          <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                            {g.dur} · {v.t?.offDirect}
+                          </span>
+                        </div>
+                        <div
+                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '110px' }}
+                        >
+                          <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.to}</strong>
+                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.arr}</span>
+                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
+                          <span style={{ fontSize: '13px', color: '#6B776F' }}>{g.toCity}</span>
+                        </div>
+                      </div>
+                      <div style={{ flex: '0 0 220px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontWeight: '800',
+                            fontSize: '17px',
+                            color: '#1F5F4A',
+                          }}
+                          dir="ltr"
+                        >
+                          ✈ {g.no}
+                        </span>
+                        <span style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              background: '#FFF6E3',
+                              color: '#8A5A00',
+                              fontWeight: '800',
+                              fontSize: '12px',
+                              padding: '4px 8px',
+                              borderRadius: '2px',
+                            }}
+                          >
+                            {v.t?.offCharter}
+                          </span>
+                          <span
+                            style={{
+                              background: '#EEF5F1',
+                              color: '#1F5F4A',
+                              fontWeight: '800',
+                              fontSize: '12px',
+                              padding: '4px 8px',
+                              borderRadius: '2px',
+                            }}
+                          >
+                            {g.seats}
+                          </span>
+                        </span>
+                        <span style={{ fontSize: '14px', color: '#3E4B44' }}>{g.plane}</span>
+                      </div>
+                    </div>
+                  </Fragment>
+                ))}{' '}
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '22px',
+                    flexWrap: 'wrap',
+                    padding: '14px 22px',
+                    fontSize: '15px',
+                    color: '#3E4B44',
+                    background: '#FAFBF9',
+                  }}
+                >
+                  <span>🧳 {v.t?.offHand}</span>
+                  <span>🛄 {v.t?.offBag}</span>
+                  <span>🍽 {v.t?.offMeal}</span>
+                  <span>✈ {v.t?.offAirline}</span>
+                </div>
+              </section>
+            </>
+          ) : null}
+          {/* Main notice: friendly, not an error */}
+          {v.showNotice ? (
+            <>
+              {/* dates mismatch */}
+              <section
+                style={{
+                  background: '#fff',
+                  border: '1px solid #E3DED2',
+                  borderRadius: '2px',
+                  padding: '28px 30px',
+                  display: 'flex',
+                  gap: '24px',
+                  alignItems: 'flex-start',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div
+                  style={{
+                    width: '84px',
+                    height: '84px',
+                    borderRadius: '50%',
+                    background: '#EEF5F1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 'none',
+                  }}
+                >
+                  <svg
+                    width="46"
+                    height="46"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                  </svg>
+                </div>
+                <div style={{ flex: '1 1 520px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <h1 style={{ fontSize: '34px' }}>{v.t?.title}</h1>
+                  <p style={{ margin: '0', fontSize: '19px', color: '#1C2620' }}>{v.t?.lead}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '4px' }}>
+                    {(v.dateChips || []).map((d: any, _i0: number) => (
+                      <Fragment key={_i0}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: d.bg,
+                            border: `1px solid ${d.bd ?? ''}`,
+                            borderRadius: '2px',
+                            padding: '8px 12px',
+                            fontSize: '16px',
+                          }}
+                        >
+                          <strong>{d.label}</strong>
+                          {d.date} ·<span style={{ color: d.color, fontWeight: '700' }}>{d.state}</span>
+                        </span>
+                      </Fragment>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: '15px', color: '#3E4B44' }}>{v.flightDaysLine}</div>
+                </div>
+              </section>
+              {/* Two big equal options */}
+              <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+                <div className="opt">
+                  <div
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      background: '#1F5F4A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#fff"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m5 12 5 5L20 7" />
+                    </svg>
+                  </div>
+                  <h2 style={{ fontSize: '26px' }}>{v.t?.aTitle}</h2>
+                  <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44', flex: '1' }}>{v.t?.aText}</p>{' '}
+                  <Link
+                    className="btn btn-primary"
+                    to="/payment"
+                    style={{ minHeight: '60px', fontSize: '19px', marginTop: '6px' }}
+                  >
+                    {v.t?.aBtn} →
+                  </Link>
+                </div>
+                <div className={`opt ${v.bCls ?? ''}`}>
+                  <div
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      background: '#EEF5F1',
+                      border: '2px solid #1F5F4A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
+                    </svg>
+                  </div>
+                  <h2 style={{ fontSize: '26px' }}>{v.t?.bTitle}</h2>
+                  <p style={{ margin: '0', fontSize: '17px', color: '#3E4B44', flex: '1' }}>{v.t?.bText}</p>{' '}
+                  {v.bIdle ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={v.openB}
+                        style={{ minHeight: '60px', fontSize: '19px', marginTop: '6px', width: '100%' }}
+                      >
+                        {v.t?.bBtn}
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </>
+          ) : null}
+          {/* B: contact request form (inline, keeps the booking) */}
+          {v.bForm ? (
+            <>
+              <section
+                className="card"
+                style={{
+                  padding: '24px 26px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '18px',
+                  border: '2px solid #1F5F4A',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <h2 style={{ fontSize: '26px' }}>{v.t?.fTitle}</h2>
+                  <button
+                    type="button"
+                    onClick={v.closeB}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#1F5F4A',
+                      fontWeight: '700',
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      minHeight: '40px',
+                    }}
+                  >
+                    {v.t?.fCancel}
+                  </button>
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
+                    gap: '16px',
+                  }}
+                >
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <span className="lbl">{v.t?.fName}</span>
+                    <input className="input" type="text" defaultValue="Mikhail Levin" />
+                  </label>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <span className="lbl">{v.t?.fPhone}</span>
+                    <input className="input" type="tel" defaultValue="+972 50 123 4567" dir="ltr" />
+                  </label>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span className="lbl">{v.t?.fHow}</span>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {(v.channels || []).map((c: any, _i0: number) => (
+                      <Fragment key={_i0}>
+                        <button type="button" className={`seg ${c.cls ?? ''}`} onClick={c.pick}>
+                          {c.t}
+                        </button>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span className="lbl">{v.t?.fWhen}</span>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {(v.times || []).map((c: any, _i0: number) => (
+                      <Fragment key={_i0}>
+                        <button type="button" className={`seg ${c.cls ?? ''}`} onClick={c.pick}>
+                          {c.t}
+                        </button>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <span className="lbl">{v.t?.fNote}</span>
+                  <textarea
+                    className="input"
+                    rows={2}
+                    placeholder={v.t?.fNotePh}
+                    style={{ padding: '12px 16px', minHeight: '80px', resize: 'vertical' }}
+                  />
+                </label>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    alignItems: 'center',
+                    background: '#EEF5F1',
+                    borderRadius: '2px',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                  }}
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    style={{ flex: 'none' }}
+                  >
+                    <rect x="4" y="11" width="16" height="10" rx="1" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  {v.t?.fKeep}
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={v.sendB}
+                    style={{ minHeight: '60px', fontSize: '19px' }}
+                  >
+                    {v.t?.fSend}
+                  </button>
+                </div>
+              </section>
+            </>
+          ) : null}
+          {/* B: sent */}
+          {v.bSent ? (
+            <>
+              <section
+                style={{
+                  background: '#EEF5F1',
+                  border: '2px solid #1F5F4A',
+                  borderRadius: '2px',
+                  padding: '24px 26px',
+                  display: 'flex',
+                  gap: '18px',
+                  alignItems: 'flex-start',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: '#1F5F4A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 'none',
+                  }}
+                >
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m5 12 5 5L20 7" />
+                  </svg>
+                </div>
+                <div style={{ flex: '1 1 420px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <h2 style={{ fontSize: '26px' }}>{v.t?.okTitle}</h2>
+                  <p style={{ margin: '0', fontSize: '17px' }}>{v.okText}</p>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
+                    <Link className="btn btn-primary" to="/payment">
+                      {v.t?.okPay}
+                    </Link>
+                    <Link className="btn btn-secondary" to="/">
+                      {v.t?.okWait}
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            </>
+          ) : null}
+          {/* C: dates changed and now fit the flights */}
+          {v.datesOkOld ? (
+            <>
+              <section
+                style={{
+                  background: '#EEF5F1',
+                  border: '2px solid #1F5F4A',
+                  borderRadius: '2px',
+                  padding: '24px 26px',
+                  display: 'flex',
+                  gap: '18px',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <svg
+                  width="46"
+                  height="46"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1F5F4A"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  style={{ flex: 'none' }}
+                >
+                  <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                </svg>
+                <div style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <h2 style={{ fontSize: '26px' }}>{v.t?.goodTitle}</h2>
+                  <span style={{ fontSize: '17px' }}>{v.goodText}</span>
+                </div>
+                <Link className="btn btn-primary" to="/payment" style={{ minHeight: '60px', fontSize: '19px' }}>
+                  {v.t?.goodBtn} →
+                </Link>
+              </section>
+            </>
+          ) : null}
+          {/* C: secondary action */}
+          {v.showNotice ? (
+            <>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                  padding: '6px 0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={v.openCal}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    background: 'none',
+                    border: 'none',
+                    color: '#1F5F4A',
+                    fontWeight: '700',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    minHeight: '48px',
+                  }}
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
+                  </svg>
+                  {v.t?.cLink}
+                </button>
+              </div>
+            </>
+          ) : null}
+          {/* Booking kept */}
+          <section
+            className="card"
+            style={{ padding: '18px 22px', display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}
+          >
+            <img
+              src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
+              alt=""
+              style={{ width: '120px', height: '84px', objectFit: 'cover', borderRadius: '2px', flex: 'none' }}
+            />
+            <div style={{ flex: '1 1 360px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  color: '#6B776F',
+                  textTransform: 'uppercase',
+                  letterSpacing: '.04em',
+                }}
+              >
+                {v.t?.kept}
+              </span>
+              <strong style={{ fontSize: '19px' }}>Эгле Комфорт ★★★★ · {v.rangeLabel}</strong>
+              <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.t?.keptLine}</span>
+            </div>
+            <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.orderTotal}</strong>
+          </section>
+        </div>
+        <footer style={{ background: '#1C2620', color: '#D9E2DC', marginTop: 'auto' }}>
+          <div
+            style={{
+              maxWidth: '1180px',
+              margin: '0 auto',
+              padding: '24px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '24px',
+              flexWrap: 'wrap',
+              fontSize: '16px',
+            }}
+          >
+            <div>
+              {v.t?.brand} · WhatsApp <span dir="ltr">+370&nbsp;600 00000</span>
+            </div>
+            <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
+              {v.t?.rules}
+            </Link>
+          </div>
+        </footer>
+      </div>{' '}
+      {/* Date picker with flight days */}{' '}
+      {v.calOpen ? (
+        <>
+          <div
+            dir={v.dir}
+            style={{
+              position: 'fixed',
+              inset: '0',
+              background: 'rgba(18,34,27,.55)',
+              zIndex: '50',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              padding: '40px 16px',
+              overflow: 'auto',
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="fcTitle"
+              style={{
+                background: '#fff',
+                borderRadius: '2px',
+                width: 'min(820px,100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                padding: '26px 28px 24px',
+                boxShadow: '0 24px 60px rgba(0,0,0,.35)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <h2 id="fcTitle" style={{ fontSize: '30px' }}>
+                    {v.t?.calTitle}
+                  </h2>
+                  <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.calHint}</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={v.closeCal}
+                  style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
+                >
+                  {v.t?.close}
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <span className="lg">
+                  <i style={{ background: '#1F5F4A' }} />
+                  {v.t?.lgPicked}
+                </span>
+                <span className="lg">
+                  <i style={{ background: '#E9F4EC', border: '2px solid #1F5F4A' }} />✈ {v.t?.lgFly}
+                </span>
+                <span className="lg">
+                  <i style={{ background: '#fff', border: '1px solid #CFC9BB' }} />
+                  {v.t?.lgNoFly}
+                </span>
+                <span className="lg">
+                  <i style={{ background: '#E8E6E1' }} />
+                  {v.t?.lgPast}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                <button type="button" className="navbtn" onClick={v.calPrev} aria-label="‹">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m15 6-6 6 6 6" />
+                  </svg>
+                </button>
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                  {(v.months || []).map((m: any, _i0: number) => (
+                    <Fragment key={_i0}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div
+                          style={{
+                            fontFamily: 'Lora,Georgia,serif',
+                            fontSize: '22px',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {m.title}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
+                          {(v.wds || []).map((w: any, _i1: number) => (
+                            <Fragment key={_i1}>
+                              <div className="wd">{w.t}</div>
+                            </Fragment>
+                          ))}
+                          {(m.cells || []).map((c: any, _i1: number) => (
+                            <Fragment key={_i1}>
+                              <button
+                                type="button"
+                                className="cell"
+                                onClick={c.pick}
+                                disabled={!!c.off}
+                                aria-label={c.aria}
+                                style={{ background: c.bg, borderColor: c.border, color: c.color, cursor: c.cursor }}
+                              >
+                                <span>{c.day}</span>
+                                <small style={{ color: c.subColor }}>{c.sub}</small>
+                                {c.fly ? (
+                                  <>
+                                    <span style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}>
+                                      <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke={c.planeColor}
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                      >
+                                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                                      </svg>
+                                    </span>
+                                  </>
+                                ) : null}
+                              </button>
+                            </Fragment>
+                          ))}
+                        </div>
+                      </div>
+                    </Fragment>
+                  ))}
+                </div>
+                <button type="button" className="navbtn" onClick={v.calNext} aria-label="›">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m9 6 6 6-6 6" />
+                  </svg>
+                </button>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                  borderTop: '1px solid #E3DED2',
+                  paddingTop: '16px',
+                }}
+              >
+                <strong style={{ fontSize: '19px' }}>{v.selLine}</strong>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={v.applyCal}
+                  disabled={!!v.applyOff}
+                  style={{ minHeight: '56px', fontSize: '18px' }}
+                >
+                  {v.t?.apply}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}{' '}
+      <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
+    </div>
+  );
+}

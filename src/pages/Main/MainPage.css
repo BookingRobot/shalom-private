@@ -1,0 +1,258 @@
+.pg-main {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.pg-main * {
+  box-sizing: border-box;
+}
+.pg-main a {
+  color: #1f5f4a;
+}
+.pg-main a:hover {
+  color: #143f31;
+}
+.pg-main h1,
+.pg-main h2,
+.pg-main h3 {
+  font-family: Lora, Georgia, 'Times New Roman', serif;
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.pg-main input,
+.pg-main select,
+.pg-main button,
+.pg-main textarea {
+  font: inherit;
+  color: inherit;
+}
+.pg-main .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-main .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-main .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-main .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-main .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-main .input {
+  min-height: 50px;
+  border: 2px solid #cfc9bb;
+  border-radius: 2px;
+  padding: 0 14px 0 42px;
+  background: #fff;
+  font-size: 16px;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  font-weight: 600;
+}
+.pg-main .input:focus {
+  outline: 3px solid #9cc9b5;
+  border-color: #1f5f4a;
+}
+.pg-main .lbl {
+  font-weight: 600;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-main .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+}
+.pg-main .navlink {
+  text-decoration: none;
+  color: #1c2620;
+  font-weight: 600;
+  font-size: 16px;
+}
+.pg-main .navlink:hover {
+  color: #1f5f4a;
+}
+.pg-main .fieldico {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  pointer-events: none;
+}
+.pg-main .fact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1 1 220px;
+  justify-content: center;
+  padding: 14px 12px;
+}
+.pg-main .fact + .fact {
+  border-left: 1px solid #e3ded2;
+}
+.pg-main .resort {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  color: #1c2620;
+}
+.pg-main .resort:hover {
+  border-color: #1f5f4a;
+}
+.pg-main .resort img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+.pg-main .hcard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pg-main .hcard img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+}
+.pg-main .feat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-main .feat svg {
+  flex: none;
+}
+.pg-main .step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 260px;
+  padding: 14px 16px;
+}
+.pg-main .step + .step {
+  border-left: 1px solid #e3ded2;
+}
+.pg-main .num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1f5f4a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  flex: none;
+}
+.pg-main .datebtn {
+  text-align: left;
+  cursor: pointer;
+}
+.pg-main .datebtn:hover {
+  border-color: #1f5f4a;
+}
+.pg-main .cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 76px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  padding: 4px 2px;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  background: none;
+}
+.pg-main .cell small {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3e4b44;
+  line-height: 1;
+}
+.pg-main .cell:hover {
+  border-color: #1f5f4a;
+}
+.pg-main .wd {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b776f;
+  text-align: center;
+  padding: 6px 0;
+}
+.pg-main .navbtn {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pg-main .navbtn:hover {
+  border-color: #1f5f4a;
+}
+.pg-main .preset {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 2px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+.pg-main .preset:hover {
+  border-color: #1f5f4a;
+}
+.pg-main .lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-main .lg i {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  display: inline-block;
+}

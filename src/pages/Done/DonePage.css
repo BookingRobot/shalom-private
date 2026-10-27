@@ -1,0 +1,154 @@
+.pg-done {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.pg-done * {
+  box-sizing: border-box;
+}
+.pg-done a {
+  color: #1f5f4a;
+}
+.pg-done a:hover {
+  color: #143f31;
+}
+.pg-done h1,
+.pg-done h2,
+.pg-done h3 {
+  font-family: Lora, Georgia, 'Times New Roman', serif;
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.pg-done p {
+  margin: 0;
+}
+.pg-done .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 24px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-done .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-done .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-done .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-done .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-done .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+}
+.pg-done .step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1c2620;
+}
+.pg-done .step .num {
+  width: 28px;
+  height: 28px;
+  border: 2px solid #1f5f4a;
+  background: #eef5f1;
+  color: #1f5f4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+}
+.pg-done .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef5f1;
+  color: #1f5f4a;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 2px;
+}
+.pg-done .tl {
+  position: relative;
+  display: flex;
+  gap: 18px;
+  padding: 14px 12px;
+  border-radius: 2px;
+}
+.pg-done .tl .dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #cfc9bb;
+  position: relative;
+  z-index: 1;
+}
+.pg-done .line {
+  position: absolute;
+  left: 31px;
+  top: 60px;
+  bottom: -14px;
+  width: 2px;
+  background: #e3ded2;
+}
+.pg-done .fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 16px;
+}
+.pg-done .fact svg {
+  flex: none;
+  margin-top: 2px;
+}
+.pg-done .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 16px;
+}
+.pg-done .row strong {
+  white-space: nowrap;
+}
+.pg-done .step.done {
+  color: #1c2620;
+}
+.pg-done .step.done .num {
+  background: #eef5f1;
+  border-color: #1f5f4a;
+  color: #1f5f4a;
+}
+.pg-done .step.on {
+  color: #1f5f4a;
+}
