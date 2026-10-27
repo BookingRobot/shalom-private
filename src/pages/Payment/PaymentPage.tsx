@@ -131,7 +131,7 @@ export default function PaymentPage() {
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '36px' }}>Как вам удобнее оплатить?</h1>
+              <h1 style={{ fontSize: '38px' }}>Как вам удобнее оплатить?</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
                 Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
               </p>
@@ -141,7 +141,7 @@ export default function PaymentPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <h2 style={{ fontSize: '24px' }}>Сумма к оплате сейчас</h2>
+              <h2 style={{ fontSize: '28px' }}>Сумма к оплате сейчас</h2>
               <div
                 style={{
                   display: 'grid',
@@ -149,52 +149,35 @@ export default function PaymentPage() {
                   gap: '14px',
                 }}
               >
-                <button type="button" className={`choice ${v.advCls ?? ''}`} onClick={v.pickAdv}>
-                  {' '}
+                <button type="button" className={`choice plan ${v.advCls ?? ''}`} onClick={v.pickAdv}>
                   <span className={`radio ${v.advCls ?? ''}`}>
                     <i />
-                  </span>{' '}
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <strong style={{ fontSize: '22px', lineHeight: '1.2' }}>
-                      Минимальный аванс — <span style={{ whiteSpace: 'nowrap' }}>{v.advAmt}&nbsp;€</span>
-                    </strong>
-                    <span style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>
-                      4&nbsp;% от стоимости бронирования
+                  </span>
+                  <span className="plan-body">
+                    <span className="plan-title">Минимальный аванс</span>
+                    <span className="plan-amount">
+                      {v.advAmt}&nbsp;€ <small>сейчас</small>
                     </span>
-                    <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                      Этого достаточно, чтобы санаторий подтвердил бронь. Остальные{' '}
-                      <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{v.restAmt}&nbsp;€</strong> оплатите
-                      при заезде: наличными, картой или переводом.
+                    <span className="plan-note">4&nbsp;% от стоимости бронирования</span>
+                    <span className="plan-text">Этого достаточно, чтобы санаторий подтвердил бронь.</span>
+                    <span className="plan-rest">
+                      Остальные <strong>{v.restAmt}&nbsp;€</strong> — при заезде: наличными, картой или переводом.
                     </span>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignSelf: 'flex-start',
-                        background: '#FFF1D6',
-                        color: '#8A5A00',
-                        fontSize: '14px',
-                        fontWeight: '800',
-                        padding: '4px 10px',
-                        borderRadius: '2px',
-                      }}
-                    >
-                      Так платят 9 из 10 гостей
-                    </span>
-                  </span>{' '}
+                    <span className="plan-badge">Так платят 9 из 10 гостей</span>
+                  </span>
                 </button>
-                <button type="button" className={`choice ${v.fullCls ?? ''}`} onClick={v.pickFull}>
-                  {' '}
+                <button type="button" className={`choice plan ${v.fullCls ?? ''}`} onClick={v.pickFull}>
                   <span className={`radio ${v.fullCls ?? ''}`}>
                     <i />
-                  </span>{' '}
-                  <span style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <strong style={{ fontSize: '22px', lineHeight: '1.2' }}>
-                      Вся сумма — <span style={{ whiteSpace: 'nowrap' }}>{v.totalAmt}&nbsp;€</span>
-                    </strong>
-                    <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                      Ничего не платить на месте. Удобно, если оплачивают родственники или организация.
+                  </span>
+                  <span className="plan-body">
+                    <span className="plan-title">Вся сумма</span>
+                    <span className="plan-amount">
+                      {v.totalAmt}&nbsp;€ <small>сейчас</small>
                     </span>
-                  </span>{' '}
+                    <span className="plan-note">Ничего не платить на месте</span>
+                    <span className="plan-text">Удобно, если оплачивают родственники или организация.</span>
+                  </span>
                 </button>
               </div>
               <div
@@ -232,7 +215,7 @@ export default function PaymentPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}
             >
-              <h2 style={{ fontSize: '24px' }}>Способ оплаты</h2>
+              <h2 style={{ fontSize: '28px' }}>Способ оплаты</h2>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <button
                   type="button"
@@ -260,11 +243,9 @@ export default function PaymentPage() {
                       <rect x="2" y="5" width="20" height="14" rx="1" />
                       <path d="M2 10h20M6 15h4" />
                     </svg>
-                    <span style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.25' }}>
-                      <strong>Банковская карта</strong>
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                        Visa, Mastercard, Isracard, Amex · Apple Pay, Google Pay
-                      </span>
+                    <span className="method-body">
+                      <span className="method-title">Банковская карта</span>
+                      <span className="method-text">Visa, Mastercard, Isracard, Amex · Apple Pay, Google Pay</span>
                     </span>
                   </span>{' '}
                 </button>
@@ -289,7 +270,7 @@ export default function PaymentPage() {
                         background: '#1F5F4A',
                         color: '#fff',
                         fontWeight: '800',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -298,11 +279,9 @@ export default function PaymentPage() {
                     >
                       bit
                     </span>
-                    <span style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.25' }}>
-                      <strong>Bit</strong>
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                        Через приложение на телефоне, в шекелях
-                      </span>
+                    <span className="method-body">
+                      <span className="method-title">Bit</span>
+                      <span className="method-text">Через приложение на телефоне, в шекелях</span>
                     </span>
                   </span>{' '}
                 </button>
@@ -358,7 +337,7 @@ export default function PaymentPage() {
                         </span>
                         <span
                           style={{
-                            fontSize: '14px',
+                            fontSize: '16px',
                             fontWeight: '700',
                             color: '#5E6862',
                             textTransform: 'uppercase',
@@ -452,7 +431,7 @@ export default function PaymentPage() {
                         display: 'flex',
                         gap: '10px',
                         alignItems: 'flex-start',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         color: '#3E4B44',
                       }}
                     >
@@ -508,7 +487,7 @@ export default function PaymentPage() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: '14px',
+                              fontSize: '16px',
                               fontWeight: '700',
                               color: '#5E6862',
                               textAlign: 'center',
@@ -522,7 +501,7 @@ export default function PaymentPage() {
                               <strong style={{ fontSize: '22px' }}>
                                 К оплате в Bit: <span style={{ whiteSpace: 'nowrap' }}>{v.bitIls}</span>
                               </strong>
-                              <span style={{ fontSize: '15px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontSize: '16px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
                                 = {v.amount}
                               </span>
                             </div>
@@ -531,7 +510,7 @@ export default function PaymentPage() {
                               <br />
                               <strong>С телефона:</strong> нажмите зелёную кнопку внизу — откроется приложение Bit.
                             </div>
-                            <div style={{ fontSize: '14px', color: '#3E4B44' }}>
+                            <div style={{ fontSize: '16px', color: '#3E4B44' }}>
                               Код действует 9 минут. После оплаты страница сама перейдёт к подтверждению заказа.
                             </div>
                           </div>
@@ -574,13 +553,13 @@ export default function PaymentPage() {
                         </div>
                       </>
                     ) : null}
-                    <div style={{ fontSize: '14px', color: '#5E6862' }}>
+                    <div style={{ fontSize: '16px', color: '#5E6862' }}>
                       Сумма пересчитана в шекели по курсу [КУРС] на сегодня. Цены в заказе остаются в евро.
                     </div>
                   </div>
                 </>
               ) : null}
-              <div style={{ fontSize: '15px', color: '#3E4B44', borderTop: '1px solid #E3DED2', paddingTop: '12px' }}>
+              <div style={{ fontSize: '16px', color: '#3E4B44', borderTop: '1px solid #E3DED2', paddingTop: '12px' }}>
                 Нужен банковский перевод (например, оплачивает организация)?{' '}
                 <a href="tel:+37060000000" style={{ fontWeight: '700' }}>
                   Позвоните нам
@@ -602,7 +581,7 @@ export default function PaymentPage() {
                   flexWrap: 'wrap',
                 }}
               >
-                <h2 style={{ fontSize: '24px' }}>Если планы изменятся</h2>
+                <h2 style={{ fontSize: '28px' }}>Если планы изменятся</h2>
                 <Link to="/rules" style={{ fontWeight: '700', fontSize: '16px' }}>
                   Полные условия бронирования →
                 </Link>
@@ -759,11 +738,21 @@ export default function PaymentPage() {
                   padding: '12px 14px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '16px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    gap: '12px',
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1F5F4A',
+                  }}
+                >
                   <span>Платите сейчас</span>
-                  <strong style={{ fontSize: '22px' }}>{v.amount}</strong>
+                  <strong style={{ fontSize: '28px', fontWeight: '800', whiteSpace: 'nowrap' }}>{v.amount}</strong>
                 </div>
-                <div style={{ fontSize: '15px', color: '#3E4B44' }}>{v.rest}</div>
+                <div style={{ fontSize: '16px', lineHeight: '1.5', color: '#3E4B44' }}>{v.rest}</div>
               </div>
             }
           />
