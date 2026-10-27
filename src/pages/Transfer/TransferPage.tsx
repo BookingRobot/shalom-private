@@ -570,6 +570,7 @@ export default function TransferPage() {
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
                                 gap: '14px',
+                                alignItems: 'end',
                               }}
                             >
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -608,7 +609,7 @@ export default function TransferPage() {
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label className="lbl" htmlFor="flight">
-                                  Номер рейса или поезда и время прибытия
+                                  Рейс или поезд, время прибытия
                                 </label>
                                 <input
                                   id="flight"
@@ -969,6 +970,7 @@ export default function TransferPage() {
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
                                     gap: '16px',
+                                    alignItems: 'end',
                                   }}
                                 >
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1006,7 +1008,7 @@ export default function TransferPage() {
                                   </div>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label className="lbl" htmlFor="backflight">
-                                      Рейс или поезд и время отправления
+                                      Рейс или поезд, время отправления
                                     </label>
                                     <input
                                       id="backflight"
