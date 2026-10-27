@@ -29,6 +29,7 @@ class TransferLogic extends PageLogic {
       vehicle: tr.vehicle,
       place: '',
       indiv: tr.mode === 'individual',
+      cmp: tr.mode === 'individual',
       back: tr.back,
       backSame: tr.backPlace === tr.place,
       backCity: tr.backPlace,
@@ -104,10 +105,13 @@ class TransferLogic extends PageLogic {
       fromHotel: /^От отеля/.test(place),
       pickPlace: (e) => this.setState({ place: e.target.value }),
       indiv,
-      toggleIndiv: () => this.setState({ indiv: !indiv }),
+      cmp: !!this.state.cmp,
+      toggleCmp: () => this.setState(this.state.cmp ? { cmp: false, indiv: false } : { cmp: true }),
+      grpCls: indiv ? '' : 'on',
+      pickGroup: () => this.setState({ indiv: false }),
       grpBorder: indiv ? '#E3DED2' : '#1F5F4A',
       grpBg: indiv ? '#fff' : '#EEF5F1',
-      indBorder: indiv ? '#1F5F4A' : '#CFC9BB',
+      indBorder: this.state.cmp ? '#1F5F4A' : '#CFC9BB',
       seatPrice: fmt(curP.seat) + '\u00a0€',
       seatTotal: fmt(curP.seat * TRANSFER_GUESTS) + '\u00a0€',
       guestsLabel: TRANSFER_GUESTS + ' гостей',
@@ -115,8 +119,8 @@ class TransferLogic extends PageLogic {
       vehicles: VEHICLES.map((v) => ({
         ...v,
         price: curP[v.id],
-        cls: v.id === vehicle ? 'on' : '',
-        pick: () => this.setState({ vehicle: v.id }),
+        cls: indiv && v.id === vehicle ? 'on' : '',
+        pick: () => this.setState({ vehicle: v.id, indiv: true }),
       })),
       back,
       backSame,
@@ -744,10 +748,7 @@ export default function TransferPage() {
                           </span>
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={v.toggleIndiv}
-                        aria-expanded={!!v.indiv}
+                      <label
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -761,14 +762,26 @@ export default function TransferPage() {
                           borderRadius: '0 0 2px 2px',
                           background: '#FAFBF9',
                           cursor: 'pointer',
-                          textAlign: 'left',
-                          font: 'inherit',
                           color: '#1C2620',
                         }}
                       >
+                        <input
+                          type="checkbox"
+                          checked={!!v.cmp}
+                          onChange={v.toggleCmp}
+                          style={{ width: '24px', height: '24px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
+                        />
+                        <span style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
+                          <strong style={{ fontSize: '17px', color: '#1F5F4A' }}>
+                            Хочу ехать с комфортом — отдельной машиной
+                          </strong>
+                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                            Только вы, без ожидания и попутчиков · от {v.indFrom} за машину
+                          </span>
+                        </span>
                         <svg
-                          width="24"
-                          height="24"
+                          width="26"
+                          height="26"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="#1F5F4A"
@@ -780,30 +793,8 @@ export default function TransferPage() {
                         >
                           <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
                         </svg>
-                        <span style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
-                          <strong style={{ fontSize: '17px', color: '#1F5F4A' }}>
-                            Хочу ехать с комфортом — отдельной машиной
-                          </strong>
-                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                            Только вы, без ожидания и попутчиков · от {v.indFrom} за машину
-                          </span>
-                        </span>
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', transform: v.indiv ? 'rotate(180deg)' : 'none' }}
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-                      {v.indiv ? (
+                      </label>
+                      {v.cmp ? (
                         <>
                           <div
                             style={{
@@ -814,9 +805,34 @@ export default function TransferPage() {
                               background: '#FAFBF9',
                             }}
                           >
-                            <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                              Цены за автомобиль {v.cityName} → санаторий, в одну сторону. Обратно — столько же.
+                            <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                              Выберите, как поедете. Цены {v.cityName} → санаторий, в одну сторону; обратно — столько
+                              же.
                             </span>
+                            <button
+                              type="button"
+                              className={`choice ${v.grpCls ?? ''}`}
+                              onClick={v.pickGroup}
+                              style={{ justifyContent: 'space-between', minHeight: '64px' }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <span className={`radio ${v.grpCls ?? ''}`}>
+                                  <i />
+                                </span>
+                                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                  <strong style={{ fontSize: '18px' }}>Групповой трансфер</strong>
+                                  <span style={{ color: '#3E4B44', fontSize: '15px' }}>
+                                    Вместе с другими гостями, возможно ожидание до 1 часа
+                                  </span>
+                                </span>
+                              </span>
+                              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
+                                <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
+                                  с человека
+                                </span>
+                              </span>
+                            </button>
                             {(v.vehicles || []).map((k: any, _i0: number) => (
                               <Fragment key={_i0}>
                                 <button
