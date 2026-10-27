@@ -25,6 +25,8 @@ export interface Booking {
   };
   /** answer on the flights step */
   flights: 'yes' | 'no' | null;
+  /** package: flight Tel Aviv ⇄ Vilnius + group transfer, chosen in the search */
+  flightPackage: boolean;
 }
 
 /** Defaults = the example order used throughout the prototype. [ПРИМЕР ДАННЫХ] */
@@ -39,4 +41,5 @@ export const DEFAULT_BOOKING: Booking = {
   programId: 'midi',
   transfer: { mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius', vehicle: 'car' },
   flights: null,
+  flightPackage: false,
 };

@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { PriceBox } from './PriceBox';
 
 /** What every programme in a room offer includes — shown as one compact row of icon + label. */
 const ROOM_INCL = [
@@ -147,13 +148,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
         >
           {o.avail ? (
             <>
-              <span style={{ fontSize: '28px', fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
-                <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {o.price}&nbsp;€
-              </span>
-              <span style={{ fontSize: '14px', color: '#3E4B44' }}>за 2 взрослых · {nightsLabel}</span>
-              <span style={{ fontSize: '14px', color: '#5E6862' }}>
-                ≈ {o.ppn}&nbsp;€ / человек / сутки · сейчас {o.adv}&nbsp;€
-              </span>
+              <PriceBox forTwo={o.price} nightsLabel={nightsLabel} />
               <Link
                 className="btn btn-primary"
                 to="/rooms"

@@ -95,9 +95,38 @@ export function OrderSummary({
   );
 }
 
-/** Grey note under the total: only the advance is paid now. */
-export const AdvanceNote = ({ advance }: { advance: string }) => (
+/** Grey note under the total: a small deposit fixes the price, the rest is paid later. */
+export const AdvanceNote = ({
+  order,
+}: {
+  order: { advanceLabel: string; restLabel: string; dueDate: string; fullOnly: boolean };
+}) => (
   <div style={{ fontSize: '15px', color: '#3E4B44', background: '#F4F1EA', borderRadius: '2px', padding: '10px 12px' }}>
-    Сейчас к оплате только аванс 4 % — <strong>{advance}</strong>. Остальное — в санатории при заезде.
+    {order.fullOnly ? (
+      <>До заезда меньше недели — оплата сразу всей суммы.</>
+    ) : (
+      <>
+        Цена фиксируется после депозита <strong>{order.advanceLabel}</strong>. Остаток{' '}
+        <strong style={{ whiteSpace: 'nowrap' }}>{order.restLabel}</strong> — до {order.dueDate}; до этой даты отмена
+        бесплатная.
+      </>
+    )}
   </div>
 );
+
+/** Price rows of the order box, the same on every step: stay (place × guests), flight package, transfer. */
+export function orderPriceRows(order: {
+  stayLabel: string;
+  stayCalc: string;
+  flight: number;
+  flightLabel: string;
+  transfer: number;
+  transferKind: string;
+  transferLabel: string;
+}): [string, string][] {
+  return [
+    ['Проживание и лечение' + (order.stayCalc ? ', ' + order.stayCalc : ''), order.stayLabel],
+    ...(order.flight ? [['Перелёт Тель-Авив ⇄ Вильнюс и трансфер', order.flightLabel] as [string, string]] : []),
+    ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
+  ];
+}

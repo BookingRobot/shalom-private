@@ -1,5 +1,3 @@
-import type { Booking } from './booking';
-
 /** Resorts offered in the search form: [key, label]. */
 export const RESORTS: [string, string][] = [
   ['druskininkai', 'Друскининкай'],
@@ -8,18 +6,57 @@ export const RESORTS: [string, string][] = [
   ['anyksciai', 'Аникщяй'],
 ];
 
-/** Guest combinations in the search form; value = "adults-children". */
-export const GUEST_OPTIONS = [
-  { value: '2-0', label: '2 взрослых' },
-  { value: '1-0', label: '1 взрослый' },
-  { value: '2-1', label: '2 взрослых, 1 ребёнок' },
-  { value: '2-2', label: '2 взрослых, 2 ребёнка' },
-  { value: '3-0', label: '3 взрослых' },
-  { value: '4-0', label: '4 взрослых' },
+/**
+ * Sanatoriums people ask for by name, with the spellings they use (Cyrillic, Latin,
+ * Lithuanian, short forms). id = SANATORIUMS id; sold = shown in "нет мест".
+ * [ПРИМЕР ДАННЫХ — из BookingRobot API]
+ */
+export const SANATORIUM_NAMES: { id: string; name: string; resort: string; aliases: string[]; sold?: boolean }[] = [
+  {
+    id: 'belorus',
+    name: 'Беларусь',
+    resort: 'Друскининкай',
+    aliases: ['белорусь', 'belarus', 'belorus', 'baltarusija'],
+  },
+  {
+    id: 'egle-comfort',
+    name: 'Эгле Комфорт',
+    resort: 'Друскининкай',
+    aliases: ['эгле', 'игле', 'egle', 'eglė', 'egles', 'comfort', 'комфорт'],
+  },
+  {
+    id: 'egle-standart',
+    name: 'Эгле Стандарт',
+    resort: 'Друскининкай',
+    aliases: ['эгле', 'egle', 'eglė', 'standart', 'стандарт'],
+  },
+  {
+    id: 'grand-spa-lietuva',
+    name: 'Гранд Спа Лиетува',
+    resort: 'Друскининкай',
+    aliases: ['литва', 'лиетува', 'летува', 'lietuva', 'grand spa lietuva', 'гранд спа литва'],
+  },
+  {
+    id: 'grand-spa-druskininkai',
+    name: 'Гранд Спа Друскининкай',
+    resort: 'Друскининкай',
+    aliases: ['grand spa druskininkai', 'гранд спа'],
+  },
+  {
+    id: 'draugyste',
+    name: 'Минерал Спа Драугисте',
+    resort: 'Друскининкай',
+    aliases: ['драугисте', 'дружба', 'draugyste', 'draugystė', 'mineral spa', 'минерал'],
+  },
+  { id: 'upa', name: 'Упа Медикал Спа', resort: 'Друскининкай', aliases: ['упа', 'upa', 'upa medical'], sold: true },
+  {
+    id: 'spa-vilnius',
+    name: 'SPA Vilnius Друскининкай',
+    resort: 'Друскининкай',
+    aliases: ['спа вильнюс', 'spa vilnius', 'вильнюс'],
+    sold: true,
+  },
 ];
 
-export const guestsKey = (b: Pick<Booking, 'adults' | 'children'>) => `${b.adults}-${b.children}`;
-export const parseGuests = (key: string) => {
-  const [adults, children] = key.split('-').map(Number);
-  return { adults, children };
-};
+/** Most-asked names — chips under the search. */
+export const POPULAR_NAMES = ['belorus', 'egle-comfort', 'grand-spa-lietuva', 'draugyste', 'spa-vilnius'];

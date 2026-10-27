@@ -1,5 +1,6 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -11,9 +12,16 @@ import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { awardsOf } from '../../data/awards';
 import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
-import { BUSY_LOOK, FREE_LOOK, busyRange, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
+import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { RoomCard } from '../../components/RoomCard';
+import { PriceBox } from '../../components/PriceBox';
+import { ChooseWizard } from '../../components/ChooseWizard';
+import { DateModeTabs, FlexDates } from '../../components/FlexDates';
+import { Compare, useCompareLimit } from '../../components/Compare';
+import { FlightToggle } from '../../components/FlightToggle';
+import { guestsLabel } from '../../lib/orderSummary';
+import { eur, placePrice, quote } from '../../lib/pricing';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -22,6 +30,8 @@ import './ResultsPage.css';
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
 class ResultsLogic extends PageLogic {
+  /** 3 on a laptop, 2 on a phone — set by the page component */
+  cmpLimit = 3;
   constructor(props: PageServices) {
     super(props);
     const b = props.booking.booking;
@@ -36,7 +46,11 @@ class ResultsLogic extends PageLogic {
       pf: { daily: true, doctor: true },
       more: false,
       pr: {},
+      wz: typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('wizard'),
     };
+    // came from the name search on the home page: open that sanatorium's rooms
+    const hq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('h') : null;
+    if (hq) this.state.open = { [hq]: true };
   }
   syncBooking(st) {
     return st.checkin ? { checkin: st.checkin, checkout: iso(addD(toD(st.checkin), st.nights || 9)) } : null;
@@ -45,6 +59,7 @@ class ResultsLogic extends PageLogic {
     return this._rv();
   }
   _rv() {
+    const GQ = { adults: this.props.booking.booking.adults, children: this.props.booking.booking.children };
     const { booking } = this.props.booking;
     const {
       sanatoriums: SANATORIUMS,
@@ -88,7 +103,7 @@ class ResultsLogic extends PageLogic {
               : h.tags.includes(k);
     const NIGHTS = st.nights || 9,
       PERSONS = 2;
-    const ppnOf = (h) => Math.round(h.price / 9 / PERSONS);
+    const ppnOf = (h) => Math.round(h.price / 2); // per person, double room, for the stay
     // Applied filters (f, pr) drive the list; pending ones (pf, ppr) are edited in the panel and applied with the button
     const pr = st.pr || {};
     const pf = st.pf || f;
@@ -116,6 +131,36 @@ class ResultsLogic extends PageLogic {
         cls: pf[k] ? 'on' : '',
         n: SANATORIUMS.filter((h) => has(h, k) && passWith({ ...pf, [k]: false }, ppr)(h)).length,
         toggle: () => this.setState({ pf: { ...pf, [k]: !pf[k] } }),
+      }));
+    // one-of groups (meals, procedures per day): picking one clears the others; applied right away
+    const mkOne = (pairs) => {
+      const keys = pairs.map((x) => x[0]);
+      const cur = keys.find((k) => f[k]) || '';
+      const setOne = (k) => () => {
+        const nf = { ...f },
+          npf = { ...pf };
+        keys.forEach((x) => {
+          nf[x] = false;
+          npf[x] = false;
+        });
+        if (k && k !== cur) {
+          nf[k] = true;
+          npf[k] = true;
+        }
+        this.setState({ f: nf, pf: npf });
+      };
+      return [{ k: '', t: 'Любое', on: !cur, pick: setOne('') }].concat(
+        pairs.map(([k, t]) => ({ k, t, on: cur === k, pick: setOne(k) })),
+      );
+    };
+    // room features: several at once, applied right away
+    const mkNow = (pairs) =>
+      pairs.map(([k, t, d]) => ({
+        k,
+        t,
+        d,
+        on: !!f[k],
+        pick: () => this.setState({ f: { ...f, [k]: !f[k] }, pf: { ...pf, [k]: !f[k] } }),
       }));
 
     const sort = st.sort || 'pop';
@@ -261,6 +306,8 @@ class ResultsLogic extends PageLogic {
         };
       });
     };
+    const cmp: string[] = st.cmp || [];
+    const cmpLimit = this.cmpLimit || 3;
     const hotels = list.map((h0) => {
       const sf = stayFactor(h0, checkin);
       const h = {
@@ -332,6 +379,12 @@ class ResultsLogic extends PageLogic {
         chev: isOpen ? 'rotate(180deg)' : 'none',
         btnCls: isOpen ? 'btn-secondary' : 'btn-primary',
         toggle: () => this.setState({ open: { ...open, [h.id]: !isOpen } }),
+        cmpOn: cmp.includes(h.id),
+        cmpOff: !cmp.includes(h.id) && cmp.length >= cmpLimit,
+        cmpToggle: () =>
+          this.setState({
+            cmp: cmp.includes(h.id) ? cmp.filter((x) => x !== h.id) : cmp.concat(h.id).slice(-cmpLimit),
+          }),
         specOpen: !!sec[h.id + 'spec'],
         toggleSpec: secT(h.id, 'spec'),
         timeOpen: !!sec[h.id + 'time'],
@@ -373,8 +426,11 @@ class ResultsLogic extends PageLogic {
             return {
               name: pp[0],
               sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
-              price: fmt(p.priceN + r.addN) + '\u00a0€',
-              diff: pi === 0 ? 'самая доступная' : '+' + fmt(p.priceN - progs[0].priceN) + '\u00a0€ к цене',
+              price: eur(quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage).perPerson) + ' / чел.',
+              diff:
+                pi === 0
+                  ? 'самая доступная'
+                  : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
               diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
               border: on ? '#1F5F4A' : '#CFC9BB',
               bg: on ? '#EEF5F1' : '#fff',
@@ -414,7 +470,7 @@ class ResultsLogic extends PageLogic {
             pill: busy
               ? 'Нет мест на ваши даты'
               : r.addN
-                ? 'Номер +' + fmt(r.addN) + '\u00a0€'
+                ? 'Номер +' + eur(placePrice(r.addN, GQ)) + ' с человека'
                 : 'Включён в цену программы',
             roomLine: (o.amen || [])
               .slice(0, 3)
@@ -427,19 +483,17 @@ class ResultsLogic extends PageLogic {
               ' · ' +
               (progs[0].meals || 'питание 3 раза'),
             choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
+            // same calendar as the search band, with this room's busy nights closed
             openRoomCal: () =>
               this.setState({
-                cal: {
-                  id: h.id,
-                  picked: busyRange(rkey) ? busyRange(rkey)[1] : iso(checkin),
-                  month: checkin.getUTCMonth(),
-                  year: checkin.getUTCFullYear(),
-                  roomKey: rkey,
-                  roomName: r.room,
-                },
+                sOpen: true,
+                sRoom: { key: rkey, name: r.room, hotel: h.name },
+                ss: { in: null, out: null },
+                sm: checkin.getUTCMonth(),
+                sy: checkin.getUTCFullYear(),
               }),
             selName: sp.title.split(' — ')[0],
-            selPrice: fmt(sp.priceN + r.addN) + '\u00a0€',
+            selPrice: eur(quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage).total),
             addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
             detBtn: 'Программы и что входит (' + progs.length + ')',
             detChev: dOpen ? 'rotate(180deg)' : 'none',
@@ -586,10 +640,12 @@ class ResultsLogic extends PageLogic {
             (m === 0 && d.getUTCDate() < 8 ? 0.18 : 0)),
       );
     };
+    const sRoom = st.sOpen && st.sRoom ? st.sRoom : null;
     const sPick = (date) => () => {
       const k = iso(date);
       if (!ss.in || (ss.in && ss.out)) this.setState({ ss: { in: k, out: null } });
-      else if (date > toD(ss.in)) this.setState({ ss: { in: ss.in, out: k } });
+      else if (date > toD(ss.in) && !(sRoom && overlaps(sRoom.key, toD(ss.in), date)))
+        this.setState({ ss: { in: ss.in, out: k } });
       else this.setState({ ss: { in: k, out: null } });
     };
     const sCells = (y, m) => {
@@ -615,6 +671,7 @@ class ResultsLogic extends PageLogic {
         const date = new Date(Date.UTC(y, m, d));
         const past = date < TODAY;
         const full = !past && isSoldOutEverywhere(iso(date));
+        const rBusy = !past && !full && !!sRoom && roomDayBusy(sRoom.key, date); // this room is taken that night
         /* [ПРИМЕР] нет мест ни в одном объекте */ const p = avgPpn(date),
           r = p / AVG;
         let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9',
@@ -629,7 +686,7 @@ class ResultsLogic extends PageLogic {
           color = '#9AA39E';
           subColor = '#9AA39E';
         }
-        if (full) {
+        if (full || rBusy) {
           bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)';
           color = '#8A968F';
           subColor = '#8A5A00';
@@ -644,14 +701,18 @@ class ResultsLogic extends PageLogic {
         cells.push({
           day: d,
           fly: isFlightDay(date) && !past,
-          sub: past ? '' : full ? 'нет мест' : isIn ? 'заезд' : isOut ? 'выезд' : p + '\u00a0€',
+          sub: past ? '' : full ? 'нет мест' : rBusy ? 'занят' : isIn ? 'заезд' : isOut ? 'выезд' : p + '\u00a0€',
           bg,
           border,
           color,
           subColor,
-          off: past || full,
-          cursor: past || full ? 'not-allowed' : 'pointer',
-          aria: d + ' ' + MONTHS[m] + (past ? ', недоступно' : ', около ' + p + ' € за человека в сутки'),
+          off: past || full || rBusy,
+          cursor: past || full || rBusy ? 'not-allowed' : 'pointer',
+          aria:
+            d +
+            ' ' +
+            MONTHS[m] +
+            (past ? ', недоступно' : rBusy ? ', номер занят' : ', около ' + p + ' € за человека в сутки'),
           pick: sPick(date),
         });
       }
@@ -670,11 +731,20 @@ class ResultsLogic extends PageLogic {
       sOpenCal: () =>
         this.setState({
           sOpen: true,
+          sRoom: null,
           ss: { in: iso(checkin), out: iso(checkout) },
           sm: checkin.getUTCMonth(),
           sy: checkin.getUTCFullYear(),
         }),
-      sCloseCal: () => this.setState({ sOpen: false }),
+      sCloseCal: () => this.setState({ sOpen: false, sRoom: null }),
+      sFlex: !!st.sFlex,
+      setSFlex: (sFlex) => this.setState({ sFlex }),
+      sFlexPick: (a, b) => {
+        const d = toD(a);
+        this.setState({ ss: { in: a, out: b }, sFlex: false, sm: d.getUTCMonth(), sy: d.getUTCFullYear() });
+      },
+      sCalTitle: sRoom ? 'Свободные даты номера' : 'Выберите даты поездки',
+      sRoomLine: sRoom ? sRoom.name + ' · ' + sRoom.hotel + ' — занятые дни закрыты' : '',
       sCalPrev: () => {
         const m = sm0 - 1;
         this.setState({ sm: (m + 12) % 12, sy: m < 0 ? sy0 - 1 : sy0 });
@@ -694,7 +764,7 @@ class ResultsLogic extends PageLogic {
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
       sApplyOff: !sN,
       sApplyCal: () => {
-        if (sN && sIn) this.setState({ checkin: iso(sIn), nights: sN, sOpen: false });
+        if (sN && sIn) this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null });
       },
       sP7: sPreset(7),
       sP10: sPreset(10),
@@ -730,6 +800,29 @@ class ResultsLogic extends PageLogic {
         notify: () => this.props.help.open(),
       })),
       soldCount: '2 санатория',
+      wzOpen: !!st.wz,
+      wzOpenFn: () => this.setState({ wz: true }),
+      wzClose: () => this.setState({ wz: false }),
+      wzShow: ({ filters, hotelId }) => {
+        this.setState({
+          f: { ...filters },
+          pf: { ...filters },
+          pr: {},
+          ppr: {},
+          open: { ...open, [hotelId]: true },
+          wz: false,
+        });
+        setTimeout(
+          () => document.getElementById('h-' + hotelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+          60,
+        );
+      },
+      cmpLimit,
+      cmpIds: cmp,
+      cmpHotels: hotels,
+      cmpRemove: (id) => this.setState({ cmp: cmp.filter((x) => x !== id) }),
+      cmpClear: () => this.setState({ cmp: [] }),
+      guestsLine: guestsLabel(booking) + (booking.flightPackage ? ' · с перелётом из Тель-Авива' : ''),
       hotels,
       none: hotels.length === 0,
       some: hotels.length > 0,
@@ -753,6 +846,9 @@ class ResultsLogic extends PageLogic {
       fStars: mk(FILTER_GROUPS.stars),
       fProfile: mk(FILTER_GROUPS.prof),
       fBeds: mk(FILTER_GROUPS.beds),
+      fMeals: mkOne(FILTER_GROUPS.meals),
+      fProcs: mkOne(FILTER_GROUPS.procs),
+      fRoom: mkNow(FILTER_GROUPS.room),
       moreOpen: !!st.more,
       moreClosed: !st.more,
       toggleMore: () => this.setState({ more: !st.more }),
@@ -799,6 +895,16 @@ class ResultsLogic extends PageLogic {
 export default function ResultsPage() {
   usePageTitle('Санатории Друскининкая');
   const [v, logic] = usePageLogic(ResultsLogic);
+  logic.cmpLimit = useCompareLimit();
+  useEffect(() => {
+    const hq = new URLSearchParams(window.location.search).get('h');
+    if (!hq) return;
+    const t = setTimeout(() => {
+      const el = document.getElementById('h-' + hq) || document.getElementById('sold');
+      el?.scrollIntoView({ block: 'start' });
+    }, 80);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <div className="page pg-results">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -925,44 +1031,7 @@ export default function ResultsPage() {
                   <label className="lbl" htmlFor="guests">
                     Гости
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 21a8 8 0 0 1 16 0" />
-                    </svg>
-                    <select id="guests" className="input sinput">
-                      <option>2 взрослых</option>
-                      <option>1 взрослый</option>
-                      <option>2 взрослых, 1 ребёнок</option>
-                      <option>2 взрослых, 2 ребёнка</option>
-                      <option>3 взрослых</option>
-                      <option>4 взрослых</option>
-                    </select>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      aria-hidden="true"
-                      style={{ position: 'absolute', right: '12px', top: '16px', pointerEvents: 'none' }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
+                  <GuestsPicker inputClass="input sinput" />
                 </div>
                 <Link className="btn btn-primary" to="/results" style={{ minHeight: '50px' }}>
                   <svg
@@ -982,8 +1051,19 @@ export default function ResultsPage() {
                   Изменить поиск
                 </Link>
               </div>
-              <div style={{ fontSize: '14px', color: '#5E6862' }}>
-                {v.nightsLabel} · Цены ниже — за весь заезд для всех гостей.
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px 16px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <FlightToggle />
+                <span style={{ fontSize: '14px', color: '#5E6862' }}>
+                  {v.nightsLabel} · Цены — на человека за весь заезд, итог для всех гостей указан ниже.
+                </span>
               </div>
             </form>
           </div>
@@ -1002,12 +1082,96 @@ export default function ResultsPage() {
           <div style={{ fontSize: '15px', color: '#3E4B44' }}>
             <Link to="/">Главная</Link> › Друскининкай
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h1 style={{ fontSize: '32px' }}>Санатории Друскининкая</h1>
-            <div style={{ fontSize: '17px', color: '#3E4B44' }}>
-              {v.dateRange} · {v.nightsLabel} · 2 взрослых
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: '12px 20px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <h1 style={{ fontSize: '32px' }}>Санатории Друскининкая</h1>
+              <div style={{ fontSize: '17px', color: '#3E4B44' }}>
+                {v.dateRange} · {v.nightsLabel} · {v.guestsLine}
+              </div>
             </div>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={v.wzOpenFn}
+              style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
+              </svg>
+              Помогите выбрать санаторий
+            </button>
           </div>
+          {/* Quick choices guests ask about most: meals, procedures per day, room */}
+          <section className="card qf" aria-label="Быстрый выбор">
+            <div className="qf-row">
+              <span className="qf-lbl">Питание</span>
+              <div className="qf-opts" role="group" aria-label="Питание">
+                {(v.fMeals || []).map((o: any) => (
+                  <button
+                    type="button"
+                    key={o.k}
+                    className={`qf-chip ${o.on ? 'on' : ''}`}
+                    aria-pressed={o.on}
+                    onClick={o.pick}
+                  >
+                    {o.t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="qf-row">
+              <span className="qf-lbl">Процедуры</span>
+              <div className="qf-opts" role="group" aria-label="Процедуры в день">
+                {(v.fProcs || []).map((o: any) => (
+                  <button
+                    type="button"
+                    key={o.k}
+                    className={`qf-chip ${o.on ? 'on' : ''}`}
+                    aria-pressed={o.on}
+                    onClick={o.pick}
+                  >
+                    {o.t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="qf-row">
+              <span className="qf-lbl">Номер</span>
+              <div className="qf-opts" role="group" aria-label="Номер">
+                {(v.fRoom || []).map((o: any) => (
+                  <button
+                    type="button"
+                    key={o.k}
+                    className={`qf-chip ${o.on ? 'on' : ''}`}
+                    aria-pressed={o.on}
+                    onClick={o.pick}
+                  >
+                    {o.on ? '✓ ' : ''}
+                    {o.t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
           {/* Filters above the list */}
           {v.fClosed ? (
             <>
@@ -1179,7 +1343,7 @@ export default function ResultsPage() {
                               className="ftitle"
                               style={{ fontFamily: 'Manrope,sans-serif', fontSize: '17px', fontWeight: '800' }}
                             >
-                              Цена за человека в сутки
+                              Цена на человека за заезд
                             </div>
                             <div style={{ display: 'flex', gap: '14px' }}>
                               <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1' }}>
@@ -1520,6 +1684,7 @@ export default function ResultsPage() {
               <Fragment key={_i0}>
                 <article
                   className="card"
+                  id={'h-' + h.id}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -1673,19 +1838,7 @@ export default function ResultsPage() {
                         margin: '14px 0',
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: '28px',
-                          fontWeight: '800',
-                          color: '#1C2620',
-                          whiteSpace: 'nowrap',
-                          lineHeight: '1.1',
-                        }}
-                      >
-                        <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {h.price}&nbsp;€
-                      </span>
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>за 2 взрослых · {v.nightsLabel}</span>
-                      <span style={{ fontSize: '14px', color: '#5E6862' }}>≈ {h.ppn}&nbsp;€ / чел. в сутки</span>
+                      <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} />
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}
@@ -1736,6 +1889,10 @@ export default function ResultsPage() {
                         </svg>
                         Когда дешевле?
                       </button>
+                      <label className="cmp-check">
+                        <input type="checkbox" checked={!!h.cmpOn} disabled={h.cmpOff} onChange={h.cmpToggle} />
+                        {h.cmpOff ? 'Сравнить (не больше ' + v.cmpLimit + ')' : 'Сравнить'}
+                      </label>
                     </div>
                   </div>
                   {h.open ? (
@@ -1852,7 +2009,9 @@ export default function ResultsPage() {
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h2 style={{ fontSize: '24px', color: '#3E4B44' }}>Нет свободных мест на ваши даты · {v.soldCount}</h2>
+                <h2 id="sold" style={{ fontSize: '24px', color: '#3E4B44', scrollMarginTop: '16px' }}>
+                  Нет свободных мест на ваши даты · {v.soldCount}
+                </h2>
                 <span style={{ fontSize: '16px', color: '#5E6862' }}>
                   На {v.dateRange} эти санатории заняты. Описание можно посмотреть, а забронировать — на другие даты.
                 </span>
@@ -2068,6 +2227,8 @@ export default function ResultsPage() {
               Задать вопрос
             </Link>
           </section>
+          <ChooseWizard open={!!v.wzOpen} onClose={v.wzClose} onShow={v.wzShow} />
+          <Compare hotels={v.cmpHotels || []} ids={v.cmpIds || []} onRemove={v.cmpRemove} onClear={v.cmpClear} />
         </div>
         <SiteFooter />
       </div>{' '}
@@ -2567,8 +2728,9 @@ export default function ResultsPage() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <h2 id="sCalTitle" style={{ fontSize: '28px' }}>
-                    Выберите даты поездки
+                    {v.sCalTitle}
                   </h2>
+                  {v.sRoomLine ? <strong style={{ fontSize: '16px', color: '#1C2620' }}>{v.sRoomLine}</strong> : null}
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.sCalHint}</span>
                 </div>
                 <button
@@ -2592,114 +2754,121 @@ export default function ResultsPage() {
                   Закрыть
                 </button>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '15px', color: '#3E4B44' }}>Быстрый выбор:</span>
-                <button type="button" className="preset" onClick={v.sP7}>
-                  7 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.sP10}>
-                  10 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.sP14}>
-                  14 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.sP21}>
-                  21 ночь
-                </button>
-                <span style={{ marginLeft: 'auto', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  <span className="lg">
-                    <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
-                    дешевле
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#FFF6E3', border: '1px solid #F0DDB8' }} />
-                    обычная цена
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#FCEDE9', border: '1px solid #F0CFC6' }} />
-                    дороже
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#E8E6E1' }} />
-                    прошедшие дни
-                  </span>
-                  <span className="lg">
-                    <i
-                      style={{
-                        background: 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)',
-                        border: '1px solid #CFC9BB',
-                      }}
-                    />
-                    нет свободных мест
-                  </span>
-                  <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
-                    <summary
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        cursor: 'pointer',
-                        listStyle: 'none',
-                      }}
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                      </svg>
-                      <span>
-                        <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+              {v.sRoomLine ? null : <DateModeTabs flex={!!v.sFlex} onChange={v.setSFlex} />}
+              {v.sFlex && !v.sRoomLine ? (
+                <FlexDates onPick={v.sFlexPick} />
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>Быстрый выбор:</span>
+                    <button type="button" className="preset" onClick={v.sP7}>
+                      7 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.sP10}>
+                      10 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.sP14}>
+                      14 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.sP21}>
+                      21 ночь
+                    </button>
+                    <span style={{ marginLeft: 'auto', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                      <span className="lg">
+                        <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
+                        дешевле
                       </span>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '20px',
-                          height: '20px',
-                          borderRadius: '50%',
-                          border: '1.5px solid #1F5F4A',
-                          color: '#1F5F4A',
-                          fontSize: '12px',
-                          fontWeight: '800',
-                        }}
-                      >
-                        i
+                      <span className="lg">
+                        <i style={{ background: '#FFF6E3', border: '1px solid #F0DDB8' }} />
+                        обычная цена
                       </span>
-                    </summary>
-                    <div
-                      style={{
-                        marginTop: '8px',
-                        maxWidth: '420px',
-                        background: '#F4F1EA',
-                        borderRadius: '2px',
-                        padding: '10px 12px',
-                        fontSize: '14px',
-                        lineHeight: '1.45',
-                        color: '#1C2620',
-                      }}
-                    >
-                      Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
-                      осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
-                      прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
-                    </div>
-                  </details>
-                </span>
-              </div>
-              <MonthsCalendar
-                months={v.sMonths || []}
-                onPrev={v.sCalPrev}
-                onNext={v.sCalNext}
-                planeTitle="Рейс из Израиля"
-              />
+                      <span className="lg">
+                        <i style={{ background: '#FCEDE9', border: '1px solid #F0CFC6' }} />
+                        дороже
+                      </span>
+                      <span className="lg">
+                        <i style={{ background: '#E8E6E1' }} />
+                        прошедшие дни
+                      </span>
+                      <span className="lg">
+                        <i
+                          style={{
+                            background: 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)',
+                            border: '1px solid #CFC9BB',
+                          }}
+                        />
+                        нет свободных мест
+                      </span>
+                      <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
+                        <summary
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer',
+                            listStyle: 'none',
+                          }}
+                        >
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                          </svg>
+                          <span>
+                            <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+                          </span>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: '1.5px solid #1F5F4A',
+                              color: '#1F5F4A',
+                              fontSize: '12px',
+                              fontWeight: '800',
+                            }}
+                          >
+                            i
+                          </span>
+                        </summary>
+                        <div
+                          style={{
+                            marginTop: '8px',
+                            maxWidth: '420px',
+                            background: '#F4F1EA',
+                            borderRadius: '2px',
+                            padding: '10px 12px',
+                            fontSize: '14px',
+                            lineHeight: '1.45',
+                            color: '#1C2620',
+                          }}
+                        >
+                          Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
+                          осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
+                          прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
+                        </div>
+                      </details>
+                    </span>
+                  </div>
+                  <MonthsCalendar
+                    months={v.sMonths || []}
+                    onPrev={v.sCalPrev}
+                    onNext={v.sCalNext}
+                    planeTitle="Рейс из Израиля"
+                  />
+                </>
+              )}
               <div
                 style={{
                   display: 'flex',

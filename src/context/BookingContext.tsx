@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_BOOKING, type Booking } from '../data/booking';
+import { bookingFromUrl } from '../lib/share';
 
 interface BookingApi {
   booking: Booking;
@@ -11,13 +12,20 @@ const BookingCtx = createContext<BookingApi | null>(null);
 const KEY = 'br-shalom:booking';
 
 function load(): Booking {
+  let b = DEFAULT_BOOKING;
   try {
     const raw = sessionStorage.getItem(KEY);
-    if (raw) return { ...DEFAULT_BOOKING, ...JSON.parse(raw) };
+    if (raw) b = { ...DEFAULT_BOOKING, ...JSON.parse(raw) };
   } catch {
     /* storage unavailable or corrupted */
   }
-  return DEFAULT_BOOKING;
+  // a shared offer link (see lib/share) overrides what this browser had
+  const shared = typeof window !== 'undefined' ? bookingFromUrl(window.location.search) : null;
+  if (shared) {
+    b = { ...b, ...shared };
+    save(b);
+  }
+  return b;
 }
 
 function save(b: Booking) {
