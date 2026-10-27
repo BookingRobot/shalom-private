@@ -129,7 +129,7 @@ export default function RoomsPage() {
             <Link to="/hotel">Эгле Комфорт</Link> › Номер и программа
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <h1 style={{ fontSize: '30px' }}>Номер и программа</h1>
+            <h1 style={{ fontSize: '26px' }}>Номер и программа</h1>
             <p style={{ margin: '0', fontSize: '18px', color: '#3E4B44' }}>
               {v.includedName} уже включена. При желании выберите другую.
             </p>
@@ -140,8 +140,8 @@ export default function RoomsPage() {
               src="/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg"
               alt="Двухместный номер"
               style={{
-                width: '220px',
-                height: '150px',
+                width: '150px',
+                height: '100px',
                 objectFit: 'cover',
                 display: 'block',
                 margin: '12px 0 12px 12px',
@@ -221,8 +221,8 @@ export default function RoomsPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <svg
-                        width="26"
-                        height="26"
+                        width="22"
+                        height="22"
                         viewBox="-1 -1 26 26"
                         fill="none"
                         stroke="#1F5F4A"
@@ -234,7 +234,7 @@ export default function RoomsPage() {
                       >
                         <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
                       </svg>
-                      <h2 style={{ fontSize: '22px' }}>{p.name}</h2>
+                      <h2 style={{ fontSize: '19px' }}>{p.name}</h2>
                     </div>
                     <div
                       style={{
@@ -250,17 +250,16 @@ export default function RoomsPage() {
                               background: '#EEF5F1',
                               border: '1px solid #C8DED3',
                               borderRadius: '2px',
-                              padding: '12px 14px',
+                              padding: '8px 12px',
                               display: 'flex',
                               flexDirection: 'column',
                               gap: '4px',
-                              minHeight: '92px',
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <svg
-                                width="22"
-                                height="22"
+                                width="18"
+                                height="18"
                                 viewBox="-1 -1 26 26"
                                 fill="none"
                                 stroke="#1F5F4A"
@@ -275,7 +274,7 @@ export default function RoomsPage() {
                               <span
                                 style={{
                                   fontFamily: 'Lora,Georgia,serif',
-                                  fontSize: '22px',
+                                  fontSize: '18px',
                                   fontWeight: '700',
                                   lineHeight: '1',
                                   color: '#1F5F4A',
@@ -311,7 +310,7 @@ export default function RoomsPage() {
                       </span>
                     )}
                     <span style={{ fontSize: '16px', color: '#3E4B44', marginTop: '8px' }}>Итого за заезд</span>
-                    <span style={{ fontSize: '26px', fontWeight: '800', lineHeight: '1.15', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: '22px', fontWeight: '800', lineHeight: '1.15', whiteSpace: 'nowrap' }}>
                       {p.total}
                     </span>
                     <span style={{ fontSize: '15px', color: '#5E6862' }}>≈ {p.ppn} / чел. в сутки</span>
@@ -319,7 +318,7 @@ export default function RoomsPage() {
                       type="button"
                       className={`btn ${p.btnCls ?? ''}`}
                       onClick={p.pick}
-                      style={{ minHeight: '48px', fontSize: '17px', marginTop: '10px', padding: '0 16px' }}
+                      style={{ minHeight: '44px', fontSize: '15px', marginTop: '8px', padding: '0 14px' }}
                     >
                       {p.btnLabel}
                     </button>
