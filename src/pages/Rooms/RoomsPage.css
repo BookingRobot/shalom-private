@@ -64,33 +64,6 @@
   border: 1px solid #e3ded2;
   border-radius: 2px;
 }
-.pg-rooms .step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #6b776f;
-}
-.pg-rooms .step .num {
-  width: 36px;
-  height: 36px;
-  border-radius: 2px;
-  border: 2px solid #cfc9bb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  background: #fff;
-}
-.pg-rooms .step.on {
-  color: #1f5f4a;
-}
-.pg-rooms .step.on .num {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
-}
 .pg-rooms .ico2 {
   display: flex;
   align-items: center;

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
+import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -25,161 +27,11 @@ export default function DonePage() {
   return (
     <div className="page pg-done">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <header style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '0 24px',
-              minHeight: '72px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Link
-              to="/"
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: '#1C2620' }}
-            >
-              <svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
-              </svg>
-              <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', fontWeight: '700' }}>
-                Санатории Литвы
-              </span>
-            </Link>
-            <a
-              href="tel:+37060000000"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                textDecoration: 'none',
-                color: '#1C2620',
-                fontWeight: '800',
-                fontSize: '20px',
-              }}
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-              </svg>
-              +370&nbsp;600 00000
-            </a>
-          </div>
-        </header>
-        <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '12px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '18px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div className="step done">
-              <span className="num">✓</span>Номер
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step done">
-              <span className="num">✓</span>Трансфер
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step done">
-              <span className="num">✓</span>Гости
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step done">
-              <span className="num">✓</span>Рейсы
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step done">
-              <span className="num">✓</span>Оплата
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step on" style={{ gap: '8px' }}>
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
-              </svg>
-              Готово
-            </div>
-          </div>
-        </div>
+        <HeaderBar>
+          <Brand size={24} />
+          <PhoneLink />
+        </HeaderBar>
+        <CheckoutSteps current={6} compact />
         <div
           style={{
             maxWidth: '1180px',

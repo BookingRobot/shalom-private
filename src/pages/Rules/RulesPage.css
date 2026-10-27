@@ -60,15 +60,6 @@
   border: 1px solid #e3ded2;
   border-radius: 3px;
 }
-.pg-rules .navlink {
-  text-decoration: none;
-  color: #1c2620;
-  font-weight: 600;
-  font-size: 17px;
-}
-.pg-rules .navlink:hover {
-  color: #1f5f4a;
-}
 .pg-rules .toc a {
   display: block;
   padding: 10px 14px;

@@ -88,15 +88,6 @@
   border: 1px solid #e3ded2;
   border-radius: 2px;
 }
-.pg-main .navlink {
-  text-decoration: none;
-  color: #1c2620;
-  font-weight: 600;
-  font-size: 16px;
-}
-.pg-main .navlink:hover {
-  color: #1f5f4a;
-}
 .pg-main .fieldico {
   position: absolute;
   left: 12px;

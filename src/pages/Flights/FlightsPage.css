@@ -87,41 +87,6 @@
   font-size: 16px;
   color: #3e4b44;
 }
-.pg-flights .step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #6b776f;
-}
-.pg-flights .step .num {
-  width: 36px;
-  height: 36px;
-  border-radius: 2px;
-  border: 2px solid #cfc9bb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  background: #fff;
-}
-.pg-flights .step.on {
-  color: #1f5f4a;
-}
-.pg-flights .step.on .num {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
-}
-.pg-flights .step.done {
-  color: #1c2620;
-}
-.pg-flights .step.done .num {
-  background: #eef5f1;
-  border-color: #1f5f4a;
-  color: #1f5f4a;
-}
 .pg-flights .opt {
   flex: 1 1 360px;
   display: flex;

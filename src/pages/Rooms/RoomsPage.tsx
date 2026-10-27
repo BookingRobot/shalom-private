@@ -1,5 +1,8 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
+import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
+import { SiteFooter, footerInfo } from '../../components/layout/SiteFooter';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -164,170 +167,20 @@ class RoomsLogic extends PageLogic {
 }
 
 export default function RoomsPage() {
-  usePageTitle('Улучшить программу');
+  usePageTitle('Шаг 1 из 5 — номер и программа');
   const [v, logic] = usePageLogic(RoomsLogic);
   return (
     <div className="page pg-rooms">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <header style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '0 24px',
-              minHeight: '84px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Link
-              to="/"
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: '#1C2620' }}
-            >
-              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
-              </svg>
-              <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', fontWeight: '700' }}>
-                Санатории Литвы
-              </span>
-            </Link>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
-              <a
-                href="tel:+37060000000"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  textDecoration: 'none',
-                  color: '#1C2620',
-                  fontWeight: '800',
-                  fontSize: '20px',
-                }}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-                </svg>
-                +370&nbsp;600 00000
-              </a>
-            </div>
-          </div>
-        </header>
+        <HeaderBar minHeight={84}>
+          <Brand logo={40} size={24} />
+          <HeaderAside>
+            <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
+            <PhoneLink icon={24} />
+          </HeaderAside>
+        </HeaderBar>
         {/* Steps */}
-        <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '16px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '28px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div className="step on">
-              <span className="num">1</span>Номер
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step">
-              <span className="num">2</span>Трансфер
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step">
-              <span className="num">3</span>Гости
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step">
-              <span className="num">4</span>Рейсы
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step">
-              <span className="num">5</span>Оплата
-            </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#CFC9BB"
-              strokeWidth="2.5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-            <div className="step" style={{ gap: '8px' }}>
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#8A968F"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
-              </svg>
-              Готово
-            </div>
-          </div>
-        </div>
+        <CheckoutSteps current={1} />
         <div
           style={{
             maxWidth: '1180px',
@@ -755,30 +608,7 @@ export default function RoomsPage() {
             </div>
           </div>
         </div>
-        <footer style={{ background: '#1C2620', color: '#D9E2DC' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '24px 24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '24px',
-              flexWrap: 'wrap',
-              fontSize: '16px',
-            }}
-          >
-            <div>Санатории Литвы · консультация на русском · WhatsApp +370&nbsp;600 00000</div>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Как оплатить
-              </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Условия отмены
-              </Link>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter padding="24px 24px" pinned={false} info={footerInfo(false)} />
       </div>{' '}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>

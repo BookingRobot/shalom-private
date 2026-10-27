@@ -1,5 +1,7 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
+import { SiteFooter } from '../../components/layout/SiteFooter';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -795,80 +797,16 @@ class HotelLogic extends PageLogic {
 }
 
 export default function HotelPage() {
-  usePageTitle('Санаторий Эгле Комфорт — вариант B');
+  usePageTitle('Санаторий Эгле Комфорт');
   const [v, logic] = usePageLogic(HotelLogic);
   return (
     <div className="page pg-hotel">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <header style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '0 24px',
-              minHeight: '72px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '24px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Link
-              to="/"
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: '#1C2620' }}
-            >
-              <svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
-              </svg>
-              <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '23px', fontWeight: '700' }}>
-                Санатории Литвы
-              </span>
-            </Link>
-            <nav style={{ display: 'flex', alignItems: 'center', gap: '36px', flexWrap: 'wrap' }}>
-              <Link className="navlink" to="/results">
-                Курорты
-              </Link>
-              <Link className="navlink" to="/rules">
-                Как оплатить
-              </Link>
-              <Link className="navlink" to="/rules">
-                Условия
-              </Link>
-              <Link className="navlink" to="/done">
-                Контакты
-              </Link>
-            </nav>
-            <a
-              href="tel:+37060000000"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                textDecoration: 'none',
-                color: '#1C2620',
-                fontWeight: '800',
-                fontSize: '19px',
-              }}
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-              </svg>
-              +370&nbsp;600 00000
-            </a>
-          </div>
-        </header>
+        <HeaderBar>
+          <Brand />
+          <MainNav />
+          <PhoneLink size={19} />
+        </HeaderBar>
         <div
           style={{
             maxWidth: '1180px',
@@ -2790,30 +2728,7 @@ export default function HotelPage() {
             </section>
           </div>
         </div>
-        <footer style={{ background: '#1C2620', color: '#D9E2DC', marginTop: 'auto' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '28px 24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '24px',
-              flexWrap: 'wrap',
-              fontSize: '16px',
-            }}
-          >
-            <div>Санатории Литвы · консультация на русском 24/7 · WhatsApp +370&nbsp;600 00000</div>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Как оплатить
-              </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Условия отмены
-              </Link>
-            </div>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>{' '}
       {/* "Когда дешевле?" — two-month range calendar with this sanatorium's prices; applying re-renders the page */}{' '}
       {v.calOpen ? (

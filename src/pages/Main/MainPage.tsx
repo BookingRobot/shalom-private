@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -290,7 +291,7 @@ class MainLogic extends PageLogic {
 }
 
 export default function MainPage() {
-  usePageTitle('Главная — поиск санатория');
+  usePageTitle('Санатории Литвы — лечение и отдых');
   const [v, logic] = usePageLogic(MainLogic);
   return (
     <div className="page pg-main">
@@ -317,101 +318,37 @@ export default function MainPage() {
               background: 'linear-gradient(90deg,rgba(18,34,27,.72) 0%,rgba(18,34,27,.35) 55%,rgba(18,34,27,.15) 100%)',
             }}
           />
-          <header style={{ position: 'relative' }}>
-            <div
-              style={{
-                maxWidth: '1180px',
-                margin: '0 auto',
-                padding: '0 24px',
-                minHeight: '64px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '24px',
-                flexWrap: 'wrap',
-              }}
-            >
-              <Link
-                to="/"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#fff' }}
-              >
-                <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
-                  <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                  <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
-                </svg>
-                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', fontWeight: '700' }}>
-                  Санатории Литвы
-                </span>
-              </Link>
-              <nav style={{ display: 'flex', alignItems: 'center', gap: '28px', flexWrap: 'wrap' }}>
-                <Link className="navlink" to="/results" style={{ color: '#fff' }}>
-                  Курорты
-                </Link>
-                <Link className="navlink" to="/rules" style={{ color: '#fff' }}>
-                  Как оплатить
-                </Link>
-                <Link className="navlink" to="/rules" style={{ color: '#fff' }}>
-                  Условия
-                </Link>
-                <Link className="navlink" to="/done" style={{ color: '#fff' }}>
-                  Контакты
-                </Link>
-              </nav>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <a
-                  href="tel:+37060000000"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    textDecoration: 'none',
-                    color: '#fff',
-                    fontWeight: '800',
-                    fontSize: '18px',
-                  }}
+          <HeaderBar tone="dark" minHeight={64}>
+            <Brand tone="dark" logo={34} size={22} gap={10} />
+            <MainNav tone="dark" gap={28} size={16} />
+            <HeaderAside gap={16} wrap={false}>
+              <PhoneLink tone="dark" size={18} icon={20} gap={8} />
+              <div style={{ position: 'relative' }}>
+                <select
+                  className="input"
+                  aria-label="Язык"
+                  style={{ padding: '0 30px 0 12px', minHeight: '40px', width: 'auto', fontSize: '14px' }}
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-                  </svg>
-                  +370&nbsp;600 00000
-                </a>
-                <div style={{ position: 'relative' }}>
-                  <select
-                    className="input"
-                    aria-label="Язык"
-                    style={{ padding: '0 30px 0 12px', minHeight: '40px', width: 'auto', fontSize: '14px' }}
-                  >
-                    <option>RU</option>
-                    <option>LT</option>
-                    <option>EN</option>
-                  </select>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                    style={{ position: 'absolute', right: '10px', top: '12px', pointerEvents: 'none' }}
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </div>
+                  <option>RU</option>
+                  <option>LT</option>
+                  <option>EN</option>
+                </select>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1F5F4A"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', right: '10px', top: '12px', pointerEvents: 'none' }}
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </div>
-            </div>
-          </header>
+            </HeaderAside>
+          </HeaderBar>
           <div
             style={{
               position: 'relative',

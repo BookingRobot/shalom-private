@@ -138,41 +138,6 @@
   border-radius: 2px;
   background: #1f5f4a;
 }
-.pg-payment .step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #6b776f;
-}
-.pg-payment .step .num {
-  width: 36px;
-  height: 36px;
-  border-radius: 2px;
-  border: 2px solid #cfc9bb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  background: #fff;
-}
-.pg-payment .step.on {
-  color: #1f5f4a;
-}
-.pg-payment .step.on .num {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
-}
-.pg-payment .step.done {
-  color: #1c2620;
-}
-.pg-payment .step.done .num {
-  background: #eef5f1;
-  border-color: #1f5f4a;
-  color: #1f5f4a;
-}
 .pg-payment .chk {
   display: flex;
   align-items: flex-start;

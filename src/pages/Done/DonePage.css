@@ -63,25 +63,6 @@
   border: 1px solid #e3ded2;
   border-radius: 2px;
 }
-.pg-done .step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 15px;
-  color: #1c2620;
-}
-.pg-done .step .num {
-  width: 28px;
-  height: 28px;
-  border: 2px solid #1f5f4a;
-  background: #eef5f1;
-  color: #1f5f4a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-}
 .pg-done .chip {
   display: inline-flex;
   align-items: center;
@@ -140,15 +121,4 @@
 }
 .pg-done .row strong {
   white-space: nowrap;
-}
-.pg-done .step.done {
-  color: #1c2620;
-}
-.pg-done .step.done .num {
-  background: #eef5f1;
-  border-color: #1f5f4a;
-  color: #1f5f4a;
-}
-.pg-done .step.on {
-  color: #1f5f4a;
 }

@@ -67,15 +67,6 @@
   border: 1px solid #e3ded2;
   border-radius: 3px;
 }
-.pg-hotel .navlink {
-  text-decoration: none;
-  color: #1c2620;
-  font-weight: 600;
-  font-size: 17px;
-}
-.pg-hotel .navlink:hover {
-  color: #1f5f4a;
-}
 .pg-hotel .thumb {
   padding: 0;
   border: 3px solid transparent;
