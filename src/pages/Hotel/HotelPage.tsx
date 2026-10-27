@@ -477,7 +477,7 @@ export default function HotelPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                 <h1 style={{ fontSize: '40px' }}>Санаторий Эгле Комфорт</h1>
-                <span style={{ color: '#B8860B', fontSize: '22px', letterSpacing: '1px' }} aria-label="4 звезды">
+                <span style={{ color: '#8A6500', fontSize: '22px', letterSpacing: '1px' }} aria-label="4 звезды">
                   ★★★★
                 </span>
               </div>
@@ -534,7 +534,7 @@ export default function HotelPage() {
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
                   color: '#fff',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
                   borderRadius: '2px',
@@ -572,7 +572,7 @@ export default function HotelPage() {
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
                   color: '#fff',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
                   borderRadius: '2px',
@@ -610,7 +610,7 @@ export default function HotelPage() {
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
                   color: '#fff',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
                   borderRadius: '2px',
@@ -648,7 +648,7 @@ export default function HotelPage() {
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
                   color: '#fff',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
                   borderRadius: '2px',
@@ -887,7 +887,7 @@ export default function HotelPage() {
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span
                       style={{
-                        fontSize: '13px',
+                        fontSize: '14px',
                         fontWeight: '700',
                         color: '#3E4B44',
                         textTransform: 'uppercase',
@@ -1116,7 +1116,7 @@ export default function HotelPage() {
                           </span>
                           <span
                             style={{
-                              fontSize: '13px',
+                              fontSize: '14px',
                               color: '#3E4B44',
                               textAlign: 'center',
                               lineHeight: '1.3',
@@ -1169,7 +1169,7 @@ export default function HotelPage() {
                           </span>
                           <span
                             style={{
-                              fontSize: '13px',
+                              fontSize: '14px',
                               color: '#3E4B44',
                               textAlign: 'center',
                               lineHeight: '1.3',
@@ -1222,7 +1222,7 @@ export default function HotelPage() {
                           </span>
                           <span
                             style={{
-                              fontSize: '13px',
+                              fontSize: '14px',
                               color: '#3E4B44',
                               textAlign: 'center',
                               lineHeight: '1.3',
@@ -1275,7 +1275,7 @@ export default function HotelPage() {
                           </span>
                           <span
                             style={{
-                              fontSize: '13px',
+                              fontSize: '14px',
                               color: '#3E4B44',
                               textAlign: 'center',
                               lineHeight: '1.3',
@@ -1330,7 +1330,7 @@ export default function HotelPage() {
                                 style={{ height: '54px', width: 'auto', maxWidth: '100%', display: 'block' }}
                               />
                               <strong style={{ fontSize: '15px', lineHeight: '1.2' }}>{v.name}</strong>
-                              <span style={{ fontSize: '13px', color: '#3E4B44', lineHeight: '1.3' }}>{v.info}</span>
+                              <span style={{ fontSize: '14px', color: '#3E4B44', lineHeight: '1.3' }}>{v.info}</span>
                               <span style={{ fontSize: '16px', fontWeight: '800', color: '#1F5F4A' }}>{v.price}</span>
                             </div>
                           </Fragment>
@@ -1767,7 +1767,7 @@ export default function HotelPage() {
                   <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none' }}>
                     +370&nbsp;600 00000
                   </a>
-                  <span style={{ fontSize: '13px', color: '#3E4B44' }}>
+                  <span style={{ fontSize: '14px', color: '#3E4B44' }}>
                     Ежедневно с 9:00 до 20:00 · <Link to="/rules">Условия оплаты и отмены</Link>
                   </span>
                 </div>
@@ -1982,7 +1982,7 @@ export default function HotelPage() {
                 >
                   <span
                     className="lbl"
-                    style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '.04em' }}
+                    style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '.04em' }}
                   >
                     Сейчас
                   </span>
@@ -2005,7 +2005,7 @@ export default function HotelPage() {
                 >
                   <span
                     className="lbl"
-                    style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '.04em' }}
+                    style={{ fontSize: '14px', textTransform: 'uppercase', letterSpacing: '.04em' }}
                   >
                     Новые даты
                   </span>

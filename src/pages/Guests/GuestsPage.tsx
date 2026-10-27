@@ -62,8 +62,8 @@ class GuestsLogic extends PageLogic {
     const vals = {
       dob1: fmtDob(dob.g1),
       dob2: fmtDob(dob.g2),
-      dob1Color: dob.g1 ? '#1C2620' : '#8A968F',
-      dob2Color: dob.g2 ? '#1C2620' : '#8A968F',
+      dob1Color: dob.g1 ? '#1C2620' : '#6B776F',
+      dob2Color: dob.g2 ? '#1C2620' : '#6B776F',
       openDob1: open('g1'),
       openDob2: open('g2'),
       dobOpen: !!pk,

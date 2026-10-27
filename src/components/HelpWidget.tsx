@@ -298,7 +298,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     }}
                   >
                     <strong style={{ fontSize: '16px' }}>Если уже знаете — так мы поможем быстрее</strong>
-                    <span style={{ fontSize: '14px', color: '#6B776F' }}>не обязательно</span>
+                    <span style={{ fontSize: '14px', color: '#5E6862' }}>не обязательно</span>
                   </div>
                   <div
                     style={{
@@ -345,7 +345,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     flexWrap: 'wrap',
                   }}
                 >
-                  <span style={{ fontSize: '14px', color: '#6B776F', maxWidth: '340px' }}>
+                  <span style={{ fontSize: '14px', color: '#5E6862', maxWidth: '340px' }}>
                     Нужно указать имя и телефон или e-mail. Данные используем только для ответа.
                   </span>
                   <button

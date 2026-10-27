@@ -16,7 +16,7 @@
   background: none;
 }
 .months-calendar .cell small {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #3e4b44;
   line-height: 1;
@@ -25,7 +25,7 @@
   border-color: #1f5f4a;
 }
 .months-calendar .wd {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #5e6862;
   text-align: center;

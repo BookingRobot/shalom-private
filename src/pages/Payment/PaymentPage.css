@@ -61,7 +61,7 @@
   border-color: #1f5f4a;
 }
 .pg-payment .input::placeholder {
-  color: #8a968f;
+  color: #6b776f;
 }
 .pg-payment .lbl {
   font-weight: 700;
@@ -70,7 +70,7 @@
 }
 .pg-payment .hint {
   font-size: 15px;
-  color: #6b776f;
+  color: #5e6862;
 }
 .pg-payment .card {
   background: #fff;

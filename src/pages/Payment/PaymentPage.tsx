@@ -358,9 +358,9 @@ export default function PaymentPage() {
                         </span>
                         <span
                           style={{
-                            fontSize: '13px',
+                            fontSize: '14px',
                             fontWeight: '700',
-                            color: '#6B776F',
+                            color: '#5E6862',
                             textTransform: 'uppercase',
                             letterSpacing: '.04em',
                           }}
@@ -376,7 +376,7 @@ export default function PaymentPage() {
                             style={{
                               display: 'flex',
                               alignItems: 'center',
-                              color: '#8A968F',
+                              color: '#6B776F',
                               fontSize: '20px',
                               letterSpacing: '.06em',
                             }}
@@ -388,7 +388,7 @@ export default function PaymentPage() {
                           <span className="lbl">Срок</span>
                           <div
                             className="input"
-                            style={{ display: 'flex', alignItems: 'center', color: '#8A968F', fontSize: '20px' }}
+                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '20px' }}
                           >
                             ММ / ГГ
                           </div>
@@ -397,7 +397,7 @@ export default function PaymentPage() {
                           <span className="lbl">CVV</span>
                           <div
                             className="input"
-                            style={{ display: 'flex', alignItems: 'center', color: '#8A968F', fontSize: '20px' }}
+                            style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '20px' }}
                           >
                             •••
                           </div>
@@ -407,7 +407,7 @@ export default function PaymentPage() {
                         <span className="lbl">Номер удостоверения личности (ת.ז.) — для карт израильских банков</span>
                         <div
                           className="input"
-                          style={{ display: 'flex', alignItems: 'center', color: '#8A968F', fontSize: '18px' }}
+                          style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
                         >
                           000000000
                         </div>
@@ -508,9 +508,9 @@ export default function PaymentPage() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: '13px',
+                              fontSize: '14px',
                               fontWeight: '700',
-                              color: '#6B776F',
+                              color: '#5E6862',
                               textAlign: 'center',
                               padding: '10px',
                             }}
@@ -574,7 +574,7 @@ export default function PaymentPage() {
                         </div>
                       </>
                     ) : null}
-                    <div style={{ fontSize: '14px', color: '#6B776F' }}>
+                    <div style={{ fontSize: '14px', color: '#5E6862' }}>
                       Сумма пересчитана в шекели по курсу [КУРС] на сегодня. Цены в заказе остаются в евро.
                     </div>
                   </div>

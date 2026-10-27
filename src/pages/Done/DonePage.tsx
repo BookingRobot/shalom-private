@@ -396,7 +396,7 @@ export default function DonePage() {
                     <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', fontWeight: '600' }}>
                       Эгле Комфорт
                     </div>
-                    <span style={{ color: '#B8860B', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
+                    <span style={{ color: '#8A6500', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
                   </div>
                   <div className="fact">
                     <svg
@@ -600,7 +600,7 @@ export default function DonePage() {
                     height="18"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#6B776F"
+                    stroke="#5E6862"
                     strokeWidth="2"
                     strokeLinecap="round"
                     aria-hidden="true"

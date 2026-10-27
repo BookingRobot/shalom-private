@@ -66,6 +66,8 @@ export function Brand({
         gap: `${gap}px`,
         textDecoration: 'none',
         color: tone === 'dark' ? '#fff' : '#1C2620',
+        padding: '4px 0',
+        margin: '-4px 0',
       }}
     >
       <LogoMark size={logo} />
@@ -141,6 +143,8 @@ export function PhoneLink({
         color: tone === 'dark' ? '#fff' : '#1C2620',
         fontWeight: '800',
         fontSize: `${size}px`,
+        padding: '8px 0',
+        margin: '-8px 0',
       }}
     >
       <PhoneIcon size={icon} color={tone === 'dark' ? 'currentColor' : '#1F5F4A'} />

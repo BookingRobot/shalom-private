@@ -61,7 +61,7 @@
   border-color: #1f5f4a;
 }
 .pg-guests .input::placeholder {
-  color: #8a968f;
+  color: #6b776f;
 }
 .pg-guests .lbl {
   font-weight: 700;
@@ -70,7 +70,7 @@
 }
 .pg-guests .hint {
   font-size: 15px;
-  color: #6b776f;
+  color: #5e6862;
 }
 .pg-guests .card {
   background: #fff;
@@ -134,7 +134,7 @@
   gap: 10px;
   font-weight: 700;
   font-size: 16px;
-  color: #6b776f;
+  color: #5e6862;
 }
 .pg-guests .pstep .n {
   width: 34px;
@@ -203,7 +203,7 @@
 .pg-guests .wd {
   font-size: 14px;
   font-weight: 700;
-  color: #6b776f;
+  color: #5e6862;
   text-align: center;
   padding: 4px 0;
 }

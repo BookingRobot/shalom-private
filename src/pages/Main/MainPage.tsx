@@ -442,7 +442,7 @@ export default function MainPage() {
                   Найти санаторий
                 </Link>
               </div>
-              <div style={{ fontSize: '14px', color: '#6B776F' }}>
+              <div style={{ fontSize: '14px', color: '#5E6862' }}>
                 {v.nightsLabel} · После поиска покажем полную стоимость за всех гостей.
               </div>
             </form>
@@ -619,7 +619,7 @@ export default function MainPage() {
                       style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}
                     >
                       <h3 style={{ fontSize: '19px' }}>{h.name}</h3>
-                      <span style={{ color: '#B8860B', fontSize: '14px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                      <span style={{ color: '#8A6500', fontSize: '14px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
                         {h.stars}
                       </span>
                     </div>
@@ -667,7 +667,7 @@ export default function MainPage() {
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.15' }}>
                         <span style={{ fontSize: '22px', fontWeight: '800' }}>от {h.price}&nbsp;€</span>
-                        <span style={{ fontSize: '13px', color: '#6B776F' }}>за человека в сутки</span>
+                        <span style={{ fontSize: '14px', color: '#5E6862' }}>за человека в сутки</span>
                       </div>
                       <Link
                         className="btn btn-secondary"
@@ -771,7 +771,7 @@ export default function MainPage() {
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <strong style={{ fontSize: '15px' }}>Выберите санаторий</strong>
-                <span style={{ fontSize: '13px', color: '#3E4B44' }}>Сравните программы и стоимость.</span>
+                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Сравните программы и стоимость.</span>
               </div>
             </div>
             <div className="step">
@@ -793,7 +793,7 @@ export default function MainPage() {
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <strong style={{ fontSize: '15px' }}>Укажите данные гостей</strong>
-                <span style={{ fontSize: '13px', color: '#3E4B44' }}>При необходимости добавьте трансфер.</span>
+                <span style={{ fontSize: '14px', color: '#3E4B44' }}>При необходимости добавьте трансфер.</span>
               </div>
             </div>
             <div className="step">
@@ -813,7 +813,7 @@ export default function MainPage() {
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <strong style={{ fontSize: '15px' }}>Оплатите аванс</strong>
-                <span style={{ fontSize: '13px', color: '#3E4B44' }}>Остаток — при заезде в санаторий.</span>
+                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Остаток — при заезде в санаторий.</span>
               </div>
             </div>
           </div>

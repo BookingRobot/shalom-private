@@ -13,3 +13,24 @@
   line-height: 1.2;
   font-weight: 600;
 }
+
+/* Phones: long button labels wrap instead of pushing the page sideways. */
+@media (max-width: 480px) {
+  body .page .btn {
+    white-space: normal;
+    text-align: center;
+    height: auto;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+/* Tap areas of at least 44px for compact controls, without changing the layout. */
+body .page :is(.lang, .acc, .linkbtn, .btn) {
+  position: relative;
+}
+body .page :is(.lang, .acc, .linkbtn, .btn)::after {
+  content: '';
+  position: absolute;
+  inset: -5px -2px;
+}

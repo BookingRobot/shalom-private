@@ -72,6 +72,7 @@
 }
 .pg-flights .opt {
   flex: 1 1 360px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -106,7 +107,7 @@
   background: #fff;
   border-radius: 2px;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
 }
 .pg-flights .lang.on {

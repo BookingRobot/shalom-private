@@ -162,9 +162,9 @@ export default function RoomsPage() {
             >
               <span
                 style={{
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  color: '#6B776F',
+                  color: '#5E6862',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}
@@ -288,7 +288,7 @@ export default function RoomsPage() {
                               </span>
                             </div>
                             <strong style={{ fontSize: '15px', lineHeight: '1.2' }}>{v.label}</strong>
-                            <span style={{ fontSize: '13px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
+                            <span style={{ fontSize: '14px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
                           </div>
                         </Fragment>
                       ))}
@@ -320,7 +320,7 @@ export default function RoomsPage() {
                     </span>
                     <span style={{ fontSize: '15px', marginTop: '6px' }}>Итого за заезд:</span>
                     <span style={{ fontSize: '22px', fontWeight: '800', whiteSpace: 'nowrap' }}>{p.total}</span>
-                    <span style={{ fontSize: '13px', color: '#6B776F' }}>≈ {p.ppn} / чел. в сутки</span>
+                    <span style={{ fontSize: '14px', color: '#5E6862' }}>≈ {p.ppn} / чел. в сутки</span>
                     <button
                       type="button"
                       className={`btn ${p.btnCls ?? ''}`}
@@ -399,9 +399,9 @@ export default function RoomsPage() {
                       <div style={{ flex: '1 1 280px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <div
                           style={{
-                            fontSize: '13px',
+                            fontSize: '14px',
                             fontWeight: '700',
-                            color: '#6B776F',
+                            color: '#5E6862',
                             textTransform: 'uppercase',
                             letterSpacing: '.04em',
                           }}
@@ -442,9 +442,9 @@ export default function RoomsPage() {
                       >
                         <div
                           style={{
-                            fontSize: '13px',
+                            fontSize: '14px',
                             fontWeight: '700',
-                            color: '#6B776F',
+                            color: '#5E6862',
                             textTransform: 'uppercase',
                             letterSpacing: '.04em',
                             marginBottom: '4px',

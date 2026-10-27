@@ -634,17 +634,17 @@ export default function TransferPage() {
                             type="text"
                             placeholder="Название отеля и адрес, например: Artis Centrum Hotels, Liejyklos g. 3"
                           />
-                          <span style={{ fontSize: '15px', color: '#6B776F' }}>
+                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
                             Водитель будет ждать у главного входа. Если выезжаете из квартиры — укажите адрес и подъезд.
                           </span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1/-1' }}>
                           <label className="lbl" htmlFor="maplink">
                             Ссылка на Google Maps{' '}
-                            <span style={{ fontWeight: '600', color: '#6B776F' }}>(не обязательно)</span>
+                            <span style={{ fontWeight: '600', color: '#5E6862' }}>(не обязательно)</span>
                           </label>
                           <input id="maplink" className="input" type="url" placeholder="https://maps.app.goo.gl/…" />
-                          <span style={{ fontSize: '15px', color: '#6B776F' }}>
+                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
                             Откройте отель в Google Maps → «Поделиться» → скопируйте ссылку. Так водитель точно не
                             ошибётся.
                           </span>
@@ -695,7 +695,7 @@ export default function TransferPage() {
                             style={{
                               background: '#1F5F4A',
                               color: '#fff',
-                              fontSize: '13px',
+                              fontSize: '14px',
                               fontWeight: '800',
                               padding: '4px 10px',
                               borderRadius: '2px',
@@ -803,7 +803,7 @@ export default function TransferPage() {
                             borderLeft: '3px solid #C8DED3',
                           }}
                         >
-                          <span style={{ fontSize: '15px', color: '#6B776F' }}>
+                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
                             Цены за автомобиль {v.cityName} → санаторий, в одну сторону. Обратно — столько же.
                           </span>
                           {(v.vehicles || []).map((k: any, _i0: number) => (
@@ -849,7 +849,7 @@ export default function TransferPage() {
                               </button>
                             </Fragment>
                           ))}
-                          <span style={{ fontSize: '15px', color: '#6B776F' }}>
+                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
                             Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00)
                             +20&nbsp;%.
                           </span>
@@ -1032,7 +1032,7 @@ export default function TransferPage() {
                                   type="text"
                                   placeholder="Например: LO 772, 16:10"
                                 />
-                                <span style={{ fontSize: '15px', color: '#6B776F' }}>
+                                <span style={{ fontSize: '15px', color: '#5E6862' }}>
                                   Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.
                                 </span>
                               </div>

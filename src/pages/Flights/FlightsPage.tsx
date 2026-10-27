@@ -344,13 +344,13 @@ export default function FlightsPage() {
               gap: '10px',
               flexWrap: 'wrap',
               fontSize: '14px',
-              color: '#6B776F',
+              color: '#5E6862',
             }}
           >
             <span style={{ fontWeight: '700' }}>[Прототип] Показать вариант:</span>
             {(v.demo || []).map((d: any, _i0: number) => (
               <Fragment key={_i0}>
-                <button type="button" className={`lang ${d.cls ?? ''}`} onClick={d.pick} style={{ fontSize: '13px' }}>
+                <button type="button" className={`lang ${d.cls ?? ''}`} onClick={d.pick} style={{ fontSize: '14px' }}>
                   {d.t}
                 </button>
               </Fragment>
@@ -413,7 +413,7 @@ export default function FlightsPage() {
                         left: '22px',
                         background: '#C9893A',
                         color: '#fff',
-                        fontSize: '13px',
+                        fontSize: '14px',
                         fontWeight: '800',
                         padding: '5px 12px',
                         borderRadius: '2px',
@@ -537,15 +537,15 @@ export default function FlightsPage() {
                     </div>
                   </>
                 ) : null}
-                <span style={{ fontSize: '14px', color: '#6B776F' }}>{v.t?.offNote}</span>
+                <span style={{ fontSize: '14px', color: '#5E6862' }}>{v.t?.offNote}</span>
               </section>
               <section className="card" style={{ overflow: 'hidden' }}>
                 <div
                   style={{
                     padding: '14px 22px 0',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '700',
-                    color: '#6B776F',
+                    color: '#5E6862',
                     textTransform: 'uppercase',
                     letterSpacing: '.04em',
                   }}
@@ -644,7 +644,7 @@ export default function FlightsPage() {
                         </span>
                         <span
                           style={{
-                            fontSize: '13px',
+                            fontSize: '14px',
                             fontWeight: '800',
                             color: '#3E4B44',
                             textTransform: 'uppercase',
@@ -661,7 +661,7 @@ export default function FlightsPage() {
                           <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.from}</strong>
                           <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.dep}</span>
                           <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
-                          <span style={{ fontSize: '13px', color: '#6B776F' }}>{g.fromCity}</span>
+                          <span style={{ fontSize: '14px', color: '#5E6862' }}>{g.fromCity}</span>
                         </div>
                         <div
                           style={{
@@ -695,7 +695,7 @@ export default function FlightsPage() {
                           <strong style={{ fontSize: '30px', lineHeight: '1' }}>{g.to}</strong>
                           <span style={{ fontSize: '22px', fontWeight: '800', color: '#1F5F4A' }}>{g.arr}</span>
                           <span style={{ fontSize: '15px', color: '#3E4B44' }}>{g.date}</span>
-                          <span style={{ fontSize: '13px', color: '#6B776F' }}>{g.toCity}</span>
+                          <span style={{ fontSize: '14px', color: '#5E6862' }}>{g.toCity}</span>
                         </div>
                       </div>
                       <div style={{ flex: '0 0 220px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -718,7 +718,7 @@ export default function FlightsPage() {
                               background: '#FFF6E3',
                               color: '#8A5A00',
                               fontWeight: '800',
-                              fontSize: '12px',
+                              fontSize: '14px',
                               padding: '4px 8px',
                               borderRadius: '2px',
                             }}
@@ -730,7 +730,7 @@ export default function FlightsPage() {
                               background: '#EEF5F1',
                               color: '#1F5F4A',
                               fontWeight: '800',
-                              fontSize: '12px',
+                              fontSize: '14px',
                               padding: '4px 8px',
                               borderRadius: '2px',
                             }}
@@ -1199,9 +1199,9 @@ export default function FlightsPage() {
             <div style={{ flex: '1 1 360px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <span
                 style={{
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  color: '#6B776F',
+                  color: '#5E6862',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}

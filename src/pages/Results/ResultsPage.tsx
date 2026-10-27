@@ -987,7 +987,7 @@ export default function ResultsPage() {
                   Изменить поиск
                 </Link>
               </div>
-              <div style={{ fontSize: '14px', color: '#6B776F' }}>
+              <div style={{ fontSize: '14px', color: '#5E6862' }}>
                 {v.nightsLabel} · Цены ниже — за весь заезд для всех гостей.
               </div>
             </form>
@@ -1570,7 +1570,7 @@ export default function ResultsPage() {
                           </Link>
                         </h2>
                         <span
-                          style={{ color: '#B8860B', fontSize: '18px', letterSpacing: '1px', whiteSpace: 'nowrap' }}
+                          style={{ color: '#8A6500', fontSize: '18px', letterSpacing: '1px', whiteSpace: 'nowrap' }}
                         >
                           {h.stars}
                         </span>
@@ -1689,7 +1689,7 @@ export default function ResultsPage() {
                         <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {h.price}&nbsp;€
                       </span>
                       <span style={{ fontSize: '14px', color: '#3E4B44' }}>за 2 взрослых · {v.nightsLabel}</span>
-                      <span style={{ fontSize: '13px', color: '#6B776F' }}>≈ {h.ppn}&nbsp;€ / чел. в сутки</span>
+                      <span style={{ fontSize: '14px', color: '#5E6862' }}>≈ {h.ppn}&nbsp;€ / чел. в сутки</span>
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}
@@ -1815,7 +1815,7 @@ export default function ResultsPage() {
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <h2 style={{ fontSize: '28px', color: '#3E4B44' }}>Нет свободных мест на ваши даты · {v.soldCount}</h2>
-                <span style={{ fontSize: '16px', color: '#6B776F' }}>
+                <span style={{ fontSize: '16px', color: '#5E6862' }}>
                   На {v.dateRange} эти санатории заняты. Описание можно посмотреть, а забронировать — на другие даты.
                 </span>
               </div>
@@ -1866,7 +1866,7 @@ export default function ResultsPage() {
                         top: '8px',
                         background: '#5E6862',
                         color: '#fff',
-                        fontSize: '13px',
+                        fontSize: '14px',
                         fontWeight: '800',
                         padding: '5px 10px',
                         borderRadius: '2px',
@@ -1893,11 +1893,11 @@ export default function ResultsPage() {
                       </h3>
                       <span style={{ color: '#A39F96', fontSize: '16px', letterSpacing: '1px' }}>{u.stars}</span>
                     </div>
-                    <span style={{ fontSize: '15px', color: '#6B776F' }}>{u.sub}</span>
+                    <span style={{ fontSize: '15px', color: '#5E6862' }}>{u.sub}</span>
                     <div style={{ display: 'flex', gap: '6px 16px', flexWrap: 'wrap', marginTop: '2px' }}>
                       {(u.chips || []).map((c: any, _i1: number) => (
                         <Fragment key={_i1}>
-                          <span className="fact" style={{ color: '#6B776F' }}>
+                          <span className="fact" style={{ color: '#5E6862' }}>
                             <svg
                               width="18"
                               height="18"
@@ -2021,7 +2021,7 @@ export default function ResultsPage() {
                 <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '19px', textDecoration: 'none' }}>
                   +370&nbsp;600 00000
                 </a>
-                <span style={{ fontSize: '13px', color: '#3E4B44' }}>
+                <span style={{ fontSize: '14px', color: '#3E4B44' }}>
                   Ежедневно с 9:00 до 20:00 по литовскому времени
                 </span>
               </div>
@@ -2196,7 +2196,7 @@ export default function ResultsPage() {
                         gap: '4px',
                         fontSize: '14px',
                         fontWeight: '700',
-                        color: '#6B776F',
+                        color: '#5E6862',
                         textAlign: 'center',
                       }}
                     >
@@ -2233,7 +2233,7 @@ export default function ResultsPage() {
                           >
                             <span style={{ fontSize: '15px', color: '#3E4B44' }}>{c.day}</span>
                             <span style={{ fontSize: '20px', fontWeight: '800', color: c.color }}>{c.text}</span>
-                            <span style={{ fontSize: '12px', color: '#1F5F4A', fontWeight: '700' }}>{c.sub}</span>
+                            <span style={{ fontSize: '14px', color: '#1F5F4A', fontWeight: '700' }}>{c.sub}</span>
                             {c.fly ? (
                               <>
                                 <span
@@ -2355,7 +2355,7 @@ export default function ResultsPage() {
                         Нет мест
                       </span>
                     </div>
-                    <div style={{ fontSize: '13px', color: '#6B776F' }}>
+                    <div style={{ fontSize: '14px', color: '#5E6862' }}>
                       Цены в календаре округлены. Итоговая стоимость указана справа.
                     </div>
                   </div>
@@ -2488,7 +2488,7 @@ export default function ResultsPage() {
                   >
                     Применить {v.cal?.newRange}
                   </button>
-                  <span style={{ fontSize: '13px', color: '#6B776F' }}>Даты изменятся после подтверждения.</span>
+                  <span style={{ fontSize: '14px', color: '#5E6862' }}>Даты изменятся после подтверждения.</span>
                 </div>
               </div>
             </div>

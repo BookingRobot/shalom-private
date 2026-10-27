@@ -51,7 +51,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   top: '10px',
                   background: '#5E6862',
                   color: '#fff',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '800',
                   padding: '5px 10px',
                   borderRadius: '2px',
@@ -68,7 +68,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               bottom: '10px',
               background: 'rgba(28,38,32,.8)',
               color: '#fff',
-              fontSize: '12px',
+              fontSize: '14px',
               fontWeight: '700',
               padding: '5px 9px',
               borderRadius: '2px',
@@ -193,7 +193,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {o.price}&nbsp;€
               </span>
               <span style={{ fontSize: '14px', color: '#3E4B44' }}>за 2 взрослых · {nightsLabel}</span>
-              <span style={{ fontSize: '13px', color: '#6B776F' }}>
+              <span style={{ fontSize: '14px', color: '#5E6862' }}>
                 ≈ {o.ppn}&nbsp;€ / человек / сутки · сейчас {o.adv}&nbsp;€
               </span>
               <Link
@@ -307,9 +307,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div
                 style={{
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  color: '#6B776F',
+                  color: '#5E6862',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}
@@ -385,7 +385,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       }}
                     >
                       <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{pr.price}</strong>
-                      <span style={{ fontSize: '13px', color: pr.diffColor, whiteSpace: 'nowrap' }}>{pr.diff}</span>
+                      <span style={{ fontSize: '14px', color: pr.diffColor, whiteSpace: 'nowrap' }}>{pr.diff}</span>
                     </span>
                   </button>
                 </Fragment>
@@ -395,9 +395,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div
                 style={{
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  color: '#6B776F',
+                  color: '#5E6862',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}
@@ -453,7 +453,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                         </span>
                       </div>
                       <strong style={{ fontSize: '16px', lineHeight: '1.2', color: '#1C2620' }}>{v.label}</strong>
-                      <span style={{ fontSize: '13px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
+                      <span style={{ fontSize: '14px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
                     </div>
                   </Fragment>
                 ))}
@@ -464,9 +464,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div
                   style={{
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '700',
-                    color: '#6B776F',
+                    color: '#5E6862',
                     textTransform: 'uppercase',
                     letterSpacing: '.04em',
                   }}
@@ -499,9 +499,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div
                   style={{
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '700',
-                    color: '#6B776F',
+                    color: '#5E6862',
                     textTransform: 'uppercase',
                     letterSpacing: '.04em',
                   }}
@@ -551,9 +551,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             >
               <div
                 style={{
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  color: '#6B776F',
+                  color: '#5E6862',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                   marginBottom: '4px',
