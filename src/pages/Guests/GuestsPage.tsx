@@ -171,11 +171,11 @@ export default function GuestsPage() {
   return (
     <div className="page pg-guests">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <HeaderAside>
             <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         <CheckoutSteps current={3} />
@@ -199,7 +199,7 @@ export default function GuestsPage() {
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '36px' }}>Кто едет в санаторий?</h1>
+              <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
                 Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для
                 карты лечения.
@@ -222,12 +222,12 @@ export default function GuestsPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: '800',
-                    fontSize: '20px',
+                    fontSize: '18px',
                   }}
                 >
                   1
                 </span>
-                <h2 style={{ fontSize: '24px' }}>Первый гость — он же контактное лицо</h2>
+                <h2 style={{ fontSize: '22px' }}>Первый гость — он же контактное лицо</h2>
               </div>
               <div
                 style={{
@@ -368,12 +368,12 @@ export default function GuestsPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: '800',
-                    fontSize: '20px',
+                    fontSize: '18px',
                   }}
                 >
                   2
                 </span>
-                <h2 style={{ fontSize: '24px' }}>Второй гость</h2>
+                <h2 style={{ fontSize: '22px' }}>Второй гость</h2>
               </div>
               <div
                 style={{
@@ -428,7 +428,7 @@ export default function GuestsPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <h2 style={{ fontSize: '24px' }}>Пожелания к заезду</h2>
+              <h2 style={{ fontSize: '22px' }}>Пожелания к заезду</h2>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
                 Не обязательно, но санаторию полезно знать заранее.
               </p>
@@ -484,7 +484,7 @@ export default function GuestsPage() {
               <Link
                 className="btn btn-primary"
                 to="/flights"
-                style={{ minHeight: '64px', fontSize: '21px', padding: '0 40px' }}
+                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
               >
                 Далее: оплата аванса →
               </Link>
@@ -494,7 +494,7 @@ export default function GuestsPage() {
             details={[
               ['Даты', order.dates],
               ['Номер', 'Двухместный'],
-              ['Программа', order.program],
+              ['Программа', order.programName, order.programPerDay],
               ['Гости', order.guests],
               ['Трансфер', order.transferRoute],
             ]}
@@ -541,7 +541,7 @@ export default function GuestsPage() {
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="dobTitle" style={{ fontSize: '30px' }}>
+                  <h2 id="dobTitle" style={{ fontSize: '26px' }}>
                     Дата рождения — {v.dobWho}
                   </h2>
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.dobHint}</span>
@@ -644,7 +644,7 @@ export default function GuestsPage() {
                         style={{
                           textAlign: 'center',
                           fontFamily: 'Lora,Georgia,serif',
-                          fontSize: '22px',
+                          fontSize: '20px',
                           fontWeight: '600',
                         }}
                       >
@@ -687,7 +687,7 @@ export default function GuestsPage() {
                           type="button"
                           className={`pick ${m.cls ?? ''}`}
                           onClick={m.pick}
-                          style={{ fontSize: '20px' }}
+                          style={{ fontSize: '18px' }}
                         >
                           {m.t}
                         </button>
@@ -703,7 +703,7 @@ export default function GuestsPage() {
                       style={{
                         textAlign: 'center',
                         fontFamily: 'Lora,Georgia,serif',
-                        fontSize: '22px',
+                        fontSize: '20px',
                         fontWeight: '600',
                       }}
                     >
@@ -724,7 +724,7 @@ export default function GuestsPage() {
                             className={`pick ${d.cls ?? ''}`}
                             onClick={d.pick}
                             disabled={!!d.off}
-                            style={{ minHeight: '54px', borderColor: d.border }}
+                            style={{ minHeight: '48px', borderColor: d.border }}
                           >
                             {d.t}
                           </button>
@@ -757,7 +757,7 @@ export default function GuestsPage() {
                     className="btn btn-primary"
                     onClick={v.dobDone}
                     disabled={!!v.doneOff}
-                    style={{ minHeight: '56px', fontSize: '18px', padding: '0 32px' }}
+                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
                     Готово
                   </button>

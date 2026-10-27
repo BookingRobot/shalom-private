@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react';
 
-const row = { display: 'flex', justifyContent: 'space-between', gap: '12px' } as const;
+const row = {
+  display: 'grid',
+  gridTemplateColumns: 'auto 1fr',
+  alignItems: 'baseline',
+  gap: '16px',
+} as const;
+const label = { color: '#3E4B44', fontSize: '16px' } as const;
+/** order details (room, programme, guests): medium weight, so the money stands out */
+const detailValue = { fontWeight: '600', textAlign: 'right', color: '#1C2620', textWrap: 'balance' } as const;
+const priceValue = { fontWeight: '700', textAlign: 'right', whiteSpace: 'nowrap' } as const;
 const section = {
   display: 'flex',
   flexDirection: 'column',
@@ -20,8 +29,8 @@ export function OrderSummary({
   total,
   footer,
 }: {
-  /** [label, value] rows: dates, room, programme, guests… */
-  details: [string, ReactNode][];
+  /** [label, value, second line?] rows: dates, room, programme, guests… */
+  details: [string, ReactNode, ReactNode?][];
   /** [label, amount] rows */
   prices: [string, ReactNode][];
   total: ReactNode;
@@ -47,22 +56,23 @@ export function OrderSummary({
       />{' '}
       <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ fontWeight: '800', fontSize: '20px' }}>Санаторий Эгле Комфорт</div>
+          <div style={{ fontWeight: '800', fontSize: '18px' }}>Санаторий Эгле Комфорт</div>
           <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
         </div>
         <div style={section}>
-          {details.map(([label, value]) => (
-            <div style={row} key={label}>
-              <span style={{ color: '#3E4B44' }}>{label}</span>
-              <strong>{value}</strong>
+          {details.map(([name, value, sub]) => (
+            <div style={row} key={name}>
+              <span style={label}>{name}</span>
+              <span style={detailValue}>{value}</span>
+              {sub ? <span style={{ ...detailValue, gridColumn: '1 / -1', marginTop: '-12px' }}>{sub}</span> : null}
             </div>
           ))}
         </div>
         <div style={section}>
-          {prices.map(([label, value]) => (
-            <div style={row} key={label}>
-              <span style={{ color: '#3E4B44' }}>{label}</span>
-              <strong>{value}</strong>
+          {prices.map(([name, value]) => (
+            <div style={row} key={name}>
+              <span style={label}>{name}</span>
+              <span style={priceValue}>{value}</span>
             </div>
           ))}
         </div>
@@ -77,7 +87,7 @@ export function OrderSummary({
           }}
         >
           <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-          <span style={{ fontWeight: '800', fontSize: '28px' }}>{total}</span>
+          <span style={{ fontWeight: '800', fontSize: '26px', whiteSpace: 'nowrap' }}>{total}</span>
         </div>
         {footer}
       </div>

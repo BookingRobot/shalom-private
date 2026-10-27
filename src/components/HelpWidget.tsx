@@ -35,7 +35,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 const fieldLabel: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '6px' };
 const labelText = (size: number): CSSProperties => ({ fontWeight: '700', fontSize: `${size}px`, color: '#3E4B44' });
 const textInput: CSSProperties = {
-  minHeight: '54px',
+  minHeight: '48px',
   border: '2px solid #CFC9BB',
   borderRadius: '2px',
   padding: '0 16px',
@@ -92,27 +92,27 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
         aria-haspopup="dialog"
         style={{
           position: 'fixed',
-          right: '24px',
-          bottom: ctx.bottom || '24px',
+          right: '20px',
+          bottom: ctx.bottom || '20px',
           zIndex: '40',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          minHeight: '60px',
-          padding: '0 22px 0 16px',
+          minHeight: '48px',
+          padding: '0 18px 0 10px',
           border: 'none',
           borderRadius: '30px',
           background: '#1F5F4A',
           color: '#fff',
-          font: "700 18px Manrope,'Segoe UI',Arial,sans-serif",
+          font: "700 16px Manrope,'Segoe UI',Arial,sans-serif",
           cursor: 'pointer',
           boxShadow: '0 8px 24px rgba(18,34,27,.35)',
         }}
       >
         <span
           style={{
-            width: '38px',
-            height: '38px',
+            width: '30px',
+            height: '30px',
             borderRadius: '50%',
             background: 'rgba(255,255,255,.16)',
             display: 'flex',
@@ -120,7 +120,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
             justifyContent: 'center',
           }}
         >
-          <HeadsetIcon size={22} color="#fff" strokeWidth={2} />
+          <HeadsetIcon size={18} color="#fff" strokeWidth={2} />
         </span>
         Свяжитесь со мной
       </button>
@@ -183,7 +183,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     id="helpTitle"
                     style={{
                       fontFamily: 'Lora,Georgia,serif',
-                      fontSize: '28px',
+                      fontSize: '24px',
                       fontWeight: '600',
                       margin: '0',
                       lineHeight: '1.2',
@@ -240,7 +240,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   <span style={{ display: 'flex', gap: '8px' }}>
                     <PhoneCodeSelect
                       style={{
-                        minHeight: '54px',
+                        minHeight: '48px',
                         border: '2px solid #CFC9BB',
                         borderRadius: '2px',
                         padding: '0 12px',
@@ -352,13 +352,13 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     type="button"
                     onClick={send}
                     style={{
-                      minHeight: '58px',
-                      padding: '0 30px',
+                      minHeight: '50px',
+                      padding: '0 24px',
                       border: 'none',
                       borderRadius: '2px',
                       background: '#1F5F4A',
                       color: '#fff',
-                      font: '700 19px Manrope,sans-serif',
+                      font: '700 18px Manrope,sans-serif',
                       cursor: 'pointer',
                     }}
                   >
@@ -410,7 +410,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                 >
                   <CheckIcon size={34} color="#fff" strokeWidth={2.6} />
                 </span>
-                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '26px', fontWeight: '600' }}>
+                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '23px', fontWeight: '600' }}>
                   Спасибо! Мы скоро свяжемся с вами
                 </strong>
                 <span style={{ fontSize: '17px', color: '#3E4B44' }}>
@@ -420,8 +420,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   type="button"
                   onClick={close}
                   style={{
-                    minHeight: '54px',
-                    padding: '0 26px',
+                    minHeight: '48px',
+                    padding: '0 22px',
                     border: '2px solid #1F5F4A',
                     borderRadius: '2px',
                     background: '#fff',

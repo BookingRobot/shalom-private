@@ -18,11 +18,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 56px;
-  padding: 0 28px;
+  min-height: 50px;
+  padding: 0 22px;
   border-radius: 2px;
   font-weight: 700;
-  font-size: 19px;
+  font-size: 18px;
   cursor: pointer;
   text-decoration: none;
   border: 2px solid transparent;
@@ -46,7 +46,7 @@
   color: #143f31;
 }
 .pg-transfer .input {
-  min-height: 56px;
+  min-height: 50px;
   border: 2px solid #cfc9bb;
   border-radius: 2px;
   padding: 0 16px;
@@ -95,7 +95,7 @@
 .pg-transfer .radio {
   width: 28px;
   height: 28px;
-  border-radius: 2px;
+  border-radius: 50%;
   border: 2px solid #8a968f;
   flex: none;
   display: flex;
@@ -110,7 +110,7 @@
   display: block;
   width: 14px;
   height: 14px;
-  border-radius: 2px;
+  border-radius: 50%;
   background: #1f5f4a;
 }
 .pg-transfer .acc {
@@ -127,4 +127,59 @@
 }
 .pg-transfer .acc:hover {
   text-decoration: underline;
+}
+
+/* Compact single-choice list (pick-up / drop-off place) */
+.pg-transfer .rowlist {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+  background: #fff;
+}
+.pg-transfer .rowpick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: none;
+  border-top: 1px solid #eeeae1;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.pg-transfer .rowpick:first-child {
+  border-top: none;
+}
+.pg-transfer .rowpick:hover {
+  background: #fafbf9;
+}
+.pg-transfer .rowpick.on {
+  background: #eef5f1;
+}
+.pg-transfer .rowpick .radio {
+  width: 22px;
+  height: 22px;
+}
+.pg-transfer .rowpick-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c2620;
+}
+.pg-transfer .rowpick-info {
+  font-size: 15px;
+  color: #5e6862;
+}
+.pg-transfer .rowpick-detail {
+  padding: 4px 14px 16px 48px;
+  background: #eef5f1;
+  border-top: 1px dashed #c8ded3;
+}
+@media (max-width: 480px) {
+  .pg-transfer .rowpick-detail {
+    padding-left: 14px;
+  }
 }

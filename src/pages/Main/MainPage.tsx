@@ -127,12 +127,7 @@ class MainLogic extends PageLogic {
       }
       return cells;
     };
-    const m1 = (m0 + 1) % 12,
-      y1 = m0 === 11 ? y0 + 1 : y0;
-    const months = [
-      { title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) },
-      { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) },
-    ];
+    const months = [{ title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) }];
     const nights = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const preset = (n) => () => {
       const i = sIn || inD;
@@ -217,10 +212,10 @@ export default function MainPage() {
             }}
           />
           <HeaderBar tone="dark" minHeight={64}>
-            <Brand tone="dark" logo={34} size={22} gap={10} />
+            <Brand tone="dark" gap={10} />
             <MainNav tone="dark" gap={28} size={16} />
             <HeaderAside gap={16} wrap={false}>
-              <PhoneLink tone="dark" size={18} icon={20} gap={8} />
+              <PhoneLink tone="dark" gap={8} />
               <div style={{ position: 'relative' }}>
                 <select
                   className="input"
@@ -260,10 +255,10 @@ export default function MainPage() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '640px' }}>
-              <h1 style={{ color: '#fff', fontSize: '46px', lineHeight: '1.1', textWrap: 'pretty' }}>
+              <h1 style={{ color: '#fff', fontSize: '40px', lineHeight: '1.1', textWrap: 'pretty' }}>
                 Санаторное лечение и&nbsp;отдых в&nbsp;Литве
               </h1>
-              <p style={{ margin: '0', color: '#E6F0EA', fontSize: '19px', lineHeight: '1.4' }}>
+              <p style={{ margin: '0', color: '#E6F0EA', fontSize: '18px', lineHeight: '1.4' }}>
                 Выберите санаторий, сравните программы и забронируйте на русском языке.
               </p>
               <p style={{ margin: '0', color: '#fff', fontSize: '16px', fontWeight: '600' }}>
@@ -514,7 +509,7 @@ export default function MainPage() {
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h2 style={{ fontSize: '32px' }}>Выберите курорт</h2>
+            <h2 style={{ fontSize: '28px' }}>Выберите курорт</h2>
             <p style={{ margin: '0', color: '#3E4B44', fontSize: '16px' }}>
               Лечение, природа или отдых у моря — найдите свой вариант.
             </p>
@@ -530,10 +525,10 @@ export default function MainPage() {
               <img src="/img/80cbf81cb33b38c12f41d140c9e34ba7.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '700' }}>
+                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
                     Друскининкай
                   </span>
-                  <span style={{ color: '#1F5F4A', fontSize: '20px' }}>→</span>
+                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Лечение и минеральные воды</span>
               </div>
@@ -542,10 +537,10 @@ export default function MainPage() {
               <img src="/img/ac9b1445a29a0df51e1bd45a8a203a39.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '700' }}>
+                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
                     Бирштонас
                   </span>
-                  <span style={{ color: '#1F5F4A', fontSize: '20px' }}>→</span>
+                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Спокойный отдых у Немана</span>
               </div>
@@ -554,8 +549,8 @@ export default function MainPage() {
               <img src="/img/c4c4cd4bcaad10e81718df6ded79f624.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '700' }}>Паланга</span>
-                  <span style={{ color: '#1F5F4A', fontSize: '20px' }}>→</span>
+                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>Паланга</span>
+                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Отдых у Балтийского моря</span>
               </div>
@@ -564,8 +559,8 @@ export default function MainPage() {
               <img src="/img/213618680529a455a08f4dc13b8abe7e.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '700' }}>Аникщяй</span>
-                  <span style={{ color: '#1F5F4A', fontSize: '20px' }}>→</span>
+                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>Аникщяй</span>
+                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Природа и тишина</span>
               </div>
@@ -594,7 +589,7 @@ export default function MainPage() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <h2 style={{ fontSize: '32px' }}>Популярные санатории</h2>
+              <h2 style={{ fontSize: '28px' }}>Популярные санатории</h2>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '16px' }}>
                 Ориентировочные цены. Точную стоимость покажем после поиска.
               </p>
@@ -618,7 +613,7 @@ export default function MainPage() {
                     <div
                       style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}
                     >
-                      <h3 style={{ fontSize: '19px' }}>{h.name}</h3>
+                      <h3 style={{ fontSize: '18px' }}>{h.name}</h3>
                       <span style={{ color: '#8A6500', fontSize: '14px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
                         {h.stars}
                       </span>
@@ -666,7 +661,7 @@ export default function MainPage() {
                       }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.15' }}>
-                        <span style={{ fontSize: '22px', fontWeight: '800' }}>от {h.price}&nbsp;€</span>
+                        <span style={{ fontSize: '20px', fontWeight: '800' }}>от {h.price}&nbsp;€</span>
                         <span style={{ fontSize: '14px', color: '#5E6862' }}>за человека в сутки</span>
                       </div>
                       <Link
@@ -713,7 +708,7 @@ export default function MainPage() {
                 <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '700' }}>
+                <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
                   Поможем выбрать санаторий
                 </div>
                 <div style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -751,7 +746,7 @@ export default function MainPage() {
             gap: '12px',
           }}
         >
-          <h2 style={{ fontSize: '24px' }}>Как забронировать — три шага</h2>
+          <h2 style={{ fontSize: '22px' }}>Как забронировать — три шага</h2>
           <div className="card" style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div className="step">
               <span className="num">1</span>
@@ -899,7 +894,7 @@ export default function MainPage() {
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '32px' }}>
+                  <h2 id="calTitle" style={{ fontSize: '28px' }}>
                     Выберите даты поездки
                   </h2>
                   <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.calHint}</span>
@@ -1047,7 +1042,7 @@ export default function MainPage() {
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Заезд</span>
-                    <strong style={{ fontSize: '20px' }}>{v.selIn}</strong>
+                    <strong style={{ fontSize: '18px' }}>{v.selIn}</strong>
                   </div>
                   <svg
                     width="26"
@@ -1064,11 +1059,11 @@ export default function MainPage() {
                   </svg>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Выезд</span>
-                    <strong style={{ fontSize: '20px' }}>{v.selOut}</strong>
+                    <strong style={{ fontSize: '18px' }}>{v.selOut}</strong>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '20px', color: '#1F5F4A' }}>{v.selNights}</strong>
+                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.selNights}</strong>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -1080,7 +1075,7 @@ export default function MainPage() {
                     className="btn btn-primary"
                     onClick={v.applyCal}
                     disabled={!!v.applyOff}
-                    style={{ minHeight: '56px', fontSize: '18px', padding: '0 32px' }}
+                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
                     Подтвердить даты
                   </button>

@@ -22,8 +22,10 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
         <div
           style={{
             position: 'relative',
-            flex: '0 0 300px',
-            minHeight: '210px',
+            flex: '0 0 200px',
+            width: '200px',
+            height: '200px',
+            alignSelf: 'flex-start',
             margin: '14px 0 14px 14px',
             borderRadius: '2px',
             overflow: 'hidden',
@@ -90,7 +92,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           <span className="pill" style={{ alignSelf: 'flex-start', background: o.pillBg, color: o.pillColor }}>
             {o.pill}
           </span>
-          <h3 style={{ fontSize: '24px', color: o.nameColor }}>{o.short}</h3>
+          <h3 style={{ fontSize: '22px', color: o.nameColor }}>{o.short}</h3>
           <div style={{ fontSize: '15px', color: '#3E4B44' }}>{o.roomLine}</div>
           <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>{o.progLine}</div>
           <div
@@ -189,7 +191,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
         >
           {o.avail ? (
             <>
-              <span style={{ fontSize: '32px', fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '28px', fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
                 <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {o.price}&nbsp;€
               </span>
               <span style={{ fontSize: '14px', color: '#3E4B44' }}>за 2 взрослых · {nightsLabel}</span>
@@ -384,7 +386,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                         lineHeight: '1.2',
                       }}
                     >
-                      <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{pr.price}</strong>
+                      <strong style={{ fontSize: '18px', whiteSpace: 'nowrap' }}>{pr.price}</strong>
                       <span style={{ fontSize: '14px', color: pr.diffColor, whiteSpace: 'nowrap' }}>{pr.diff}</span>
                     </span>
                   </button>
@@ -443,7 +445,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                         <span
                           style={{
                             fontFamily: 'Lora,Georgia,serif',
-                            fontSize: '36px',
+                            fontSize: '32px',
                             fontWeight: '700',
                             lineHeight: '1',
                             color: '#1F5F4A',

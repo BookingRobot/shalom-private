@@ -18,11 +18,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 56px;
-  padding: 0 28px;
+  min-height: 50px;
+  padding: 0 22px;
   border-radius: 2px;
   font-weight: 700;
-  font-size: 19px;
+  font-size: 18px;
   cursor: pointer;
   text-decoration: none;
   border: 2px solid transparent;
@@ -187,7 +187,7 @@
 }
 .pg-results .ftitle {
   font-family: Lora, Georgia, serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   margin: 0 0 6px;
 }
@@ -273,7 +273,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  min-height: 54px;
+  min-height: 48px;
   padding: 0 20px;
   border: 2px solid #cfc9bb;
   background: #fff;
@@ -336,4 +336,14 @@
   height: 18px;
   border-radius: 2px;
   display: inline-block;
+}
+
+@media (max-width: 480px) {
+  /* keep the indent small on phones */
+  .pg-results .rooms-indent {
+    padding-left: 26px !important;
+  }
+  .pg-results .rooms-guide {
+    left: 10px !important;
+  }
 }

@@ -52,6 +52,10 @@ export function orderSummary(b: Booking) {
     dates: stayRange(b.checkin, b.checkout) + ' · ' + nights + ' ' + nightsWord(nights),
     nights,
     program: program.short,
+    /** "«Миди»" */
+    programName: program.name.replace('Программа ', ''),
+    /** "3 процедуры в день" */
+    programPerDay: program.perDay,
     /** "Программа «Миди» · 3 процедуры в день" */
     programFull: program.name + ' · ' + program.perDay,
     guests: guestsLabel(b),
@@ -75,14 +79,14 @@ export function orderSummary(b: Booking) {
         ? 'Без трансфера'
         : `${b.transfer.mode === 'group' ? 'Групповой' : 'Индивидуальный'} трансфер: ` +
           (b.transfer.place === 'vilnius' ? 'аэропорт Вильнюса' : placeName(b.transfer.place)) +
-          (b.transfer.back ? ' ⇄ ' : ' → ') +
+          (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
           'санаторий',
     /** route for the payment step */
     transferPlaces:
       b.transfer.mode === 'none'
         ? 'не нужен'
         : (b.transfer.place === 'vilnius' ? 'Вильнюс, аэропорт' : placeName(b.transfer.place)) +
-          (b.transfer.back ? ' ⇄ ' : ' → ') +
+          (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
           'санаторий',
     total,
     totalLabel: eur(total),

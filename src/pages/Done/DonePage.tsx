@@ -38,7 +38,7 @@ export default function DonePage() {
     <div className="page pg-done">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
         <HeaderBar>
-          <Brand size={24} />
+          <Brand />
           <PhoneLink />
         </HeaderBar>
         <CheckoutSteps current={6} compact />
@@ -82,9 +82,9 @@ export default function DonePage() {
               </svg>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '44px' }}>Спасибо! Заказ № 12345 принят</h1>
+              <h1 style={{ fontSize: '32px' }}>Спасибо! Заказ № 12345 принят</h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px' }}>
+                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>
                   Аванс {o.advanceLabel} оплачен.
                 </span>
                 <span
@@ -150,7 +150,7 @@ export default function DonePage() {
               <path d="M18 15v2l1.5 1" />
             </svg>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <strong style={{ fontSize: '19px', color: '#1F5F4A' }}>
+              <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>
                 Следующий шаг — подтверждение санатория до 28 октября.
               </strong>
               <span style={{ fontSize: '16px', color: '#1C2620' }}>Сейчас от вас ничего не требуется.</span>
@@ -164,7 +164,7 @@ export default function DonePage() {
                 style={{ padding: '24px 24px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
-                  <h2 style={{ fontSize: '30px' }}>Что дальше</h2>
+                  <h2 style={{ fontSize: '26px' }}>Что дальше</h2>
                   <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                     До заезда {daysLeft} {plural(daysLeft, ['день', 'дня', 'дней'])}
                   </span>
@@ -189,7 +189,7 @@ export default function DonePage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">27 октября · сегодня</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>Аванс получен</strong>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Аванс получен</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Оплата {o.advanceLabel} (4 % от стоимости) прошла успешно.
                       </span>
@@ -217,7 +217,7 @@ export default function DonePage() {
                       <span className="chip" style={{ background: '#FFF1D6', color: '#8A5A00' }}>
                         До 28 октября
                       </span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>
                         Подтверждение санатория
                       </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -230,7 +230,7 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">2–6 ноября</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>Памятка и встреча</strong>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Памятка и встреча</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Пришлём время встречи, контакты водителя и список вещей.
                       </span>
@@ -241,7 +241,7 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">{inDay} · с 14:00</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>Заезд в санаторий</strong>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Заезд в санаторий</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Остаток за проживание — {eur(o.stay - o.advance)} на стойке регистрации.
                       </span>
@@ -251,7 +251,7 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">{outDay} · до 12:00</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>
                         Выезд и обратный трансфер
                       </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -327,7 +327,7 @@ export default function DonePage() {
                 </svg>
                 <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>
+                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>
                       Нужна помощь? Мы на связи
                     </strong>
                     <span style={{ fontSize: '16px', color: '#3E4B44' }}>
@@ -393,7 +393,7 @@ export default function DonePage() {
                 />{' '}
                 <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px', fontWeight: '600' }}>
+                    <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', fontWeight: '600' }}>
                       Эгле Комфорт
                     </div>
                     <span style={{ color: '#8A6500', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
@@ -556,7 +556,7 @@ export default function DonePage() {
                 </div>
               </div>
               <div className="card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <h2 style={{ fontSize: '24px' }}>Стоимость и оплата</h2>
+                <h2 style={{ fontSize: '22px' }}>Стоимость и оплата</h2>
                 <div className="row">
                   <span style={{ color: '#3E4B44' }}>Проживание и программа</span>
                   <strong>{o.stayLabel}</strong>
@@ -567,7 +567,7 @@ export default function DonePage() {
                 </div>
                 <div className="row" style={{ borderTop: '1px solid #E3DED2', paddingTop: '10px', fontSize: '18px' }}>
                   <strong>Всего</strong>
-                  <strong style={{ fontSize: '22px' }}>{o.totalLabel}</strong>
+                  <strong style={{ fontSize: '20px' }}>{o.totalLabel}</strong>
                 </div>
                 <div className="row">
                   <span style={{ color: '#3E4B44' }}>Оплачено</span>
@@ -584,7 +584,7 @@ export default function DonePage() {
                   }}
                 >
                   <span style={{ color: '#1F5F4A', fontSize: '15px', fontWeight: '700' }}>Осталось оплатить</span>
-                  <strong style={{ fontSize: '32px', lineHeight: '1.1', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
+                  <strong style={{ fontSize: '28px', lineHeight: '1.1', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
                     {eur(o.total - o.advance)}
                   </strong>
                 </div>

@@ -29,6 +29,7 @@ class TransferLogic extends PageLogic {
       vehicle: tr.vehicle,
       place: '',
       indiv: tr.mode === 'individual',
+      cmp: tr.mode === 'individual',
       back: tr.back,
       backSame: tr.backPlace === tr.place,
       backCity: tr.backPlace,
@@ -95,6 +96,7 @@ class TransferLogic extends PageLogic {
       cityName: cur.name,
       cities: PICKUP_PLACES.map((c) => ({
         ...c,
+        on: c.id === city,
         cls: c.id === city ? 'on' : '',
         pick: () => this.setState({ city: c.id }),
       })),
@@ -103,10 +105,13 @@ class TransferLogic extends PageLogic {
       fromHotel: /^От отеля/.test(place),
       pickPlace: (e) => this.setState({ place: e.target.value }),
       indiv,
-      toggleIndiv: () => this.setState({ indiv: !indiv }),
+      cmp: !!this.state.cmp,
+      toggleCmp: () => this.setState(this.state.cmp ? { cmp: false, indiv: false } : { cmp: true }),
+      grpCls: indiv ? '' : 'on',
+      pickGroup: () => this.setState({ indiv: false }),
       grpBorder: indiv ? '#E3DED2' : '#1F5F4A',
       grpBg: indiv ? '#fff' : '#EEF5F1',
-      indBorder: indiv ? '#1F5F4A' : '#CFC9BB',
+      indBorder: this.state.cmp ? '#1F5F4A' : '#CFC9BB',
       seatPrice: fmt(curP.seat) + '\u00a0€',
       seatTotal: fmt(curP.seat * TRANSFER_GUESTS) + '\u00a0€',
       guestsLabel: TRANSFER_GUESTS + ' гостей',
@@ -114,8 +119,8 @@ class TransferLogic extends PageLogic {
       vehicles: VEHICLES.map((v) => ({
         ...v,
         price: curP[v.id],
-        cls: v.id === vehicle ? 'on' : '',
-        pick: () => this.setState({ vehicle: v.id }),
+        cls: indiv && v.id === vehicle ? 'on' : '',
+        pick: () => this.setState({ vehicle: v.id, indiv: true }),
       })),
       back,
       backSame,
@@ -164,11 +169,11 @@ export default function TransferPage() {
   return (
     <div className="page pg-transfer">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        <HeaderBar minHeight={84}>
-          <Brand logo={40} size={24} />
+        <HeaderBar>
+          <Brand />
           <HeaderAside>
             <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
-            <PhoneLink icon={24} />
+            <PhoneLink />
           </HeaderAside>
         </HeaderBar>
         {/* Steps */}
@@ -188,40 +193,56 @@ export default function TransferPage() {
           {/* Main column */}
           <div style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '36px' }}>Нужен ли вам трансфер до санатория?</h1>
+              <h1 style={{ fontSize: '32px' }}>Нужен ли вам трансфер до санатория?</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
                 Встретим с табличкой, поможем с багажом и довезём прямо до стойки регистрации санатория «Эгле Комфорт» в
                 Друскининкай.
               </p>
             </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                gap: '16px',
-              }}
-            >
-              <button type="button" className={`choice ${v.yesCls ?? ''}`} onClick={v.sayYes}>
-                {' '}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+              <button
+                type="button"
+                className={`choice ${v.yesCls ?? ''}`}
+                onClick={v.sayYes}
+                style={{ flex: '2 1 360px' }}
+              >
                 <span className={`radio ${v.yesCls ?? ''}`}>
                   <i />
-                </span>{' '}
+                </span>
                 <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '20px' }}>Да, нужен трансфер</strong>
-                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                    Заберём из аэропорта, с вокзала или от отеля
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: '18px' }}>Да, нужен трансфер</strong>
+                    <span
+                      style={{
+                        background: '#FFF1D6',
+                        color: '#8A5A00',
+                        fontSize: '14px',
+                        fontWeight: '800',
+                        padding: '2px 8px',
+                        borderRadius: '2px',
+                      }}
+                    >
+                      Рекомендуем
+                    </span>
                   </span>
-                </span>{' '}
+                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>
+                    Заберём из аэропорта, с вокзала или от отеля · групповой от 30&nbsp;€ с человека
+                  </span>
+                </span>
               </button>
-              <button type="button" className={`choice ${v.noCls ?? ''}`} onClick={v.sayNo}>
-                {' '}
-                <span className={`radio ${v.noCls ?? ''}`}>
+              <button
+                type="button"
+                className={`choice ${v.noCls ?? ''}`}
+                onClick={v.sayNo}
+                style={{ flex: '1 1 220px', padding: '12px 16px', minHeight: '56px', borderWidth: '1px', gap: '12px' }}
+              >
+                <span className={`radio ${v.noCls ?? ''}`} style={{ width: '22px', height: '22px' }}>
                   <i />
-                </span>{' '}
-                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '20px' }}>Нет, доберусь сам</strong>
-                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>На машине или общественным транспортом</span>
-                </span>{' '}
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>Нет, доберусь сам</span>
+                  <span style={{ color: '#5E6862', fontSize: '15px' }}>На машине или общественным транспортом</span>
+                </span>
               </button>
             </div>
             {/* Confirmation pop-up when the guest declines the transfer */}
@@ -269,7 +290,7 @@ export default function TransferPage() {
                       >
                         <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                       </svg>
-                      <h2 id="noTitle" style={{ fontSize: '26px' }}>
+                      <h2 id="noTitle" style={{ fontSize: '23px' }}>
                         Вы уверены, что доберётесь сами?
                       </h2>
                     </div>
@@ -298,7 +319,7 @@ export default function TransferPage() {
                         type="button"
                         className="btn btn-primary"
                         onClick={v.keepTransfer}
-                        style={{ minHeight: '60px', fontSize: '19px' }}
+                        style={{ minHeight: '52px', fontSize: '18px' }}
                       >
                         Нет, добавить трансфер
                       </button>
@@ -531,86 +552,83 @@ export default function TransferPage() {
                     ) : null}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h2 style={{ fontSize: '26px' }}>Откуда вас забрать {v.inDay}?</h2>
+                    <h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>
                     <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
                       Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2 часов.
                     </p>
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
-                      gap: '12px',
-                    }}
-                  >
-                    {(v.cities || []).map((c: any, _i0: number) => (
-                      <Fragment key={_i0}>
-                        <button
-                          type="button"
-                          className={`choice ${c.cls ?? ''}`}
-                          onClick={c.pick}
-                          style={{ minHeight: '80px' }}
-                        >
-                          {' '}
+                  <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
+                    {(v.cities || []).map((c: any, i: number) => (
+                      <Fragment key={i}>
+                        <button type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
                           <span className={`radio ${c.cls ?? ''}`}>
                             <i />
-                          </span>{' '}
-                          <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <strong style={{ fontSize: '19px' }}>{c.from}</strong>
-                            <span style={{ color: '#3E4B44', fontSize: '15px' }}>{c.info}</span>
-                          </span>{' '}
+                          </span>
+                          <span className="rowpick-name">{c.from}</span>
+                          <span className="rowpick-info">{c.info}</span>
                         </button>
+                        {c.on ? (
+                          <div className="rowpick-detail">
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
+                                gap: '14px',
+                                alignItems: 'end',
+                              }}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="place">
+                                  Откуда именно вас забрать?
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                  <select
+                                    id="place"
+                                    className="input"
+                                    style={{ paddingRight: '44px' }}
+                                    value={v.place}
+                                    onChange={v.pickPlace}
+                                  >
+                                    {(v.places || []).map((p: any, _i0: number) => (
+                                      <Fragment key={_i0}>
+                                        <option value={p.t}>{p.t}</option>
+                                      </Fragment>
+                                    ))}
+                                  </select>{' '}
+                                  <svg
+                                    width="22"
+                                    height="22"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#1F5F4A"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                    style={{ position: 'absolute', right: '14px', top: '17px', pointerEvents: 'none' }}
+                                  >
+                                    <path d="m6 9 6 6 6-6" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="flight">
+                                  Рейс или поезд, время прибытия
+                                </label>
+                                <input
+                                  id="flight"
+                                  className="input"
+                                  type="text"
+                                  placeholder="Например: LO 771, 14:35"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </Fragment>
                     ))}
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                      gap: '16px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="lbl" htmlFor="place">
-                        Откуда именно вас забрать?
-                      </label>
-                      <div style={{ position: 'relative' }}>
-                        <select
-                          id="place"
-                          className="input"
-                          style={{ paddingRight: '44px' }}
-                          value={v.place}
-                          onChange={v.pickPlace}
-                        >
-                          {(v.places || []).map((p: any, _i0: number) => (
-                            <Fragment key={_i0}>
-                              <option value={p.t}>{p.t}</option>
-                            </Fragment>
-                          ))}
-                        </select>{' '}
-                        <svg
-                          width="22"
-                          height="22"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ position: 'absolute', right: '14px', top: '17px', pointerEvents: 'none' }}
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="lbl" htmlFor="flight">
-                        Номер рейса или поезда и время прибытия
-                      </label>
-                      <input id="flight" className="input" type="text" placeholder="Например: LO 771, 14:35" />
-                    </div>
-                  </div>
+
                   {v.fromHotel ? (
                     <>
                       <div
@@ -657,204 +675,250 @@ export default function TransferPage() {
                     <div className="lbl" style={{ fontSize: '18px', color: '#1C2620' }}>
                       Как поедем
                     </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '20px',
-                        flexWrap: 'wrap',
-                        padding: '18px 20px',
-                        border: `2px solid ${v.grpBorder ?? ''}`,
-                        background: v.grpBg,
-                        borderRadius: '2px',
-                      }}
-                    >
-                      <span
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div
                         style={{
-                          width: '170px',
-                          height: '84px',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          flex: 'none',
-                          background: '#fff',
-                          borderRadius: '2px',
-                          overflow: 'hidden',
+                          gap: '20px',
+                          flexWrap: 'wrap',
+                          padding: '18px 20px',
+                          border: `2px solid ${v.grpBorder ?? ''}`,
+                          background: v.grpBg,
+                          borderRadius: '2px 2px 0 0',
                         }}
                       >
-                        <img
-                          src="/img/165765111b3ce679a969db85fe7d023f.png"
-                          alt="Микроавтобус"
-                          style={{ width: '170px', height: 'auto', display: 'block' }}
-                        />
-                      </span>
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 300px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <strong style={{ fontSize: '21px' }}>Групповой трансфер</strong>
-                          <span
-                            style={{
-                              background: '#1F5F4A',
-                              color: '#fff',
-                              fontSize: '14px',
-                              fontWeight: '800',
-                              padding: '4px 10px',
-                              borderRadius: '2px',
-                            }}
-                          >
-                            Самый выгодный
+                        <span
+                          style={{
+                            width: '170px',
+                            height: '84px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 'none',
+                            background: '#fff',
+                            borderRadius: '2px',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <img
+                            src="/img/165765111b3ce679a969db85fe7d023f.png"
+                            alt="Микроавтобус"
+                            style={{ width: '170px', height: 'auto', display: 'block' }}
+                          />
+                        </span>
+                        <span style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 300px' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            <strong style={{ fontSize: '20px' }}>Групповой трансфер</strong>
+                            <span
+                              style={{
+                                background: '#1F5F4A',
+                                color: '#fff',
+                                fontSize: '14px',
+                                fontWeight: '800',
+                                padding: '4px 10px',
+                                borderRadius: '2px',
+                              }}
+                            >
+                              Самый выгодный
+                            </span>
+                          </span>
+                          <span style={{ fontSize: '16px', color: '#1C2620' }}>
+                            Обычно микроавтобус Mercedes Sprinter / Vito вместе с другими гостями санаториев.
+                          </span>
+                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                            {v.cityName} → санаторий · встреча с табличкой · помощь с багажом
                           </span>
                         </span>
-                        <span style={{ fontSize: '16px', color: '#1C2620' }}>
-                          Обычно микроавтобус Mercedes Sprinter / Vito вместе с другими гостями санаториев.
-                        </span>
-                        <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                          {v.cityName} → санаторий · встреча с табличкой · помощь с багажом
-                        </span>
-                      </span>
-                      <span
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-end',
-                          gap: '2px',
-                          flex: '0 0 auto',
-                        }}
-                      >
-                        <strong style={{ fontSize: '28px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
-                        <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                          с человека, в одну сторону
-                        </span>
-                        <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                          за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
-                        </span>
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '12px',
-                        alignItems: 'flex-start',
-                        background: '#FFF1D6',
-                        borderRadius: '2px',
-                        padding: '12px 16px',
-                        fontSize: '15px',
-                        color: '#1C2620',
-                        maxWidth: '900px',
-                      }}
-                    >
-                      <svg
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#8A5A00"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                        style={{ flex: 'none', marginTop: '1px' }}
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 8v5M12 16h.01" />
-                      </svg>
-                      <span>
-                        <strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями: возможно
-                        ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев (дорога длиннее на
-                        30–40 минут). Точное время встречи сообщим за день до приезда.
-                      </span>
-                    </div>
-                    <label
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '14px',
-                        minHeight: '60px',
-                        padding: '12px 16px',
-                        border: `2px solid ${v.indBorder ?? ''}`,
-                        background: '#fff',
-                        borderRadius: '2px',
-                        cursor: 'pointer',
-                        fontSize: '17px',
-                        maxWidth: '900px',
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={!!v.indiv}
-                        onChange={v.toggleIndiv}
-                        style={{ width: '26px', height: '26px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
-                      />
-                      <span>
-                        <strong>Хочу индивидуальный трансфер</strong> — только для нас, без ожидания и попутчиков
-                        <br />
-                        <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                          от {v.indFrom} за автомобиль в одну сторону
-                        </span>
-                      </span>
-                    </label>
-                    {v.indiv ? (
-                      <>
-                        <div
+                        <span
                           style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '10px',
-                            paddingLeft: '18px',
-                            borderLeft: '3px solid #C8DED3',
+                            alignItems: 'flex-end',
+                            gap: '2px',
+                            flex: '0 0 auto',
                           }}
                         >
-                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                            Цены за автомобиль {v.cityName} → санаторий, в одну сторону. Обратно — столько же.
+                          <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
+                          <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
+                            с человека, в одну сторону
                           </span>
-                          {(v.vehicles || []).map((k: any, _i0: number) => (
-                            <Fragment key={_i0}>
-                              <button
-                                type="button"
-                                className={`choice ${k.cls ?? ''}`}
-                                onClick={k.pick}
-                                style={{ justifyContent: 'space-between', minHeight: '96px' }}
-                              >
-                                {' '}
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                  <span className={`radio ${k.cls ?? ''}`}>
-                                    <i />
-                                  </span>
-                                  <span
-                                    style={{
-                                      width: '150px',
-                                      height: '72px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      flex: 'none',
-                                      background: '#fff',
-                                      borderRadius: '2px',
-                                      overflow: 'hidden',
-                                    }}
-                                  >
-                                    <img
-                                      src={k.img}
-                                      alt=""
-                                      style={{ width: '150px', height: 'auto', display: 'block' }}
-                                    />
-                                  </span>
-                                  <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                    <strong style={{ fontSize: '19px' }}>{k.name}</strong>
-                                    <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
-                                  </span>
-                                </span>{' '}
-                                <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>
-                                  {k.price}&nbsp;€
-                                </strong>{' '}
-                              </button>
-                            </Fragment>
-                          ))}
-                          <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                            Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00)
-                            +20&nbsp;%.
+                          <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
+                            за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
                           </span>
-                        </div>
-                      </>
+                        </span>
+                      </div>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          width: '100%',
+                          minHeight: '52px',
+                          padding: '10px 20px',
+                          marginTop: '-2px',
+                          border: `2px solid ${v.indBorder ?? ''}`,
+                          borderTop: '1px dashed #C8DED3',
+                          borderRadius: '0 0 2px 2px',
+                          background: '#FAFBF9',
+                          cursor: 'pointer',
+                          color: '#1C2620',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={!!v.cmp}
+                          onChange={v.toggleCmp}
+                          style={{ width: '24px', height: '24px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
+                        />
+                        <span style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
+                          <strong style={{ fontSize: '17px', color: '#1F5F4A' }}>
+                            Хочу ехать с комфортом — отдельной машиной
+                          </strong>
+                          <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                            Только вы, без ожидания и попутчиков · от {v.indFrom} за машину
+                          </span>
+                        </span>
+                        <svg
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#1F5F4A"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          style={{ flex: 'none' }}
+                        >
+                          <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
+                        </svg>
+                      </label>
+                      {v.cmp ? (
+                        <>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '10px',
+                              padding: '4px 16px 16px',
+                              background: '#FAFBF9',
+                            }}
+                          >
+                            <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                              Выберите, как поедете. Цены {v.cityName} → санаторий, в одну сторону; обратно — столько
+                              же.
+                            </span>
+                            <button
+                              type="button"
+                              className={`choice ${v.grpCls ?? ''}`}
+                              onClick={v.pickGroup}
+                              style={{ justifyContent: 'space-between', minHeight: '64px' }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <span className={`radio ${v.grpCls ?? ''}`}>
+                                  <i />
+                                </span>
+                                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                  <strong style={{ fontSize: '18px' }}>Групповой трансфер</strong>
+                                  <span style={{ color: '#3E4B44', fontSize: '15px' }}>
+                                    Вместе с другими гостями, возможно ожидание до 1 часа
+                                  </span>
+                                </span>
+                              </span>
+                              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
+                                <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
+                                  с человека
+                                </span>
+                              </span>
+                            </button>
+                            {(v.vehicles || []).map((k: any, _i0: number) => (
+                              <Fragment key={_i0}>
+                                <button
+                                  type="button"
+                                  className={`choice ${k.cls ?? ''}`}
+                                  onClick={k.pick}
+                                  style={{ justifyContent: 'space-between', minHeight: '96px' }}
+                                >
+                                  {' '}
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                    <span className={`radio ${k.cls ?? ''}`}>
+                                      <i />
+                                    </span>
+                                    <span
+                                      style={{
+                                        width: '150px',
+                                        height: '72px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flex: 'none',
+                                        background: '#fff',
+                                        borderRadius: '2px',
+                                        overflow: 'hidden',
+                                      }}
+                                    >
+                                      <img
+                                        src={k.img}
+                                        alt=""
+                                        style={{ width: '150px', height: 'auto', display: 'block' }}
+                                      />
+                                    </span>
+                                    <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                      <strong style={{ fontSize: '18px' }}>{k.name}</strong>
+                                      <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
+                                    </span>
+                                  </span>{' '}
+                                  <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>
+                                    {k.price}&nbsp;€
+                                  </strong>{' '}
+                                </button>
+                              </Fragment>
+                            ))}
+                            <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                              Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00)
+                              +20&nbsp;%.
+                            </span>
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                    {!v.indiv ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '12px',
+                          alignItems: 'flex-start',
+                          background: '#FFF1D6',
+                          borderRadius: '2px',
+                          padding: '12px 16px',
+                          fontSize: '15px',
+                          color: '#1C2620',
+                          maxWidth: '900px',
+                        }}
+                      >
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#8A5A00"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          style={{ flex: 'none', marginTop: '1px' }}
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 8v5M12 16h.01" />
+                        </svg>
+                        <span>
+                          <strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями: возможно
+                          ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев (дорога длиннее на
+                          30–40 минут). Точное время встречи сообщим за день до приезда.
+                        </span>
+                      </div>
                     ) : null}
                   </div>
                   {/* Return transfer */}
@@ -885,7 +949,7 @@ export default function TransferPage() {
                         style={{ width: '26px', height: '26px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
                       />
                       <span>
-                        <strong style={{ fontSize: '20px' }}>
+                        <strong style={{ fontSize: '18px' }}>
                           Обратный трансфер {v.outDay}, {v.outWeekday}
                         </strong>
                         <br />
@@ -941,28 +1005,14 @@ export default function TransferPage() {
                                 }}
                               >
                                 <div className="lbl">Куда отвезти {v.outDay}?</div>
-                                <div
-                                  style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit,minmax(min(200px,100%),1fr))',
-                                    gap: '10px',
-                                  }}
-                                >
-                                  {(v.backCities || []).map((c: any, _i0: number) => (
-                                    <Fragment key={_i0}>
-                                      <button
-                                        type="button"
-                                        className={`choice ${c.cls ?? ''}`}
-                                        onClick={c.pick}
-                                        style={{ minHeight: '56px', padding: '12px 16px' }}
-                                      >
-                                        {' '}
-                                        <span className={`radio ${c.cls ?? ''}`}>
-                                          <i />
-                                        </span>{' '}
-                                        <strong style={{ fontSize: '17px' }}>{c.to}</strong>{' '}
-                                      </button>
-                                    </Fragment>
+                                <div className="rowlist" role="radiogroup" aria-label="Куда отвезти">
+                                  {(v.backCities || []).map((c: any, i: number) => (
+                                    <button key={i} type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
+                                      <span className={`radio ${c.cls ?? ''}`}>
+                                        <i />
+                                      </span>
+                                      <span className="rowpick-name">{c.to}</span>
+                                    </button>
                                   ))}
                                 </div>
                                 <div
@@ -970,6 +1020,7 @@ export default function TransferPage() {
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
                                     gap: '16px',
+                                    alignItems: 'end',
                                   }}
                                 >
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1007,7 +1058,7 @@ export default function TransferPage() {
                                   </div>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label className="lbl" htmlFor="backflight">
-                                      Рейс или поезд и время отправления
+                                      Рейс или поезд, время отправления
                                     </label>
                                     <input
                                       id="backflight"
@@ -1091,7 +1142,7 @@ export default function TransferPage() {
                     borderColor: '#C8DED3',
                   }}
                 >
-                  <div style={{ fontWeight: '800', fontSize: '19px' }}>Хорошо, трансфер не добавляем</div>
+                  <div style={{ fontWeight: '800', fontSize: '18px' }}>Хорошо, трансфер не добавляем</div>
                   <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
                     Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно
                     добавить позже — просто позвоните.
@@ -1114,7 +1165,7 @@ export default function TransferPage() {
               <Link
                 className="btn btn-primary"
                 to="/guests"
-                style={{ minHeight: '64px', fontSize: '21px', padding: '0 40px' }}
+                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
               >
                 Далее: данные гостей →
               </Link>
@@ -1125,12 +1176,12 @@ export default function TransferPage() {
             details={[
               ['Даты', order.dates],
               ['Номер', 'Двухместный'],
-              ['Программа', order.program],
+              ['Программа', order.programName, order.programPerDay],
               ['Гости', order.guests],
             ]}
             prices={[
               ['Проживание и лечение', order.stayLabel],
-              ['Трансфер', v.transferSum],
+              ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
             ]}
             total={v.total}
             footer={<AdvanceNote advance={order.advanceLabel} />}
