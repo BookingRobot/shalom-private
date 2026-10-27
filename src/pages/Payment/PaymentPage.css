@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.5;
 }
-.pg-payment * {
-  box-sizing: border-box;
-}
-.pg-payment a {
-  color: #1f5f4a;
-}
-.pg-payment a:hover {
-  color: #143f31;
-}
-.pg-payment h1,
-.pg-payment h2,
-.pg-payment h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-payment input,
 .pg-payment select,
 .pg-payment button,

@@ -1,7 +1,14 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
+import { MONTHS, MONTHS_N, addD, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
+import { TODAY } from '../../data/demo';
+import { isSoldOutEverywhere } from '../../data/availability';
+import { isFlightDay } from '../../data/flights';
+import { api } from '../../api';
+import { GUEST_OPTIONS, RESORTS, guestsKey, parseGuests } from '../../data/search';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './MainPage.css';
@@ -9,125 +16,22 @@ import './MainPage.css';
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
 class MainLogic extends PageLogic {
+  constructor(props: PageServices) {
+    super(props);
+    const b = props.booking.booking;
+    this.state = { in: b.checkin, out: b.checkout };
+  }
+  syncBooking(st) {
+    return st.in && st.out ? { checkin: st.in, checkout: st.out } : null;
+  }
   renderVals() {
     return this._rv();
   }
   _rv() {
-    const DOC = 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4';
-    const POOL =
-      'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6';
-    const MEAL = 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8';
-    const hotels = [
-      {
-        name: 'Эгле Комфорт',
-        stars: '★★★★',
-        sub: 'Друскининкай · 26 отзывов',
-        img: '/img/1efd1efc34d4137ff98a8658a068afc5.jpg',
-        f1: 'Врач и лечебные программы',
-        f1d: DOC,
-        f2: 'Бассейны и сауны',
-        f2d: POOL,
-        price: 106,
-      },
-      {
-        name: 'Гранд Спа Лиетува',
-        stars: '★★★★',
-        sub: 'Друскининкай · 20 отзывов',
-        img: '/img/a77ef961b37e1edf9b38716a5c54a79f.jpg',
-        f1: 'Врач и лечебные программы',
-        f1d: DOC,
-        f2: 'Бассейны и бани',
-        f2d: POOL,
-        price: 90,
-      },
-      {
-        name: 'Градиали',
-        stars: '★★★★',
-        sub: 'Паланга · 17 отзывов',
-        img: '/img/983aebb39738d3905bb5383746fb9356.jpg',
-        f1: 'Врач и лечебные программы',
-        f1d: DOC,
-        f2: 'Бассейн и SPA',
-        f2d: POOL,
-        price: 106,
-      },
-      {
-        name: 'Беларусь',
-        stars: '★★★',
-        sub: 'Друскининкай · 17 отзывов',
-        img: '/img/405a6bd8cba041318eac2ff89e9e9806.jpg',
-        f1: 'Врач и лечебные программы',
-        f1d: DOC,
-        f2: 'Питание включено',
-        f2d: MEAL,
-        price: 90,
-      },
-      {
-        name: 'Эгле Комфорт Бирштонас',
-        stars: '',
-        sub: 'Бирштонас · 35 отзывов',
-        img: '/img/226796cc08c3c360c4ac718f6a4c433f.jpg',
-        f1: 'Врач и лечебные программы',
-        f1d: DOC,
-        f2: 'Бассейны и сауны',
-        f2d: POOL,
-        price: 119,
-      },
-      {
-        name: 'Минерал SPA Драугисте',
-        stars: '',
-        sub: 'Друскининкай · 5 отзывов',
-        img: '/img/a3e6585f5dd9cb9a1b6daa1d5c50ff22.jpg',
-        f1: 'Питание включено',
-        f1d: MEAL,
-        f2: 'Бассейн и бани',
-        f2d: POOL,
-        price: 107,
-      },
-    ];
+    const POPULAR_SANATORIUMS = api.getPopularSanatoriums();
+
     // ---- Custom two-month range calendar with price colours ----
     const st = this.state || {};
-    const MONTHS = [
-      'января',
-      'февраля',
-      'марта',
-      'апреля',
-      'мая',
-      'июня',
-      'июля',
-      'августа',
-      'сентября',
-      'октября',
-      'ноября',
-      'декабря',
-    ];
-    const MONTHS_N = [
-      'Январь',
-      'Февраль',
-      'Март',
-      'Апрель',
-      'Май',
-      'Июнь',
-      'Июль',
-      'Август',
-      'Сентябрь',
-      'Октябрь',
-      'Ноябрь',
-      'Декабрь',
-    ];
-    const DAY = 86400000;
-    const toD = (s) => new Date(s + 'T00:00:00Z');
-    const iso = (d) => d.toISOString().slice(0, 10);
-    const addD = (d, n) => new Date(d.getTime() + n * DAY);
-    const TODAY = toD('2026-10-27');
-    const long = (d) => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
-    const short = (d) => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()];
-    const nightsWord = (n) =>
-      n % 10 === 1 && n % 100 !== 11
-        ? 'ночь'
-        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
-          ? 'ночи'
-          : 'ночей';
     const inD = toD(st.in || '2026-11-09'),
       outD = toD(st.out || '2026-11-18');
     const sel = st.sel || { in: iso(inD), out: iso(outD) };
@@ -135,7 +39,7 @@ class MainLogic extends PageLogic {
       sOut = sel.out ? toD(sel.out) : null;
     // Average price per person per night across the resort — synthetic season curve [ЗАМЕНИТЬ НА РЕАЛЬНЫЕ ТАРИФЫ]
     const BASE = 100;
-    const dayIdx = (d) => Math.round((d - TODAY) / DAY);
+    const dayIdx = (d) => daysBetween(TODAY, d);
     const priceOf = (d) => {
       const n = dayIdx(d),
         wd = d.getUTCDay(),
@@ -162,7 +66,7 @@ class MainLogic extends PageLogic {
       const first = new Date(Date.UTC(y, m, 1));
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-      const cells = [];
+      const cells: CalendarCell[] = [];
       for (let i = 0; i < lead; i++)
         cells.push({
           day: '',
@@ -180,19 +84,7 @@ class MainLogic extends PageLogic {
       for (let d = 1; d <= days; d++) {
         const date = new Date(Date.UTC(y, m, d));
         const past = date < TODAY;
-        const full =
-          !past &&
-          [
-            '2026-11-20',
-            '2026-11-21',
-            '2026-11-22',
-            '2026-12-24',
-            '2026-12-25',
-            '2026-12-26',
-            '2026-12-27',
-            '2026-12-31',
-            '2027-01-01',
-          ].includes(iso(date)); /* [ПРИМЕР] нет мест ни в одном объекте */
+        const full = !past && isSoldOutEverywhere(iso(date)); /* [ПРИМЕР] нет мест ни в одном объекте */
         const p = priceOf(date),
           r = p / BASE;
         let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9';
@@ -221,7 +113,7 @@ class MainLogic extends PageLogic {
         }
         cells.push({
           day: d,
-          fly: [0, 2, 4].includes(date.getUTCDay()) && !(typeof past !== 'undefined' && past),
+          fly: isFlightDay(date) && !past,
           sub: past ? '' : full ? 'нет мест' : isIn ? 'заезд' : isOut ? 'выезд' : p + '\u00a0€',
           bg,
           border,
@@ -241,16 +133,22 @@ class MainLogic extends PageLogic {
       { title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) },
       { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) },
     ];
-    const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
+    const nights = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const preset = (n) => () => {
       const i = sIn || inD;
       this.setState({ sel: { in: iso(i), out: iso(addD(i, n)) } });
     };
-    const curNights = Math.round((outD - inD) / DAY);
+    const curNights = daysBetween(inD, outD);
+    const { booking, update } = this.props.booking;
     return {
-      hotels,
-      inLabel: long(inD),
-      outLabel: long(outD),
+      hotels: POPULAR_SANATORIUMS,
+      dest: booking.dest,
+      destOptions: RESORTS,
+      setDest: (e) => update({ dest: e.target.value }),
+      guests: guestsKey(booking),
+      setGuests: (e) => update(parseGuests(e.target.value)),
+      inLabel: longDate(inD),
+      outLabel: longDate(outD),
       nightsLabel: curNights + ' ' + nightsWord(curNights),
       calOpen: !!st.calOpen,
       openCal: () =>
@@ -275,8 +173,8 @@ class MainLogic extends PageLogic {
         : !sOut
           ? 'Теперь нажмите день выезда'
           : 'Можно поменять: нажмите новый день заезда',
-      selIn: sIn ? short(sIn) : '—',
-      selOut: sOut ? short(sOut) : '—',
+      selIn: sIn ? shortDate(sIn) : '—',
+      selOut: sOut ? shortDate(sOut) : '—',
       selNights: nights ? nights + ' ' + nightsWord(nights) : '—',
       applyOff: !(sIn && sOut),
       applyCal: () => {
@@ -374,7 +272,10 @@ export default function MainPage() {
             </div>
             <form
               className="card"
-              action="results.html"
+              onSubmit={(e) => {
+                e.preventDefault();
+                logic.props.navigate('/results');
+              }}
               style={{
                 padding: '16px 18px 12px',
                 display: 'flex',
@@ -411,11 +312,12 @@ export default function MainPage() {
                       <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
                       <circle cx="12" cy="10" r="2.5" />
                     </svg>
-                    <select id="city" className="input">
-                      <option>Друскининкай</option>
-                      <option>Бирштонас</option>
-                      <option>Паланга</option>
-                      <option>Аникщяй</option>
+                    <select id="city" className="input" value={v.dest} onChange={v.setDest}>
+                      {v.destOptions.map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
                     </select>
                     <svg
                       width="18"
@@ -500,13 +402,12 @@ export default function MainPage() {
                       <circle cx="12" cy="8" r="4" />
                       <path d="M4 21a8 8 0 0 1 16 0" />
                     </svg>
-                    <select id="guests" className="input">
-                      <option>2 взрослых</option>
-                      <option>1 взрослый</option>
-                      <option>2 взрослых, 1 ребёнок</option>
-                      <option>2 взрослых, 2 ребёнка</option>
-                      <option>3 взрослых</option>
-                      <option>4 взрослых</option>
+                    <select id="guests" className="input" value={v.guests} onChange={v.setGuests}>
+                      {GUEST_OPTIONS.map((g) => (
+                        <option key={g.value} value={g.value}>
+                          {g.label}
+                        </option>
+                      ))}
                     </select>
                     <svg
                       width="18"
@@ -1126,102 +1027,12 @@ export default function MainPage() {
                   </details>
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                <button type="button" className="navbtn" onClick={v.calPrev} aria-label="Предыдущие месяцы">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m15 6-6 6 6 6" />
-                  </svg>
-                </button>
-                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                  {(v.months || []).map((m: any, _i0: number) => (
-                    <Fragment key={_i0}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div
-                          style={{
-                            fontFamily: 'Lora,Georgia,serif',
-                            fontSize: '22px',
-                            fontWeight: '600',
-                            textAlign: 'center',
-                          }}
-                        >
-                          {m.title}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
-                          <div className="wd">Пн</div>
-                          <div className="wd">Вт</div>
-                          <div className="wd">Ср</div>
-                          <div className="wd">Чт</div>
-                          <div className="wd">Пт</div>
-                          <div className="wd">Сб</div>
-                          <div className="wd">Вс</div>
-                          {(m.cells || []).map((c: any, _i1: number) => (
-                            <Fragment key={_i1}>
-                              <button
-                                type="button"
-                                className="cell"
-                                onClick={c.pick}
-                                disabled={!!c.off}
-                                aria-label={c.aria}
-                                style={{ background: c.bg, borderColor: c.border, color: c.color, cursor: c.cursor }}
-                              >
-                                <span>{c.day}</span>
-                                <small style={{ color: c.subColor }}>{c.sub}</small>
-                                {c.fly ? (
-                                  <>
-                                    <span
-                                      style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}
-                                      title="Рейс из Израиля"
-                                    >
-                                      <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                      >
-                                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                                      </svg>
-                                    </span>
-                                  </>
-                                ) : null}
-                              </button>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-                <button type="button" className="navbtn" onClick={v.calNext} aria-label="Следующие месяцы">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m9 6 6 6-6 6" />
-                  </svg>
-                </button>
-              </div>
+              <MonthsCalendar
+                months={v.months || []}
+                onPrev={v.calPrev}
+                onNext={v.calNext}
+                planeTitle="Рейс из Израиля"
+              />
               <div
                 style={{
                   display: 'flex',

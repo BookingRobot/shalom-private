@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.5;
 }
-.pg-transfer * {
-  box-sizing: border-box;
-}
-.pg-transfer a {
-  color: #1f5f4a;
-}
-.pg-transfer a:hover {
-  color: #143f31;
-}
-.pg-transfer h1,
-.pg-transfer h2,
-.pg-transfer h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-transfer input,
 .pg-transfer select,
 .pg-transfer button,

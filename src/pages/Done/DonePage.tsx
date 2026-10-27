@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
+import { orderSummary } from '../../lib/orderSummary';
+import { daysBetween, nightsWord, plural, shortDate, toD } from '../../lib/dates';
+import { fmt } from '../../lib/format';
+import { TODAY } from '../../data/demo';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -23,7 +27,13 @@ class DoneLogic extends PageLogic {
 
 export default function DonePage() {
   usePageTitle('Заказ принят');
-  const [v, logic] = usePageLogic(DoneLogic);
+  const [, logic] = usePageLogic(DoneLogic);
+  const booking = logic.props.booking.booking;
+  const o = orderSummary(booking);
+  const inDay = shortDate(toD(booking.checkin));
+  const outDay = shortDate(toD(booking.checkout));
+  const daysLeft = daysBetween(TODAY, toD(booking.checkin));
+  const eur = (n: number) => fmt(n) + '\u00a0€';
   return (
     <div className="page pg-done">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -74,7 +84,9 @@ export default function DonePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '44px' }}>Спасибо! Заказ № 12345 принят</h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px' }}>Аванс 86&nbsp;€ оплачен.</span>
+                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '24px' }}>
+                  Аванс {o.advanceLabel} оплачен.
+                </span>
                 <span
                   style={{
                     display: 'inline-flex',
@@ -153,7 +165,9 @@ export default function DonePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
                   <h2 style={{ fontSize: '30px' }}>Что дальше</h2>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>До заезда 13 дней</span>
+                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                    До заезда {daysLeft} {plural(daysLeft, ['день', 'дня', 'дней'])}
+                  </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <div className="tl">
@@ -177,7 +191,7 @@ export default function DonePage() {
                       <span className="chip">27 октября · сегодня</span>
                       <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>Аванс получен</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                        Оплата 86&nbsp;€ (4 % от стоимости) прошла успешно.
+                        Оплата {o.advanceLabel} (4 % от стоимости) прошла успешно.
                       </span>
                     </div>
                   </div>
@@ -226,17 +240,17 @@ export default function DonePage() {
                     <div className="line" />
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip">9 ноября · с 14:00</span>
+                      <span className="chip">{inDay} · с 14:00</span>
                       <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>Заезд в санаторий</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                        Остаток за проживание — 2&nbsp;052&nbsp;€ на стойке регистрации.
+                        Остаток за проживание — {eur(o.stay - o.advance)} на стойке регистрации.
                       </span>
                     </div>
                   </div>
                   <div className="tl">
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip">18 ноября · до 12:00</span>
+                      <span className="chip">{outDay} · до 12:00</span>
                       <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '19px' }}>
                         Выезд и обратный трансфер
                       </strong>
@@ -433,7 +447,7 @@ export default function DonePage() {
                         >
                           <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
                         </svg>
-                        9 ноября · 14:00
+                        {inDay} · 14:00
                       </span>
                     </div>
                     <div
@@ -453,7 +467,7 @@ export default function DonePage() {
                         >
                           <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
                         </svg>
-                        18 ноября · 12:00
+                        {outDay} · 12:00
                       </span>
                     </div>
                   </div>
@@ -471,7 +485,7 @@ export default function DonePage() {
                     >
                       <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
                     </svg>
-                    9 ночей · 2 взрослых
+                    {o.nights} {nightsWord(o.nights)} · {o.guests}
                   </div>
                   <div className="fact">
                     <svg
@@ -503,7 +517,7 @@ export default function DonePage() {
                     >
                       <path d="M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6" />
                     </svg>
-                    Программа «Миди» · 3 процедуры в день
+                    {o.programFull}
                   </div>
                   <div className="fact">
                     <svg
@@ -537,7 +551,7 @@ export default function DonePage() {
                     >
                       <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
                     </svg>
-                    Групповой трансфер: аэропорт Вильнюса ⇄ санаторий
+                    {o.transferLine}
                   </div>
                 </div>
               </div>
@@ -545,19 +559,19 @@ export default function DonePage() {
                 <h2 style={{ fontSize: '24px' }}>Стоимость и оплата</h2>
                 <div className="row">
                   <span style={{ color: '#3E4B44' }}>Проживание и программа</span>
-                  <strong>2&nbsp;138&nbsp;€</strong>
+                  <strong>{o.stayLabel}</strong>
                 </div>
                 <div className="row">
-                  <span style={{ color: '#3E4B44' }}>Трансфер групповой, туда и обратно</span>
-                  <strong>120&nbsp;€</strong>
+                  <span style={{ color: '#3E4B44' }}>{o.transferKind}</span>
+                  <strong>{o.transferLabel}</strong>
                 </div>
                 <div className="row" style={{ borderTop: '1px solid #E3DED2', paddingTop: '10px', fontSize: '18px' }}>
                   <strong>Всего</strong>
-                  <strong style={{ fontSize: '22px' }}>2&nbsp;258&nbsp;€</strong>
+                  <strong style={{ fontSize: '22px' }}>{o.totalLabel}</strong>
                 </div>
                 <div className="row">
                   <span style={{ color: '#3E4B44' }}>Оплачено</span>
-                  <strong style={{ color: '#1F5F4A' }}>86&nbsp;€ ✓</strong>
+                  <strong style={{ color: '#1F5F4A' }}>{o.advanceLabel} ✓</strong>
                 </div>
                 <div
                   style={{
@@ -571,12 +585,12 @@ export default function DonePage() {
                 >
                   <span style={{ color: '#1F5F4A', fontSize: '15px', fontWeight: '700' }}>Осталось оплатить</span>
                   <strong style={{ fontSize: '32px', lineHeight: '1.1', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
-                    2&nbsp;172&nbsp;€
+                    {eur(o.total - o.advance)}
                   </strong>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '16px' }}>
-                  <span>В санатории — 2&nbsp;052&nbsp;€</span>
-                  <span>За трансфер — 120&nbsp;€</span>
+                  <span>В санатории — {eur(o.stay - o.advance)}</span>
+                  <span>За трансфер — {o.transferLabel}</span>
                 </div>
                 <div
                   style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', fontSize: '14px', color: '#3E4B44' }}

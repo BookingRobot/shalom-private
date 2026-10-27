@@ -49,7 +49,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
  * Language for the current page. Pages translated only into Russian pass ['ru'] and
  * stay Russian even if the guest switched language elsewhere. Sets <html lang/dir>.
  */
-export function usePageLanguage(supported: Lang[] = ['ru']): LangApi & { dir: 'ltr' | 'rtl' } {
+export function usePageLanguage(supported: readonly Lang[] = ['ru']): LangApi & { dir: 'ltr' | 'rtl' } {
   const api = useContext(LangCtx);
   const lang = supported.includes(api.lang) ? api.lang : supported[0];
   const dir = isRtl(lang) ? 'rtl' : 'ltr';

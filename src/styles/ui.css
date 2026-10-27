@@ -1,0 +1,15 @@
+/* Shared basics for every booking page (inside .page): links and headings. */
+.page a {
+  color: #1f5f4a;
+}
+.page a:hover {
+  color: #143f31;
+}
+.page h1,
+.page h2,
+.page h3 {
+  font-family: Lora, Georgia, 'Times New Roman', serif;
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+}

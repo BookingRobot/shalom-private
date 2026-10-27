@@ -6,23 +6,6 @@
   font-size: 17px;
   line-height: 1.5;
 }
-.pg-done * {
-  box-sizing: border-box;
-}
-.pg-done a {
-  color: #1f5f4a;
-}
-.pg-done a:hover {
-  color: #143f31;
-}
-.pg-done h1,
-.pg-done h2,
-.pg-done h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-done p {
   margin: 0;
 }

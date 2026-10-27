@@ -1,9 +1,12 @@
-import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { fmt } from '../../lib/format';
+import { OrderSummary } from '../../components/OrderSummary';
+import { ADVANCE_RATE, orderSummary } from '../../lib/orderSummary';
+import { shortDate, toD } from '../../lib/dates';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './PaymentPage.css';
@@ -15,7 +18,7 @@ const HELP_CTX: HelpContextInfo = {
 };
 
 class PaymentLogic extends PageLogic {
-  constructor(props?: any) {
+  constructor(props: PageServices) {
     super(props);
     this.state = { plan: 'adv', method: 'card' };
   }
@@ -27,10 +30,11 @@ class PaymentLogic extends PageLogic {
     const method = this.state.method ?? 'card';
     const adv = plan === 'adv';
     // Минимальный аванс — 4 % от суммы бронирования (проживание и программа), округляем вверх до евро
-    const TOTAL = 2138,
-      ADV_RATE = 0.04,
+    const booking = this.props.booking.booking;
+    const TOTAL = orderSummary(booking).stay,
+      ADV_RATE = ADVANCE_RATE,
       ILS = 3.85;
-    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+    const checkinDay = shortDate(toD(booking.checkin));
     const advN = Math.ceil(TOTAL * ADV_RATE),
       restN = TOTAL - advN;
     const advAmt = fmt(advN),
@@ -61,7 +65,9 @@ class PaymentLogic extends PageLogic {
           advAmt +
           '\u00a0€ — сегодня, 27 октября. ' +
           restAmt +
-          '\u00a0€ — при заезде 9 ноября в санатории.'
+          '\u00a0€ — при заезде ' +
+          checkinDay +
+          ' в санатории.'
         : 'График: ' + totalAmt + '\u00a0€ — сегодня, 27 октября. На месте доплачивать ничего не нужно.',
       rest: adv ? 'Остаток ' + restAmt + '\u00a0€ — в санатории при заезде' : 'На месте ничего доплачивать не нужно',
       payLabel:
@@ -77,6 +83,7 @@ class PaymentLogic extends PageLogic {
 export default function PaymentPage() {
   usePageTitle('Шаг 5 из 5 — оплата');
   const [v, logic] = usePageLogic(PaymentLogic);
+  const order = orderSummary(logic.props.booking.booking);
   return (
     <div className="page pg-payment">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -117,7 +124,10 @@ export default function PaymentPage() {
           }}
         >
           <form
-            action="done.html"
+            onSubmit={(e) => {
+              e.preventDefault();
+              logic.props.navigate('/done');
+            }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -725,90 +735,20 @@ export default function PaymentPage() {
               </Link>
             </div>
           </form>
-          <aside
-            className="card"
-            style={{
-              flex: '1 1 300px',
-              maxWidth: '360px',
-              padding: '0',
-              overflow: 'hidden',
-              position: 'sticky',
-              top: '16px',
-            }}
-          >
-            <img
-              src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
-              alt=""
-              style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
-            />{' '}
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ fontWeight: '800', fontSize: '20px' }}>Санаторий Эгле Комфорт</div>
-                <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Даты</span>
-                  <strong>9–18 ноября · 9 ночей</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Номер</span>
-                  <strong>Двухместный</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Программа</span>
-                  <strong>«Миди», 3 процедуры</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Гости</span>
-                  <strong>Mikhail Levin, Irina Levina</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Трансфер</span>
-                  <strong>Вильнюс, аэропорт ⇄ санаторий</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Проживание и лечение</span>
-                  <strong>2&nbsp;138&nbsp;€</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Трансфер групповой, туда и обратно</span>
-                  <strong>120&nbsp;€</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: '12px',
-                  borderTop: '2px solid #1C2620',
-                  paddingTop: '12px',
-                }}
-              >
-                <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-                <span style={{ fontWeight: '800', fontSize: '28px' }}>2&nbsp;258&nbsp;€</span>
-              </div>
+          <OrderSummary
+            details={[
+              ['Даты', order.dates],
+              ['Номер', 'Двухместный'],
+              ['Программа', order.program],
+              ['Гости', 'Mikhail Levin, Irina Levina'],
+              ['Трансфер', order.transferPlaces],
+            ]}
+            prices={[
+              ['Проживание и лечение', order.stayLabel],
+              [order.transferKind, order.transferLabel],
+            ]}
+            total={order.totalLabel}
+            footer={
               <div
                 style={{
                   display: 'flex',
@@ -825,8 +765,8 @@ export default function PaymentPage() {
                 </div>
                 <div style={{ fontSize: '15px', color: '#3E4B44' }}>{v.rest}</div>
               </div>
-            </div>
-          </aside>
+            }
+          />
         </div>
         <SiteFooter />
       </div>{' '}

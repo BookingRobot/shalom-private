@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { MONTHS_N } from '../../lib/dates';
+import { AdvanceNote, OrderSummary } from '../../components/OrderSummary';
+import { orderSummary } from '../../lib/orderSummary';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './GuestsPage.css';
@@ -15,7 +18,7 @@ const HELP_CTX: HelpContextInfo = {
 };
 
 class GuestsLogic extends PageLogic {
-  constructor(props?: any) {
+  constructor(props: PageServices) {
     super(props);
     this.state = { dob: {}, pk: null };
   }
@@ -39,20 +42,6 @@ class GuestsLogic extends PageLogic {
       'октября',
       'ноября',
       'декабря',
-    ];
-    const MONTHS_N = [
-      'Январь',
-      'Февраль',
-      'Март',
-      'Апрель',
-      'Май',
-      'Июнь',
-      'Июль',
-      'Август',
-      'Сентябрь',
-      'Октябрь',
-      'Ноябрь',
-      'Декабрь',
     ];
     const fmtDob = (v) => (v ? v.d + ' ' + MONTHS[v.m] + ' ' + v.y : 'Выберите дату');
     const set = (patch) => this.setState({ pk: { ...pk, ...patch } });
@@ -111,7 +100,7 @@ class GuestsLogic extends PageLogic {
         dobDone: () => {},
       };
     const from = pk.from ?? 1950;
-    const years = [];
+    const years: any[] = [];
     for (let y = from; y < from + 20; y++)
       years.push({ t: String(y), cls: y === pk.y ? 'on' : '', pick: () => set({ y, step: 'month', d: null }) });
     const months = MONTHS_N.map((t, i) => ({
@@ -119,7 +108,7 @@ class GuestsLogic extends PageLogic {
       cls: i === pk.m ? 'on' : '',
       pick: () => set({ m: i, step: 'day', d: null }),
     }));
-    const days = [];
+    const days: any[] = [];
     if (pk.y != null && pk.m != null) {
       const first = new Date(Date.UTC(pk.y, pk.m, 1));
       const lead = (first.getUTCDay() + 6) % 7;
@@ -178,6 +167,7 @@ class GuestsLogic extends PageLogic {
 export default function GuestsPage() {
   usePageTitle('Шаг 3 из 5 — данные гостей');
   const [v, logic] = usePageLogic(GuestsLogic);
+  const order = orderSummary(logic.props.booking.booking);
   return (
     <div className="page pg-guests">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -202,7 +192,10 @@ export default function GuestsPage() {
           }}
         >
           <form
-            action="flights.html"
+            onSubmit={(e) => {
+              e.preventDefault();
+              logic.props.navigate('/flights');
+            }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -497,103 +490,21 @@ export default function GuestsPage() {
               </Link>
             </div>
           </form>
-          <aside
-            className="card"
-            style={{
-              flex: '1 1 300px',
-              maxWidth: '360px',
-              padding: '0',
-              overflow: 'hidden',
-              position: 'sticky',
-              top: '16px',
-            }}
-          >
-            <img
-              src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
-              alt=""
-              style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
-            />{' '}
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ fontWeight: '800', fontSize: '20px' }}>Санаторий Эгле Комфорт</div>
-                <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Даты</span>
-                  <strong>9–18 ноября · 9 ночей</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Номер</span>
-                  <strong>Двухместный</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Программа</span>
-                  <strong>«Миди», 3 процедуры</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Гости</span>
-                  <strong>2 взрослых</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Трансфер</span>
-                  <strong>из аэропорта Вильнюса, туда и обратно</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Проживание и лечение</span>
-                  <strong>2&nbsp;138&nbsp;€</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Трансфер групповой, туда и обратно</span>
-                  <strong>120&nbsp;€</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: '12px',
-                  borderTop: '2px solid #1C2620',
-                  paddingTop: '12px',
-                }}
-              >
-                <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-                <span style={{ fontWeight: '800', fontSize: '28px' }}>2&nbsp;258&nbsp;€</span>
-              </div>
-              <div
-                style={{
-                  fontSize: '15px',
-                  color: '#3E4B44',
-                  background: '#F4F1EA',
-                  borderRadius: '2px',
-                  padding: '10px 12px',
-                }}
-              >
-                Сейчас к оплате только аванс 4 % — <strong>86&nbsp;€</strong>. Остальное — в санатории при заезде.
-              </div>
-            </div>
-          </aside>
+          <OrderSummary
+            details={[
+              ['Даты', order.dates],
+              ['Номер', 'Двухместный'],
+              ['Программа', order.program],
+              ['Гости', order.guests],
+              ['Трансфер', order.transferRoute],
+            ]}
+            prices={[
+              ['Проживание и лечение', order.stayLabel],
+              [order.transferKind, order.transferLabel],
+            ]}
+            total={order.totalLabel}
+            footer={<AdvanceNote advance={order.advanceLabel} />}
+          />
         </div>
         <SiteFooter />
       </div>{' '}

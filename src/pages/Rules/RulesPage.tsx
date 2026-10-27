@@ -19,7 +19,7 @@ class RulesLogic extends PageLogic {
 
 export default function RulesPage() {
   usePageTitle('Условия бронирования, оплаты и отмены');
-  const [v, logic] = usePageLogic(RulesLogic);
+  const [, logic] = usePageLogic(RulesLogic);
   return (
     <div className="page pg-rules">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>

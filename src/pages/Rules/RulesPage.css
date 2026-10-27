@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.55;
 }
-.pg-rules * {
-  box-sizing: border-box;
-}
-.pg-rules a {
-  color: #1f5f4a;
-}
-.pg-rules a:hover {
-  color: #143f31;
-}
-.pg-rules h1,
-.pg-rules h2,
-.pg-rules h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-rules .btn {
   display: inline-flex;
   align-items: center;

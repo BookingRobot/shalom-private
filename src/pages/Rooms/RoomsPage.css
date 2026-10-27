@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.5;
 }
-.pg-rooms * {
-  box-sizing: border-box;
-}
-.pg-rooms a {
-  color: #1f5f4a;
-}
-.pg-rooms a:hover {
-  color: #143f31;
-}
-.pg-rooms h1,
-.pg-rooms h2,
-.pg-rooms h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-rooms button {
   font: inherit;
   color: inherit;

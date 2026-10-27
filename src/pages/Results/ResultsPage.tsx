@@ -2,7 +2,19 @@ import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
+import { MONTHS, MONTHS_N, addD, daysBetween, iso, shortDate, toD } from '../../lib/dates';
+import { TODAY } from '../../data/demo';
+import { fmt } from '../../lib/format';
+import { isSoldOutEverywhere } from '../../data/availability';
+import { isFlightDay } from '../../data/flights';
+import { ICON_PATHS } from '../../data/iconPaths';
+import { awardsOf } from '../../data/awards';
+import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
+import { BUSY_LOOK, FREE_LOOK, busyRange, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
+import { api } from '../../api';
+import { RoomCard } from '../../components/RoomCard';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './ResultsPage.css';
@@ -10,9 +22,12 @@ import './ResultsPage.css';
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
 class ResultsLogic extends PageLogic {
-  constructor(props?: any) {
+  constructor(props: PageServices) {
     super(props);
+    const b = props.booking.booking;
     this.state = {
+      checkin: b.checkin,
+      nights: daysBetween(toD(b.checkin), toD(b.checkout)),
       sort: 'pop',
       open: { 'egle-comfort': true },
       det: {},
@@ -23,561 +38,29 @@ class ResultsLogic extends PageLogic {
       pr: {},
     };
   }
+  syncBooking(st) {
+    return st.checkin ? { checkin: st.checkin, checkout: iso(addD(toD(st.checkin), st.nights || 9)) } : null;
+  }
   renderVals() {
     return this._rv();
   }
   _rv() {
-    const I = {
-      bed2: 'M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M3 18h18M5 9V6h6v3M13 9V6h6v3',
-      bed1: 'M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M6 10V7h12v3',
-      balcony: 'M3 11h18M5 11v8M9 11v8M13 11v8M17 11v8M3 19h18M6 11V5h12v6',
-      ac: 'M3 6h18v7H3zM7 16v3M12 16v4M17 16v3M6 10h12',
-      wifi: 'M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5h.01',
-      shower: 'M4 20V7a4 4 0 0 1 8 0M8 11h8M9 14v1M12 14v1M15 14v1M9 18v1M12 18v1M15 18v1',
-      bath: 'M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM6 12V6a2 2 0 0 1 4 0M7 19v2M17 19v2',
-      area: 'M4 4h16v16H4zM4 9h5M4 14h3M9 4v5M14 4v3',
-      tv: 'M3 5h18v12H3zM8 21h8M12 17v4',
-      kettle: 'M6 9h11a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3H6zM6 9V7h8v2M6 12H4M9 20h6',
-      fridge: 'M6 3h12v18H6zM6 10h12M9 6v2M9 13v3',
-      meals: 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8',
-      doctor: 'M8 4h8v3H8zM6 6h12v15H6zM9 14h2l1-3 2 6 1-3h2',
-      proc: 'M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0',
-      massage: 'M12 20c-4 0-8-3-8-7 2 0 4 1 5 2-1-3 0-7 3-9 3 2 4 6 3 9 1-1 3-2 5-2 0 4-4 7-8 7z',
-      gym: 'M2 12h3M19 12h3M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8',
-      pool: 'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6',
-      aqua: 'M3 20h18M4 16c6 0 8-10 14-10M12 11l3 3M16 9l3 3',
-      sauna: 'M8 4c-1 2 1 3 0 5M12 4c-1 2 1 3 0 5M16 4c-1 2 1 3 0 5M4 12h16v8H4zM8 16h8',
-    };
-    const am = (k, t) => ({ d: I[k], t });
-    const twinRoom = [
-      am('bed2', '2 односпальные кровати'),
-      am('balcony', 'Балкон'),
-      am('ac', 'Кондиционер'),
-      am('wifi', 'Бесплатный Wi-Fi'),
-      am('shower', 'Душ'),
-      am('tv', 'Телевизор'),
-      am('kettle', 'Чайник'),
-      am('area', '17–18 м²'),
-    ];
-    const stdRoom = [
-      am('bed1', 'Двуспальная или 2 односпальные'),
-      am('shower', 'Душ'),
-      am('wifi', 'Бесплатный Wi-Fi'),
-      am('tv', 'Телевизор'),
-      am('area', '[ПЛОЩАДЬ] м²'),
-    ];
-    const egleDetails =
-      'Для взрослого в цену включено:\n— Консультация врача и по программе назначенные процедуры и исследования\n— Проживание\n— Трёхразовое питание «шведский стол» (завтрак, обед, ужин)\n— Ежедневное посещение бассейнов и саун — без ограничений по времени и количеству раз\n\nДень приезда и отъезда считаются как один лечебный день. Процедуры назначает врач, по одной из каждой группы:\n1. Лечебная ванна (минеральная жемчужная, углекислая) или грязевая аппликация\n2. Лечебный массаж 15 мин (каждый второй день), подводный или аппаратный массаж 20 мин\n3. Групповая кинезитерапия — в зале, в воде или в вертикальной ванне\n4. Аппаратная физиотерапия: электростимуляция, магнитотерапия, ингаляции, соляная комната';
-    const all = [
-      {
-        id: 'egle-comfort',
-        name: 'Санаторий Эгле Комфорт',
-        sub: 'Друскининкай · Egles g. 1 · 26 отзывов',
-        starsN: 4,
-        img: '/img/1efd1efc34d4137ff98a8658a068afc5.jpg',
-        photos: 10,
-        price: 2138,
-        pop: 1,
-        inc: [
-          '3 процедуры в день',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Бассейны и сауны — без ограничений',
-          'Врач говорит по-русски',
-        ],
-        note: 'При 10 ночах трансфер из аэропорта бесплатный — посмотреть вариант →',
-        tags: [
-          'daily',
-          'doctor',
-          'samebld',
-          'ru',
-          'transfer',
-          'lech',
-          'pool',
-          'meals3',
-          'balcony',
-          'ac',
-          'lift',
-          'twin',
-          'p-oda',
-          'p-spine',
-          'p-nerv',
-          'p-resp',
-          'p-digest',
-          'p-diab',
-          'p-heart',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник, нервная система, дыхательные пути, пищеварительный тракт, сердечно-сосудистая система, диабет и эндокринология, гинекология, дерматология.',
-        time: 'Официальное время заезда — с 14:00. Выезд в последний день — до 12:00. Ранний приезд: багаж примут на хранение, можно сразу на обед.',
-        trNote:
-          'Бесплатный трансфер из аэропорта Вильнюса — только при заезде от 10 ночей. У вас 9 ночей: продлите на одну — и трансфер бесплатный. Откуда забрать — выберете на следующем шаге.',
-        offers: [
-          {
-            n: 1,
-            room: 'Двухместный номер',
-            img: '/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg',
-            roomPhotos: 7,
-            amen: twinRoom,
-            roomText:
-              'Что ещё есть в номере: телефон, спутниковое ТВ, гардероб, сейф, фен, халат, тапочки. Однокомнатный, 17–18 м².',
-            title: 'Программа «Миди» — 3 процедуры в день',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '3 процедуры в день'),
-              am('pool', 'Бассейны и сауны'),
-              am('sauna', 'Турецкая и финская бани'),
-            ],
-            price: '2\u00a0138',
-            old: '2\u00a0250',
-            adv: 43,
-            rest: '2\u00a0095',
-            details: egleDetails,
-          },
-          {
-            n: 2,
-            room: 'Двухместный номер',
-            img: '/img/26b9aff2d91280c2b14c33946e17c65c.jpg',
-            roomPhotos: 7,
-            amen: twinRoom,
-            roomText: 'Тот же номер, расширенная лечебная программа.',
-            title: 'Программа «Макси» — 5 процедур в день',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '5 процедур в день'),
-              am('pool', 'Бассейны и сауны'),
-              am('sauna', 'Турецкая и финская бани'),
-            ],
-            price: '2\u00a0275',
-            old: '',
-            adv: 46,
-            rest: '2\u00a0229',
-            details: egleDetails.replace(
-              'по одной из каждой группы',
-              'по одной из каждой группы, плюс одна дополнительная ванна и один дополнительный массаж в день',
-            ),
-          },
-        ],
-      },
-      {
-        id: 'grand-spa-lietuva',
-        name: 'Санаторий Гранд Спа Лиетува',
-        sub: 'Друскининкай · 20 отзывов',
-        starsN: 4,
-        img: '/img/a77ef961b37e1edf9b38716a5c54a79f.jpg',
-        photos: 17,
-        price: 925,
-        pop: 2,
-        inc: [
-          '5 процедур за весь заезд',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Бассейны и бани — вход включён',
-          'Врач говорит по-русски',
-        ],
-        note: '',
-        tags: [
-          'doctor',
-          'samebld',
-          'ru',
-          'lech',
-          'pool',
-          'meals3',
-          'ac',
-          'lift',
-          'double',
-          'p-oda',
-          'p-spine',
-          'p-nerv',
-          'p-resp',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник, нервная система, дыхательные пути.',
-        time: 'Заезд — с 15:00, выезд — до 12:00.',
-        trNote: 'Трансфер из Вильнюса, Каунаса или Варшавы выберете на следующем шаге.',
-        offers: [
-          {
-            n: 1,
-            room: 'Двухместный стандарт',
-            img: '',
-            roomPhotos: 0,
-            amen: stdRoom,
-            roomText: 'Корпус «Друскининкай», рядом с комплексом бассейнов и бюветом.',
-            title: 'Лечебная программа — 5 процедур',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('aqua', 'Много бассейнов и бань, без ограничений'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '5 лечебных процедур'),
-              am('pool', 'Бассейн и бани'),
-            ],
-            price: '925',
-            old: '',
-            adv: 19,
-            rest: '906',
-            details:
-              'Для взрослого включено: проживание, трёхразовое питание «шведский стол», консультация врача, 5 лечебных процедур за заезд по назначению врача, ежедневный вход в комплекс бассейнов и бань.\n\nДень приезда и отъезда считаются как один лечебный день.',
-          },
-        ],
-      },
-      {
-        id: 'egle-standart',
-        name: 'Санаторий Эгле Стандарт',
-        sub: 'Друскининкай · 13 отзывов',
-        starsN: 3,
-        img: '/img/c99246b157929f79cff6d7e3a80fe603.jpg',
-        photos: 9,
-        price: 1710,
-        pop: 3,
-        inc: [
-          '5 процедур в день',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Бассейны и сауны — без ограничений',
-          'Врач говорит по-русски',
-        ],
-        note: '',
-        tags: [
-          'daily',
-          'doctor',
-          'ru',
-          'transfer',
-          'lech',
-          'pool',
-          'meals3',
-          'lift',
-          'twin',
-          'p-oda',
-          'p-spine',
-          'p-nerv',
-          'p-resp',
-          'p-digest',
-          'p-diab',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник, нервная система, дыхательные пути, пищеварительный тракт, эндокринология.',
-        time: 'Заезд — с 14:00, выезд — до 12:00.',
-        trNote:
-          'Бесплатный трансфер из аэропорта Вильнюса — только при заезде от 10 ночей. У вас ' +
-          (this.state.nights || 9) +
-          ' ноч.',
-        offers: [
-          {
-            n: 1,
-            room: 'Двухместный стандарт',
-            img: '',
-            roomPhotos: 0,
-            amen: [
-              am('bed2', '2 односпальные кровати'),
-              am('shower', 'Душ'),
-              am('wifi', 'Бесплатный Wi-Fi'),
-              am('tv', 'Телевизор'),
-              am('fridge', 'Холодильник'),
-            ],
-            roomText: 'Корпус «Стандарт», без балкона и кондиционера.',
-            title: 'Программа «Макси» — 5 процедур в день',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '5 процедур в день'),
-              am('pool', 'Бассейны и сауны'),
-            ],
-            price: '1\u00a0710',
-            old: '',
-            adv: 34,
-            rest: '1\u00a0676',
-            details: egleDetails,
-          },
-        ],
-      },
-      {
-        id: 'grand-spa-druskininkai',
-        name: 'Санаторий Гранд Спа Друскининкай',
-        sub: 'Друскининкай · 13 отзывов',
-        starsN: 4,
-        img: '/img/e1a95754062c0aa141d79e8971428c9c.jpg',
-        photos: 13,
-        price: 1105,
-        pop: 4,
-        inc: [
-          '5 процедур за весь заезд',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Бассейны и бани — вход включён',
-          'Врач говорит по-русски',
-        ],
-        note: '',
-        tags: [
-          'doctor',
-          'samebld',
-          'ru',
-          'lech',
-          'pool',
-          'meals3',
-          'ac',
-          'balcony',
-          'lift',
-          'double',
-          'p-oda',
-          'p-spine',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник.',
-        time: 'Заезд — с 15:00, выезд — до 12:00.',
-        trNote: 'Трансфер выберете на следующем шаге.',
-        offers: [
-          {
-            n: 1,
-            room: 'Двухместный с балконом',
-            img: '',
-            roomPhotos: 0,
-            amen: [
-              am('bed1', 'Двуспальная кровать'),
-              am('balcony', 'Балкон'),
-              am('ac', 'Кондиционер'),
-              am('shower', 'Душ'),
-              am('wifi', 'Бесплатный Wi-Fi'),
-            ],
-            roomText: 'Новый корпус с панорамными окнами.',
-            title: 'Лечебная программа — 5 процедур',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('aqua', 'Много бассейнов и бань'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '5 лечебных процедур'),
-            ],
-            price: '1\u00a0105',
-            old: '',
-            adv: 22,
-            rest: '1\u00a0083',
-            details:
-              'Для взрослого включено: проживание, трёхразовое питание, консультация врача, 5 лечебных процедур, ежедневный вход в комплекс бассейнов и бань.',
-          },
-        ],
-      },
-      {
-        id: 'belorus',
-        name: 'Санаторий Беларусь',
-        sub: 'Друскининкай · 17 отзывов',
-        starsN: 3,
-        img: '/img/405a6bd8cba041318eac2ff89e9e9806.jpg',
-        photos: 12,
-        price: 1410,
-        pop: 5,
-        inc: [
-          '5 процедур в день',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Бассейн и сауны — без ограничений',
-          'Врач говорит по-русски',
-        ],
-        note: 'При 14 ночах 14-я ночь бесплатно — посмотреть вариант →',
-        tags: [
-          'daily',
-          'doctor',
-          'samebld',
-          'ru',
-          'lech',
-          'pool',
-          'meals3',
-          'ac',
-          'balcony',
-          'lift',
-          'twin',
-          'double',
-          'p-oda',
-          'p-spine',
-          'p-nerv',
-          'p-heart',
-          'p-digest',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник, нервная система, сердечно-сосудистая система, пищеварительный тракт.',
-        time: 'Заезд — с 14:00, выезд — до 12:00.',
-        trNote: 'Трансфер выберете на следующем шаге.',
-        offers: [
-          {
-            n: 1,
-            room: 'Двухместный улучшенный',
-            img: '',
-            roomPhotos: 0,
-            amen: [
-              am('bed2', '2 односпальные кровати'),
-              am('ac', 'Кондиционер'),
-              am('balcony', 'Балкон'),
-              am('bath', 'Ванна'),
-              am('wifi', 'Бесплатный Wi-Fi'),
-              am('fridge', 'Холодильник'),
-            ],
-            roomText: 'После реновации, с видом на парк.',
-            title: 'Лечебная программа — 5 процедур в день',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('doctor', 'Консультация врача'),
-              am('proc', '5 процедур в день'),
-              am('pool', 'Бассейн и сауны'),
-            ],
-            price: '1\u00a0410',
-            old: '',
-            adv: 28,
-            rest: '1\u00a0382',
-            details:
-              'Для взрослого включено: проживание в улучшенном номере, трёхразовое питание, консультация врача, 5 процедур в день по назначению, бассейн и сауны ежедневно.\n\nАкция: при заезде от 14 ночей — 14-я ночь бесплатно.',
-          },
-        ],
-      },
-      {
-        id: 'draugyste',
-        name: 'Санаторий Минерал Спа Драугисте',
-        sub: 'Друскининкай · 4 отзыва',
-        starsN: 4,
-        img: '/img/a3e6585f5dd9cb9a1b6daa1d5c50ff22.jpg',
-        photos: 14,
-        price: 1791,
-        pop: 6,
-        inc: [
-          'Процедуры по назначению врача, ежедневно',
-          'Консультация врача',
-          'Трёхразовое питание',
-          'Минеральный бассейн и бани — без ограничений',
-          'Врач говорит по-русски',
-        ],
-        note: '',
-        tags: [
-          'daily',
-          'doctor',
-          'samebld',
-          'ru',
-          'lech',
-          'pool',
-          'meals3',
-          'ac',
-          'balcony',
-          'lift',
-          'double',
-          'p-oda',
-          'p-spine',
-          'p-nerv',
-          'p-resp',
-        ],
-        spec: 'Опорно-двигательный аппарат, позвоночник, нервная система, дыхательные пути.',
-        time: 'Заезд — с 15:00, выезд — до 12:00.',
-        trNote: 'Трансфер выберете на следующем шаге.',
-        offers: [
-          {
-            n: 1,
-            room: 'Улучшенный двухместный',
-            img: '',
-            roomPhotos: 0,
-            amen: [
-              am('bed1', 'Двуспальная кровать'),
-              am('ac', 'Кондиционер'),
-              am('balcony', 'Балкон'),
-              am('shower', 'Душ'),
-              am('wifi', 'Бесплатный Wi-Fi'),
-              am('tv', 'Телевизор'),
-            ],
-            roomText: 'Корпус после реконструкции, минеральная вода в бассейне.',
-            title: 'Программа санаторного лечения',
-            prog: [
-              am('meals', 'Трёхразовое питание'),
-              am('doctor', 'Консультация врача'),
-              am('proc', 'Процедуры по назначению'),
-              am('pool', 'Минеральный бассейн и бани'),
-              am('gym', 'Тренажёрный зал'),
-            ],
-            price: '1\u00a0791',
-            old: '',
-            adv: 36,
-            rest: '1\u00a0755',
-            details:
-              'Для взрослого включено: проживание, трёхразовое питание, консультация врача, программа санаторного лечения по назначению врача, ежедневно минеральный бассейн, бани и тренажёрный зал.',
-          },
-        ],
-      },
-    ];
+    const { booking } = this.props.booking;
+    const {
+      sanatoriums: SANATORIUMS,
+      roomSets: ROOM_SETS,
+      extraPrograms: EXTRA_PROGRAMS,
+    } = api.searchSanatoriums({
+      dest: booking.dest,
+      checkin: booking.checkin,
+      nights: daysBetween(toD(booking.checkin), toD(booking.checkout)),
+      adults: booking.adults,
+    });
 
     // Знаки отличия — только конкретные, проверяемые факты [ПОДТВЕРДИТЬ ПО САНАТОРИЯМ]
-    const IC = {
-      lift: 'M4 3h16v18H4zM12 3v18M8 10V7M16 10V7M8 14v3M16 14v3',
-      pin: 'M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
-      thumb: 'M7 11v10H3V11zM7 11l4-8a2 2 0 0 1 3 2v4h5a2 2 0 0 1 2 2l-1 7a2 2 0 0 1-2 2H7',
-      family:
-        'M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM16 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM2 21v-5a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v5M14 21v-4a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v4',
-      water: 'M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11zM9 15a3 3 0 0 0 3 3',
-      renov: 'M3 21l6-6M14 4l6 6-9 9H5v-6z',
-    };
-    const awardsOf = {
-      'egle-comfort': [
-        { t: 'Лифт во всех корпусах', d: IC.lift },
-        { t: 'Бассейн и бани в здании', d: I.pool },
-        { t: 'Выбор гостей', d: IC.thumb },
-      ],
-      'grand-spa-lietuva': [
-        { t: 'Много бассейнов и бань в здании', d: I.aqua },
-        { t: 'Центр города, у бювета', d: IC.pin },
-      ],
-      'egle-standart': [{ t: 'До процедур [N] м по улице', d: I.proc }],
-      'grand-spa-druskininkai': [
-        { t: 'Новый корпус', d: IC.renov },
-        { t: 'Много бассейнов и бань рядом', d: I.aqua },
-      ],
-      belorus: [
-        { t: 'Номера после ремонта', d: IC.renov },
-        { t: 'Подходит семьям', d: IC.family },
-      ],
-      draugyste: [{ t: 'Минеральный бассейн', d: IC.water }],
-    };
-
     const st = this.state;
     const f = st.f || {};
     const sel = Object.keys(f).filter((k) => f[k]);
-    const FI = {
-      star: 'M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z',
-      lift: 'M4 3h16v18H4zM12 3v18M8 10V7M16 10V7M8 14v3M16 14v3',
-      oda: 'M13 4a1.5 1.5 0 1 0 0 .01M9 21l2-6 2 2v4M15 21l-2-6-2-2 1-5 3 1 2 3M11 8l-3 2-1 3',
-      spine: 'M12 3v18M9 6h6M9 10h6M9 14h6M9 18h6',
-      nerv: 'M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 3 3 3 0 0 0 2 3 3 3 0 0 0 3 3h3V4zM15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 3 3 3 0 0 1-2 3 3 3 0 0 1-3 3h-3',
-      heart: 'M12 21s-8-5-8-11a4 4 0 0 1 8-2 4 4 0 0 1 8 2c0 6-8 11-8 11zM7 12h3l1-2 2 4 1-2h3',
-      resp: 'M12 4v8M12 12c-2 0-3 2-3 4v3H6c-2 0-3-1-3-3v-3c0-3 2-5 5-5h1M12 12c2 0 3 2 3 4v3h3c2 0 3-1 3-3v-3c0-3-2-5-5-5h-1',
-      digest: 'M9 3v4a3 3 0 0 0 3 3h1a5 5 0 0 1 0 10h-1a4 4 0 0 1-4-4v-2M15 3v3',
-      diab: 'M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11zM10 12h.01M14 16h.01M10 16l4-4',
-    };
-    const BUILD =
-      'M3 21h18M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M8 8h2M8 12h2M8 16h2M11 8h1M11 12h1';
-    const CAR = 'M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01';
-    const groups = {
-      // Top tiles — the choices that actually narrow this list
-      imp: [
-        ['daily', 'Процедуры каждый день', I.proc],
-        ['doctor', 'Консультация врача включена', I.doctor],
-        ['samebld', 'Всё в одном здании', BUILD],
-        ['pool', 'Бассейн', I.pool],
-        ['meals3', 'Трёхразовое питание', I.meals],
-        ['transfer', 'Трансфер из аэропорта', CAR],
-      ],
-      comfort: [
-        ['lift', 'Лифт', FI.lift],
-        ['ac', 'Кондиционер', I.ac],
-        ['balcony', 'Балкон', I.balcony],
-        ['shower', 'Душ без высокого порога', I.shower],
-        ['ru', 'Врач говорит по-русски', 'M4 4h16v12H7l-3 3zM8 9h8M8 12h5'],
-      ],
-      stars: [
-        ['s3', '3 звезды', FI.star],
-        ['s4', '4 звезды', FI.star],
-        ['s5', '5 звёзд', FI.star],
-      ],
-      prof: [
-        ['p-oda', 'Спина и суставы', FI.oda],
-        ['p-nerv', 'Нервная система', FI.nerv],
-        ['p-heart', 'Сердце и сосуды', FI.heart],
-        ['p-resp', 'Дыхательные пути', FI.resp],
-        ['p-digest', 'Пищеварение', FI.digest],
-        ['p-diab', 'Диабет', FI.diab],
-      ],
-      beds: [
-        ['double', 'Двуспальная', I.bed1],
-        ['twin', 'Две отдельные', I.bed2],
-      ],
-    };
     const plural = (n) =>
       n % 10 === 1 && n % 100 !== 11
         ? 'санаторий'
@@ -587,7 +70,7 @@ class ResultsLogic extends PageLogic {
     const labelOf = (k) => {
       if (k === 'pmin') return 'от ' + pr.min + '\u00a0€';
       if (k === 'pmax') return 'до ' + pr.max + '\u00a0€';
-      for (const g of Object.values(groups)) {
+      for (const g of Object.values(FILTER_GROUPS)) {
         const hit = g.find((x) => x[0] === k);
         if (hit) return hit[1];
       }
@@ -622,7 +105,7 @@ class ResultsLogic extends PageLogic {
     };
     const pass = passWith(f, pr);
     const passPending = passWith(pf, ppr);
-    const pendingN = all.filter(passPending).length;
+    const pendingN = SANATORIUMS.filter(passPending).length;
     const pendingCount = Object.keys(pf).filter((k) => pf[k]).length + (ppr.min ? 1 : 0) + (ppr.max ? 1 : 0);
     const mk = (pairs) =>
       pairs.map(([k, t, d]) => ({
@@ -631,65 +114,31 @@ class ResultsLogic extends PageLogic {
         d,
         on: !!pf[k],
         cls: pf[k] ? 'on' : '',
-        n: all.filter((h) => has(h, k) && passWith({ ...pf, [k]: false }, ppr)(h)).length,
+        n: SANATORIUMS.filter((h) => has(h, k) && passWith({ ...pf, [k]: false }, ppr)(h)).length,
         toggle: () => this.setState({ pf: { ...pf, [k]: !pf[k] } }),
       }));
 
     const sort = st.sort || 'pop';
-    const list = all
-      .filter(pass)
-      .sort((a, b) => (sort === 'cheap' ? a.price - b.price : sort === 'exp' ? b.price - a.price : a.pop - b.pop));
+    const list = SANATORIUMS.filter(pass).sort((a, b) =>
+      sort === 'cheap' ? a.price - b.price : sort === 'exp' ? b.price - a.price : a.pop - b.pop,
+    );
     const open = st.open || {},
       det = st.det || {},
       sec = st.sec || {};
     const secT = (id, s) => () => this.setState({ sec: { ...sec, [id + s]: !sec[id + s] } });
     const ADV_RATE = 0.04; // минимальный аванс — 4 % от суммы бронирования
     const toNum = (s) => Number(String(s).replace(/\s/g, ''));
-    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
     const ppn = (total) => Math.round(toNum(total) / NIGHTS / PERSONS);
     // ---- Dates & price calendar ("Когда дешевле?") ----
-    const MONTHS = [
-      'января',
-      'февраля',
-      'марта',
-      'апреля',
-      'мая',
-      'июня',
-      'июля',
-      'августа',
-      'сентября',
-      'октября',
-      'ноября',
-      'декабря',
-    ];
-    const MONTHS_N = [
-      'Январь',
-      'Февраль',
-      'Март',
-      'Апрель',
-      'Май',
-      'Июнь',
-      'Июль',
-      'Август',
-      'Сентябрь',
-      'Октябрь',
-      'Ноябрь',
-      'Декабрь',
-    ];
-    const DAY = 86400000;
-    const toD = (s) => new Date(s + 'T00:00:00Z');
-    const iso = (d) => d.toISOString().slice(0, 10);
-    const addD = (d, n) => new Date(d.getTime() + n * DAY);
-    const short = (d) => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()];
     const range = (d) => {
       const e = addD(d, NIGHTS);
       return d.getUTCMonth() === e.getUTCMonth()
         ? d.getUTCDate() + '–' + e.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()]
-        : short(d) + ' – ' + short(e);
+        : shortDate(d) + ' – ' + shortDate(e);
     };
     const BASE_IN = toD('2026-11-09');
     const checkin = toD(st.checkin || '2026-11-09');
-    const dayIdx = (d) => Math.round((d - BASE_IN) / DAY);
+    const dayIdx = (d) => daysBetween(BASE_IN, d);
     // Seasonal/weekday factor; normalised so the original price holds on the original dates
     const G = (h, d) => {
       const n = dayIdx(d),
@@ -723,168 +172,55 @@ class ResultsLogic extends PageLogic {
       return [
         nProc
           ? {
-              d: I.proc,
+              d: ICON_PATHS.proc,
               big: String(nProc),
               label: perDay ? pf1(nProc) + ' в день' : pf1(nProc) + ' за заезд',
               sub: perDay
                 ? nProc * NIGHTS + ' ' + pf1(nProc * NIGHTS) + ' за весь заезд · по назначению врача'
                 : 'по назначению врача',
             }
-          : { d: I.proc, big: '✓', label: 'процедуры каждый день', sub: 'по назначению врача' },
+          : { d: ICON_PATHS.proc, big: '✓', label: 'процедуры каждый день', sub: 'по назначению врача' },
         /массаж/i.test(progT)
-          ? { d: I.massage, big: String(NIGHTS), label: 'массажей', sub: 'классический массаж каждый день' }
+          ? { d: ICON_PATHS.massage, big: String(NIGHTS), label: 'массажей', sub: 'классический массаж каждый день' }
           : null,
         /питани|пансион/i.test(progT)
           ? {
-              d: I.meals,
+              d: ICON_PATHS.meals,
               big: /пансион/i.test(progT) ? '4' : '3',
               label: 'приёма пищи в день',
               sub: /пансион/i.test(progT) ? 'полный пансион, диетическое меню' : 'завтрак, обед, ужин · шведский стол',
             }
           : null,
         /врач/i.test(progT)
-          ? { d: I.doctor, big: '1', label: 'консультация врача', sub: 'при заезде · говорит по-русски' }
+          ? { d: ICON_PATHS.doctor, big: '1', label: 'консультация врача', sub: 'при заезде · говорит по-русски' }
           : null,
         /бассейн|бан/i.test(progT)
           ? {
-              d: I.pool,
+              d: ICON_PATHS.pool,
               big: '∞',
               label: /много/i.test(progT) ? 'бассейны и бани' : 'бассейны и сауны',
               sub: 'каждый день, без ограничений',
             }
           : null,
-        { d: I.bed2, big: String(NIGHTS), label: 'ночей в номере', sub: roomName + (area ? ' · ' + area : '') },
+        {
+          d: ICON_PATHS.bed2,
+          big: String(NIGHTS),
+          label: 'ночей в номере',
+          sub: roomName + (area ? ' · ' + area : ''),
+        },
       ].filter(Boolean);
     };
     // Room sets per sanatorium [ПРИМЕР — ДОПЛАТЫ ЗА НОМЕР ЗАМЕНИТЬ ТАРИФАМИ]
-    const ROOMSET = {
-      'egle-comfort': [
-        { id: 'std', room: 'Двухместный номер', add: 0, img: '/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg' },
-        {
-          id: 'plus',
-          room: 'Улучшенный двухместный',
-          add: 162,
-          img: '/img/b7bf541f72a32e5e2b9be1fa1ffd7676.jpg',
-          amen: [
-            am('bed1', 'Двуспальная кровать'),
-            am('area', '22 м²'),
-            am('balcony', 'Балкон'),
-            am('ac', 'Кондиционер'),
-            am('shower', 'Душ без порога'),
-            am('wifi', 'Бесплатный Wi-Fi'),
-          ],
-          roomText: 'Окна на юг во внутренний парк, тихая сторона, обновлённая мебель.',
-        },
-        {
-          id: 'junior',
-          room: 'Полулюкс',
-          add: 396,
-          img: '/img/26b9aff2d91280c2b14c33946e17c65c.jpg',
-          amen: [
-            am('bed1', 'Двуспальная кровать'),
-            am('area', '30 м²'),
-            am('bath', 'Ванна'),
-            am('balcony', 'Большой балкон'),
-            am('ac', 'Кондиционер'),
-            am('fridge', 'Мини-холодильник'),
-          ],
-          roomText: 'Спальня и зона отдыха с диваном, халаты и тапочки.',
-        },
-        {
-          id: 'apt',
-          room: 'Апартаменты',
-          add: 684,
-          img: '/img/1efd1efc34d4137ff98a8658a068afc5.jpg',
-          amen: [
-            am('bed2', '2 отдельные комнаты'),
-            am('area', '42 м²'),
-            am('bath', 'Ванна и душ'),
-            am('balcony', 'Балкон'),
-            am('ac', 'Кондиционер'),
-            am('wifi', 'Бесплатный Wi-Fi'),
-          ],
-          roomText: 'Две комнаты с дверью — каждый в своём режиме сна.',
-        },
-      ],
-    };
-    const EXTRA_PROG = {
-      'egle-comfort': {
-        n: 3,
-        title: 'Программа «Премиум» — 5 процедур в день + массаж',
-        price: '2 550',
-        prog: [
-          am('meals', 'Полный пансион, диетическое меню'),
-          am('doctor', 'Консультация врача'),
-          am('proc', '5 процедур в день'),
-          am('massage', 'Массаж каждый день'),
-          am('pool', 'Бассейны и сауны'),
-        ],
-        details:
-          'Для взрослого в цену включено:\n— Всё, что в программе «Макси»\n— Ежедневный классический массаж 30 мин\n— Полный пансион: завтрак, обед, полдник, ужин, диетическое меню по назначению врача\n\nПроцедуры назначает врач после консультации.',
-      },
-    };
-
     // Room types fully booked on some dates [ПРИМЕР — ИЗ ДАННЫХ О НАЛИЧИИ]: [from, to) per room
-    const ROOM_BUSY = { 'egle-comfort:junior': ['2026-11-01', '2026-11-23'] };
-    const busyRange = (key) => ROOM_BUSY[key] || null;
-    const overlaps = (key, a, b) => {
-      const r = busyRange(key);
-      if (!r) return false;
-      const s0 = new Date(r[0] + 'T00:00:00Z'),
-        s1 = new Date(r[1] + 'T00:00:00Z');
-      return a < s1 && b > s0;
-    };
-    const roomDayBusy = (key, d) => {
-      const r = busyRange(key);
-      if (!r) return false;
-      const t = d.toISOString().slice(0, 10);
-      return t >= r[0] && t < r[1];
-    };
-    const RU_M = [
-      'января',
-      'февраля',
-      'марта',
-      'апреля',
-      'мая',
-      'июня',
-      'июля',
-      'августа',
-      'сентября',
-      'октября',
-      'ноября',
-      'декабря',
-    ];
-    const freeFrom = (key) => {
-      const r = busyRange(key);
-      if (!r) return '';
-      const d = new Date(r[1] + 'T00:00:00Z');
-      return 'с ' + d.getUTCDate() + ' ' + RU_M[d.getUTCMonth()];
-    };
-    const BUSY_LOOK = {
-      cardBorder: '1px solid #E3DED2',
-      cardBg: '#F7F5F0',
-      imgFilter: 'grayscale(1) opacity(.7)',
-      pillBg: '#E8E6E1',
-      pillColor: '#5E6862',
-      nameColor: '#5E6862',
-    };
-    const FREE_LOOK = {
-      cardBorder: '1px solid #E3DED2',
-      cardBg: '#fff',
-      imgFilter: 'none',
-      pillBg: '#EEF5F1',
-      pillColor: '#1F5F4A',
-      nameColor: '#1C2620',
-    };
-    const roomsOf = (h0, h, sf) => {
+    const roomsOf = (h0, _h, sf) => {
       const scale = (x) => Math.round(toNum(x) * sf);
       let progs = h0.offers.map((o) => ({
         ...o,
         priceN: scale(o.price),
         meals: o.prog.some((x) => /питани/i.test(x.t)) ? 'питание 3 раза' : '',
       }));
-      if (EXTRA_PROG[h0.id]) {
-        const e = EXTRA_PROG[h0.id];
+      if (EXTRA_PROGRAMS[h0.id]) {
+        const e = EXTRA_PROGRAMS[h0.id];
         progs.push({ ...e, priceN: scale(e.price), meals: 'полный пансион' });
       } else
         progs.push({
@@ -897,7 +233,7 @@ class ResultsLogic extends PageLogic {
         });
       progs.sort((a, b) => a.priceN - b.priceN);
       const base = h0.offers[0];
-      const set = ROOMSET[h0.id] || [
+      const set = ROOM_SETS[h0.id] || [
         { id: 'std', room: base.room, add: 0, img: base.img },
         { id: 'plus', room: 'Улучшенный номер', add: Math.round(toNum(base.price) * 0.08), img: '' },
       ];
@@ -929,6 +265,7 @@ class ResultsLogic extends PageLogic {
       const sf = stayFactor(h0, checkin);
       const h = {
         ...h0,
+        trNote: h0.trNote.replace('{nights}', String(st.nights || 9)),
         price: Math.round(h0.price * sf),
         offers: h0.offers.map((o) => ({
           ...o,
@@ -956,39 +293,40 @@ class ResultsLogic extends PageLogic {
         procSub: /в день|ежедневно/.test(h.inc[0])
           ? 'лечебные процедуры по назначению врача, каждый день'
           : 'лечебные процедуры по назначению врача',
-        incRest: h.inc
-          .slice(1)
-          .map((t) => ({
-            t,
-            d: /питани/i.test(t)
-              ? I.meals
-              : /говорит/i.test(t)
-                ? 'M4 4h16v12H7l-3 3zM8 9h8M8 12h5'
-                : /врач/i.test(t)
-                  ? I.doctor
-                  : /бассейн/i.test(t)
-                    ? I.pool
-                    : /процедур/i.test(t)
-                      ? I.proc
-                      : /процедур|лечени/i.test(t)
-                        ? I.proc
-                        : /номер/i.test(t)
-                          ? I.bed2
-                          : 'm5 12 5 5L20 7',
-          })),
+        incRest: h.inc.slice(1).map((t) => ({
+          t,
+          d: /питани/i.test(t)
+            ? ICON_PATHS.meals
+            : /говорит/i.test(t)
+              ? 'M4 4h16v12H7l-3 3zM8 9h8M8 12h5'
+              : /врач/i.test(t)
+                ? ICON_PATHS.doctor
+                : /бассейн/i.test(t)
+                  ? ICON_PATHS.pool
+                  : /процедур/i.test(t)
+                    ? ICON_PATHS.proc
+                    : /процедур|лечени/i.test(t)
+                      ? ICON_PATHS.proc
+                      : /номер/i.test(t)
+                        ? ICON_PATHS.bed2
+                        : 'm5 12 5 5L20 7',
+        })),
         open: isOpen,
         border: isOpen ? '#1F5F4A' : '#E3DED2',
         btnLabel: isOpen ? 'Скрыть варианты' : 'Номера и программы',
         chips: [
-          h.tags.includes('doctor') ? { t: 'Врач включён', d: I.doctor } : null,
+          h.tags.includes('doctor') ? { t: 'Врач включён', d: ICON_PATHS.doctor } : null,
           h.tags.includes('pool')
-            ? { t: /много бассейнов|бани/i.test(h.inc.join(' ')) ? 'Бассейны и бани' : 'Бассейн и сауны', d: I.pool }
+            ? {
+                t: /много бассейнов|бани/i.test(h.inc.join(' ')) ? 'Бассейны и бани' : 'Бассейн и сауны',
+                d: ICON_PATHS.pool,
+              }
             : null,
-          h.tags.includes('meals3') ? { t: 'Питание 3 раза', d: I.meals } : null,
+          h.tags.includes('meals3') ? { t: 'Питание 3 раза', d: ICON_PATHS.meals } : null,
           h.tags.includes('samebld')
-            ? { t: 'Всё в одном здании', d: BUILD }
+            ? { t: 'Всё в одном здании', d: BUILDING_ICON }
             : h.tags.includes('transfer')
-              ? { t: 'Трансфер из аэропорта', d: CAR }
+              ? { t: 'Трансфер из аэропорта', d: CAR_ICON }
               : null,
         ].filter(Boolean),
         chev: isOpen ? 'rotate(180deg)' : 'none',
@@ -1008,7 +346,7 @@ class ResultsLogic extends PageLogic {
           const beds = o.amen.find((a) => /кроват/i.test(a.t));
           const extra = o.amen.find((a) => /Балкон|Кондиционер|Ванна/.test(a.t));
           const amenTop = [
-            { d: I.bed2, t: o.room + (area ? ' · ' + area : '') },
+            { d: ICON_PATHS.bed2, t: o.room + (area ? ' · ' + area : '') },
             beds
               ? {
                   d: beds.d,
@@ -1016,51 +354,9 @@ class ResultsLogic extends PageLogic {
                 }
               : null,
           ].filter(Boolean);
-          const detLines = String(o.details)
-            .split('\n')
-            .map((l) => l.trim())
-            .filter(Boolean)
-            .map((l) => ({
-              t: l.replace(/^— ?/, '• '),
-              fw: /:$/.test(l) || /^\d+\./.test(l) ? 700 : 400,
-              pl: /^—/.test(l) ? '14px' : '0',
-              mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
-            }));
           const parts = String(o.title).split(' — ');
           const short = parts[0];
-          // Value tiles: the big, fast-to-read numbers of what the programme gives
-          const pm = String(o.title).match(/(\d+) процедур/);
-          const nProc = pm ? Number(pm[1]) : 0;
-          const perDay = /в день/.test(o.title);
           const progT = o.prog.map((p) => p.t).join(' ');
-          const pf1 = (n) => (n === 1 ? 'процедура' : n < 5 ? 'процедуры' : 'процедур');
-          const value = [
-            nProc
-              ? {
-                  d: I.proc,
-                  big: String(nProc),
-                  label: perDay ? pf1(nProc) + ' в день' : pf1(nProc) + ' за заезд',
-                  sub: perDay
-                    ? nProc * NIGHTS + ' ' + pf1(nProc * NIGHTS) + ' за весь заезд · по назначению врача'
-                    : 'по назначению врача, 4 группы на выбор',
-                }
-              : { d: I.proc, big: '✓', label: 'процедуры каждый день', sub: 'по назначению врача' },
-            /питани/i.test(progT)
-              ? { d: I.meals, big: '3', label: 'приёма пищи в день', sub: 'завтрак, обед, ужин · шведский стол' }
-              : null,
-            /врач/i.test(progT)
-              ? { d: I.doctor, big: '1', label: 'консультация врача', sub: 'при заезде · говорит по-русски' }
-              : null,
-            /бассейн|бан/i.test(progT)
-              ? {
-                  d: I.pool,
-                  big: '∞',
-                  label: /много/i.test(progT) ? 'бассейны и бани' : 'бассейны и сауны',
-                  sub: 'каждый день, без ограничений',
-                }
-              : null,
-            { d: I.bed2, big: String(NIGHTS), label: 'ночей в номере', sub: o.room + (area ? ' · ' + area : '') },
-          ].filter(Boolean);
           const sub =
             'с программой ' +
             short.replace('Программа ', '') +
@@ -1130,7 +426,7 @@ class ResultsLogic extends PageLogic {
               (p0[1] ? ' · ' + p0[1] : '') +
               ' · ' +
               (progs[0].meals || 'питание 3 раза'),
-            ppn: Math.round(toNum(o.price) / NIGHTS / PERSONS),
+            choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
             openRoomCal: () =>
               this.setState({
                 cal: {
@@ -1158,8 +454,8 @@ class ResultsLogic extends PageLogic {
       };
     });
     // calendar modal values
-    const calH = st.cal ? all.find((h) => h.id === st.cal.id) : null;
-    let cal = { cells: [] };
+    const calH = st.cal ? SANATORIUMS.find((h) => h.id === st.cal.id) : null;
+    let cal: Record<string, any> = { cells: [] };
     if (calH) {
       const base = toNum(calH.offers[0].price);
       const picked = toD(st.cal.picked || iso(checkin));
@@ -1169,7 +465,7 @@ class ResultsLogic extends PageLogic {
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y0, m0 + 1, 0)).getUTCDate();
       const curP = ppnFor(calH, checkin, base);
-      const cells = [];
+      const cells: CalendarCell[] = [];
       for (let i = 0; i < lead; i++)
         cells.push({
           day: '',
@@ -1186,7 +482,7 @@ class ResultsLogic extends PageLogic {
         });
       for (let d = 1; d <= days; d++) {
         const date = new Date(Date.UTC(y0, m0, d));
-        const past = date < toD('2026-10-27');
+        const past = date < TODAY;
         const so =
           soldOut(calH, date) ||
           (st.cal.roomKey
@@ -1202,7 +498,7 @@ class ResultsLogic extends PageLogic {
         if (so || past) bg = '#E8E6E1';
         cells.push({
           day: d,
-          fly: [0, 2, 4].includes(date.getUTCDay()) && !(typeof past !== 'undefined' && past),
+          fly: isFlightDay(date) && !past,
           text: so || past ? (past ? '' : 'Нет мест') : p + '\u00a0€',
           sub: isPick ? '✓ Новый заезд' : isCur ? 'Ваш заезд' : '',
           bg,
@@ -1225,8 +521,8 @@ class ResultsLogic extends PageLogic {
         curPpn: curP,
         monthTitle: MONTHS_N[m0] + ' ' + y0,
         cells,
-        newIn: short(picked),
-        newOut: short(addD(picked, NIGHTS)),
+        newIn: shortDate(picked),
+        newOut: shortDate(addD(picked, NIGHTS)),
         newPpn: ppnFor(calH, picked, base),
         newTotal: fmt(newTotal),
         curTotal: fmt(curTotal),
@@ -1268,7 +564,6 @@ class ResultsLogic extends PageLogic {
         : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
           ? 'ночи'
           : 'ночей';
-    const TODAY = toD('2026-10-27');
     const checkout = addD(checkin, NIGHTS);
     const longD = (d) => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
     const ss = st.ss || { in: iso(checkin), out: iso(checkout) };
@@ -1280,7 +575,7 @@ class ResultsLogic extends PageLogic {
       sy1 = sm0 === 11 ? sy0 + 1 : sy0;
     const AVG = 100;
     const avgPpn = (d) => {
-      const n = Math.round((d - TODAY) / DAY),
+      const n = daysBetween(TODAY, d),
         wd = d.getUTCDay(),
         m = d.getUTCMonth();
       return Math.round(
@@ -1303,7 +598,7 @@ class ResultsLogic extends PageLogic {
       const first = new Date(Date.UTC(y, m, 1));
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-      const cells = [];
+      const cells: CalendarCell[] = [];
       for (let i = 0; i < lead; i++)
         cells.push({
           day: '',
@@ -1321,19 +616,7 @@ class ResultsLogic extends PageLogic {
       for (let d = 1; d <= days; d++) {
         const date = new Date(Date.UTC(y, m, d));
         const past = date < TODAY;
-        const full =
-          !past &&
-          [
-            '2026-11-20',
-            '2026-11-21',
-            '2026-11-22',
-            '2026-12-24',
-            '2026-12-25',
-            '2026-12-26',
-            '2026-12-27',
-            '2026-12-31',
-            '2027-01-01',
-          ].includes(iso(date));
+        const full = !past && isSoldOutEverywhere(iso(date));
         /* [ПРИМЕР] нет мест ни в одном объекте */ const p = avgPpn(date),
           r = p / AVG;
         let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9',
@@ -1362,7 +645,7 @@ class ResultsLogic extends PageLogic {
         }
         cells.push({
           day: d,
-          fly: [0, 2, 4].includes(date.getUTCDay()) && !(typeof past !== 'undefined' && past),
+          fly: isFlightDay(date) && !past,
           sub: past ? '' : full ? 'нет мест' : isIn ? 'заезд' : isOut ? 'выезд' : p + '\u00a0€',
           bg,
           border,
@@ -1376,7 +659,7 @@ class ResultsLogic extends PageLogic {
       }
       return cells;
     };
-    const sN = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
+    const sN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const sPreset = (n) => () => {
       const a = sIn || checkin;
       this.setState({ ss: { in: iso(a), out: iso(addD(a, n)) } });
@@ -1411,12 +694,12 @@ class ResultsLogic extends PageLogic {
         : !sOut
           ? 'Теперь нажмите день выезда'
           : 'Можно поменять: нажмите новый день заезда',
-      sSelIn: sIn ? short(sIn) : '—',
-      sSelOut: sOut ? short(sOut) : '—',
+      sSelIn: sIn ? shortDate(sIn) : '—',
+      sSelOut: sOut ? shortDate(sOut) : '—',
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
       sApplyOff: !sN,
       sApplyCal: () => {
-        if (sN) this.setState({ checkin: iso(sIn), nights: sN, sOpen: false });
+        if (sN && sIn) this.setState({ checkin: iso(sIn), nights: sN, sOpen: false });
       },
       sP7: sPreset(7),
       sP10: sPreset(10),
@@ -1445,20 +728,20 @@ class ResultsLogic extends PageLogic {
       ].map((u) => ({
         ...u,
         chips: [
-          { t: 'Врач включён', d: I.doctor },
-          { t: 'Бассейн и сауны', d: I.pool },
-          { t: 'Питание 3 раза', d: I.meals },
+          { t: 'Врач включён', d: ICON_PATHS.doctor },
+          { t: 'Бассейн и сауны', d: ICON_PATHS.pool },
+          { t: 'Питание 3 раза', d: ICON_PATHS.meals },
         ],
-        notify: () => this.setState({ help: 'form' }),
+        notify: () => this.props.help.open(),
       })),
       soldCount: '2 санатория',
       hotels,
       none: hotels.length === 0,
       some: hotels.length > 0,
       foundLabel:
-        hotels.length === all.length
-          ? 'Все ' + all.length + ' ' + plural(all.length)
-          : 'Подходят ' + hotels.length + ' из ' + all.length + ' ' + plural(all.length),
+        hotels.length === SANATORIUMS.length
+          ? 'Все ' + SANATORIUMS.length + ' ' + plural(SANATORIUMS.length)
+          : 'Подходят ' + hotels.length + ' из ' + SANATORIUMS.length + ' ' + plural(SANATORIUMS.length),
       hasActive: sel.length > 0 || !!pr.min || !!pr.max,
       active: sel.concat(pr.min ? ['pmin'] : [], pr.max ? ['pmax'] : []).map((k) => ({
         t: labelOf(k),
@@ -1470,11 +753,11 @@ class ResultsLogic extends PageLogic {
           } else this.setState({ f: { ...f, [k]: false }, pf: { ...pf, [k]: false } });
         },
       })),
-      fTop: mk(groups.imp),
-      fComfort: mk(groups.comfort),
-      fStars: mk(groups.stars),
-      fProfile: mk(groups.prof),
-      fBeds: mk(groups.beds),
+      fTop: mk(FILTER_GROUPS.imp),
+      fComfort: mk(FILTER_GROUPS.comfort),
+      fStars: mk(FILTER_GROUPS.stars),
+      fProfile: mk(FILTER_GROUPS.prof),
+      fBeds: mk(FILTER_GROUPS.beds),
       moreOpen: !!st.more,
       moreClosed: !st.more,
       toggleMore: () => this.setState({ more: !st.more }),
@@ -1534,7 +817,10 @@ export default function ResultsPage() {
           <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '16px 24px 18px' }}>
             <form
               className="card"
-              action="results.html"
+              onSubmit={(e) => {
+                e.preventDefault();
+                logic.props.navigate('/results');
+              }}
               style={{
                 padding: '16px 18px 12px',
                 display: 'flex',
@@ -2470,645 +1756,7 @@ export default function ResultsPage() {
                       >
                         {(h.offers || []).map((o: any, _i1: number) => (
                           <Fragment key={_i1}>
-                            <article
-                              className="card"
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                overflow: 'hidden',
-                                border: o.cardBorder,
-                                background: o.cardBg,
-                              }}
-                            >
-                              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                <div
-                                  style={{
-                                    position: 'relative',
-                                    flex: '0 0 300px',
-                                    minHeight: '210px',
-                                    margin: '14px 0 14px 14px',
-                                    borderRadius: '2px',
-                                    overflow: 'hidden',
-                                    background: '#2B3A33',
-                                  }}
-                                >
-                                  <img
-                                    src={o.img}
-                                    alt={o.room}
-                                    style={{
-                                      position: 'absolute',
-                                      inset: '0',
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                      filter: o.imgFilter,
-                                    }}
-                                  />{' '}
-                                  {o.busy ? (
-                                    <>
-                                      <span
-                                        style={{
-                                          position: 'absolute',
-                                          left: '10px',
-                                          top: '10px',
-                                          background: '#5E6862',
-                                          color: '#fff',
-                                          fontSize: '13px',
-                                          fontWeight: '800',
-                                          padding: '5px 10px',
-                                          borderRadius: '2px',
-                                        }}
-                                      >
-                                        Занят на ваши даты
-                                      </span>
-                                    </>
-                                  ) : null}{' '}
-                                  <span
-                                    style={{
-                                      position: 'absolute',
-                                      left: '10px',
-                                      bottom: '10px',
-                                      background: 'rgba(28,38,32,.8)',
-                                      color: '#fff',
-                                      fontSize: '12px',
-                                      fontWeight: '700',
-                                      padding: '5px 9px',
-                                      borderRadius: '2px',
-                                    }}
-                                  >
-                                    Фото номера
-                                  </span>
-                                </div>
-                                <div
-                                  style={{
-                                    flex: '1 1 300px',
-                                    minWidth: '0',
-                                    padding: '16px 20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '8px',
-                                  }}
-                                >
-                                  <span
-                                    className="pill"
-                                    style={{ alignSelf: 'flex-start', background: o.pillBg, color: o.pillColor }}
-                                  >
-                                    {o.pill}
-                                  </span>
-                                  <h3 style={{ fontSize: '24px', color: o.nameColor }}>{o.short}</h3>
-                                  <div style={{ fontSize: '15px', color: '#3E4B44' }}>{o.roomLine}</div>
-                                  <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>
-                                    {o.progLine}
-                                  </div>
-                                  <div
-                                    style={{
-                                      display: 'grid',
-                                      gridTemplateColumns: 'repeat(4,minmax(0,1fr))',
-                                      gap: '10px 18px',
-                                      marginTop: '8px',
-                                    }}
-                                  >
-                                    <div className="ico2">
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                        style={{ flex: 'none' }}
-                                      >
-                                        <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4" />
-                                      </svg>
-                                      Консультация
-                                      <br />
-                                      врача
-                                    </div>
-                                    <div className="ico2">
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                        style={{ flex: 'none' }}
-                                      >
-                                        <path d="M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8" />
-                                      </svg>
-                                      Питание
-                                      <br />3 раза в день
-                                    </div>
-                                    <div className="ico2">
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                        style={{ flex: 'none' }}
-                                      >
-                                        <path d="M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6" />
-                                      </svg>
-                                      Бассейн и сауны
-                                    </div>
-                                    <div className="ico2">
-                                      <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                        style={{ flex: 'none' }}
-                                      >
-                                        <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
-                                      </svg>
-                                      Процедуры
-                                      <br />
-                                      ежедневно
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  style={{
-                                    flex: '0 0 240px',
-                                    padding: '18px 20px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '2px',
-                                    borderLeft: '1px solid #E3DED2',
-                                    justifyContent: 'center',
-                                  }}
-                                >
-                                  {o.avail ? (
-                                    <>
-                                      <span
-                                        style={{
-                                          fontSize: '32px',
-                                          fontWeight: '800',
-                                          lineHeight: '1.1',
-                                          whiteSpace: 'nowrap',
-                                        }}
-                                      >
-                                        <span style={{ fontSize: '18px', fontWeight: '600' }}>от</span> {o.price}&nbsp;€
-                                      </span>
-                                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                                        за 2 взрослых · {v.nightsLabel}
-                                      </span>
-                                      <span style={{ fontSize: '13px', color: '#6B776F' }}>
-                                        ≈ {o.ppn}&nbsp;€ / человек / сутки · сейчас {o.adv}&nbsp;€
-                                      </span>
-                                      <Link
-                                        className="btn btn-primary"
-                                        to="/rooms"
-                                        style={{ minHeight: '48px', fontSize: '16px', marginTop: '12px' }}
-                                      >
-                                        Выбрать номер
-                                      </Link>
-                                    </>
-                                  ) : null}
-                                  {o.busy ? (
-                                    <>
-                                      <span
-                                        style={{
-                                          fontSize: '18px',
-                                          fontWeight: '800',
-                                          color: '#3E4B44',
-                                          lineHeight: '1.25',
-                                        }}
-                                      >
-                                        Занят на {o.busyRange}
-                                      </span>
-                                      <span style={{ fontSize: '15px', color: '#3E4B44', marginTop: '4px' }}>
-                                        Свободен: <strong style={{ color: '#1C2620' }}>{o.nextFree}</strong>
-                                      </span>
-                                      <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={o.openRoomCal}
-                                        style={{
-                                          minHeight: '48px',
-                                          fontSize: '16px',
-                                          marginTop: '12px',
-                                          padding: '0 14px',
-                                        }}
-                                      >
-                                        <svg
-                                          width="20"
-                                          height="20"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          aria-hidden="true"
-                                        >
-                                          <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                                        </svg>
-                                        Выбрать другие даты
-                                      </button>
-                                    </>
-                                  ) : null}
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={o.toggleDet}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                  gap: '12px',
-                                  width: '100%',
-                                  border: 'none',
-                                  borderTop: '1px solid #E3DED2',
-                                  background: '#FAFBF9',
-                                  padding: '12px 18px',
-                                  minHeight: '48px',
-                                  cursor: 'pointer',
-                                  fontWeight: '600',
-                                  fontSize: '15px',
-                                  textAlign: 'left',
-                                }}
-                              >
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                    style={{ flex: 'none' }}
-                                  >
-                                    <path d="M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6" />
-                                  </svg>
-                                  {o.detBtn}
-                                </span>
-                                <svg
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#1F5F4A"
-                                  strokeWidth="2.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                  style={{ transform: o.detChev }}
-                                >
-                                  <path d="m6 9 6 6 6-6" />
-                                </svg>
-                              </button>
-                              {o.detOpen ? (
-                                <>
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '18px',
-                                      padding: '18px 18px 18px',
-                                      borderTop: '1px solid #E3DED2',
-                                      background: '#FAFBF9',
-                                    }}
-                                  >
-                                    {/* 0. Programmes available for this room (cheapest first) */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                      <div
-                                        style={{
-                                          fontSize: '13px',
-                                          fontWeight: '700',
-                                          color: '#6B776F',
-                                          textTransform: 'uppercase',
-                                          letterSpacing: '.04em',
-                                        }}
-                                      >
-                                        Программы для этого номера
-                                      </div>
-                                      {(o.progRows || []).map((pr: any, _i2: number) => (
-                                        <Fragment key={_i2}>
-                                          <button
-                                            type="button"
-                                            onClick={pr.pick}
-                                            style={{
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              gap: '14px',
-                                              width: '100%',
-                                              minHeight: '64px',
-                                              padding: '10px 16px',
-                                              border: `2px solid ${pr.border ?? ''}`,
-                                              background: pr.bg,
-                                              borderRadius: '2px',
-                                              cursor: 'pointer',
-                                              textAlign: 'left',
-                                            }}
-                                          >
-                                            <span
-                                              style={{
-                                                width: '24px',
-                                                height: '24px',
-                                                borderRadius: '50%',
-                                                border: `2px solid ${pr.border ?? ''}`,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                flex: 'none',
-                                                background: '#fff',
-                                              }}
-                                            >
-                                              <span
-                                                style={{
-                                                  width: '12px',
-                                                  height: '12px',
-                                                  borderRadius: '50%',
-                                                  background: pr.dot,
-                                                }}
-                                              />
-                                            </span>
-                                            <svg
-                                              width="28"
-                                              height="28"
-                                              viewBox="-1 -1 26 26"
-                                              fill="none"
-                                              stroke="#1F5F4A"
-                                              strokeWidth="1.8"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              aria-hidden="true"
-                                              style={{ flex: 'none' }}
-                                            >
-                                              <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
-                                            </svg>
-                                            <span
-                                              style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                flex: '1',
-                                                minWidth: '0',
-                                                lineHeight: '1.25',
-                                              }}
-                                            >
-                                              <strong style={{ fontSize: '17px' }}>{pr.name}</strong>
-                                              <span style={{ fontSize: '14px', color: '#3E4B44' }}>{pr.sub}</span>
-                                            </span>
-                                            <span
-                                              style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'flex-end',
-                                                lineHeight: '1.2',
-                                              }}
-                                            >
-                                              <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>
-                                                {pr.price}
-                                              </strong>
-                                              <span
-                                                style={{ fontSize: '13px', color: pr.diffColor, whiteSpace: 'nowrap' }}
-                                              >
-                                                {pr.diff}
-                                              </span>
-                                            </span>
-                                          </button>
-                                        </Fragment>
-                                      ))}
-                                    </div>
-                                    {/* 1. Value at a glance: big numbers + icons */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                      <div
-                                        style={{
-                                          fontSize: '13px',
-                                          fontWeight: '700',
-                                          color: '#6B776F',
-                                          textTransform: 'uppercase',
-                                          letterSpacing: '.04em',
-                                        }}
-                                      >
-                                        {o.selName}: что вы получаете за {v.nightsLabel}
-                                      </div>
-                                      <div
-                                        style={{
-                                          display: 'grid',
-                                          gridTemplateColumns: 'repeat(auto-fit,minmax(min(190px,100%),1fr))',
-                                          gap: '10px',
-                                        }}
-                                      >
-                                        {(o.value || []).map((v: any, _i2: number) => (
-                                          <Fragment key={_i2}>
-                                            <div
-                                              style={{
-                                                background: '#EEF5F1',
-                                                border: '1px solid #C8DED3',
-                                                borderRadius: '2px',
-                                                padding: '14px 16px',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '4px',
-                                                minHeight: '118px',
-                                              }}
-                                            >
-                                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <svg
-                                                  width="34"
-                                                  height="34"
-                                                  viewBox="-1 -1 26 26"
-                                                  fill="none"
-                                                  stroke="#1F5F4A"
-                                                  strokeWidth="1.8"
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  aria-hidden="true"
-                                                  style={{ flex: 'none' }}
-                                                >
-                                                  <path d={v.d} />
-                                                </svg>
-                                                <span
-                                                  style={{
-                                                    fontFamily: 'Lora,Georgia,serif',
-                                                    fontSize: '36px',
-                                                    fontWeight: '700',
-                                                    lineHeight: '1',
-                                                    color: '#1F5F4A',
-                                                  }}
-                                                >
-                                                  {v.big}
-                                                </span>
-                                              </div>
-                                              <strong style={{ fontSize: '16px', lineHeight: '1.2', color: '#1C2620' }}>
-                                                {v.label}
-                                              </strong>
-                                              <span style={{ fontSize: '13px', lineHeight: '1.3', color: '#3E4B44' }}>
-                                                {v.sub}
-                                              </span>
-                                            </div>
-                                          </Fragment>
-                                        ))}
-                                      </div>
-                                    </div>
-                                    {/* 2. Programme items + room amenities */}
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px 28px' }}>
-                                      <div
-                                        style={{
-                                          flex: '1 1 260px',
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          gap: '8px',
-                                        }}
-                                      >
-                                        <div
-                                          style={{
-                                            fontSize: '13px',
-                                            fontWeight: '700',
-                                            color: '#6B776F',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '.04em',
-                                          }}
-                                        >
-                                          В программу входит
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                          {(o.prog || []).map((p: any, _i2: number) => (
-                                            <Fragment key={_i2}>
-                                              <div className="fact" style={{ color: '#1C2620', fontSize: '16px' }}>
-                                                <svg
-                                                  width="24"
-                                                  height="24"
-                                                  viewBox="0 0 24 24"
-                                                  fill="none"
-                                                  stroke="#1F5F4A"
-                                                  strokeWidth="1.8"
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  aria-hidden="true"
-                                                >
-                                                  <path d={p.d} />
-                                                </svg>
-                                                {p.t}
-                                              </div>
-                                            </Fragment>
-                                          ))}
-                                        </div>
-                                      </div>
-                                      <div
-                                        style={{
-                                          flex: '1 1 260px',
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          gap: '8px',
-                                        }}
-                                      >
-                                        <div
-                                          style={{
-                                            fontSize: '13px',
-                                            fontWeight: '700',
-                                            color: '#6B776F',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '.04em',
-                                          }}
-                                        >
-                                          Номер
-                                        </div>
-                                        <div
-                                          style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: 'repeat(auto-fit,minmax(min(170px,100%),1fr))',
-                                            gap: '8px 12px',
-                                          }}
-                                        >
-                                          {(o.amen || []).map((a: any, _i2: number) => (
-                                            <Fragment key={_i2}>
-                                              <div className="fact" style={{ color: '#1C2620' }}>
-                                                <svg
-                                                  width="22"
-                                                  height="22"
-                                                  viewBox="0 0 24 24"
-                                                  fill="none"
-                                                  stroke="#3E4B44"
-                                                  strokeWidth="1.8"
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  aria-hidden="true"
-                                                >
-                                                  <path d={a.d} />
-                                                </svg>
-                                                {a.t}
-                                              </div>
-                                            </Fragment>
-                                          ))}
-                                        </div>
-                                        <p style={{ margin: '0', fontSize: '14px', color: '#3E4B44' }}>{o.roomText}</p>
-                                      </div>
-                                    </div>
-                                    <div
-                                      style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '3px',
-                                        background: '#FAF8F3',
-                                        borderRadius: '2px',
-                                        padding: '12px 16px',
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          fontSize: '13px',
-                                          fontWeight: '700',
-                                          color: '#6B776F',
-                                          textTransform: 'uppercase',
-                                          letterSpacing: '.04em',
-                                          marginBottom: '4px',
-                                        }}
-                                      >
-                                        Подробно о программе
-                                      </div>
-                                      {(o.detLines || []).map((l: any, _i2: number) => (
-                                        <Fragment key={_i2}>
-                                          <div
-                                            style={{
-                                              fontSize: '15px',
-                                              lineHeight: '1.45',
-                                              color: '#1C2620',
-                                              fontWeight: l.fw,
-                                              paddingLeft: l.pl,
-                                              marginTop: l.mt,
-                                            }}
-                                          >
-                                            {l.t}
-                                          </div>
-                                        </Fragment>
-                                      ))}
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                      <Link
-                                        className="btn btn-primary"
-                                        to="/rooms"
-                                        style={{ minHeight: '52px', fontSize: '17px' }}
-                                      >
-                                        Выбрать: {o.selName} · {o.selPrice}
-                                      </Link>
-                                    </div>
-                                  </div>
-                                </>
-                              ) : null}
-                            </article>
+                            <RoomCard o={o} nightsLabel={v.nightsLabel} />
                           </Fragment>
                         ))}
                         <div
@@ -4008,102 +2656,12 @@ export default function ResultsPage() {
                   </details>
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                <button type="button" className="navbtn" onClick={v.sCalPrev} aria-label="Предыдущие месяцы">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m15 6-6 6 6 6" />
-                  </svg>
-                </button>
-                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                  {(v.sMonths || []).map((m: any, _i0: number) => (
-                    <Fragment key={_i0}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div
-                          style={{
-                            fontFamily: 'Lora,Georgia,serif',
-                            fontSize: '22px',
-                            fontWeight: '600',
-                            textAlign: 'center',
-                          }}
-                        >
-                          {m.title}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
-                          <div className="wd">Пн</div>
-                          <div className="wd">Вт</div>
-                          <div className="wd">Ср</div>
-                          <div className="wd">Чт</div>
-                          <div className="wd">Пт</div>
-                          <div className="wd">Сб</div>
-                          <div className="wd">Вс</div>
-                          {(m.cells || []).map((c: any, _i1: number) => (
-                            <Fragment key={_i1}>
-                              <button
-                                type="button"
-                                className="cell"
-                                onClick={c.pick}
-                                disabled={!!c.off}
-                                aria-label={c.aria}
-                                style={{ background: c.bg, borderColor: c.border, color: c.color, cursor: c.cursor }}
-                              >
-                                <span>{c.day}</span>
-                                <small style={{ color: c.subColor }}>{c.sub}</small>
-                                {c.fly ? (
-                                  <>
-                                    <span
-                                      style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}
-                                      title="Рейс из Израиля"
-                                    >
-                                      <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                      >
-                                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                                      </svg>
-                                    </span>
-                                  </>
-                                ) : null}
-                              </button>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-                <button type="button" className="navbtn" onClick={v.sCalNext} aria-label="Следующие месяцы">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m9 6 6 6-6 6" />
-                  </svg>
-                </button>
-              </div>
+              <MonthsCalendar
+                months={v.sMonths || []}
+                onPrev={v.sCalPrev}
+                onNext={v.sCalNext}
+                planeTitle="Рейс из Израиля"
+              />
               <div
                 style={{
                   display: 'flex',

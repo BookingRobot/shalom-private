@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { fmt } from '../../lib/format';
+import { api } from '../../api';
+import { AdvanceNote, OrderSummary } from '../../components/OrderSummary';
+import { orderSummary } from '../../lib/orderSummary';
+import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../lib/dates';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './TransferPage.css';
@@ -15,133 +20,68 @@ const HELP_CTX: HelpContextInfo = {
 };
 
 class TransferLogic extends PageLogic {
-  constructor(props?: any) {
+  constructor(props: PageServices) {
     super(props);
+    const tr = props.booking.booking.transfer;
     this.state = {
-      need: true,
-      city: 'vilnius',
-      vehicle: 'car',
+      need: tr.mode !== 'none',
+      city: tr.place,
+      vehicle: tr.vehicle,
       place: '',
-      indiv: false,
-      back: true,
-      backSame: true,
-      backCity: 'vilnius',
+      indiv: tr.mode === 'individual',
+      back: tr.back,
+      backSame: tr.backPlace === tr.place,
+      backCity: tr.backPlace,
     };
+  }
+  syncBooking(st) {
+    return {
+      transfer: {
+        mode: !st.need ? 'none' : st.indiv ? 'individual' : 'group',
+        back: st.back,
+        place: st.city,
+        backPlace: st.backSame ? st.city : st.backCity,
+        vehicle: st.vehicle,
+      },
+    } as const;
   }
   renderVals() {
     return this._rv();
   }
   _rv() {
+    const booking = this.props.booking.booking;
+    const { places: PICKUP_PLACES, prices: TRANSFER_PRICES, vehicles: VEHICLES } = api.getTransferOptions();
+    const TRANSFER_GUESTS = this.props.booking.booking.adults + this.props.booking.booking.children;
     const need = this.state.need ?? true;
     const city = this.state.city ?? 'vilnius';
-    const cityDefs = [
-      {
-        id: 'vilnius',
-        name: 'Вильнюс',
-        from: 'Из Вильнюса',
-        to: 'В Вильнюс',
-        info: 'аэропорт, вокзалы · 130 км · ≈ 2 ч',
-        places: ['Из аэропорта Вильнюса', 'С ЖД вокзала', 'С автовокзала', 'От отеля в Вильнюсе'],
-      },
-      {
-        id: 'kaunas',
-        name: 'Каунас',
-        from: 'Из Каунаса',
-        to: 'В Каунас',
-        info: 'аэропорт, вокзалы · 130 км · ≈ 2 ч',
-        places: ['Из аэропорта Каунаса', 'С ЖД вокзала', 'С автовокзала', 'От отеля в Каунасе'],
-      },
-      {
-        id: 'warsaw',
-        name: 'Варшава',
-        from: 'Из Варшавы',
-        to: 'В Варшаву',
-        info: 'аэропорт Шопена · 330 км · ≈ 5 ч',
-        places: [
-          'Из аэропорта Шопена',
-          'Из аэропорта Модлин',
-          'С ЖД вокзала Варшава-Центральная',
-          'От отеля в Варшаве',
-        ],
-      },
-      {
-        id: 'marijampole',
-        name: 'Мариямполе',
-        from: 'Из Мариямполе',
-        to: 'В Мариямполе',
-        info: 'автовокзал · 75 км · ≈ 1 ч 15 мин',
-        places: ['С автовокзала', 'С ЖД вокзала', 'От отеля'],
-      },
-      {
-        id: 'druskininkai',
-        name: 'Друскининкай',
-        from: 'Из Друскининкай',
-        to: 'В Друскининкай',
-        info: 'автовокзал или отель в городе · 10 мин',
-        places: ['С автовокзала Друскининкай', 'От отеля в Друскининкай'],
-      },
-    ];
-    const cur = cityDefs.find((c) => c.id === city) || cityDefs[0];
+
+    const cur = PICKUP_PLACES.find((c) => c.id === city) || PICKUP_PLACES[0];
     const place = cur.places.includes(this.state.place) ? this.state.place : cur.places[0];
     const back = this.state.back ?? true,
       backSame = this.state.backSame ?? true,
       backCity = this.state.backCity ?? 'vilnius';
-    const backCur = cityDefs.find((c) => c.id === backCity) || cityDefs[0];
+    const backCur = PICKUP_PLACES.find((c) => c.id === backCity) || PICKUP_PLACES[0];
     // Рыночные цены (Vilnius Airport → Druskininkai: частные перевозчики 130–190\u00a0€ за машину) — [ПРОВЕРИТЬ ПО ТАРИФУ ПЕРЕВОЗЧИКА]
-    const PRICES = {
-      vilnius: { seat: 30, car: 130, van: 170, premium: 200 },
-      kaunas: { seat: 30, car: 130, van: 170, premium: 200 },
-      warsaw: { seat: 70, car: 320, van: 420, premium: 480 },
-      marijampole: { seat: 25, car: 85, van: 110, premium: 140 },
-      druskininkai: { seat: 10, car: 15, van: 25, premium: 35 },
-    };
-    const GUESTS = 2;
     const vehicle = this.state.vehicle ?? 'car';
-    const VEH = [
-      {
-        id: 'car',
-        img: '/img/edfa76a71b436810e36bd398235820b7.png',
-        name: 'Легковой автомобиль',
-        info: 'до 3 человек, 3 чемодана · Škoda Octavia, Toyota Camry или аналог',
-        d: 'M5 15h14M4 15l1.5-3.5h13L20 15M4 15v2.5h16V15M7 17.5a1.2 1.2 0 1 0 0 .01M17 17.5a1.2 1.2 0 1 0 0 .01M8.5 11.5l1-2h5l1 2',
-        sz: 26,
-      },
-      {
-        id: 'van',
-        img: '/img/165765111b3ce679a969db85fe7d023f.png',
-        name: 'Микроавтобус',
-        info: 'до 7 человек, 7 чемоданов · Mercedes Vito / V-Class',
-        d: 'M3 6h12l6 5v7H3zM3 12h18M7 18a1.5 1.5 0 1 0 0 .01M17 18a1.5 1.5 0 1 0 0 .01M7 6v6M11 6v6M15 6v5',
-        sz: 38,
-      },
-      {
-        id: 'premium',
-        img: '/img/3bd69c9fea391e27ab155af10bf6d27f.png',
-        name: 'Премиум-класс',
-        info: 'до 3 человек · Mercedes E-Class, вода, помощь с багажом',
-        d: 'M3 15h18M2 15l2-4h16l2 4M2 15v3h20v-3M6 18a1.3 1.3 0 1 0 0 .01M18 18a1.3 1.3 0 1 0 0 .01M7 11l1.5-2.5h7L17 11M12 3.5l.8 1.6 1.8.3-1.3 1.2.3 1.8-1.6-.9-1.6.9.3-1.8L9.4 5.4l1.8-.3z',
-        sz: 32,
-      },
-    ];
+
     const indiv = !!this.state.indiv;
     // Group transfer (default, per person) vs individual car (per vehicle)
     const legPrice = (cityId) => {
-      const P = PRICES[cityId] || PRICES.vilnius;
-      return indiv ? P[vehicle] : P.seat * GUESTS;
+      const P = TRANSFER_PRICES[cityId] || TRANSFER_PRICES.vilnius;
+      return indiv ? P[vehicle] : P.seat * TRANSFER_GUESTS;
     };
     const leg1 = need ? legPrice(city) : 0;
     const leg2 = need && back ? legPrice(backSame ? city : backCity) : 0;
     const legs = (need ? 1 : 0) + (need && back ? 1 : 0);
     const transferTotal = leg1 + leg2;
-    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
-    const vName = (VEH.find((v) => v.id === vehicle) || VEH[0]).name.toLowerCase();
+    const vName = (VEHICLES.find((v) => v.id === vehicle) || VEHICLES[0]).name.toLowerCase();
     const transferSum = need
       ? fmt(transferTotal) +
         '\u00a0€ · ' +
         (indiv ? 'индивидуальный, ' + vName : 'групповой') +
         (legs === 2 ? ', туда и обратно' : ', в одну сторону')
       : '0\u00a0€';
-    const curP = PRICES[city] || PRICES.vilnius;
+    const curP = TRANSFER_PRICES[city] || TRANSFER_PRICES.vilnius;
     return {
       need,
       noNeed: !need,
@@ -153,7 +93,7 @@ class TransferLogic extends PageLogic {
       confirmNo: () => this.setState({ askNo: false, need: false }),
       keepTransfer: () => this.setState({ askNo: false, need: true }),
       cityName: cur.name,
-      cities: cityDefs.map((c) => ({
+      cities: PICKUP_PLACES.map((c) => ({
         ...c,
         cls: c.id === city ? 'on' : '',
         pick: () => this.setState({ city: c.id }),
@@ -168,10 +108,10 @@ class TransferLogic extends PageLogic {
       grpBg: indiv ? '#fff' : '#EEF5F1',
       indBorder: indiv ? '#1F5F4A' : '#CFC9BB',
       seatPrice: fmt(curP.seat) + '\u00a0€',
-      seatTotal: fmt(curP.seat * GUESTS) + '\u00a0€',
-      guestsLabel: GUESTS + ' гостей',
+      seatTotal: fmt(curP.seat * TRANSFER_GUESTS) + '\u00a0€',
+      guestsLabel: TRANSFER_GUESTS + ' гостей',
       indFrom: fmt(curP.car) + '\u00a0€',
-      vehicles: VEH.map((v) => ({
+      vehicles: VEHICLES.map((v) => ({
         ...v,
         price: curP[v.id],
         cls: v.id === vehicle ? 'on' : '',
@@ -187,7 +127,7 @@ class TransferLogic extends PageLogic {
       pickSame: () => this.setState({ backSame: true }),
       pickOther: () => this.setState({ backSame: false }),
       backCityName: backCur.name,
-      backCities: cityDefs.map((c) => ({
+      backCities: PICKUP_PLACES.map((c) => ({
         ...c,
         cls: c.id === backCity ? 'on' : '',
         pick: () => this.setState({ backCity: c.id }),
@@ -205,7 +145,14 @@ class TransferLogic extends PageLogic {
       moreLabel: this.state.more ? 'Свернуть' : 'Подробнее о встрече и поездке',
       toggleMore: () => this.setState({ more: !this.state.more }),
       transferSum,
-      total: fmt(2138 + transferTotal) + '\u00a0€',
+      inDay: shortDate(toD(booking.checkin)),
+      outDay: shortDate(toD(booking.checkout)),
+      outWeekday: WEEKDAYS_SHORT[toD(booking.checkout).getUTCDay()],
+      stayNights:
+        daysBetween(toD(booking.checkin), toD(booking.checkout)) +
+        ' ' +
+        nightsWord(daysBetween(toD(booking.checkin), toD(booking.checkout))),
+      total: fmt(orderSummary(this.props.booking.booking).stay + transferTotal) + '\u00a0€',
     };
   }
 }
@@ -213,6 +160,7 @@ class TransferLogic extends PageLogic {
 export default function TransferPage() {
   usePageTitle('Шаг 2 из 5 — трансфер');
   const [v, logic] = usePageLogic(TransferLogic);
+  const order = orderSummary(logic.props.booking.booking);
   return (
     <div className="page pg-transfer">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -583,7 +531,7 @@ export default function TransferPage() {
                     ) : null}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h2 style={{ fontSize: '26px' }}>Откуда вас забрать 9 ноября?</h2>
+                    <h2 style={{ fontSize: '26px' }}>Откуда вас забрать {v.inDay}?</h2>
                     <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
                       Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2 часов.
                     </p>
@@ -937,7 +885,9 @@ export default function TransferPage() {
                         style={{ width: '26px', height: '26px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
                       />
                       <span>
-                        <strong style={{ fontSize: '20px' }}>Обратный трансфер 18 ноября, Ср</strong>
+                        <strong style={{ fontSize: '20px' }}>
+                          Обратный трансфер {v.outDay}, {v.outWeekday}
+                        </strong>
                         <br />
                         <span style={{ color: '#3E4B44', fontSize: '16px' }}>
                           Из санатория «Эгле Комфорт» — куда вас отвезти?
@@ -990,7 +940,7 @@ export default function TransferPage() {
                                   borderRadius: '2px',
                                 }}
                               >
-                                <div className="lbl">Куда отвезти 18 ноября?</div>
+                                <div className="lbl">Куда отвезти {v.outDay}?</div>
                                 <div
                                   style={{
                                     display: 'grid',
@@ -1074,7 +1024,7 @@ export default function TransferPage() {
                             <>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '420px' }}>
                                 <label className="lbl" htmlFor="backflight2">
-                                  Рейс или поезд и время отправления 18 ноября
+                                  Рейс или поезд и время отправления {v.outDay}
                                 </label>
                                 <input
                                   id="backflight2"
@@ -1121,7 +1071,7 @@ export default function TransferPage() {
                     </svg>
                     <span>
                       При проживании от 10 суток санаторий «Эгле» предоставляет трансфер из аэропорта Вильнюса{' '}
-                      <strong>бесплатно</strong>. Ваш заезд — 9 ночей; если продлите на сутки, трансфер будет
+                      <strong>бесплатно</strong>. Ваш заезд — {v.stayNights}; если продлите на сутки, трансфер будет
                       бесплатным.
                     </span>
                   </div>
@@ -1171,99 +1121,20 @@ export default function TransferPage() {
             </div>
           </div>
           {/* Summary */}
-          <aside
-            className="card"
-            style={{
-              flex: '1 1 300px',
-              maxWidth: '360px',
-              padding: '0',
-              overflow: 'hidden',
-              position: 'sticky',
-              top: '16px',
-            }}
-          >
-            <img
-              src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
-              alt=""
-              style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
-            />{' '}
-            <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ fontWeight: '800', fontSize: '20px' }}>Санаторий Эгле Комфорт</div>
-                <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Даты</span>
-                  <strong>9–18 ноября · 9 ночей</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Номер</span>
-                  <strong>Двухместный</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Программа</span>
-                  <strong>«Миди», 3 процедуры</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Гости</span>
-                  <strong>2 взрослых</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  fontSize: '16px',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Проживание и лечение</span>
-                  <strong>2&nbsp;138&nbsp;€</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                  <span style={{ color: '#3E4B44' }}>Трансфер</span>
-                  <strong>{v.transferSum}</strong>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'baseline',
-                  gap: '12px',
-                  borderTop: '2px solid #1C2620',
-                  paddingTop: '12px',
-                }}
-              >
-                <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-                <span style={{ fontWeight: '800', fontSize: '28px' }}>{v.total}</span>
-              </div>
-              <div
-                style={{
-                  fontSize: '15px',
-                  color: '#3E4B44',
-                  background: '#F4F1EA',
-                  borderRadius: '2px',
-                  padding: '10px 12px',
-                }}
-              >
-                Сейчас к оплате только аванс 4 % — <strong>86&nbsp;€</strong>. Остальное — в санатории при заезде.
-              </div>
-            </div>
-          </aside>
+          <OrderSummary
+            details={[
+              ['Даты', order.dates],
+              ['Номер', 'Двухместный'],
+              ['Программа', order.program],
+              ['Гости', order.guests],
+            ]}
+            prices={[
+              ['Проживание и лечение', order.stayLabel],
+              ['Трансфер', v.transferSum],
+            ]}
+            total={v.total}
+            footer={<AdvanceNote advance={order.advanceLabel} />}
+          />
         </div>
         <SiteFooter />
       </div>{' '}

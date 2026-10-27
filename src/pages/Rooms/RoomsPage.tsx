@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter, footerInfo } from '../../components/layout/SiteFooter';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { fmt } from '../../lib/format';
+import { ICON_PATHS } from '../../data/iconPaths';
+import { api } from '../../api';
+import { ADVANCE_RATE, guestsLabel, stayRange } from '../../lib/orderSummary';
+import { daysBetween, nightsWord, toD } from '../../lib/dates';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './RoomsPage.css';
@@ -16,117 +21,41 @@ const HELP_CTX: HelpContextInfo = {
 };
 
 class RoomsLogic extends PageLogic {
-  constructor(props?: any) {
+  constructor(props: PageServices) {
     super(props);
-    this.state = { prog: 'midi', open: {} };
+    this.state = { prog: props.booking.booking.programId, open: {} };
+  }
+  syncBooking(st) {
+    return { programId: st.prog };
   }
   renderVals() {
     return this._rv();
   }
   _rv() {
-    const I = {
-      meals: 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8',
-      doctor: 'M8 4h8v3H8zM6 6h12v15H6zM9 14h2l1-3 2 6 1-3h2',
-      proc: 'M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0',
-      pool: 'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6',
-      sauna: 'M8 4c-1 2 1 3 0 5M12 4c-1 2 1 3 0 5M16 4c-1 2 1 3 0 5M4 12h16v8H4zM8 16h8',
-      massage: 'M12 20c-4 0-8-3-8-7 2 0 4 1 5 2-1-3 0-7 3-9 3 2 4 6 3 9 1-1 3-2 5-2 0 4-4 7-8 7z',
-      gym: 'M2 12h3M19 12h3M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8',
-      bed2: 'M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M3 18h18M5 9V6h6v3M13 9V6h6v3',
-    };
-    const am = (k, t) => ({ d: I[k], t });
+    const { hotelId, roomId } = this.props.booking.booking;
+    const { programs: ROOM_PROGRAMS, roomPrice: SELECTED_ROOM_PRICE } = api.getRoomPrograms(hotelId, roomId);
+
     const st = this.state;
-    const NIGHTS = 9,
-      PERS = 2,
-      ADV = 0.04;
-    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const booking = this.props.booking.booking;
+    const NIGHTS = daysBetween(toD(booking.checkin), toD(booking.checkout)),
+      PERS = booking.adults + booking.children,
+      ADV = ADVANCE_RATE;
     const eur = (n) => fmt(n) + ' €';
-    const ROOM = { name: 'Двухместный номер', add: 0 };
-    const base =
-      'Для взрослого в цену включено:\n— Консультация врача и назначенные процедуры\n— Проживание\n— Трёхразовое питание «шведский стол»\n— Бассейны и сауны без ограничений\n\nДень приезда и отъезда считаются одним лечебным днём. Процедуры назначает врач, по одной из каждой группы:\n1. Лечебная ванна или грязевая аппликация\n2. Лечебный массаж или подводный массаж\n3. Кинезитерапия в зале или в воде\n4. Аппаратная физиотерапия, ингаляции, соляная комната';
-    const PROGS = [
-      {
-        id: 'midi',
-        name: 'Программа «Миди»',
-        price: 2138,
-        tag: '3 процедуры в день',
-        sub: '3 процедуры в день · питание 3 раза · бассейны и сауны',
-        prog: [
-          am('meals', 'Трёхразовое питание'),
-          am('doctor', 'Консультация врача'),
-          am('proc', '3 процедуры в день'),
-          am('pool', 'Бассейны без ограничений'),
-          am('sauna', 'Турецкая и финская бани'),
-        ],
-        details: base,
-        value: [
-          ['proc', '3', 'процедуры в день', '27 за весь заезд'],
-          ['meals', '3', 'приёма пищи', 'шведский стол'],
-          ['doctor', '1', 'консультация врача', 'при заезде'],
-          ['pool', '∞', 'бассейны и сауны', 'без ограничений'],
-        ],
-      },
-      {
-        id: 'maxi',
-        name: 'Программа «Макси»',
-        price: 2275,
-        tag: '5 процедур в день',
-        sub: '5 процедур в день · питание 3 раза · бассейны и сауны',
-        prog: [
-          am('meals', 'Трёхразовое питание'),
-          am('doctor', 'Консультация врача'),
-          am('proc', '5 процедур в день'),
-          am('pool', 'Бассейны без ограничений'),
-          am('gym', 'Тренажёрный зал'),
-        ],
-        details: base.replace(
-          'по одной из каждой группы',
-          'по одной из каждой группы, плюс дополнительная ванна и массаж в день',
-        ),
-        value: [
-          ['proc', '5', 'процедур в день', '45 за весь заезд'],
-          ['meals', '3', 'приёма пищи', 'шведский стол'],
-          ['doctor', '1', 'консультация врача', 'при заезде'],
-          ['pool', '∞', 'бассейны и сауны', 'без ограничений'],
-        ],
-      },
-      {
-        id: 'prem',
-        name: 'Программа «Премиум»',
-        price: 2550,
-        tag: '5 процедур + массаж',
-        sub: '5 процедур в день + массаж каждый день · полный пансион',
-        prog: [
-          am('meals', 'Полный пансион, диетическое меню'),
-          am('doctor', 'Консультация врача'),
-          am('proc', '5 процедур в день'),
-          am('massage', 'Массаж каждый день, 30 мин'),
-          am('pool', 'Бассейны без ограничений'),
-        ],
-        details:
-          'Для взрослого в цену включено:\n— Всё, что в программе «Макси»\n— Ежедневный классический массаж 30 мин\n— Полный пансион: завтрак, обед, полдник, ужин, диетическое меню по назначению врача',
-        value: [
-          ['proc', '5', 'процедур в день', '45 за весь заезд'],
-          ['massage', '9', 'массажей', 'каждый день по 30 мин'],
-          ['meals', '4', 'приёма пищи', 'полный пансион'],
-          ['doctor', '1', 'консультация врача', 'при заезде'],
-        ],
-      },
-    ];
     const open = st.open || {};
-    const sel = PROGS.find((p) => p.id === st.prog) || PROGS[0];
-    const total = sel.price + ROOM.add;
+    const sel = ROOM_PROGRAMS.find((p) => p.id === st.prog) || ROOM_PROGRAMS[0];
+    const total = sel.price + SELECTED_ROOM_PRICE.add;
     return {
-      dateRange: '9–18 ноября 2026',
-      nightsLabel: NIGHTS + ' ночей',
-      progs: PROGS.map((p, i) => {
+      guestsLabel: guestsLabel(booking),
+      dateRange: stayRange(booking.checkin, booking.checkout) + ' ' + toD(booking.checkout).getUTCFullYear(),
+      nightsLabel: NIGHTS + ' ' + nightsWord(NIGHTS),
+      progs: ROOM_PROGRAMS.map((p, i) => {
         const on = p.id === sel.id,
-          t = p.price + ROOM.add,
-          d = p.price - PROGS[0].price,
+          t = p.price + SELECTED_ROOM_PRICE.add,
+          d = p.price - ROOM_PROGRAMS[0].price,
           isO = !!open[p.id];
         return {
           ...p,
-          value: p.value.map(([k, big, label, sub]) => ({ d: I[k], big, label, sub })),
+          value: p.value.map(([k, big, label, sub]) => ({ d: ICON_PATHS[k], big, label, sub })),
           detLines: p.details
             .split('\n')
             .map((l) => l.trim())
@@ -153,13 +82,16 @@ class RoomsLogic extends PageLogic {
         };
       }),
       sumLine:
-        ROOM.name +
+        SELECTED_ROOM_PRICE.name +
         ' · ' +
         sel.name +
-        (sel.price > PROGS[0].price ? ' (+' + eur(sel.price - PROGS[0].price) + ')' : '') +
+        (sel.price > ROOM_PROGRAMS[0].price ? ' (+' + eur(sel.price - ROOM_PROGRAMS[0].price) + ')' : '') +
         ' · ' +
         NIGHTS +
-        ' ночей · 2 взрослых',
+        ' ' +
+        nightsWord(NIGHTS) +
+        ' · ' +
+        guestsLabel(booking),
       sumTotal: eur(total),
       sumAdv: eur(Math.ceil(total * ADV)),
     };
@@ -244,7 +176,7 @@ export default function RoomsPage() {
                 Санаторий Эгле Комфорт ★★★★ · 17–18 м² · 2 отдельные кровати · балкон
               </span>
               <span style={{ fontSize: '16px', color: '#3E4B44' }}>
-                {v.dateRange} · {v.nightsLabel} · 2 взрослых
+                {v.dateRange} · {v.nightsLabel} · {v.guestsLabel}
               </span>
             </div>
             <div

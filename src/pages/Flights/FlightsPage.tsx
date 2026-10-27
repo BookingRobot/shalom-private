@@ -4,7 +4,13 @@ import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layou
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { PHONE_DISPLAY } from '../../data/contacts';
-import { PageLogic, usePageLogic } from '../../lib/pageLogic';
+import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
+import { FLIGHTS_TEXTS } from '../../i18n/flights';
+import type { Lang } from '../../i18n/LanguageContext';
+import { addD, daysBetween, iso, toD } from '../../lib/dates';
+import { TODAY } from '../../data/demo';
+import { isFlightDay } from '../../data/flights';
+import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './FlightsPage.css';
@@ -16,398 +22,28 @@ const HELP_CTX: HelpContextInfo = {
 };
 
 class FlightsLogic extends PageLogic {
-  constructor(props?: any) {
+  static languages = ['ru', 'en', 'he'] as const;
+  constructor(props: PageServices) {
     super(props);
-    this.state = { lang: 'ru', b: 'idle', ch: 'wa', tm: 'day', in: '2026-11-09', out: '2026-11-18', cal: false };
+    const bk = props.booking.booking;
+    this.state = { b: 'idle', ch: 'wa', tm: 'day', in: bk.checkin, out: bk.checkout, cal: false, tk: bk.flights };
+  }
+  syncBooking(st) {
+    return { checkin: st.in, checkout: st.out, flights: st.tk ?? null };
   }
   renderVals() {
     return this._rv();
   }
   _rv() {
-    // ---- Localisation-ready strings (ru / en / he) ----
-    const T = {
-      ru: {
-        brand: 'Санатории Литвы',
-        offTitle: 'Отлично! В ваши даты есть прямые рейсы',
-        offLead:
-          'Вылет и возвращение совпадают с датами заезда и выезда. Можем сразу добавить эти билеты в заказ — трансфер встретит вас прямо у самолёта.',
-        offFlights: 'Рейсы в ваши даты',
-        offPpp: 'туда и обратно, на 1 человека',
-        offDirect: 'прямой',
-        offCharter: 'ЧАРТЕР',
-        offHand: 'Ручная кладь 8 кг',
-        offBag: 'Багаж 20 кг',
-        offMeal: 'Без питания на борту',
-        offAirline: 'Israir',
-        there: 'Туда',
-        back: 'Обратно',
-        seats: 'осталось {n} мест',
-        qTitle: 'Добавить эти авиабилеты в ваш заказ?',
-        qLead: 'Выберите один вариант — на цену и даты санатория это не влияет.',
-        yTitle: 'Да, забронируйте мне эти рейсы',
-        yText:
-          'Рейсы {a} и {b} для {g} гостей. Имена возьмём из данных, которые вы указали. Билеты пришлём на почту и в WhatsApp.',
-        yBtn: 'Да, добавить билеты в заказ',
-        yBtnOn: '✓ Билеты добавлены',
-        recBadge: 'РЕКОМЕНДУЕМ',
-        forTwo: 'за 2 гостей, туда и обратно',
-        detailsHead: 'Подробно о рейсах',
-        nTitle: 'Нет, билеты у меня уже есть',
-        nText:
-          'Я покупаю билеты сам(а) или лечу другим рейсом. Номер рейса можно сообщить позже — трансфер встретит вас по нему.',
-        nBtn: 'Продолжить без билетов',
-        nBtnOn: '✓ Без билетов',
-        decYes: 'Билеты на 2 гостей добавлены: +{p}. Итого заказ: {t}.',
-        decNo: 'Без авиабилетов. Итого заказ: {t}.',
-        toPay: 'Перейти к оплате',
-        offNote:
-          'Цена билетов фиксируется в момент оформления. Места на чартерных рейсах ограничены. [ПРИМЕР ДАННЫХ — ИЗ СИСТЕМЫ БРОНИРОВАНИЯ РЕЙСОВ]',
-        demoNo: 'даты без рейсов',
-        demoYes: 'даты с рейсами',
-        sRoom: 'Номер',
-        sTransfer: 'Трансфер',
-        sGuests: 'Гости',
-        sPay: 'Оплата',
-        sFlights: 'Рейсы',
-        sDone: 'Готово',
-        title: 'В выбранные даты наша авиакомпания-партнёр не летает',
-        lead: 'Это не значит, что поехать нельзя! Вы можете выбрать рейсы других авиакомпаний, прилететь через другие аэропорты или организовать дорогу самостоятельно. Мы просто хотим убедиться, что вы об этом знаете.',
-        arrive: 'Заезд',
-        depart: 'Выезд',
-        noFlight: 'рейса нет',
-        hasFlight: 'есть рейс',
-        flightDays:
-          'Наша авиакомпания-партнёр летает Тель-Авив ⇄ Вильнюс по вторникам, четвергам и воскресеньям. Ближайшие дни с рейсами: ',
-        aTitle: 'Всё в порядке, моя поездка спланирована!',
-        aText:
-          'Я знаю, что в эти даты рейсов этой авиакомпании нет. Позабочусь о дороге сам или у меня уже есть другие билеты.',
-        aBtn: 'Продолжить бронирование',
-        bTitle: 'Не уверен насчёт рейсов. Хочу поговорить.',
-        bText: 'Пусть со мной свяжется ваш консультант и поможет разобраться с вариантами поездки.',
-        bBtn: 'Свяжитесь со мной',
-        cLink: 'Хочу выбрать даты, в которые есть рейсы',
-        fTitle: 'Как с вами связаться?',
-        fCancel: 'Отмена',
-        fName: 'Ваше имя',
-        fPhone: 'Телефон',
-        fHow: 'Удобнее всего',
-        fWhen: 'Когда позвонить (время Израиля)',
-        fNote: 'Комментарий (не обязательно)',
-        fNotePh: 'Например: летим из Хайфы, рассматриваем Варшаву',
-        fKeep: 'Ваш заказ сохранён: даты, номер и программа не изменятся.',
-        fSend: 'Отправить запрос',
-        chWa: 'WhatsApp',
-        chCall: 'Звонок',
-        chMail: 'E-mail',
-        tmMorning: 'Утром',
-        tmDay: 'Днём',
-        tmEvening: 'Вечером',
-        okTitle: 'Спасибо! Мы свяжемся с вами',
-        okText: 'Консультант напишет вам в {ch} {tm} — в течение 2 часов в рабочее время (9:00–20:00). Заказ сохранён.',
-        okPay: 'Всё равно продолжить к оплате',
-        okWait: 'Подождать консультанта',
-        goodTitle: 'Отлично — в эти даты есть рейсы',
-        goodText: 'Новые даты: {range}. Цена пересчитана при оплате.',
-        goodBtn: 'Продолжить с новыми датами',
-        kept: 'Ваш заказ сохранён',
-        keptLine: 'Двухместный номер · программа «Миди» · 2 взрослых · групповой трансфер',
-        calTitle: 'Выберите даты с рейсами',
-        calHintIn: 'Нажмите день заезда — лучше с ✈',
-        calHintOut: 'Теперь день выезда',
-        calHintDone: 'Можно поменять: нажмите новый день заезда',
-        lgPicked: 'выбрано',
-        lgFly: 'есть рейс из Израиля',
-        lgNoFly: 'рейса нет',
-        lgPast: 'недоступно',
-        close: 'Закрыть',
-        apply: 'Подтвердить даты',
-        nights: 'ночей',
-        rules: 'Условия',
-        wd: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-        months: [
-          'января',
-          'февраля',
-          'марта',
-          'апреля',
-          'мая',
-          'июня',
-          'июля',
-          'августа',
-          'сентября',
-          'октября',
-          'ноября',
-          'декабря',
-        ],
-        monthsN: [
-          'Январь',
-          'Февраль',
-          'Март',
-          'Апрель',
-          'Май',
-          'Июнь',
-          'Июль',
-          'Август',
-          'Сентябрь',
-          'Октябрь',
-          'Ноябрь',
-          'Декабрь',
-        ],
-        wdShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
-      },
-      en: {
-        brand: 'Lithuania Sanatoriums',
-        offTitle: 'Great! There are direct flights on your dates',
-        offLead:
-          'Departure and return match your check-in and check-out dates. We can add these tickets to your booking right away — the transfer will meet you at the plane.',
-        offFlights: 'Flights on your dates',
-        offPpp: 'round trip, per person',
-        offDirect: 'direct',
-        offCharter: 'CHARTER',
-        offHand: 'Hand luggage 8 kg',
-        offBag: 'Checked bag 20 kg',
-        offMeal: 'No meal on board',
-        offAirline: 'Israir',
-        there: 'Outbound',
-        back: 'Return',
-        seats: '{n} seats left',
-        qTitle: 'Add these flights to your booking?',
-        qLead: 'Choose one option — it doesn’t change the sanatorium price or dates.',
-        yTitle: 'Yes, book these flights for me',
-        yText:
-          'Flights {a} and {b} for {g} guests. We’ll use the names you entered. Tickets will be sent by e-mail and WhatsApp.',
-        yBtn: 'Yes, add tickets to my booking',
-        yBtnOn: '✓ Tickets added',
-        recBadge: 'RECOMMENDED',
-        forTwo: 'for 2 guests, round trip',
-        detailsHead: 'Flight details',
-        nTitle: 'No, I already have tickets',
-        nText:
-          'I’m buying tickets myself or flying another route. You can send us the flight number later — the transfer will meet you by it.',
-        nBtn: 'Continue without tickets',
-        nBtnOn: '✓ Without tickets',
-        decYes: 'Tickets for 2 guests added: +{p}. Booking total: {t}.',
-        decNo: 'No flight tickets. Booking total: {t}.',
-        toPay: 'Go to payment',
-        offNote:
-          'The ticket price is fixed when booked. Charter seats are limited. [SAMPLE DATA — FROM THE FLIGHT BOOKING SYSTEM]',
-        demoNo: 'dates without flights',
-        demoYes: 'dates with flights',
-        sRoom: 'Room',
-        sTransfer: 'Transfer',
-        sGuests: 'Guests',
-        sPay: 'Payment',
-        sFlights: 'Flights',
-        sDone: 'Done',
-        title: 'Our partner airline does not fly on your selected dates',
-        lead: 'This doesn’t mean you can’t travel! You can choose flights with other airlines, arrive via other airports, or arrange the journey yourself. We just want to make sure you know.',
-        arrive: 'Check-in',
-        depart: 'Check-out',
-        noFlight: 'no flight',
-        hasFlight: 'flight available',
-        flightDays:
-          'Our partner airline flies Tel Aviv ⇄ Vilnius on Tuesdays, Thursdays and Sundays. Nearest flight days: ',
-        aTitle: 'All good, my trip is planned!',
-        aText:
-          'I know this airline doesn’t fly on these dates. I’ll arrange the journey myself or I already have other flights.',
-        aBtn: 'Continue booking',
-        bTitle: 'Not sure about flights. I’d like to talk.',
-        bText: 'I’d like your consultant to contact me and help me work out the travel options.',
-        bBtn: 'Contact me',
-        cLink: 'I want to choose dates with flights',
-        fTitle: 'How can we reach you?',
-        fCancel: 'Cancel',
-        fName: 'Your name',
-        fPhone: 'Phone',
-        fHow: 'Preferred channel',
-        fWhen: 'When to call (Israel time)',
-        fNote: 'Comment (optional)',
-        fNotePh: 'E.g. flying from Haifa, considering Warsaw',
-        fKeep: 'Your booking is saved: dates, room and programme stay the same.',
-        fSend: 'Send request',
-        chWa: 'WhatsApp',
-        chCall: 'Phone call',
-        chMail: 'E-mail',
-        tmMorning: 'Morning',
-        tmDay: 'Afternoon',
-        tmEvening: 'Evening',
-        okTitle: 'Thank you! We’ll be in touch',
-        okText:
-          'A consultant will contact you via {ch} ({tm}) within 2 working hours (9:00–20:00). Your booking is saved.',
-        okPay: 'Continue to payment anyway',
-        okWait: 'Wait for the consultant',
-        goodTitle: 'Great — there are flights on these dates',
-        goodText: 'New dates: {range}. The price is recalculated at payment.',
-        goodBtn: 'Continue with new dates',
-        kept: 'Your booking is saved',
-        keptLine: 'Double room · “Midi” programme · 2 adults · group transfer',
-        calTitle: 'Choose dates with flights',
-        calHintIn: 'Tap the check-in day — ideally one with ✈',
-        calHintOut: 'Now the check-out day',
-        calHintDone: 'To change, tap a new check-in day',
-        lgPicked: 'selected',
-        lgFly: 'flight from Israel',
-        lgNoFly: 'no flight',
-        lgPast: 'unavailable',
-        close: 'Close',
-        apply: 'Confirm dates',
-        nights: 'nights',
-        rules: 'Terms',
-        wd: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-        months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        monthsN: [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July',
-          'August',
-          'September',
-          'October',
-          'November',
-          'December',
-        ],
-        wdShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-      },
-      he: {
-        brand: 'בתי הבראה בליטא',
-        offTitle: 'מצוין! יש טיסות ישירות בתאריכים שלכם',
-        offLead:
-          'ההמראה והחזרה תואמות את תאריכי ההגעה והעזיבה. נוכל להוסיף את הכרטיסים להזמנה כבר עכשיו — ההסעה תחכה לכם בשדה התעופה.',
-        offFlights: 'טיסות בתאריכים שלכם',
-        offPpp: 'הלוך ושוב, לנוסע',
-        offDirect: 'ישירה',
-        offCharter: 'שכר',
-        offHand: 'כבודת יד 8 ק״ג',
-        offBag: 'מזוודה 20 ק״ג',
-        offMeal: 'ללא ארוחה בטיסה',
-        offAirline: 'ישראייר',
-        there: 'הלוך',
-        back: 'חזור',
-        seats: 'נותרו {n} מקומות',
-        qTitle: 'להוסיף את כרטיסי הטיסה להזמנה?',
-        qLead: 'בחרו אפשרות אחת — היא לא משנה את המחיר או התאריכים של בית ההבראה.',
-        yTitle: 'כן, הזמינו לי את הטיסות האלה',
-        yText: 'טיסות {a} ו-{b} עבור {g} אורחים. נשתמש בשמות שמילאתם. הכרטיסים יישלחו בדוא״ל ובוואטסאפ.',
-        yBtn: 'כן, להוסיף כרטיסים להזמנה',
-        yBtnOn: '✓ הכרטיסים נוספו',
-        recBadge: 'מומלץ',
-        forTwo: 'ל-2 אורחים, הלוך ושוב',
-        detailsHead: 'פרטי הטיסות',
-        nTitle: 'לא, כבר יש לי כרטיסים',
-        nText: 'אני קונה כרטיסים בעצמי או טס בטיסה אחרת. אפשר לשלוח לנו את מספר הטיסה מאוחר יותר — ההסעה תחכה לפיו.',
-        nBtn: 'להמשיך בלי כרטיסים',
-        nBtnOn: '✓ בלי כרטיסים',
-        decYes: 'נוספו כרטיסים ל-2 אורחים: ‎+{p}. סך ההזמנה: {t}.',
-        decNo: 'בלי כרטיסי טיסה. סך ההזמנה: {t}.',
-        toPay: 'מעבר לתשלום',
-        offNote: 'מחיר הכרטיס נקבע ברגע ההזמנה. מספר המקומות בטיסות שכר מוגבל. [נתוני דוגמה — ממערכת הזמנת הטיסות]',
-        demoNo: 'תאריכים בלי טיסות',
-        demoYes: 'תאריכים עם טיסות',
-        sRoom: 'חדר',
-        sTransfer: 'הסעה',
-        sGuests: 'אורחים',
-        sPay: 'תשלום',
-        sFlights: 'טיסות',
-        sDone: 'סיום',
-        title: 'חברת התעופה השותפה שלנו אינה טסה בתאריכים שבחרתם',
-        lead: 'זה לא אומר שאי אפשר לנסוע! אפשר לבחור טיסות של חברות אחרות, להגיע דרך שדות תעופה אחרים או לארגן את הנסיעה בעצמכם. אנחנו רק רוצים לוודא שאתם יודעים על כך.',
-        arrive: 'הגעה',
-        depart: 'עזיבה',
-        noFlight: 'אין טיסה',
-        hasFlight: 'יש טיסה',
-        flightDays: 'חברת התעופה השותפה שלנו טסה תל אביב ⇄ וילנה בימי שלישי, חמישי וראשון. ימי הטיסה הקרובים: ',
-        aTitle: 'הכול בסדר, הנסיעה שלי מתוכננת!',
-        aText: 'אני יודע/ת שאין טיסות של חברה זו בתאריכים האלה. אדאג לנסיעה בעצמי או שכבר יש לי טיסות אחרות.',
-        aBtn: 'להמשיך בהזמנה',
-        bTitle: 'לא בטוח/ה לגבי הטיסות. רוצה לדבר.',
-        bText: 'אשמח שנציג/ה שלכם יחזור אליי ויעזור לבדוק את אפשרויות הנסיעה.',
-        bBtn: 'צרו איתי קשר',
-        cLink: 'אני רוצה לבחור תאריכים שיש בהם טיסות',
-        fTitle: 'איך ליצור איתכם קשר?',
-        fCancel: 'ביטול',
-        fName: 'שם',
-        fPhone: 'טלפון',
-        fHow: 'ערוץ מועדף',
-        fWhen: 'מתי להתקשר (שעון ישראל)',
-        fNote: 'הערה (לא חובה)',
-        fNotePh: 'לדוגמה: טסים מחיפה, שוקלים את ורשה',
-        fKeep: 'ההזמנה שלכם נשמרה: התאריכים, החדר והתוכנית לא ישתנו.',
-        fSend: 'שליחת בקשה',
-        chWa: 'WhatsApp',
-        chCall: 'שיחת טלפון',
-        chMail: 'דוא״ל',
-        tmMorning: 'בבוקר',
-        tmDay: 'בצהריים',
-        tmEvening: 'בערב',
-        okTitle: 'תודה! ניצור איתכם קשר',
-        okText: 'נציג/ה יפנה אליכם ב-{ch} ({tm}) תוך שעתיים בשעות הפעילות (9:00–20:00). ההזמנה נשמרה.',
-        okPay: 'להמשיך לתשלום בכל זאת',
-        okWait: 'לחכות לנציג',
-        goodTitle: 'מצוין — יש טיסות בתאריכים האלה',
-        goodText: 'תאריכים חדשים: {range}. המחיר יחושב מחדש בתשלום.',
-        goodBtn: 'להמשיך עם התאריכים החדשים',
-        kept: 'ההזמנה שלכם נשמרה',
-        keptLine: 'חדר זוגי · תוכנית „מידי“ · 2 מבוגרים · הסעה קבוצתית',
-        calTitle: 'בחרו תאריכים עם טיסות',
-        calHintIn: 'לחצו על יום ההגעה — עדיף עם ✈',
-        calHintOut: 'עכשיו יום העזיבה',
-        calHintDone: 'לשינוי לחצו על יום הגעה חדש',
-        lgPicked: 'נבחר',
-        lgFly: 'יש טיסה מישראל',
-        lgNoFly: 'אין טיסה',
-        lgPast: 'לא זמין',
-        close: 'סגירה',
-        apply: 'אישור התאריכים',
-        nights: 'לילות',
-        rules: 'תנאים',
-        wd: ['ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳', 'א׳'],
-        months: [
-          'בינואר',
-          'בפברואר',
-          'במרץ',
-          'באפריל',
-          'במאי',
-          'ביוני',
-          'ביולי',
-          'באוגוסט',
-          'בספטמבר',
-          'באוקטובר',
-          'בנובמבר',
-          'בדצמבר',
-        ],
-        monthsN: [
-          'ינואר',
-          'פברואר',
-          'מרץ',
-          'אפריל',
-          'מאי',
-          'יוני',
-          'יולי',
-          'אוגוסט',
-          'ספטמבר',
-          'אוקטובר',
-          'נובמבר',
-          'דצמבר',
-        ],
-        wdShort: ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'],
-      },
-    };
+    const T = FLIGHTS_TEXTS;
     const st = this.state;
-    const L = T[st.lang] ? st.lang : 'ru';
+    const L: Lang = this.props.lang.lang;
     const t = T[L];
-    const FLY = [0, 2, 4]; // Sun, Tue, Thu — partner airline schedule [ПОДТВЕРДИТЬ]
-    const DAY = 86400000,
-      TODAY = new Date('2026-10-27T00:00:00Z');
-    const toD = (s) => new Date(s + 'T00:00:00Z'),
-      iso = (d) => d.toISOString().slice(0, 10),
-      addD = (d, n) => new Date(d.getTime() + n * DAY);
-    const fly = (d) => FLY.includes(d.getUTCDay());
+    const fly = isFlightDay;
     const fmtD = (d) => d.getUTCDate() + ' ' + t.months[d.getUTCMonth()] + ' (' + t.wdShort[d.getUTCDay()] + ')';
     const inD = toD(st.in),
       outD = toD(st.out);
-    const nights = Math.round((outD - inD) / DAY);
+    const nights = daysBetween(inD, outD);
     const range =
       inD.getUTCDate() +
       ' ' +
@@ -421,14 +57,14 @@ class FlightsLogic extends PageLogic {
       ' ' +
       t.nights;
     const nearest = (d) => {
-      const r = [];
+      const r: Date[] = [];
       for (let k = 1; k <= 3 && r.length < 2; k++) {
         [addD(d, -k), addD(d, k)].forEach((x) => {
           if (fly(x) && r.length < 2 && x >= TODAY) r.push(x);
         });
       }
       return r
-        .sort((a, b) => a - b)
+        .sort((a, b) => a.getTime() - b.getTime())
         .map(fmtD)
         .join(', ');
     };
@@ -487,7 +123,7 @@ class FlightsLogic extends PageLogic {
       const first = new Date(Date.UTC(y, m, 1)),
         lead = (first.getUTCDay() + 6) % 7,
         days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(),
-        out = [];
+        out: CalendarCell[] = [];
       for (let i = 0; i < lead; i++)
         out.push({
           day: '',
@@ -544,7 +180,7 @@ class FlightsLogic extends PageLogic {
     };
     const m1 = (m0 + 1) % 12,
       y1 = m0 === 11 ? y0 + 1 : y0;
-    const selN = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
+    const selN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     return {
       t,
       dir: L === 'he' ? 'rtl' : 'ltr',
@@ -552,7 +188,7 @@ class FlightsLogic extends PageLogic {
         ['ru', 'RU'],
         ['en', 'EN'],
         ['he', 'HE'],
-      ].map(([k, l]) => ({ t: l, cls: k === L ? 'on' : '', pick: () => this.setState({ lang: k }) })),
+      ].map(([k, l]) => ({ t: l, cls: k === L ? 'on' : '', pick: () => this.props.lang.setLang(k as Lang) })),
       showNotice: !allOk,
       showOffer: allOk,
       demo: [
@@ -579,7 +215,7 @@ class FlightsLogic extends PageLogic {
           date: dd(inD),
           dur: L === 'ru' ? '4 ч 15 мин' : '4h 15m',
           no: 'IZ 2549',
-          seats: t.seats.replace('{n}', 9),
+          seats: t.seats.replace('{n}', '9'),
           plane: 'Airbus A320',
         },
         {
@@ -595,11 +231,11 @@ class FlightsLogic extends PageLogic {
           date: dd(outD),
           dur: L === 'ru' ? '4 ч 00 мин' : '4h 00m',
           no: 'IZ 2550',
-          seats: t.seats.replace('{n}', 9),
+          seats: t.seats.replace('{n}', '9'),
           plane: 'Airbus A320',
         },
       ],
-      yText: t.yText.replace('{a}', 'IZ 2549').replace('{b}', 'IZ 2550').replace('{g}', GUESTS),
+      yText: t.yText.replace('{a}', 'IZ 2549').replace('{b}', 'IZ 2550').replace('{g}', String(GUESTS)),
       yesCls: tk === 'yes' ? 'on' : '',
       noCls: tk === 'no' ? 'on' : '',
       yesBtn: tk === 'yes' ? 'btn-primary' : 'btn-secondary',
@@ -654,7 +290,7 @@ class FlightsLogic extends PageLogic {
       selLine: sIn ? fmtD(sIn) + (sOut ? ' → ' + fmtD(sOut) + ' · ' + selN + ' ' + t.nights : ' → …') : '—',
       applyOff: !selN,
       applyCal: () => {
-        if (selN) this.setState({ in: iso(sIn), out: iso(sOut), cal: false, tk: null });
+        if (selN && sIn && sOut) this.setState({ in: iso(sIn), out: iso(sOut), cal: false, tk: null });
       },
     };
   }
@@ -1657,97 +1293,15 @@ export default function FlightsPage() {
                   {v.t?.lgPast}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-                <button type="button" className="navbtn" onClick={v.calPrev} aria-label="‹">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m15 6-6 6 6 6" />
-                  </svg>
-                </button>
-                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                  {(v.months || []).map((m: any, _i0: number) => (
-                    <Fragment key={_i0}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div
-                          style={{
-                            fontFamily: 'Lora,Georgia,serif',
-                            fontSize: '22px',
-                            fontWeight: '600',
-                            textAlign: 'center',
-                          }}
-                        >
-                          {m.title}
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
-                          {(v.wds || []).map((w: any, _i1: number) => (
-                            <Fragment key={_i1}>
-                              <div className="wd">{w.t}</div>
-                            </Fragment>
-                          ))}
-                          {(m.cells || []).map((c: any, _i1: number) => (
-                            <Fragment key={_i1}>
-                              <button
-                                type="button"
-                                className="cell"
-                                onClick={c.pick}
-                                disabled={!!c.off}
-                                aria-label={c.aria}
-                                style={{ background: c.bg, borderColor: c.border, color: c.color, cursor: c.cursor }}
-                              >
-                                <span>{c.day}</span>
-                                <small style={{ color: c.subColor }}>{c.sub}</small>
-                                {c.fly ? (
-                                  <>
-                                    <span style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}>
-                                      <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke={c.planeColor}
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                      >
-                                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                                      </svg>
-                                    </span>
-                                  </>
-                                ) : null}
-                              </button>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-                <button type="button" className="navbtn" onClick={v.calNext} aria-label="›">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m9 6 6 6-6 6" />
-                  </svg>
-                </button>
-              </div>
+              <MonthsCalendar
+                months={v.months || []}
+                onPrev={v.calPrev}
+                onNext={v.calNext}
+                gap={14}
+                weekdays={(v.wds || []).map((w: any) => w.t)}
+                prevLabel="‹"
+                nextLabel="›"
+              />
               <div
                 style={{
                   display: 'flex',

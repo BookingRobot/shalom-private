@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.5;
 }
-.pg-flights * {
-  box-sizing: border-box;
-}
-.pg-flights a {
-  color: #1f5f4a;
-}
-.pg-flights a:hover {
-  color: #143f31;
-}
-.pg-flights h1,
-.pg-flights h2,
-.pg-flights h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-flights input,
 .pg-flights select,
 .pg-flights button,
@@ -130,50 +113,6 @@
   background: #1c2620;
   color: #fff;
   border-color: #1c2620;
-}
-.pg-flights .cell {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  min-height: 76px;
-  border: 2px solid transparent;
-  border-radius: 2px;
-  padding: 4px 2px;
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1;
-  cursor: pointer;
-  background: none;
-}
-.pg-flights .cell small {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
-}
-.pg-flights .cell:hover {
-  border-color: #1f5f4a;
-}
-.pg-flights .wd {
-  font-size: 13px;
-  font-weight: 700;
-  color: #6b776f;
-  text-align: center;
-  padding: 6px 0;
-}
-.pg-flights .navbtn {
-  width: 48px;
-  height: 48px;
-  border: 2px solid #cfc9bb;
-  background: #fff;
-  border-radius: 2px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
 }
 .pg-flights .lg {
   display: flex;

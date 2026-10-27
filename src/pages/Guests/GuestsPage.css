@@ -6,23 +6,6 @@
   font-size: 18px;
   line-height: 1.5;
 }
-.pg-guests * {
-  box-sizing: border-box;
-}
-.pg-guests a {
-  color: #1f5f4a;
-}
-.pg-guests a:hover {
-  color: #143f31;
-}
-.pg-guests h1,
-.pg-guests h2,
-.pg-guests h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
-  margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
-}
 .pg-guests input,
 .pg-guests select,
 .pg-guests button,

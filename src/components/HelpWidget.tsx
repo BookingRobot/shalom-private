@@ -76,7 +76,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
   // keyboard: Esc closes, focus moves into the dialog
   useEffect(() => {
     if (status === 'closed') return;
-    dialogRef.current?.focus();
+    dialogRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -86,6 +86,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
     <>
       <button
         type="button"
+        dir="ltr"
+        lang="ru"
         onClick={open}
         aria-haspopup="dialog"
         style={{
@@ -125,6 +127,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
 
       {status !== 'closed' && (
         <div
+          dir="ltr"
+          lang="ru"
           onClick={(e) => e.target === e.currentTarget && close()}
           style={{
             position: 'fixed',
