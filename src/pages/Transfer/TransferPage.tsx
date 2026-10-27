@@ -194,34 +194,50 @@ export default function TransferPage() {
                 Друскининкай.
               </p>
             </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                gap: '16px',
-              }}
-            >
-              <button type="button" className={`choice ${v.yesCls ?? ''}`} onClick={v.sayYes}>
-                {' '}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+              <button
+                type="button"
+                className={`choice ${v.yesCls ?? ''}`}
+                onClick={v.sayYes}
+                style={{ flex: '2 1 360px' }}
+              >
                 <span className={`radio ${v.yesCls ?? ''}`}>
                   <i />
-                </span>{' '}
+                </span>
                 <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '18px' }}>Да, нужен трансфер</strong>
-                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                    Заберём из аэропорта, с вокзала или от отеля
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: '18px' }}>Да, нужен трансфер</strong>
+                    <span
+                      style={{
+                        background: '#FFF1D6',
+                        color: '#8A5A00',
+                        fontSize: '14px',
+                        fontWeight: '800',
+                        padding: '2px 8px',
+                        borderRadius: '2px',
+                      }}
+                    >
+                      Рекомендуем
+                    </span>
                   </span>
-                </span>{' '}
+                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>
+                    Заберём из аэропорта, с вокзала или от отеля · групповой от 30&nbsp;€ с человека
+                  </span>
+                </span>
               </button>
-              <button type="button" className={`choice ${v.noCls ?? ''}`} onClick={v.sayNo}>
-                {' '}
-                <span className={`radio ${v.noCls ?? ''}`}>
+              <button
+                type="button"
+                className={`choice ${v.noCls ?? ''}`}
+                onClick={v.sayNo}
+                style={{ flex: '1 1 220px', padding: '12px 16px', minHeight: '56px', borderWidth: '1px', gap: '12px' }}
+              >
+                <span className={`radio ${v.noCls ?? ''}`} style={{ width: '22px', height: '22px' }}>
                   <i />
-                </span>{' '}
-                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <strong style={{ fontSize: '18px' }}>Нет, доберусь сам</strong>
-                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>На машине или общественным транспортом</span>
-                </span>{' '}
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>Нет, доберусь сам</span>
+                  <span style={{ color: '#5E6862', fontSize: '15px' }}>На машине или общественным транспортом</span>
+                </span>
               </button>
             </div>
             {/* Confirmation pop-up when the guest declines the transfer */}
@@ -1130,7 +1146,7 @@ export default function TransferPage() {
             ]}
             prices={[
               ['Проживание и лечение', order.stayLabel],
-              ['Трансфер', v.transferSum],
+              ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
             ]}
             total={v.total}
             footer={<AdvanceNote advance={order.advanceLabel} />}
