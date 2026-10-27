@@ -95,6 +95,7 @@ class TransferLogic extends PageLogic {
       cityName: cur.name,
       cities: PICKUP_PLACES.map((c) => ({
         ...c,
+        on: c.id === city,
         cls: c.id === city ? 'on' : '',
         pick: () => this.setState({ city: c.id }),
       })),
@@ -554,63 +555,75 @@ export default function TransferPage() {
                   </div>
                   <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
                     {(v.cities || []).map((c: any, i: number) => (
-                      <button key={i} type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
-                        <span className={`radio ${c.cls ?? ''}`}>
-                          <i />
-                        </span>
-                        <span className="rowpick-name">{c.from}</span>
-                        <span className="rowpick-info">{c.info}</span>
-                      </button>
+                      <Fragment key={i}>
+                        <button type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
+                          <span className={`radio ${c.cls ?? ''}`}>
+                            <i />
+                          </span>
+                          <span className="rowpick-name">{c.from}</span>
+                          <span className="rowpick-info">{c.info}</span>
+                        </button>
+                        {c.on ? (
+                          <div className="rowpick-detail">
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
+                                gap: '14px',
+                              }}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="place">
+                                  Откуда именно вас забрать?
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                  <select
+                                    id="place"
+                                    className="input"
+                                    style={{ paddingRight: '44px' }}
+                                    value={v.place}
+                                    onChange={v.pickPlace}
+                                  >
+                                    {(v.places || []).map((p: any, _i0: number) => (
+                                      <Fragment key={_i0}>
+                                        <option value={p.t}>{p.t}</option>
+                                      </Fragment>
+                                    ))}
+                                  </select>{' '}
+                                  <svg
+                                    width="22"
+                                    height="22"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#1F5F4A"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                    style={{ position: 'absolute', right: '14px', top: '17px', pointerEvents: 'none' }}
+                                  >
+                                    <path d="m6 9 6 6 6-6" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="flight">
+                                  Номер рейса или поезда и время прибытия
+                                </label>
+                                <input
+                                  id="flight"
+                                  className="input"
+                                  type="text"
+                                  placeholder="Например: LO 771, 14:35"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
+                      </Fragment>
                     ))}
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                      gap: '16px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="lbl" htmlFor="place">
-                        Откуда именно вас забрать?
-                      </label>
-                      <div style={{ position: 'relative' }}>
-                        <select
-                          id="place"
-                          className="input"
-                          style={{ paddingRight: '44px' }}
-                          value={v.place}
-                          onChange={v.pickPlace}
-                        >
-                          {(v.places || []).map((p: any, _i0: number) => (
-                            <Fragment key={_i0}>
-                              <option value={p.t}>{p.t}</option>
-                            </Fragment>
-                          ))}
-                        </select>{' '}
-                        <svg
-                          width="22"
-                          height="22"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ position: 'absolute', right: '14px', top: '17px', pointerEvents: 'none' }}
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="lbl" htmlFor="flight">
-                        Номер рейса или поезда и время прибытия
-                      </label>
-                      <input id="flight" className="input" type="text" placeholder="Например: LO 771, 14:35" />
-                    </div>
-                  </div>
+
                   {v.fromHotel ? (
                     <>
                       <div

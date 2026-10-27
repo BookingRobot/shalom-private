@@ -173,3 +173,13 @@
   font-size: 15px;
   color: #5e6862;
 }
+.pg-transfer .rowpick-detail {
+  padding: 4px 14px 16px 48px;
+  background: #eef5f1;
+  border-top: 1px dashed #c8ded3;
+}
+@media (max-width: 480px) {
+  .pg-transfer .rowpick-detail {
+    padding-left: 14px;
+  }
+}
