@@ -612,14 +612,19 @@ export default function TransferPage() {
                                 </div>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label className="lbl" htmlFor="flight">
-                                  Рейс или поезд, время прибытия
+                                <label className="lbl" htmlFor="flight" style={{ fontSize: '15px' }}>
+                                  Уже есть билеты? Рейс и время прибытия
+                                  <span style={{ fontWeight: '400', color: '#5E6862' }}>
+                                    {' '}
+                                    · необязательно, можно сообщить позже
+                                  </span>
                                 </label>
                                 <input
                                   id="flight"
                                   className="input"
                                   type="text"
                                   placeholder="Например: LO 771, 14:35"
+                                  style={{ minHeight: '44px', fontSize: '16px' }}
                                 />
                               </div>
                             </div>
@@ -961,14 +966,13 @@ export default function TransferPage() {
                     {v.back ? (
                       <>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                          <div
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                              gap: '12px',
-                            }}
-                          >
-                            <button type="button" className={`choice ${v.sameCls ?? ''}`} onClick={v.pickSame}>
+                          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+                            <button
+                              type="button"
+                              className={`choice ${v.sameCls ?? ''}`}
+                              onClick={v.pickSame}
+                              style={{ flex: '2 1 320px' }}
+                            >
                               {' '}
                               <span className={`radio ${v.sameCls ?? ''}`}>
                                 <i />
@@ -978,17 +982,29 @@ export default function TransferPage() {
                                 <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.sameInfo}</span>
                               </span>{' '}
                             </button>
-                            <button type="button" className={`choice ${v.otherCls ?? ''}`} onClick={v.pickOther}>
-                              {' '}
-                              <span className={`radio ${v.otherCls ?? ''}`}>
+                            <button
+                              type="button"
+                              className={`choice ${v.otherCls ?? ''}`}
+                              onClick={v.pickOther}
+                              style={{
+                                flex: '1 1 200px',
+                                padding: '12px 16px',
+                                minHeight: '56px',
+                                borderWidth: '1px',
+                                gap: '12px',
+                              }}
+                            >
+                              <span className={`radio ${v.otherCls ?? ''}`} style={{ width: '22px', height: '22px' }}>
                                 <i />
-                              </span>{' '}
-                              <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                <strong style={{ fontSize: '18px' }}>В другое место</strong>
-                                <span style={{ color: '#3E4B44', fontSize: '15px' }}>
+                              </span>
+                              <span style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>
+                                  В другое место
+                                </span>
+                                <span style={{ color: '#5E6862', fontSize: '15px' }}>
                                   Другой город, вокзал или отель
                                 </span>
-                              </span>{' '}
+                              </span>
                             </button>
                           </div>
                           {v.backOther ? (
@@ -1057,14 +1073,19 @@ export default function TransferPage() {
                                     </div>
                                   </div>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label className="lbl" htmlFor="backflight">
-                                      Рейс или поезд, время отправления
+                                    <label className="lbl" htmlFor="backflight" style={{ fontSize: '15px' }}>
+                                      Уже есть билеты? Рейс и время отправления
+                                      <span style={{ fontWeight: '400', color: '#5E6862' }}>
+                                        {' '}
+                                        · необязательно, можно сообщить позже
+                                      </span>
                                     </label>
                                     <input
                                       id="backflight"
                                       className="input"
                                       type="text"
                                       placeholder="Например: LO 772, 16:10"
+                                      style={{ minHeight: '44px', fontSize: '16px' }}
                                     />
                                   </div>
                                 </div>
@@ -1074,14 +1095,19 @@ export default function TransferPage() {
                           {v.backSame ? (
                             <>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '420px' }}>
-                                <label className="lbl" htmlFor="backflight2">
-                                  Рейс или поезд и время отправления {v.outDay}
+                                <label className="lbl" htmlFor="backflight2" style={{ fontSize: '15px' }}>
+                                  Уже есть билеты? Рейс и время отправления
+                                  <span style={{ fontWeight: '400', color: '#5E6862' }}>
+                                    {' '}
+                                    · необязательно, можно сообщить позже
+                                  </span>
                                 </label>
                                 <input
                                   id="backflight2"
                                   className="input"
                                   type="text"
                                   placeholder="Например: LO 772, 16:10"
+                                  style={{ minHeight: '44px', fontSize: '16px' }}
                                 />
                                 <span style={{ fontSize: '15px', color: '#5E6862' }}>
                                   Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.

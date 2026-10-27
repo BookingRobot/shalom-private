@@ -137,53 +137,35 @@ export default function PaymentPage() {
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
               <h2 style={{ fontSize: '24px' }}>Сумма к оплате сейчас</h2>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit,minmax(min(300px,100%),1fr))',
-                  gap: '14px',
-                }}
-              >
-                <button type="button" className={`choice plan ${v.advCls ?? ''}`} onClick={v.pickAdv}>
+              <div className="plan-list">
+                <button type="button" className={`choice plan plan-main ${v.advCls ?? ''}`} onClick={v.pickAdv}>
                   <span className={`radio ${v.advCls ?? ''}`}>
                     <i />
                   </span>
                   <span className="plan-body">
-                    <span className="plan-title">Минимальный аванс</span>
-                    <span className="plan-amount">
-                      {v.advAmt}&nbsp;€ <small>сейчас</small>
+                    <span className="plan-head">
+                      <strong className="plan-title">
+                        Минимальный аванс — <span className="nowrap">{v.advAmt}&nbsp;€</span>
+                      </strong>
+                      <span className="plan-badge">Так платят 9 из 10 гостей</span>
                     </span>
-                    <span className="plan-note">4&nbsp;% от проживания и лечения</span>
-                    <span className="plan-text">Этого достаточно, чтобы санаторий подтвердил бронь.</span>
-                    <span className="plan-rest">
-                      Остальные <strong>{v.restAmt}&nbsp;€</strong> — при заезде:
-                      {v.transferAmt ? (
-                        <span className="plan-rest-list">
-                          <span>
-                            <strong>{v.stayRestAmt}&nbsp;€</strong> — санаторию
-                          </span>
-                          <span>
-                            <strong>{v.transferAmt}&nbsp;€</strong> — за трансфер
-                          </span>
-                        </span>
-                      ) : null}{' '}
-                      <span className="plan-rest-how">Наличными, картой или переводом.</span>
+                    <span className="plan-text">
+                      4&nbsp;% от проживания и лечения — этого достаточно, чтобы санаторий подтвердил бронь. Остальные{' '}
+                      <strong>{v.restAmt}&nbsp;€</strong> — при заезде: наличными, картой или переводом.
                     </span>
-                    <span className="plan-badge">Так платят 9 из 10 гостей</span>
                   </span>
                 </button>
-                <button type="button" className={`choice plan ${v.fullCls ?? ''}`} onClick={v.pickFull}>
+                <button type="button" className={`choice plan plan-alt ${v.fullCls ?? ''}`} onClick={v.pickFull}>
                   <span className={`radio ${v.fullCls ?? ''}`}>
                     <i />
                   </span>
-                  <span className="plan-body">
-                    <span className="plan-title">Вся сумма</span>
-                    <span className="plan-amount">
-                      {v.totalAmt}&nbsp;€ <small>сейчас</small>
-                    </span>
-                    <span className="plan-note">Ничего не платить на месте</span>
+                  <span className="plan-body plan-inline">
+                    <strong className="plan-title">
+                      Вся сумма — <span className="nowrap">{v.totalAmt}&nbsp;€</span>
+                    </strong>
                     <span className="plan-text">
-                      {v.fullIncludes} Удобно, если оплачивают родственники или организация.
+                      {v.fullIncludes} Ничего не платить на месте — удобно, если оплачивают родственники или
+                      организация.
                     </span>
                   </span>
                 </button>

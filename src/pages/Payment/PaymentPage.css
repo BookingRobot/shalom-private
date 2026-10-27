@@ -146,62 +146,82 @@
   min-width: 150px;
 }
 
-/* Payment plan cards: title, then the amount in the same place in both cards */
+/* Payment plans: two compact rows — the advance is the main choice, the full sum is secondary */
+.pg-payment .plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pg-payment .plan {
+  align-items: center;
+  gap: 14px;
+}
+.pg-payment .plan .radio {
+  margin-top: 0;
+}
+.pg-payment .plan-main {
+  padding: 14px 18px;
+}
+.pg-payment .plan-alt {
+  padding: 10px 18px;
+  min-height: 52px;
+  border-width: 1px;
+}
+.pg-payment .plan-alt .radio {
+  width: 22px;
+  height: 22px;
+}
+.pg-payment .plan-alt .radio.on i {
+  width: 10px;
+  height: 10px;
+}
 .pg-payment .plan-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
+  flex: 1;
+}
+.pg-payment .plan-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
 }
 .pg-payment .plan-title {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.25;
-}
-.pg-payment .plan-amount {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.15;
-  white-space: nowrap;
   color: #1c2620;
 }
-.pg-payment .plan-amount small {
-  font-size: 18px;
+.pg-payment .plan-alt .plan-title {
+  font-size: 17px;
   font-weight: 600;
   color: #3e4b44;
-}
-.pg-payment .plan-note {
-  font-size: 16px;
-  color: #3e4b44;
-  margin-bottom: 6px;
 }
 .pg-payment .plan-text {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.45;
   color: #3e4b44;
 }
-.pg-payment .plan-rest {
-  margin-top: 8px;
-  padding: 10px 12px;
-  background: #fff;
-  border-left: 3px solid #1f5f4a;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #3e4b44;
+.pg-payment .plan-alt .plan-text {
+  color: #5e6862;
 }
-.pg-payment .plan-rest strong {
+.pg-payment .plan-text strong {
   color: #1c2620;
+  white-space: nowrap;
+}
+.pg-payment .nowrap {
   white-space: nowrap;
 }
 .pg-payment .plan-badge {
-  align-self: flex-start;
-  margin-top: 8px;
   background: #fff1d6;
   color: #8a5a00;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: 2px;
+  white-space: nowrap;
 }
 
 @media (max-width: 480px) {
@@ -209,14 +229,4 @@
     padding: 14px;
     gap: 12px;
   }
-}
-
-.pg-payment .plan-rest-list {
-  display: flex;
-  flex-direction: column;
-  margin: 4px 0;
-  color: #1c2620;
-}
-.pg-payment .plan-rest-how {
-  display: block;
 }
