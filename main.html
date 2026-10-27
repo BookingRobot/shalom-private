@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Главная — поиск санатория</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+body{margin:0;background:#F4F1EA;color:#1C2620;font-family:Manrope,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.5}
+*{box-sizing:border-box}
+a{color:#1F5F4A}a:hover{color:#143F31}
+h1,h2,h3{font-family:Lora,Georgia,"Times New Roman",serif;margin:0;line-height:1.2;font-weight:600}
+input,select,button,textarea{font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:2px;font-weight:700;font-size:17px;cursor:pointer;text-decoration:none;border:2px solid transparent;white-space:nowrap}
+.btn-primary{background:#1F5F4A;color:#fff}.btn-primary:hover{background:#174B3A;color:#fff}
+.btn-secondary{background:#fff;color:#1F5F4A;border-color:#1F5F4A}.btn-secondary:hover{background:#EEF5F1;color:#143F31}
+.input{min-height:50px;border:2px solid #CFC9BB;border-radius:2px;padding:0 14px 0 42px;background:#fff;font-size:16px;width:100%;appearance:none;-webkit-appearance:none;font-weight:600}
+.input:focus{outline:3px solid #9CC9B5;border-color:#1F5F4A}
+.lbl{font-weight:600;font-size:14px;color:#3E4B44}
+.card{background:#fff;border:1px solid #E3DED2;border-radius:2px}
+.navlink{text-decoration:none;color:#1C2620;font-weight:600;font-size:16px}
+.navlink:hover{color:#1F5F4A}
+.fieldico{position:absolute;left:12px;top:14px;pointer-events:none}
+.fact{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;flex:1 1 220px;justify-content:center;padding:14px 12px}
+.fact+.fact{border-left:1px solid #E3DED2}
+.resort{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:#1C2620}
+.resort:hover{border-color:#1F5F4A}
+.resort img{width:100%;height:120px;object-fit:cover;display:block}
+.hcard{display:flex;flex-direction:column;overflow:hidden}
+.hcard img{width:100%;height:130px;object-fit:cover;display:block}
+.feat{display:flex;align-items:center;gap:8px;font-size:14px;color:#3E4B44}
+.feat svg{flex:none}
+.step{display:flex;align-items:center;gap:14px;flex:1 1 260px;padding:14px 16px}
+.step+.step{border-left:1px solid #E3DED2}
+.num{width:32px;height:32px;border-radius:50%;background:#1F5F4A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none}
+.datebtn{text-align:left;cursor:pointer}
+.datebtn:hover{border-color:#1F5F4A}
+.cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:76px;border:2px solid transparent;border-radius:2px;padding:4px 2px;font-weight:700;font-size:21px;line-height:1;cursor:pointer;background:none}
+.cell small{font-size:13px;font-weight:600;color:#3E4B44;line-height:1}
+.cell:hover{border-color:#1F5F4A}
+.wd{font-size:13px;font-weight:700;color:#6B776F;text-align:center;padding:6px 0}
+.navbtn{width:48px;height:48px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.navbtn:hover{border-color:#1F5F4A}
+.preset{min-height:44px;padding:0 16px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;font-weight:700;font-size:15px;cursor:pointer}
+.preset:hover{border-color:#1F5F4A}
+.lg{display:flex;align-items:center;gap:8px;font-size:14px;color:#3E4B44}
+.lg i{width:18px;height:18px;border-radius:2px;display:inline-block}
+</style>
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+
+<div style="display:flex;flex-direction:column;min-height:400px">
+
+<!-- Hero with header on top -->
+<section style="position:relative;min-height:420px;background:#1E3A2F;display:flex;flex-direction:column">
+  <img src="assets/94582b10c29a7431c8ced47b9345bb6d.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,34,27,.72) 0%,rgba(18,34,27,.35) 55%,rgba(18,34,27,.15) 100%)"></div>
+
+  <header style="position:relative">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <a href="main.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff">
+        <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="#1F5F4A"></rect><path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA"></path></svg>
+        <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:700">Санатории Литвы</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+        <a class="navlink" href="results.html" style="color:#fff">Курорты</a><a class="navlink" href="rules.html" style="color:#fff">Как оплатить</a><a class="navlink" href="rules.html" style="color:#fff">Условия</a><a class="navlink" href="done.html" style="color:#fff">Контакты</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:16px">
+        <a href="tel:+37060000000" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-weight:800;font-size:18px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"></path></svg>+370&nbsp;600 00000</a>
+        <div style="position:relative"><select class="input" aria-label="Язык" style="padding:0 30px 0 12px;min-height:40px;width:auto;font-size:14px"><option>RU</option><option>LT</option><option>EN</option></select><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="position:absolute;right:10px;top:12px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg></div>
+      </div>
+    </div>
+  </header>
+
+  <div style="position:relative;max-width:1180px;margin:0 auto;padding:16px 24px 32px;width:100%;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:640px">
+      <h1 style="color:#fff;font-size:46px;line-height:1.1;text-wrap:pretty">Санаторное лечение и&nbsp;отдых в&nbsp;Литве</h1>
+      <p style="margin:0;color:#E6F0EA;font-size:19px;line-height:1.4">Выберите санаторий, сравните программы и забронируйте на русском языке.</p>
+      <p style="margin:0;color:#fff;font-size:16px;font-weight:600">Друскининкай · Бирштонас · Паланга · Аникщяй</p>
+    </div>
+
+    <form class="card" action="results.html" style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.18)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:12px;align-items:end">
+        <div style="display:flex;flex-direction:column;gap:5px"><label class="lbl" for="city">Курорт</label>
+          <div style="position:relative"><svg class="fieldico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><select id="city" class="input"><option>Друскининкай</option><option>Бирштонас</option><option>Паланга</option><option>Аникщяй</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="position:absolute;right:12px;top:16px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label class="lbl" for="datein">Заезд</label>
+          <div style="position:relative"><svg class="fieldico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18"></path></svg><button type="button" id="datein" class="input datebtn" onClick="{{openCal}}">{{inLabel}}</button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label class="lbl" for="dateout">Выезд</label>
+          <div style="position:relative"><svg class="fieldico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18"></path></svg><button type="button" id="dateout" class="input datebtn" onClick="{{openCal}}">{{outLabel}}</button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px"><label class="lbl" for="guests">Гости</label>
+          <div style="position:relative"><svg class="fieldico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg><select id="guests" class="input"><option>2 взрослых</option><option>1 взрослый</option><option>2 взрослых, 1 ребёнок</option><option>2 взрослых, 2 ребёнка</option><option>3 взрослых</option><option>4 взрослых</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="position:absolute;right:12px;top:16px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg></div>
+        </div>
+        <a class="btn btn-primary" href="results.html" style="min-height:50px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>Найти санаторий</a>
+      </div>
+      <div style="font-size:14px;color:#6B776F">{{nightsLabel}} · После поиска покажем полную стоимость за всех гостей.</div>
+    </form>
+  </div>
+</section>
+
+<!-- Three facts -->
+<section style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:4px 24px;display:flex;flex-wrap:wrap">
+    <div class="fact"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg>Помощь на русском</div>
+    <div class="fact"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01"></path></svg>Трансфер до санатория</div>
+    <div class="fact"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h20v12H2zM2 10h20M6 15h4"></path></svg>Аванс 1–10 %, остальное при заезде</div>
+  </div>
+</section>
+
+<!-- Resorts -->
+<section style="max-width:1180px;margin:0 auto;padding:36px 24px 10px;width:100%;display:flex;flex-direction:column;gap:16px">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h2 style="font-size:32px">Выберите курорт</h2>
+    <p style="margin:0;color:#3E4B44;font-size:16px">Лечение, природа или отдых у моря — найдите свой вариант.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px">
+    <a class="card resort" href="results.html"><img src="assets/80cbf81cb33b38c12f41d140c9e34ba7.jpg" alt=""><div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:700">Друскининкай</span><span style="color:#1F5F4A;font-size:20px">→</span></div><span style="font-size:14px;color:#3E4B44">Лечение и минеральные воды</span></div></a>
+    <a class="card resort" href="results.html"><img src="assets/ac9b1445a29a0df51e1bd45a8a203a39.jpg" alt=""><div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:700">Бирштонас</span><span style="color:#1F5F4A;font-size:20px">→</span></div><span style="font-size:14px;color:#3E4B44">Спокойный отдых у Немана</span></div></a>
+    <a class="card resort" href="results.html"><img src="assets/c4c4cd4bcaad10e81718df6ded79f624.jpg" alt=""><div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:700">Паланга</span><span style="color:#1F5F4A;font-size:20px">→</span></div><span style="font-size:14px;color:#3E4B44">Отдых у Балтийского моря</span></div></a>
+    <a class="card resort" href="results.html"><img src="assets/213618680529a455a08f4dc13b8abe7e.jpg" alt=""><div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:700">Аникщяй</span><span style="color:#1F5F4A;font-size:20px">→</span></div><span style="font-size:14px;color:#3E4B44">Природа и тишина</span></div></a>
+  </div>
+</section>
+
+<!-- Popular -->
+<section style="max-width:1180px;margin:0 auto;padding:30px 24px 10px;width:100%;display:flex;flex-direction:column;gap:16px">
+  <div style="display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <h2 style="font-size:32px">Популярные санатории</h2>
+      <p style="margin:0;color:#3E4B44;font-size:16px">Ориентировочные цены. Точную стоимость покажем после поиска.</p>
+    </div>
+    <a href="results.html" style="font-weight:700;font-size:16px">Все санатории →</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px">
+    <template data-for="{{hotels}}" data-as="h">
+      <article class="card hcard">
+        <img src="{{h.img}}" alt="{{h.name}}">
+        <div style="padding:12px 16px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><h3 style="font-size:19px">{{h.name}}</h3><span style="color:#B8860B;font-size:14px;letter-spacing:1px;white-space:nowrap">{{h.stars}}</span></div>
+          <div style="font-size:14px;color:#3E4B44;margin-top:-4px">{{h.sub}}</div>
+          <div class="feat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{h.f1d}}"></path></svg>{{h.f1}}</div>
+          <div class="feat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{h.f2d}}"></path></svg>{{h.f2}}</div>
+          <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;margin-top:6px">
+            <div style="display:flex;flex-direction:column;line-height:1.15"><span style="font-size:22px;font-weight:800">от {{h.price}}&nbsp;€</span><span style="font-size:13px;color:#6B776F">за человека в сутки</span></div>
+            <a class="btn btn-secondary" href="hotel.html" style="min-height:42px;font-size:15px;padding:0 16px">Посмотреть →</a>
+          </div>
+        </div>
+      </article>
+    </template>
+  </div>
+</section>
+
+<!-- Help band -->
+<section style="max-width:1180px;margin:30px auto 0;padding:0 24px;width:100%">
+  <div style="background:#EEF5F1;border:1px solid #C8DED3;border-radius:2px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:16px">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg>
+      <div style="display:flex;flex-direction:column;gap:2px"><div style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:700">Поможем выбрать санаторий</div><div style="font-size:15px;color:#3E4B44">Объясним программы, условия проживания и трансфера.</div></div>
+    </div>
+    <a class="btn btn-secondary" href="tel:+37060000000" style="min-height:48px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"></path></svg>+370&nbsp;600 00000</a>
+  </div>
+</section>
+
+<!-- Three steps -->
+<section style="max-width:1180px;margin:0 auto;padding:28px 24px 36px;width:100%;display:flex;flex-direction:column;gap:12px">
+  <h2 style="font-size:24px">Как забронировать — три шага</h2>
+  <div class="card" style="display:flex;flex-wrap:wrap">
+    <div class="step"><span class="num">1</span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h4"></path><circle cx="17" cy="17" r="3"></circle></svg><div style="display:flex;flex-direction:column"><strong style="font-size:15px">Выберите санаторий</strong><span style="font-size:13px;color:#3E4B44">Сравните программы и стоимость.</span></div></div>
+    <div class="step"><span class="num">2</span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M2 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3M15 21v-3a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v3"></path></svg><div style="display:flex;flex-direction:column"><strong style="font-size:15px">Укажите данные гостей</strong><span style="font-size:13px;color:#3E4B44">При необходимости добавьте трансфер.</span></div></div>
+    <div class="step"><span class="num">3</span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h20v12H2zM2 10h20M6 15h4"></path></svg><div style="display:flex;flex-direction:column"><strong style="font-size:15px">Оплатите аванс</strong><span style="font-size:13px;color:#3E4B44">Остаток — при заезде в санаторий.</span></div></div>
+  </div>
+</section>
+
+<footer style="background:#1C2620;color:#D9E2DC;margin-top:auto">
+  <div style="max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;font-size:14px">
+    <div style="display:flex;align-items:center;gap:10px;font-family:Lora,Georgia,serif;font-size:16px;font-weight:700;color:#fff"><svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="#1F5F4A"></rect><path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA"></path></svg>Санатории Литвы</div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap"><a href="done.html" style="color:#D9E2DC;text-decoration:none">Контакты</a><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Условия оплаты</a><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Отмена бронирования</a></div>
+    <div style="display:flex;gap:18px;align-items:center;font-weight:700;color:#fff">+370&nbsp;600 00000 <span style="font-weight:600;color:#D9E2DC">RU ▾</span></div>
+  </div>
+</footer>
+
+</div>
+
+<!-- Custom date-range calendar (two months, price colours) -->
+<template data-if="{{calOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto">
+  <div role="dialog" aria-modal="true" aria-labelledby="calTitle" style="background:#fff;border-radius:2px;width:min(820px,100%);display:flex;flex-direction:column;gap:18px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 id="calTitle" style="font-size:32px">Выберите даты поездки</h2>
+        <span style="font-size:17px;color:#3E4B44">{{calHint}}</span>
+      </div>
+      <button type="button" class="btn btn-secondary" onClick="{{closeCal}}" style="min-height:48px;font-size:16px;padding:0 18px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Закрыть</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <span style="font-size:15px;color:#3E4B44">Быстрый выбор:</span>
+      <button type="button" class="preset" onClick="{{p7}}">7 ночей</button>
+      <button type="button" class="preset" onClick="{{p10}}">10 ночей</button>
+      <button type="button" class="preset" onClick="{{p14}}">14 ночей</button>
+      <button type="button" class="preset" onClick="{{p21}}">21 ночь</button>
+      <span style="margin-left:auto;display:flex;gap:16px;flex-wrap:wrap">
+        <span class="lg"><i style="background:#E9F4EC;border:1px solid #C8DED3"></i>дешевле</span>
+        <span class="lg"><i style="background:#FFF6E3;border:1px solid #F0DDB8"></i>обычная цена</span>
+        <span class="lg"><i style="background:#FCEDE9;border:1px solid #F0CFC6"></i>дороже</span>
+        <span class="lg"><i style="background:#E8E6E1"></i>прошедшие дни</span>
+        <span class="lg"><i style="background:repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px);border:1px solid #CFC9BB"></i>нет свободных мест</span>
+        <details style="display:inline-block;font-size:14px;color:#3E4B44"><summary style="display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z"></path></svg><span><strong style="color:#1C2620">Рейсы из Израиля</strong> — вт, чт, вс</span><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid #1F5F4A;color:#1F5F4A;font-size:12px;font-weight:800">i</span></summary><div style="margin-top:8px;max-width:420px;background:#F4F1EA;border-radius:2px;padding:10px 12px;font-size:14px;line-height:1.45;color:#1C2620">Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].</div></details>
+      </span>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:16px">
+      <button type="button" class="navbtn" onClick="{{calPrev}}" aria-label="Предыдущие месяцы"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg></button>
+      <div style="flex:1;display:flex;flex-direction:column;gap:22px">
+        <template data-for="{{months}}" data-as="m">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:600;text-align:center">{{m.title}}</div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+              <div class="wd">Пн</div><div class="wd">Вт</div><div class="wd">Ср</div><div class="wd">Чт</div><div class="wd">Пт</div><div class="wd">Сб</div><div class="wd">Вс</div>
+              <template data-for="{{m.cells}}" data-as="c">
+                <button type="button" class="cell" onClick="{{c.pick}}" disabled="{{c.off}}" aria-label="{{c.aria}}" style="background:{{c.bg}};border-color:{{c.border}};color:{{c.color}};cursor:{{c.cursor}}"><span>{{c.day}}</span><small style="color:{{c.subColor}}">{{c.sub}}</small><template data-if="{{c.fly}}"><span style="position:absolute;top:4px;right:5px;line-height:0" title="Рейс из Израиля"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z"></path></svg></span></template></button>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+      <button type="button" class="navbtn" onClick="{{calNext}}" aria-label="Следующие месяцы"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></button>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:16px">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;flex-direction:column"><span class="lbl">Заезд</span><strong style="font-size:20px">{{selIn}}</strong></div>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        <div style="display:flex;flex-direction:column"><span class="lbl">Выезд</span><strong style="font-size:20px">{{selOut}}</strong></div>
+        <div style="display:flex;flex-direction:column"><span class="lbl">Итого</span><strong style="font-size:20px;color:#1F5F4A">{{selNights}}</strong></div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button type="button" class="btn btn-secondary" onClick="{{closeCal}}">Отмена</button>
+        <button type="button" class="btn btn-primary" onClick="{{applyCal}}" disabled="{{applyOff}}" style="min-height:56px;font-size:18px;padding:0 32px">Подтвердить даты</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<!-- Sticky help button + support pop-up (same on every page) -->
+<button type="button" onClick="{{helpOpenFn}}" aria-haspopup="dialog" style="position:fixed;right:24px;bottom:{{helpBottom}};z-index:40;display:flex;align-items:center;gap:10px;min-height:60px;padding:0 22px 0 16px;border:none;border-radius:30px;background:#1F5F4A;color:#fff;font:700 18px Manrope,'Segoe UI',Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(18,34,27,.35)">
+  <span style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+  Свяжитесь со мной
+</button>
+<template data-if="{{helpOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:70;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;font-family:Manrope,'Segoe UI',Arial,sans-serif;color:#1C2620">
+  <div role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="background:#fff;border-radius:2px;width:min(720px,100%);display:flex;flex-direction:column;gap:18px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <span style="width:52px;height:52px;border-radius:50%;background:#EEF5F1;display:flex;align-items:center;justify-content:center;flex:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:2px"><h2 id="helpTitle" style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:600;margin:0;line-height:1.2">Свяжитесь со мной</h2><span style="font-size:16px;color:#3E4B44">Ответим на русском в течение 2 часов (9:00–20:00)</span></div>
+      </div>
+      <button type="button" onClick="{{helpCloseFn}}" aria-label="Закрыть" style="width:48px;height:48px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C2620" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+
+    <template data-if="{{helpForm}}">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Имя</span><input type="text" placeholder="Например: Михаил" autocomplete="name" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">E-mail</span><input type="email" placeholder="name@gmail.com" autocomplete="email" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Телефон</span>
+        <span style="display:flex;gap:8px"><select aria-label="Код страны" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:700 17px Manrope,sans-serif;background:#fff;flex:none;width:170px"><option>+972 · Израиль</option><option>+370 · Литва</option><option>+1 · США</option><option>+49 · Германия</option><option>+7 · Россия</option><option>+380 · Украина</option></select><input type="tel" inputmode="numeric" placeholder="50 123 4567" autocomplete="tel-national" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></span>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Ваш вопрос</span><textarea rows="3" placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?" style="min-height:100px;border:2px solid #CFC9BB;border-radius:2px;padding:12px 16px;font:500 17px Manrope,sans-serif;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+
+      <div style="display:flex;flex-direction:column;gap:12px;background:#F7F5F0;border:1px solid #E3DED2;border-radius:2px;padding:14px 16px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:16px">Если уже знаете — так мы поможем быстрее</strong><span style="font-size:14px;color:#6B776F">не обязательно</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Заезд, примерно</span><input type="date" value="{{helpIn}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Выезд, примерно</span><input type="date" value="{{helpOut}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1"><span style="font-weight:700;font-size:15px;color:#3E4B44">Куда хотите поехать</span>
+            <select style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;background:#fff">
+              <template data-for="{{helpDests}}" data-as="hd"><option value="{{hd.v}}" selected="{{hd.sel}}">{{hd.t}}</option></template>
+            </select>
+          </label>
+        </div>
+        <template data-if="{{helpPrefilled}}"><span style="font-size:14px;color:#1F5F4A;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>Заполнили по вашему поиску — можно изменить</span></template>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <span style="font-size:14px;color:#6B776F;max-width:340px">Нужно указать имя и телефон или e-mail. Данные используем только для ответа.</span>
+        <button type="button" onClick="{{helpSendFn}}" style="min-height:58px;padding:0 30px;border:none;border-radius:2px;background:#1F5F4A;color:#fff;font:700 19px Manrope,sans-serif;cursor:pointer">Отправить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:14px;font-size:16px">
+        <span style="color:#3E4B44">Или сразу:</span>
+        <a href="https://wa.me/37060000000" style="font-weight:700;color:#1F5F4A">WhatsApp</a>
+        <a href="tel:+37060000000" style="font-weight:700;color:#1F5F4A;white-space:nowrap">+370&nbsp;600 00000</a>
+      </div>
+    </div>
+    </template>
+
+    <template data-if="{{helpSent}}">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 4px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#1F5F4A;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></span>
+      <strong style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:600">Спасибо! Мы скоро свяжемся с вами</strong>
+      <span style="font-size:17px;color:#3E4B44">Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.</span>
+      <button type="button" onClick="{{helpCloseFn}}" style="min-height:54px;padding:0 26px;border:2px solid #1F5F4A;border-radius:2px;background:#fff;color:#1F5F4A;font:700 18px Manrope,sans-serif;cursor:pointer">Вернуться</button>
+    </div>
+    </template>
+  </div>
+</div>
+</template>
+</template>
+<script src="dc-lite.js"></script>
+<script>
+class Component extends DCLogic {
+  renderVals() {
+    return { ...this._rv(), ...this.helpVals() };
+  }
+  // ---- Support pop-up: same on every page; dates/destination prefilled from the page when known ----
+  helpVals() {
+    const st = this.state || {};
+    const CTX = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
+    const iso = d => d.toISOString().slice(0, 10);
+    let hin = st.in || st.checkin || CTX.in || '', hout = st.out || CTX.out || '';
+    if (!st.out && st.checkin) { const d = new Date(st.checkin + 'T00:00:00Z'); hout = iso(new Date(d.getTime() + (st.nights || 9) * 86400000)); }
+    const DEST = [['', 'Ещё не знаю — подскажите'], ['druskininkai', 'Друскининкай'], ['birstonas', 'Бирштонас'], ['palanga', 'Паланга'], ['anyksciai', 'Аникщяй']];
+    if (CTX.hotel) DEST.splice(2, 0, ['hotel', CTX.hotel]);
+    const sel = CTX.hotel ? 'hotel' : (CTX.dest || '');
+    const hs = st.help || 'closed';
+    return {
+      helpOpen: hs !== 'closed', helpForm: hs === 'form', helpSent: hs === 'sent',
+      helpOpenFn: () => this.setState({ help: 'form' }), helpCloseFn: () => this.setState({ help: 'closed' }), helpSendFn: () => this.setState({ help: 'sent' }),
+      helpIn: hin, helpOut: hout, helpPrefilled: !!(hin || sel),
+      helpDests: DEST.map(([v, t]) => ({ v, t, sel: v === sel })),
+      helpBottom: CTX.bottom || '24px'
+    };
+  }
+  _rv() {
+    const DOC = 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4';
+    const POOL = 'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6';
+    const MEAL = 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8';
+    const hotels = [
+      { name: 'Эгле Комфорт', stars: '★★★★', sub: 'Друскининкай · 26 отзывов', img: 'assets/1efd1efc34d4137ff98a8658a068afc5.jpg', f1: 'Врач и лечебные программы', f1d: DOC, f2: 'Бассейны и сауны', f2d: POOL, price: 106 },
+      { name: 'Гранд Спа Лиетува', stars: '★★★★', sub: 'Друскининкай · 20 отзывов', img: 'assets/a77ef961b37e1edf9b38716a5c54a79f.jpg', f1: 'Врач и лечебные программы', f1d: DOC, f2: 'Бассейны и бани', f2d: POOL, price: 90 },
+      { name: 'Градиали', stars: '★★★★', sub: 'Паланга · 17 отзывов', img: 'assets/983aebb39738d3905bb5383746fb9356.jpg', f1: 'Врач и лечебные программы', f1d: DOC, f2: 'Бассейн и SPA', f2d: POOL, price: 106 },
+      { name: 'Беларусь', stars: '★★★', sub: 'Друскининкай · 17 отзывов', img: 'assets/405a6bd8cba041318eac2ff89e9e9806.jpg', f1: 'Врач и лечебные программы', f1d: DOC, f2: 'Питание включено', f2d: MEAL, price: 90 },
+      { name: 'Эгле Комфорт Бирштонас', stars: '', sub: 'Бирштонас · 35 отзывов', img: 'assets/226796cc08c3c360c4ac718f6a4c433f.jpg', f1: 'Врач и лечебные программы', f1d: DOC, f2: 'Бассейны и сауны', f2d: POOL, price: 119 },
+      { name: 'Минерал SPA Драугисте', stars: '', sub: 'Друскининкай · 5 отзывов', img: 'assets/a3e6585f5dd9cb9a1b6daa1d5c50ff22.jpg', f1: 'Питание включено', f1d: MEAL, f2: 'Бассейн и бани', f2d: POOL, price: 107 }
+    ];
+    // ---- Custom two-month range calendar with price colours ----
+    const st = this.state || {};
+    const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const MONTHS_N = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    const DAY = 86400000;
+    const toD = s => new Date(s + 'T00:00:00Z');
+    const iso = d => d.toISOString().slice(0, 10);
+    const addD = (d, n) => new Date(d.getTime() + n * DAY);
+    const TODAY = toD('2026-10-27');
+    const long = d => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+    const short = d => d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()];
+    const nightsWord = n => (n % 10 === 1 && n % 100 !== 11) ? 'ночь' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'ночи' : 'ночей';
+    const inD = toD(st.in || '2026-11-09'), outD = toD(st.out || '2026-11-18');
+    const sel = st.sel || { in: iso(inD), out: iso(outD) };
+    const sIn = sel.in ? toD(sel.in) : null, sOut = sel.out ? toD(sel.out) : null;
+    // Average price per person per night across the resort — synthetic season curve [ЗАМЕНИТЬ НА РЕАЛЬНЫЕ ТАРИФЫ]
+    const BASE = 100;
+    const dayIdx = d => Math.round((d - TODAY) / DAY);
+    const priceOf = d => { const n = dayIdx(d), wd = d.getUTCDay(), m = d.getUTCMonth(); return Math.round(BASE * (1 + 0.12 * Math.sin(n * 0.42) + ((wd === 5 || wd === 6) ? 0.06 : 0) + (m === 11 && d.getUTCDate() > 20 ? 0.22 : 0) + (m >= 5 && m <= 7 ? 0.15 : 0) + (m === 0 && d.getUTCDate() < 8 ? 0.18 : 0))); };
+    const m0 = st.month ?? inD.getUTCMonth(), y0 = st.year ?? inD.getUTCFullYear();
+    const pickDay = date => () => {
+      const k = iso(date);
+      if (!sel.in || (sel.in && sel.out)) this.setState({ sel: { in: k, out: null } });
+      else if (date > toD(sel.in)) this.setState({ sel: { in: sel.in, out: k } });
+      else this.setState({ sel: { in: k, out: null } });
+    };
+    const monthCells = (y, m) => {
+      const first = new Date(Date.UTC(y, m, 1));
+      const lead = (first.getUTCDay() + 6) % 7;
+      const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+      const cells = [];
+      for (let i = 0; i < lead; i++) cells.push({ day: '', fly: false, sub: '', bg: 'transparent', border: 'transparent', color: '#1C2620', subColor: '#3E4B44', off: true, cursor: 'default', aria: '', pick: () => {} });
+      for (let d = 1; d <= days; d++) {
+        const date = new Date(Date.UTC(y, m, d));
+        const past = date < TODAY; const full = !past && ['2026-11-20', '2026-11-21', '2026-11-22', '2026-12-24', '2026-12-25', '2026-12-26', '2026-12-27', '2026-12-31', '2027-01-01'].includes(iso(date)); /* [ПРИМЕР] нет мест ни в одном объекте */
+        const p = priceOf(date), r = p / BASE;
+        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9';
+        let color = '#1C2620', subColor = '#3E4B44', border = 'transparent';
+        const isIn = sIn && iso(date) === iso(sIn), isOut = sOut && iso(date) === iso(sOut);
+        const between = sIn && sOut && date > sIn && date < sOut;
+        if (past) { bg = '#E8E6E1'; color = '#9AA39E'; subColor = '#9AA39E'; }
+        if (full) { bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)'; color = '#8A968F'; subColor = '#8A5A00'; }
+        if (between) border = '#1F5F4A';
+        if (isIn || isOut) { bg = '#1F5F4A'; color = '#fff'; subColor = '#D9E2DC'; border = '#1F5F4A'; }
+        cells.push({ day: d, fly: [0, 2, 4].includes(date.getUTCDay()) && !(typeof past !== 'undefined' && past), sub: past ? '' : full ? 'нет мест' : (isIn ? 'заезд' : isOut ? 'выезд' : p + '\u00a0€'), bg, border, color, subColor, off: past || full, cursor: (past || full) ? 'not-allowed' : 'pointer',
+          aria: d + ' ' + MONTHS[m] + (past ? ', недоступно' : ', около ' + p + '\u00a0€ за человека в сутки'), pick: pickDay(date) });
+      }
+      return cells;
+    };
+    const m1 = (m0 + 1) % 12, y1 = m0 === 11 ? y0 + 1 : y0;
+    const months = [{ title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) }, { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) }];
+    const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
+    const preset = n => () => { const i = sIn || inD; this.setState({ sel: { in: iso(i), out: iso(addD(i, n)) } }); };
+    const curNights = Math.round((outD - inD) / DAY);
+    return {
+      hotels,
+      inLabel: long(inD), outLabel: long(outD), nightsLabel: curNights + ' ' + nightsWord(curNights),
+      calOpen: !!st.calOpen,
+      openCal: () => this.setState({ calOpen: true, sel: { in: iso(inD), out: iso(outD) }, month: inD.getUTCMonth(), year: inD.getUTCFullYear() }),
+      closeCal: () => this.setState({ calOpen: false }),
+      calPrev: () => { const m = m0 - 1; this.setState({ month: (m + 12) % 12, year: m < 0 ? y0 - 1 : y0 }); },
+      calNext: () => { const m = m0 + 1; this.setState({ month: m % 12, year: m > 11 ? y0 + 1 : y0 }); },
+      months,
+      calHint: !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
+      selIn: sIn ? short(sIn) : '—', selOut: sOut ? short(sOut) : '—', selNights: nights ? nights + ' ' + nightsWord(nights) : '—',
+      applyOff: !(sIn && sOut),
+      applyCal: () => { if (sIn && sOut) this.setState({ in: iso(sIn), out: iso(sOut), calOpen: false }); },
+      p7: preset(7), p10: preset(10), p14: preset(14), p21: preset(21)
+    };
+  }
+}
+DC.mount(Component);
+</script>
+</body>
+</html>

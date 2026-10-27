@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Условия бронирования, оплаты и отмены</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+body{margin:0;background:#F4F1EA;color:#1C2620;font-family:Manrope,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.55}
+*{box-sizing:border-box}
+a{color:#1F5F4A}a:hover{color:#143F31}
+h1,h2,h3{font-family:Lora,Georgia,"Times New Roman",serif;margin:0;line-height:1.2;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 28px;border-radius:2px;font-weight:700;font-size:19px;cursor:pointer;text-decoration:none;border:2px solid transparent;white-space:nowrap}
+.btn-primary{background:#1F5F4A;color:#fff}.btn-primary:hover{background:#174B3A;color:#fff}
+.btn-secondary{background:#fff;color:#1F5F4A;border-color:#1F5F4A}.btn-secondary:hover{background:#EEF5F1;color:#143F31}
+.card{background:#fff;border:1px solid #E3DED2;border-radius:3px}
+.navlink{text-decoration:none;color:#1C2620;font-weight:600;font-size:17px}
+.navlink:hover{color:#1F5F4A}
+.toc a{display:block;padding:10px 14px;border-radius:2px;text-decoration:none;font-weight:700;font-size:17px;color:#1C2620}
+.toc a:hover{background:#EEF5F1;color:#1F5F4A}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px 24px;padding:14px 0;border-top:1px solid #E3DED2;align-items:start}
+.row b{font-size:18px}
+.ph{background:#FFF1D6;color:#8A5A00;font-weight:800;padding:2px 8px;border-radius:2px}
+p{margin:0}
+</style>
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+
+<div style="display:flex;flex-direction:column;min-height:400px">
+
+<header style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:0 24px;min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <a href="main.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#1C2620">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="#1F5F4A"></rect><path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA"></path></svg>
+      <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:700">Санатории Литвы</span>
+    </a>
+    <nav style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+      <a class="navlink" href="results.html">Курорты</a>
+      <a class="navlink" href="rules.html">Как оплатить</a>
+      <a class="navlink" href="rules.html" style="color:#1F5F4A">Условия</a>
+      <a class="navlink" href="done.html">Контакты</a>
+    </nav>
+    <a href="tel:+37060000000" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#1C2620;font-weight:800;font-size:20px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"></path></svg>
+      +370&nbsp;600 00000
+    </a>
+  </div>
+</header>
+
+<div style="max-width:1180px;margin:0 auto;padding:32px 24px 56px;width:100%;display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:800px">
+    <div style="font-size:16px;color:#3E4B44"><a href="main.html">Главная</a> › Условия</div>
+    <h1 style="font-size:40px">Условия бронирования, оплаты и отмены</h1>
+    <p style="color:#3E4B44;font-size:19px">Простыми словами — что происходит после заказа, сколько и когда платить, и что будет, если планы изменятся.</p>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:start">
+    <aside class="card toc" style="flex:1 1 240px;max-width:300px;padding:12px;position:sticky;top:16px">
+      <a href="rules.html#how">1. Как проходит заказ</a>
+      <a href="rules.html#pay">2. Оплата</a>
+      <a href="rules.html#cancel">3. Отмена и перенос</a>
+      <a href="rules.html#stay">4. Заезд и проживание</a>
+      <a href="rules.html#data">5. Ваши данные</a>
+      <a href="rules.html#contact">6. Как с нами связаться</a>
+    </aside>
+
+    <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px">
+
+      <section id="how" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px">
+        <h2 style="font-size:26px">1. Как проходит заказ</h2>
+        <div style="display:flex;flex-direction:column">
+          <div class="row" style="border-top:none"><b>Вы оформляете заказ</b><p>Выбираете санаторий, номер, даты, трансфер и вводите имена гостей. Это занимает 5–7 минут.</p></div>
+          <div class="row"><b>Мы подтверждаем места</b><p>В течение <span class="ph">[N часов]</span> проверяем наличие в санатории и присылаем подтверждение на почту и в WhatsApp.</p></div>
+          <div class="row"><b>Вы оплачиваете аванс</b><p>Картой на сайте или банковским переводом. После оплаты номер закреплён за вами.</p></div>
+          <div class="row"><b>Ваучер и памятка</b><p>За <span class="ph">[N дней]</span> до заезда присылаем ваучер, адрес санатория, время трансфера и памятку: что взять с собой.</p></div>
+        </div>
+      </section>
+
+      <section id="pay" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px">
+        <h2 style="font-size:26px">2. Оплата</h2>
+        <div style="display:flex;flex-direction:column">
+          <div class="row" style="border-top:none"><b>Аванс</b><p>Минимальный аванс — 4 % стоимости бронирования (проживание и программа), округляется до евро. Этого достаточно, чтобы санаторий подтвердил бронь. Точная сумма показана перед оплатой; можно сразу оплатить всю сумму.</p></div>
+          <div class="row"><b>Остаток</b><p>Оплачивается в санатории при заезде: наличными (евро), банковской картой или переводом заранее.</p></div>
+          <div class="row"><b>Карты</b><p>Visa, Mastercard, Maestro любого банка, включая банки Израиля. Платёж проходит через Paysera; данные карты мы не видим.</p></div>
+          <div class="row"><b>Валюта</b><p>Все цены в евро. Ваш банк конвертирует по своему курсу на день оплаты.</p></div>
+          <div class="row"><b>Почему цены ниже</b><p>Работаем с санаториями напрямую и получаем партнёрские тарифы. Цена на сайте — окончательная, без сборов за бронирование.</p></div>
+        </div>
+      </section>
+
+      <section id="cancel" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px;border:2px solid #1F5F4A">
+        <h2 style="font-size:26px">3. Отмена и перенос</h2>
+        <p style="color:#3E4B44">Сроки считаются от даты заезда. Отменить или перенести можно одним звонком или сообщением.</p>
+        <div style="display:flex;flex-direction:column">
+          <div class="row" style="border-top:none"><b>За <span class="ph">[N]</span> дней и раньше</b><p><strong>Бесплатно.</strong> Аванс возвращаем на ту же карту или счёт в течение 5 рабочих дней.</p></div>
+          <div class="row"><b>Менее чем за <span class="ph">[N]</span> дней</b><p>Аванс не возвращается. Остальную сумму вы не платите, других штрафов нет.</p></div>
+          <div class="row"><b>Незаезд без предупреждения</b><p>Аванс не возвращается. Санаторий может удержать стоимость <span class="ph">[первых суток]</span> при полной предоплате.</p></div>
+          <div class="row"><b>Перенос дат</b><p>Бесплатно при наличии мест. Если новый период дороже — доплата по разнице, если дешевле — разницу вернём.</p></div>
+          <div class="row"><b>Болезнь или форс-мажор</b><p>С медицинской справкой аванс возвращаем полностью в любой срок. Рекомендуем оформить страховку отмены поездки.</p></div>
+          <div class="row"><b>Досрочный выезд</b><p>Неиспользованные дни санаторий возвращает по своим правилам — <span class="ph">[уточнить по санаториям]</span>. Поможем договориться.</p></div>
+        </div>
+      </section>
+
+      <section id="stay" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px">
+        <h2 style="font-size:26px">4. Заезд и проживание</h2>
+        <div style="display:flex;flex-direction:column">
+          <div class="row" style="border-top:none"><b>Заезд и выезд</b><p>Заезд с 14:00, выезд до 12:00. Если приезжаете рано — багаж примут на хранение, можно сразу пойти на обед.</p></div>
+          <div class="row"><b>Документы</b><p>Паспорт каждого гостя. Для лечения — желательно выписка от врача или список принимаемых лекарств.</p></div>
+          <div class="row"><b>Первый день лечения</b><p>Консультация врача санатория в день приезда; процедуры назначаются с первого полного дня. День приезда и день отъезда считаются одним лечебным днём.</p></div>
+          <div class="row"><b>Питание</b><p>Шведский стол. Диетические и кошерные варианты — по предварительной просьбе в заказе.</p></div>
+        </div>
+      </section>
+
+      <section id="data" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px">
+        <h2 style="font-size:26px">5. Ваши данные</h2>
+        <p>Имена, даты рождения и контакты гостей передаём только санаторию и перевозчику — для регистрации, лечения и трансфера. Храним их <span class="ph">[срок]</span> и удаляем по вашей просьбе. Данные карт не храним.</p>
+      </section>
+
+      <section id="contact" class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:14px;background:#EEF5F1;border-color:#C8DED3">
+        <h2 style="font-size:26px">6. Как с нами связаться</h2>
+        <p>Отвечаем на русском языке круглосуточно. Звоните, пишите в WhatsApp или на почту.</p>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="tel:+37060000000">+370&nbsp;600 00000</a>
+          <a class="btn btn-secondary" href="tel:+37060000001">+370&nbsp;600 00001</a>
+          <a class="btn btn-secondary" href="mailto:[EMAIL]">[EMAIL]</a>
+        </div>
+      </section>
+
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <a class="btn btn-secondary" href="payment.html">← Вернуться к оплате</a>
+        <a class="btn btn-primary" href="main.html">На главную</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:#1C2620;color:#D9E2DC;margin-top:auto">
+  <div style="max-width:1180px;margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:16px">
+    <div>Санатории Литвы · консультация на русском 24/7 · WhatsApp +370&nbsp;600 00000</div>
+    <div>© 2026</div>
+  </div>
+</footer>
+
+</div>
+
+<!-- Sticky help button + support pop-up (same on every page) -->
+<button type="button" onClick="{{helpOpenFn}}" aria-haspopup="dialog" style="position:fixed;right:24px;bottom:{{helpBottom}};z-index:40;display:flex;align-items:center;gap:10px;min-height:60px;padding:0 22px 0 16px;border:none;border-radius:30px;background:#1F5F4A;color:#fff;font:700 18px Manrope,'Segoe UI',Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(18,34,27,.35)">
+  <span style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+  Свяжитесь со мной
+</button>
+<template data-if="{{helpOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:70;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;font-family:Manrope,'Segoe UI',Arial,sans-serif;color:#1C2620">
+  <div role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="background:#fff;border-radius:2px;width:min(720px,100%);display:flex;flex-direction:column;gap:18px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <span style="width:52px;height:52px;border-radius:50%;background:#EEF5F1;display:flex;align-items:center;justify-content:center;flex:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:2px"><h2 id="helpTitle" style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:600;margin:0;line-height:1.2">Свяжитесь со мной</h2><span style="font-size:16px;color:#3E4B44">Ответим на русском в течение 2 часов (9:00–20:00)</span></div>
+      </div>
+      <button type="button" onClick="{{helpCloseFn}}" aria-label="Закрыть" style="width:48px;height:48px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C2620" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+
+    <template data-if="{{helpForm}}">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Имя</span><input type="text" placeholder="Например: Михаил" autocomplete="name" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">E-mail</span><input type="email" placeholder="name@gmail.com" autocomplete="email" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Телефон</span>
+        <span style="display:flex;gap:8px"><select aria-label="Код страны" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:700 17px Manrope,sans-serif;background:#fff;flex:none;width:170px"><option>+972 · Израиль</option><option>+370 · Литва</option><option>+1 · США</option><option>+49 · Германия</option><option>+7 · Россия</option><option>+380 · Украина</option></select><input type="tel" inputmode="numeric" placeholder="50 123 4567" autocomplete="tel-national" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></span>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Ваш вопрос</span><textarea rows="3" placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?" style="min-height:100px;border:2px solid #CFC9BB;border-radius:2px;padding:12px 16px;font:500 17px Manrope,sans-serif;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+
+      <div style="display:flex;flex-direction:column;gap:12px;background:#F7F5F0;border:1px solid #E3DED2;border-radius:2px;padding:14px 16px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:16px">Если уже знаете — так мы поможем быстрее</strong><span style="font-size:14px;color:#6B776F">не обязательно</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Заезд, примерно</span><input type="date" value="{{helpIn}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Выезд, примерно</span><input type="date" value="{{helpOut}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1"><span style="font-weight:700;font-size:15px;color:#3E4B44">Куда хотите поехать</span>
+            <select style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;background:#fff">
+              <template data-for="{{helpDests}}" data-as="hd"><option value="{{hd.v}}" selected="{{hd.sel}}">{{hd.t}}</option></template>
+            </select>
+          </label>
+        </div>
+        <template data-if="{{helpPrefilled}}"><span style="font-size:14px;color:#1F5F4A;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>Заполнили по вашему поиску — можно изменить</span></template>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <span style="font-size:14px;color:#6B776F;max-width:340px">Нужно указать имя и телефон или e-mail. Данные используем только для ответа.</span>
+        <button type="button" onClick="{{helpSendFn}}" style="min-height:58px;padding:0 30px;border:none;border-radius:2px;background:#1F5F4A;color:#fff;font:700 19px Manrope,sans-serif;cursor:pointer">Отправить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:14px;font-size:16px">
+        <span style="color:#3E4B44">Или сразу:</span>
+        <a href="https://wa.me/37060000000" style="font-weight:700;color:#1F5F4A">WhatsApp</a>
+        <a href="tel:+37060000000" style="font-weight:700;color:#1F5F4A;white-space:nowrap">+370&nbsp;600 00000</a>
+      </div>
+    </div>
+    </template>
+
+    <template data-if="{{helpSent}}">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 4px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#1F5F4A;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></span>
+      <strong style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:600">Спасибо! Мы скоро свяжемся с вами</strong>
+      <span style="font-size:17px;color:#3E4B44">Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.</span>
+      <button type="button" onClick="{{helpCloseFn}}" style="min-height:54px;padding:0 26px;border:2px solid #1F5F4A;border-radius:2px;background:#fff;color:#1F5F4A;font:700 18px Manrope,sans-serif;cursor:pointer">Вернуться</button>
+    </div>
+    </template>
+  </div>
+</div>
+</template>
+</template>
+<script src="dc-lite.js"></script>
+<script>
+class Component extends DCLogic {
+  renderVals() {
+    return { ...this._rv(), ...this.helpVals() };
+  }
+  // ---- Support pop-up: same on every page; dates/destination prefilled from the page when known ----
+  helpVals() {
+    const st = this.state || {};
+    const CTX = {};
+    const iso = d => d.toISOString().slice(0, 10);
+    let hin = st.in || st.checkin || CTX.in || '', hout = st.out || CTX.out || '';
+    if (!st.out && st.checkin) { const d = new Date(st.checkin + 'T00:00:00Z'); hout = iso(new Date(d.getTime() + (st.nights || 9) * 86400000)); }
+    const DEST = [['', 'Ещё не знаю — подскажите'], ['druskininkai', 'Друскининкай'], ['birstonas', 'Бирштонас'], ['palanga', 'Паланга'], ['anyksciai', 'Аникщяй']];
+    if (CTX.hotel) DEST.splice(2, 0, ['hotel', CTX.hotel]);
+    const sel = CTX.hotel ? 'hotel' : (CTX.dest || '');
+    const hs = st.help || 'closed';
+    return {
+      helpOpen: hs !== 'closed', helpForm: hs === 'form', helpSent: hs === 'sent',
+      helpOpenFn: () => this.setState({ help: 'form' }), helpCloseFn: () => this.setState({ help: 'closed' }), helpSendFn: () => this.setState({ help: 'sent' }),
+      helpIn: hin, helpOut: hout, helpPrefilled: !!(hin || sel),
+      helpDests: DEST.map(([v, t]) => ({ v, t, sel: v === sel })),
+      helpBottom: CTX.bottom || '24px'
+    };
+  }
+  _rv() {
+    return {};
+  }
+}
+DC.mount(Component);
+</script>
+</body>
+</html>
