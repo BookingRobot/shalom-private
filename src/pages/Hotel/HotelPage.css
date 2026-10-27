@@ -1,0 +1,233 @@
+.pg-hotel {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.pg-hotel input,
+.pg-hotel select,
+.pg-hotel button,
+.pg-hotel textarea {
+  font: inherit;
+  color: inherit;
+}
+.pg-hotel .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 19px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-hotel .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-hotel .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-hotel .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-hotel .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-hotel .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 3px;
+}
+.pg-hotel .thumb {
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #2b3a33;
+  cursor: pointer;
+  min-height: 44px;
+}
+.pg-hotel .thumb img {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+.pg-hotel .thumb.on {
+  border-color: #1f5f4a;
+}
+.pg-hotel .ico {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #1c2620;
+}
+.pg-hotel .ico svg {
+  flex: none;
+}
+.pg-hotel .tab {
+  padding: 12px 4px;
+  font-weight: 700;
+  font-size: 17px;
+  color: #3e4b44;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.pg-hotel .tab.on {
+  color: #1f5f4a;
+  border-bottom-color: #1f5f4a;
+}
+.pg-hotel .fact {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-hotel .acc {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f5f4a;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  min-height: 44px;
+  text-align: left;
+}
+.pg-hotel .acc:hover {
+  text-decoration: underline;
+}
+.pg-hotel .detail {
+  font-size: 16px;
+  color: #1c2620;
+  white-space: pre-line;
+  padding: 4px 0 8px 32px;
+}
+.pg-hotel .chk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.pg-hotel .chk input {
+  width: 24px;
+  height: 24px;
+  accent-color: #1f5f4a;
+  margin: 0;
+  flex: none;
+}
+
+.pg-hotel .pill {
+  display: inline-flex;
+  align-items: center;
+  background: #eef5f1;
+  color: #1f5f4a;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: 2px;
+}
+.pg-hotel .fact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: #3e4b44;
+}
+.pg-hotel .ico2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #1c2620;
+  line-height: 1.2;
+}
+.pg-hotel .strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c2620;
+  padding: 14px 18px;
+  flex: 1 1 220px;
+  justify-content: center;
+}
+.pg-hotel .strip + .strip {
+  border-left: 1px solid #c8ded3;
+}
+.pg-hotel .accrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+  padding: 12px 18px;
+  min-height: 52px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+}
+.pg-hotel .accrow:hover {
+  border-color: #1f5f4a;
+}
+.pg-hotel .srow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+}
+.pg-hotel .lbl {
+  font-weight: 700;
+  font-size: 15px;
+  color: #3e4b44;
+}
+.pg-hotel .preset {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 2px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+.pg-hotel .preset:hover {
+  border-color: #1f5f4a;
+}
+.pg-hotel .lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-hotel .lg i {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  display: inline-block;
+}

@@ -1,0 +1,48 @@
+.months-calendar .cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 76px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  padding: 4px 2px;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  background: none;
+}
+.months-calendar .cell small {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3e4b44;
+  line-height: 1;
+}
+.months-calendar .cell:hover {
+  border-color: #1f5f4a;
+}
+.months-calendar .wd {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5e6862;
+  text-align: center;
+  padding: 6px 0;
+}
+.months-calendar .navbtn {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.months-calendar .navbtn:hover {
+  border-color: #1f5f4a;
+}

@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Шаг 1 из 3 — трансфер</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+body{margin:0;background:#F4F1EA;color:#1C2620;font-family:Manrope,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.5}
+*{box-sizing:border-box}
+a{color:#1F5F4A}a:hover{color:#143F31}
+h1,h2,h3{font-family:Lora,Georgia,"Times New Roman",serif;margin:0;line-height:1.2;font-weight:600}
+input,select,button,textarea{font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 28px;border-radius:2px;font-weight:700;font-size:19px;cursor:pointer;text-decoration:none;border:2px solid transparent;white-space:nowrap}
+.btn-primary{background:#1F5F4A;color:#fff}.btn-primary:hover{background:#174B3A;color:#fff}
+.btn-secondary{background:#fff;color:#1F5F4A;border-color:#1F5F4A}.btn-secondary:hover{background:#EEF5F1;color:#143F31}
+.input{min-height:56px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;background:#fff;font-size:18px;width:100%;appearance:none;-webkit-appearance:none}
+.input:focus{outline:3px solid #9CC9B5;border-color:#1F5F4A}
+.lbl{font-weight:700;font-size:16px;color:#3E4B44}
+.card{background:#fff;border:1px solid #E3DED2;border-radius:3px}
+.choice{display:flex;align-items:center;gap:16px;padding:18px 20px;border:2px solid #CFC9BB;border-radius:3px;background:#fff;cursor:pointer;text-align:left;width:100%;min-height:64px;font-size:18px}
+.choice:hover{border-color:#1F5F4A}
+.choice.on{border-color:#1F5F4A;background:#EEF5F1;box-shadow:inset 0 0 0 1px #1F5F4A}
+.radio{width:28px;height:28px;border-radius:2px;border:2px solid #8A968F;flex:none;display:flex;align-items:center;justify-content:center;background:#fff}
+.radio.on{border-color:#1F5F4A}
+.radio.on i{display:block;width:14px;height:14px;border-radius:2px;background:#1F5F4A}
+.acc{background:none;border:none;padding:0;display:flex;align-items:center;gap:8px;color:#1F5F4A;font-weight:700;cursor:pointer;text-align:left}
+.acc:hover{text-decoration:underline}
+.step{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#6B776F}
+.step .num{width:36px;height:36px;border-radius:2px;border:2px solid #CFC9BB;display:flex;align-items:center;justify-content:center;font-weight:800;background:#fff}
+.step.on{color:#1F5F4A}.step.on .num{background:#1F5F4A;border-color:#1F5F4A;color:#fff}
+.step.done{color:#1C2620}.step.done .num{background:#EEF5F1;border-color:#1F5F4A;color:#1F5F4A}
+</style>
+</head>
+<body>
+<div id="dc-root"></div>
+<template id="dc-tpl">
+
+
+<div style="display:flex;flex-direction:column;min-height:400px">
+
+<header style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:0 24px;min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <a href="main.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#1C2620">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="#1F5F4A"></rect><path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA"></path></svg>
+      <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:700">Санатории Литвы</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <span style="font-size:16px;color:#3E4B44">Нужна помощь с заказом?</span>
+      <a href="tel:+37060000000" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#1C2620;font-weight:800;font-size:20px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"></path></svg>
+        +370&nbsp;600 00000
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Steps -->
+<div style="background:#fff;border-bottom:1px solid #E3DED2">
+  <div style="max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <div class="step done"><span class="num">✓</span>Номер</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step on"><span class="num">2</span>Трансфер</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step"><span class="num">3</span>Гости</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step"><span class="num">4</span>Рейсы</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step"><span class="num">5</span>Оплата</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CFC9BB" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    <div class="step" style="gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A968F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg>Готово</div>
+    </div>
+</div>
+
+<div style="max-width:1180px;margin:0 auto;padding:32px 24px 56px;width:100%;display:flex;flex-wrap:wrap;gap:24px;align-items:start">
+
+  <!-- Main column -->
+  <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h1 style="font-size:36px">Нужен ли вам трансфер до санатория?</h1>
+      <p style="margin:0;color:#3E4B44;font-size:18px">Встретим с табличкой, поможем с багажом и довезём прямо до стойки регистрации санатория «Эгле Комфорт» в Друскининкай.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px">
+      <button type="button" class="choice {{yesCls}}" onClick="{{sayYes}}">
+        <span class="radio {{yesCls}}"><i></i></span>
+        <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:20px">Да, нужен трансфер</strong><span style="color:#3E4B44;font-size:16px">Заберём из аэропорта, с вокзала или от отеля</span></span>
+      </button>
+      <button type="button" class="choice {{noCls}}" onClick="{{sayNo}}">
+        <span class="radio {{noCls}}"><i></i></span>
+        <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:20px">Нет, доберусь сам</strong><span style="color:#3E4B44;font-size:16px">На машине или общественным транспортом</span></span>
+      </button>
+    </div>
+
+    <!-- Confirmation pop-up when the guest declines the transfer -->
+    <template data-if="{{askNo}}">
+      <div style="position:fixed;inset:0;z-index:60;background:rgba(20,28,24,.55);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div role="dialog" aria-modal="true" aria-labelledby="noTitle" class="card" style="max-width:560px;width:100%;padding:28px 30px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)">
+          <div style="display:flex;align-items:center;gap:14px">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#C9893A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+            <h2 id="noTitle" style="font-size:26px">Вы уверены, что доберётесь сами?</h2>
+          </div>
+          <p style="margin:0;font-size:17px;color:#1C2620">От аэропорта Вильнюса до санатория — 130 км. Прямого автобуса из аэропорта нет: нужно доехать до автовокзала, купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.</p>
+          <div style="padding:14px 16px;background:#EEF5F1;border-radius:2px;font-size:16px"><strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до стойки санатория. Групповой трансфер — всего 30&nbsp;€ с человека, индивидуальный — от 130&nbsp;€ за машину.</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;padding-top:4px">
+            <button type="button" class="btn btn-secondary" onClick="{{confirmNo}}">Да, доберусь сам</button>
+            <button type="button" class="btn btn-primary" onClick="{{keepTransfer}}" style="min-height:60px;font-size:19px">Нет, добавить трансфер</button>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template data-if="{{need}}">
+    <div class="card" style="padding:26px 28px;display:flex;flex-direction:column;gap:22px">
+      <!-- Four-step illustrated strip: how the transfer works -->
+      <div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px 12px;background:#EDF4EF;border:1px solid #C8DED3;border-radius:2px">
+        <div style="font-weight:800;font-size:17px">От встречи до санатория</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:nowrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 0;min-width:0">
+            <img src="assets/39ad8fe2bfcea92423d717bc9dac8f37.png" alt="Водитель встречает с табличкой" style="height:64px;width:auto;max-width:100%;display:block">
+            <span style="font-size:14px;font-weight:700;color:#1C2620;text-align:center;line-height:1.2;max-width:120px">Встретим с табличкой</span>
+          </div>
+          <svg width="30" height="12" viewBox="0 0 46 12" fill="none" stroke="#7FB49A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6h30" stroke-dasharray="2 4"></path><path d="M36 2l5 4-5 4"></path></svg>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 0;min-width:0">
+            <img src="assets/838118fe86e78736560c2ece8886b813.png" alt="Водитель укладывает чемодан в багажник" style="height:64px;width:auto;max-width:100%;display:block">
+            <span style="font-size:14px;font-weight:700;color:#1C2620;text-align:center;line-height:1.2;max-width:120px">Поможем с багажом</span>
+          </div>
+          <svg width="30" height="12" viewBox="0 0 46 12" fill="none" stroke="#7FB49A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6h30" stroke-dasharray="2 4"></path><path d="M36 2l5 4-5 4"></path></svg>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 0;min-width:0">
+            <img src="assets/565b4c9fbca5b96b414361547b3a452f.png" alt="Микроавтобус едет к санаторию" style="height:64px;width:auto;max-width:100%;display:block">
+            <span style="font-size:14px;font-weight:700;color:#1C2620;text-align:center;line-height:1.2;max-width:120px">Довезём до санатория</span>
+          </div>
+          <svg width="30" height="12" viewBox="0 0 46 12" fill="none" stroke="#7FB49A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6h30" stroke-dasharray="2 4"></path><path d="M36 2l5 4-5 4"></path></svg>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 0;min-width:0">
+            <img src="assets/05b41fccbf0a437d88db58e3ce3a1a91.png" alt="Гость у стойки регистрации санатория" style="height:64px;width:auto;max-width:100%;display:block">
+            <span style="font-size:14px;font-weight:700;color:#1C2620;text-align:center;line-height:1.2;max-width:120px">Проводим до стойки</span>
+          </div>
+        </div>
+        <button type="button" class="acc" onClick="{{toggleMore}}" style="align-self:flex-start;font-size:15px;min-height:36px">{{moreLabel}}</button>
+        <template data-if="{{moreOpen}}">
+          <div style="font-size:15px;color:#3E4B44;display:flex;flex-direction:column;gap:6px;padding-bottom:4px">
+            <span>• <strong>Если рейс задерживается</strong> — следим за ним по номеру и ждём без доплаты.</span>
+            <span>• <strong>Остановки по пути</strong> — по вашей просьбе: туалет, кафе, аптека.</span>
+            <span>• <strong>Обратно</strong> — так же: заберём из санатория за 3 часа до вылета, время подтвердим за день.</span>
+            <span>• <strong>Время в пути</strong> зависит от маршрута — указано рядом с городом ниже.</span>
+          </div>
+        </template>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <h2 style="font-size:26px">Откуда вас забрать 9 ноября?</h2>
+        <p style="margin:0;color:#3E4B44;font-size:17px">Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2 часов.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px">
+        <template data-for="{{cities}}" data-as="c">
+          <button type="button" class="choice {{c.cls}}" onClick="{{c.pick}}" style="min-height:80px">
+            <span class="radio {{c.cls}}"><i></i></span>
+            <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:19px">{{c.from}}</strong><span style="color:#3E4B44;font-size:15px">{{c.info}}</span></span>
+          </button>
+        </template>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="lbl" for="place">Откуда именно вас забрать?</label>
+          <div style="position:relative">
+            <select id="place" class="input" style="padding-right:44px" value="{{place}}" onChange="{{pickPlace}}">
+              <template data-for="{{places}}" data-as="p"><option value="{{p.t}}">{{p.t}}</option></template>
+            </select>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;right:14px;top:17px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="lbl" for="flight">Номер рейса или поезда и время прибытия</label>
+          <input id="flight" class="input" type="text" placeholder="Например: LO 771, 14:35">
+        </div>
+      </div>
+
+      <template data-if="{{fromHotel}}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px;padding:18px 20px;border:1px solid #E3DED2;border-radius:2px;background:#FAF8F3">
+        <div style="display:flex;flex-direction:column;gap:8px;grid-column:1/-1">
+          <label class="lbl" for="hotelname">Из какого отеля вас забрать? <span style="color:#B3261E">*</span></label>
+          <input id="hotelname" class="input" type="text" placeholder="Название отеля и адрес, например: Artis Centrum Hotels, Liejyklos g. 3">
+          <span style="font-size:15px;color:#6B776F">Водитель будет ждать у главного входа. Если выезжаете из квартиры — укажите адрес и подъезд.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;grid-column:1/-1">
+          <label class="lbl" for="maplink">Ссылка на Google Maps <span style="font-weight:600;color:#6B776F">(не обязательно)</span></label>
+          <input id="maplink" class="input" type="url" placeholder="https://maps.app.goo.gl/…">
+          <span style="font-size:15px;color:#6B776F">Откройте отель в Google Maps → «Поделиться» → скопируйте ссылку. Так водитель точно не ошибётся.</span>
+        </div>
+      </div>
+      </template>
+
+      <!-- Transfer type: group (cheapest) by default, individual on request -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="lbl" style="font-size:18px;color:#1C2620">Как поедем</div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:18px 20px;border:2px solid {{grpBorder}};background:{{grpBg}};border-radius:2px">
+          <span style="width:170px;height:84px;display:flex;align-items:center;justify-content:center;flex:none;background:#fff;border-radius:2px;overflow:hidden"><img src="assets/165765111b3ce679a969db85fe7d023f.png" alt="Микроавтобус" style="width:170px;height:auto;display:block"></span>
+          <span style="display:flex;flex-direction:column;gap:4px;flex:1 1 300px">
+            <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><strong style="font-size:21px">Групповой трансфер</strong><span style="background:#1F5F4A;color:#fff;font-size:13px;font-weight:800;padding:4px 10px;border-radius:2px">Самый выгодный</span></span>
+            <span style="font-size:16px;color:#1C2620">Обычно микроавтобус Mercedes Sprinter / Vito вместе с другими гостями санаториев.</span>
+            <span style="font-size:15px;color:#3E4B44">{{cityName}} → санаторий · встреча с табличкой · помощь с багажом</span>
+          </span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto">
+            <strong style="font-size:28px;white-space:nowrap">{{seatPrice}}</strong>
+            <span style="font-size:14px;color:#3E4B44;white-space:nowrap">с человека, в одну сторону</span>
+            <span style="font-size:14px;color:#3E4B44;white-space:nowrap">за {{guestsLabel}}: <strong style="color:#1C2620">{{seatTotal}}</strong></span>
+          </span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;background:#FFF1D6;border-radius:2px;padding:12px 16px;font-size:15px;color:#1C2620;max-width:900px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A5A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+          <span><strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями: возможно ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев (дорога длиннее на 30–40 минут). Точное время встречи сообщим за день до приезда.</span>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 16px;border:2px solid {{indBorder}};background:#fff;border-radius:2px;cursor:pointer;font-size:17px;max-width:900px">
+          <input type="checkbox" checked="{{indiv}}" onChange="{{toggleIndiv}}" style="width:26px;height:26px;accent-color:#1F5F4A;margin:0;flex:none">
+          <span><strong>Хочу индивидуальный трансфер</strong> — только для нас, без ожидания и попутчиков<br><span style="font-size:15px;color:#3E4B44">от {{indFrom}} за автомобиль в одну сторону</span></span>
+        </label>
+
+        <template data-if="{{indiv}}">
+        <div style="display:flex;flex-direction:column;gap:10px;padding-left:18px;border-left:3px solid #C8DED3">
+          <span style="font-size:15px;color:#6B776F">Цены за автомобиль {{cityName}} → санаторий, в одну сторону. Обратно — столько же.</span>
+          <template data-for="{{vehicles}}" data-as="k">
+            <button type="button" class="choice {{k.cls}}" onClick="{{k.pick}}" style="justify-content:space-between;min-height:96px">
+              <span style="display:flex;align-items:center;gap:16px">
+                <span class="radio {{k.cls}}"><i></i></span>
+                <span style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;flex:none;background:#fff;border-radius:2px;overflow:hidden"><img src="{{k.img}}" alt="" style="width:150px;height:auto;display:block"></span>
+                <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:19px">{{k.name}}</strong><span style="color:#3E4B44;font-size:15px">{{k.info}}</span></span>
+              </span>
+              <strong style="font-size:22px;white-space:nowrap">{{k.price}}&nbsp;€</strong>
+            </button>
+          </template>
+          <span style="font-size:15px;color:#6B776F">Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00) +20&nbsp;%.</span>
+        </div>
+        </template>
+      </div>
+
+      <!-- Return transfer -->
+      <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border:2px solid #1F5F4A;border-radius:2px;background:#fff">
+        <label style="display:flex;align-items:center;gap:14px;cursor:pointer;font-size:18px">
+          <input type="checkbox" checked="{{back}}" onChange="{{toggleBack}}" style="width:26px;height:26px;accent-color:#1F5F4A;margin:0;flex:none">
+          <span><strong style="font-size:20px">Обратный трансфер 18 ноября, Ср</strong><br><span style="color:#3E4B44;font-size:16px">Из санатория «Эгле Комфорт» — куда вас отвезти?</span></span>
+        </label>
+        <template data-if="{{back}}">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px">
+            <button type="button" class="choice {{sameCls}}" onClick="{{pickSame}}">
+              <span class="radio {{sameCls}}"><i></i></span>
+              <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:18px">Туда же, откуда забрали</strong><span style="color:#3E4B44;font-size:15px">{{sameInfo}}</span></span>
+            </button>
+            <button type="button" class="choice {{otherCls}}" onClick="{{pickOther}}">
+              <span class="radio {{otherCls}}"><i></i></span>
+              <span style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:18px">В другое место</strong><span style="color:#3E4B44;font-size:15px">Другой город, вокзал или отель</span></span>
+            </button>
+          </div>
+          <template data-if="{{backOther}}">
+          <div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:#FAF8F3;border:1px solid #E3DED2;border-radius:2px">
+            <div class="lbl">Куда отвезти 18 ноября?</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px">
+              <template data-for="{{backCities}}" data-as="c">
+                <button type="button" class="choice {{c.cls}}" onClick="{{c.pick}}" style="min-height:56px;padding:12px 16px">
+                  <span class="radio {{c.cls}}"><i></i></span>
+                  <strong style="font-size:17px">{{c.to}}</strong>
+                </button>
+              </template>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label class="lbl" for="backplace">Куда именно отвезти?</label>
+                <div style="position:relative">
+                  <select id="backplace" class="input" style="padding-right:44px">
+                    <template data-for="{{backPlaces}}" data-as="p"><option>{{p.t}}</option></template>
+                  </select>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;right:14px;top:17px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label class="lbl" for="backflight">Рейс или поезд и время отправления</label>
+                <input id="backflight" class="input" type="text" placeholder="Например: LO 772, 16:10">
+              </div>
+            </div>
+          </div>
+          </template>
+          <template data-if="{{backSame}}">
+          <div style="display:flex;flex-direction:column;gap:8px;max-width:420px">
+            <label class="lbl" for="backflight2">Рейс или поезд и время отправления 18 ноября</label>
+            <input id="backflight2" class="input" type="text" placeholder="Например: LO 772, 16:10">
+            <span style="font-size:15px;color:#6B776F">Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.</span>
+          </div>
+          </template>
+        </div>
+        </template>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:start;padding:14px 16px;border-radius:2px;border:1px solid #E3DED2;font-size:16px;color:#3E4B44">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+        <span>При проживании от 10 суток санаторий «Эгле» предоставляет трансфер из аэропорта Вильнюса <strong>бесплатно</strong>. Ваш заезд — 9 ночей; если продлите на сутки, трансфер будет бесплатным.</span>
+      </div>
+    </div>
+    </template>
+
+    <template data-if="{{noNeed}}">
+    <div class="card" style="padding:22px 26px;display:flex;flex-direction:column;gap:8px;background:#EEF5F1;border-color:#C8DED3">
+      <div style="font-weight:800;font-size:19px">Хорошо, трансфер не добавляем</div>
+      <p style="margin:0;font-size:17px;color:#1C2620">Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно добавить позже — просто позвоните.</p>
+    </div>
+    </template>
+
+    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:8px">
+      <a class="btn btn-secondary" href="rooms.html">← Назад к номеру</a>
+      <a class="btn btn-primary" href="guests.html" style="min-height:64px;font-size:21px;padding:0 40px">Далее: данные гостей →</a>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <aside class="card" style="flex:1 1 300px;max-width:360px;padding:0;overflow:hidden;position:sticky;top:16px">
+    <img src="assets/1efd1efc34d4137ff98a8658a068afc5.jpg" alt="" style="width:100%;height:160px;object-fit:cover;display:block">
+    <div style="padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div style="font-weight:800;font-size:20px">Санаторий Эгле Комфорт</div>
+        <div style="font-size:16px;color:#3E4B44">Друскининкай · ★★★★</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;border-top:1px solid #E3DED2;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Даты</span><strong>9–18 ноября · 9 ночей</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Номер</span><strong>Двухместный</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Программа</span><strong>«Миди», 3 процедуры</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Гости</span><strong>2 взрослых</strong></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;border-top:1px solid #E3DED2;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Проживание и лечение</span><strong>2&nbsp;138&nbsp;€</strong></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#3E4B44">Трансфер</span><strong>{{transferSum}}</strong></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:2px solid #1C2620;padding-top:12px">
+        <span style="font-weight:800;font-size:18px">Итого</span><span style="font-weight:800;font-size:28px">{{total}}</span>
+      </div>
+      <div style="font-size:15px;color:#3E4B44;background:#F4F1EA;border-radius:2px;padding:10px 12px">Сейчас к оплате только аванс 4 % — <strong>86&nbsp;€</strong>. Остальное — в санатории при заезде.</div>
+    </div>
+  </aside>
+</div>
+
+<footer style="background:#1C2620;color:#D9E2DC;margin-top:auto">
+  <div style="max-width:1180px;margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:16px">
+    <div>Санатории Литвы · консультация на русском 24/7 · WhatsApp +370&nbsp;600 00000</div>
+    <div style="display:flex;gap:24px"><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Как оплатить</a><a href="rules.html" style="color:#D9E2DC;text-decoration:none">Условия отмены</a></div>
+  </div>
+</footer>
+
+</div>
+
+<!-- Sticky help button + support pop-up (same on every page) -->
+<button type="button" onClick="{{helpOpenFn}}" aria-haspopup="dialog" style="position:fixed;right:24px;bottom:{{helpBottom}};z-index:40;display:flex;align-items:center;gap:10px;min-height:60px;padding:0 22px 0 16px;border:none;border-radius:30px;background:#1F5F4A;color:#fff;font:700 18px Manrope,'Segoe UI',Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(18,34,27,.35)">
+  <span style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+  Свяжитесь со мной
+</button>
+<template data-if="{{helpOpen}}">
+<div style="position:fixed;inset:0;background:rgba(18,34,27,.55);z-index:70;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;font-family:Manrope,'Segoe UI',Arial,sans-serif;color:#1C2620">
+  <div role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="background:#fff;border-radius:2px;width:min(720px,100%);display:flex;flex-direction:column;gap:18px;padding:26px 28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <span style="width:52px;height:52px;border-radius:50%;background:#EEF5F1;display:flex;align-items:center;justify-content:center;flex:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:2px"><h2 id="helpTitle" style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:600;margin:0;line-height:1.2">Свяжитесь со мной</h2><span style="font-size:16px;color:#3E4B44">Ответим на русском в течение 2 часов (9:00–20:00)</span></div>
+      </div>
+      <button type="button" onClick="{{helpCloseFn}}" aria-label="Закрыть" style="width:48px;height:48px;border:2px solid #CFC9BB;background:#fff;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C2620" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+
+    <template data-if="{{helpForm}}">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Имя</span><input type="text" placeholder="Например: Михаил" autocomplete="name" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">E-mail</span><input type="email" placeholder="name@gmail.com" autocomplete="email" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Телефон</span>
+        <span style="display:flex;gap:8px"><select aria-label="Код страны" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:700 17px Manrope,sans-serif;background:#fff;flex:none;width:170px"><option>+972 · Израиль</option><option>+370 · Литва</option><option>+1 · США</option><option>+49 · Германия</option><option>+7 · Россия</option><option>+380 · Украина</option></select><input type="tel" inputmode="numeric" placeholder="50 123 4567" autocomplete="tel-national" style="min-height:54px;border:2px solid #CFC9BB;border-radius:2px;padding:0 16px;font:500 18px Manrope,sans-serif;width:100%;box-sizing:border-box"></span>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:16px;color:#3E4B44">Ваш вопрос</span><textarea rows="3" placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?" style="min-height:100px;border:2px solid #CFC9BB;border-radius:2px;padding:12px 16px;font:500 17px Manrope,sans-serif;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+
+      <div style="display:flex;flex-direction:column;gap:12px;background:#F7F5F0;border:1px solid #E3DED2;border-radius:2px;padding:14px 16px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:16px">Если уже знаете — так мы поможем быстрее</strong><span style="font-size:14px;color:#6B776F">не обязательно</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Заезд, примерно</span><input type="date" value="{{helpIn}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-weight:700;font-size:15px;color:#3E4B44">Выезд, примерно</span><input type="date" value="{{helpOut}}" style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;box-sizing:border-box;background:#fff"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1"><span style="font-weight:700;font-size:15px;color:#3E4B44">Куда хотите поехать</span>
+            <select style="min-height:52px;border:2px solid #CFC9BB;border-radius:2px;padding:0 12px;font:600 17px Manrope,sans-serif;width:100%;background:#fff">
+              <template data-for="{{helpDests}}" data-as="hd"><option value="{{hd.v}}" selected="{{hd.sel}}">{{hd.t}}</option></template>
+            </select>
+          </label>
+        </div>
+        <template data-if="{{helpPrefilled}}"><span style="font-size:14px;color:#1F5F4A;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>Заполнили по вашему поиску — можно изменить</span></template>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <span style="font-size:14px;color:#6B776F;max-width:340px">Нужно указать имя и телефон или e-mail. Данные используем только для ответа.</span>
+        <button type="button" onClick="{{helpSendFn}}" style="min-height:58px;padding:0 30px;border:none;border-radius:2px;background:#1F5F4A;color:#fff;font:700 19px Manrope,sans-serif;cursor:pointer">Отправить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #E3DED2;padding-top:14px;font-size:16px">
+        <span style="color:#3E4B44">Или сразу:</span>
+        <a href="https://wa.me/37060000000" style="font-weight:700;color:#1F5F4A">WhatsApp</a>
+        <a href="tel:+37060000000" style="font-weight:700;color:#1F5F4A;white-space:nowrap">+370&nbsp;600 00000</a>
+      </div>
+    </div>
+    </template>
+
+    <template data-if="{{helpSent}}">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 4px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#1F5F4A;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></span>
+      <strong style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:600">Спасибо! Мы скоро свяжемся с вами</strong>
+      <span style="font-size:17px;color:#3E4B44">Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.</span>
+      <button type="button" onClick="{{helpCloseFn}}" style="min-height:54px;padding:0 26px;border:2px solid #1F5F4A;border-radius:2px;background:#fff;color:#1F5F4A;font:700 18px Manrope,sans-serif;cursor:pointer">Вернуться</button>
+    </div>
+    </template>
+  </div>
+</div>
+</template>
+</template>
+<script src="dc-lite.js"></script>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { need: true, city: 'vilnius', vehicle: 'car', place: '', indiv: false, back: true, backSame: true, backCity: 'vilnius' };
+  }
+  renderVals() {
+    return { ...this._rv(), ...this.helpVals() };
+  }
+  // ---- Support pop-up: same on every page; dates/destination prefilled from the page when known ----
+  helpVals() {
+    const st = this.state || {};
+    const CTX = { hotel: 'Санаторий Эгле Комфорт, Друскининкай', in: '2026-11-09', out: '2026-11-18' };
+    const iso = d => d.toISOString().slice(0, 10);
+    let hin = st.in || st.checkin || CTX.in || '', hout = st.out || CTX.out || '';
+    if (!st.out && st.checkin) { const d = new Date(st.checkin + 'T00:00:00Z'); hout = iso(new Date(d.getTime() + (st.nights || 9) * 86400000)); }
+    const DEST = [['', 'Ещё не знаю — подскажите'], ['druskininkai', 'Друскининкай'], ['birstonas', 'Бирштонас'], ['palanga', 'Паланга'], ['anyksciai', 'Аникщяй']];
+    if (CTX.hotel) DEST.splice(2, 0, ['hotel', CTX.hotel]);
+    const sel = CTX.hotel ? 'hotel' : (CTX.dest || '');
+    const hs = st.help || 'closed';
+    return {
+      helpOpen: hs !== 'closed', helpForm: hs === 'form', helpSent: hs === 'sent',
+      helpOpenFn: () => this.setState({ help: 'form' }), helpCloseFn: () => this.setState({ help: 'closed' }), helpSendFn: () => this.setState({ help: 'sent' }),
+      helpIn: hin, helpOut: hout, helpPrefilled: !!(hin || sel),
+      helpDests: DEST.map(([v, t]) => ({ v, t, sel: v === sel })),
+      helpBottom: CTX.bottom || '24px'
+    };
+  }
+  _rv() {
+    const need = this.state.need ?? true;
+    const city = this.state.city ?? 'vilnius';
+    const cityDefs = [
+      { id: 'vilnius', name: 'Вильнюс', from: 'Из Вильнюса', to: 'В Вильнюс', info: 'аэропорт, вокзалы · 130 км · ≈ 2 ч', places: ['Из аэропорта Вильнюса', 'С ЖД вокзала', 'С автовокзала', 'От отеля в Вильнюсе'] },
+      { id: 'kaunas', name: 'Каунас', from: 'Из Каунаса', to: 'В Каунас', info: 'аэропорт, вокзалы · 130 км · ≈ 2 ч', places: ['Из аэропорта Каунаса', 'С ЖД вокзала', 'С автовокзала', 'От отеля в Каунасе'] },
+      { id: 'warsaw', name: 'Варшава', from: 'Из Варшавы', to: 'В Варшаву', info: 'аэропорт Шопена · 330 км · ≈ 5 ч', places: ['Из аэропорта Шопена', 'Из аэропорта Модлин', 'С ЖД вокзала Варшава-Центральная', 'От отеля в Варшаве'] },
+      { id: 'marijampole', name: 'Мариямполе', from: 'Из Мариямполе', to: 'В Мариямполе', info: 'автовокзал · 75 км · ≈ 1 ч 15 мин', places: ['С автовокзала', 'С ЖД вокзала', 'От отеля'] },
+      { id: 'druskininkai', name: 'Друскининкай', from: 'Из Друскининкай', to: 'В Друскининкай', info: 'автовокзал или отель в городе · 10 мин', places: ['С автовокзала Друскининкай', 'От отеля в Друскининкай'] }
+    ];
+    const cur = cityDefs.find(c => c.id === city) || cityDefs[0];
+    const place = cur.places.includes(this.state.place) ? this.state.place : cur.places[0];
+    const back = this.state.back ?? true, backSame = this.state.backSame ?? true, backCity = this.state.backCity ?? 'vilnius';
+    const backCur = cityDefs.find(c => c.id === backCity) || cityDefs[0];
+    // Рыночные цены (Vilnius Airport → Druskininkai: частные перевозчики 130–190\u00a0€ за машину) — [ПРОВЕРИТЬ ПО ТАРИФУ ПЕРЕВОЗЧИКА]
+    const PRICES = {
+      vilnius: { seat: 30, car: 130, van: 170, premium: 200 },
+      kaunas: { seat: 30, car: 130, van: 170, premium: 200 },
+      warsaw: { seat: 70, car: 320, van: 420, premium: 480 },
+      marijampole: { seat: 25, car: 85, van: 110, premium: 140 },
+      druskininkai: { seat: 10, car: 15, van: 25, premium: 35 }
+    };
+    const GUESTS = 2;
+    const vehicle = this.state.vehicle ?? 'car';
+    const VEH = [
+      { id: 'car', img: 'assets/edfa76a71b436810e36bd398235820b7.png', name: 'Легковой автомобиль', info: 'до 3 человек, 3 чемодана · Škoda Octavia, Toyota Camry или аналог', d: 'M5 15h14M4 15l1.5-3.5h13L20 15M4 15v2.5h16V15M7 17.5a1.2 1.2 0 1 0 0 .01M17 17.5a1.2 1.2 0 1 0 0 .01M8.5 11.5l1-2h5l1 2', sz: 26 },
+      { id: 'van', img: 'assets/165765111b3ce679a969db85fe7d023f.png', name: 'Микроавтобус', info: 'до 7 человек, 7 чемоданов · Mercedes Vito / V-Class', d: 'M3 6h12l6 5v7H3zM3 12h18M7 18a1.5 1.5 0 1 0 0 .01M17 18a1.5 1.5 0 1 0 0 .01M7 6v6M11 6v6M15 6v5', sz: 38 },
+      { id: 'premium', img: 'assets/3bd69c9fea391e27ab155af10bf6d27f.png', name: 'Премиум-класс', info: 'до 3 человек · Mercedes E-Class, вода, помощь с багажом', d: 'M3 15h18M2 15l2-4h16l2 4M2 15v3h20v-3M6 18a1.3 1.3 0 1 0 0 .01M18 18a1.3 1.3 0 1 0 0 .01M7 11l1.5-2.5h7L17 11M12 3.5l.8 1.6 1.8.3-1.3 1.2.3 1.8-1.6-.9-1.6.9.3-1.8L9.4 5.4l1.8-.3z', sz: 32 }
+    ];
+    const indiv = !!this.state.indiv;
+    // Group transfer (default, per person) vs individual car (per vehicle)
+    const legPrice = (cityId) => { const P = PRICES[cityId] || PRICES.vilnius; return indiv ? P[vehicle] : P.seat * GUESTS; };
+    const leg1 = need ? legPrice(city) : 0;
+    const leg2 = need && back ? legPrice(backSame ? city : backCity) : 0;
+    const legs = (need ? 1 : 0) + (need && back ? 1 : 0);
+    const transferTotal = leg1 + leg2;
+    const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+    const vName = (VEH.find(v => v.id === vehicle) || VEH[0]).name.toLowerCase();
+    const transferSum = need ? fmt(transferTotal) + '\u00a0€ · ' + (indiv ? 'индивидуальный, ' + vName : 'групповой') + (legs === 2 ? ', туда и обратно' : ', в одну сторону') : '0\u00a0€';
+    const curP = PRICES[city] || PRICES.vilnius;
+    return {
+      need, noNeed: !need,
+      yesCls: need ? 'on' : '', noCls: need ? '' : 'on',
+      sayYes: () => this.setState({ need: true }),
+      sayNo: () => this.setState({ askNo: true }),
+      askNo: !!this.state.askNo,
+      confirmNo: () => this.setState({ askNo: false, need: false }),
+      keepTransfer: () => this.setState({ askNo: false, need: true }),
+      cityName: cur.name,
+      cities: cityDefs.map(c => ({ ...c, cls: c.id === city ? 'on' : '', pick: () => this.setState({ city: c.id }) })),
+      places: cur.places.map(t => ({ t })),
+      place, fromHotel: /^От отеля/.test(place),
+      pickPlace: (e) => this.setState({ place: e.target.value }),
+      indiv, toggleIndiv: () => this.setState({ indiv: !indiv }),
+      grpBorder: indiv ? '#E3DED2' : '#1F5F4A', grpBg: indiv ? '#fff' : '#EEF5F1', indBorder: indiv ? '#1F5F4A' : '#CFC9BB',
+      seatPrice: fmt(curP.seat) + '\u00a0€', seatTotal: fmt(curP.seat * GUESTS) + '\u00a0€', guestsLabel: GUESTS + ' гостей', indFrom: fmt(curP.car) + '\u00a0€',
+      vehicles: VEH.map(v => ({ ...v, price: curP[v.id], cls: v.id === vehicle ? 'on' : '', pick: () => this.setState({ vehicle: v.id }) })),
+      back, backSame, backOther: back && !backSame,
+      sameCls: backSame ? 'on' : '', otherCls: backSame ? '' : 'on',
+      sameInfo: cur.name + ', ' + place.toLowerCase().replace(/^(из|с|от)\s/, ''),
+      toggleBack: () => this.setState({ back: !back }),
+      pickSame: () => this.setState({ backSame: true }),
+      pickOther: () => this.setState({ backSame: false }),
+      backCityName: backCur.name,
+      backCities: cityDefs.map(c => ({ ...c, cls: c.id === backCity ? 'on' : '', pick: () => this.setState({ backCity: c.id }) })),
+      backPlaces: backCur.places.map(t => ({ t: t.replace(/^Из аэропорта/, 'В аэропорт').replace(/^С ЖД вокзала/, 'На ЖД вокзал').replace(/^С автовокзала/, 'На автовокзал').replace(/^Из аэропорта (\S+)/, 'В аэропорт $1').replace(/^От отеля/, 'В отель').replace(/^С ЖД вокзала (.+)/, 'На ЖД вокзал $1') })),
+      moreOpen: !!this.state.more, moreLabel: this.state.more ? 'Свернуть' : 'Подробнее о встрече и поездке', toggleMore: () => this.setState({ more: !this.state.more }),
+      transferSum,
+      total: fmt(2138 + transferTotal) + '\u00a0€'
+    };
+  }
+}
+DC.mount(Component);
+</script>
+</body>
+</html>

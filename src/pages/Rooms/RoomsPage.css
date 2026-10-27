@@ -1,0 +1,109 @@
+.pg-rooms {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.pg-rooms button {
+  font: inherit;
+  color: inherit;
+}
+.pg-rooms .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 19px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-rooms .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-rooms .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-rooms .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-rooms .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-rooms .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+}
+.pg-rooms .ico2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #1c2620;
+  line-height: 1.25;
+}
+.pg-rooms .ico2 svg {
+  flex: none;
+}
+.pg-rooms .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef5f1;
+  color: #1f5f4a;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: 2px;
+}
+.pg-rooms .prog {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 18px;
+  border: 2px solid #cfc9bb;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  flex: 1 1 280px;
+}
+.pg-rooms .prog.on {
+  border-color: #1f5f4a;
+  background: #eef5f1;
+}
+.pg-rooms .radio {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #cfc9bb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: #fff;
+}
+.pg-rooms .radio.on {
+  border-color: #1f5f4a;
+}
+.pg-rooms .radio.on i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1f5f4a;
+  display: block;
+}

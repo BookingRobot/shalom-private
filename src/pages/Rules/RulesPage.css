@@ -1,0 +1,79 @@
+.pg-rules {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+}
+.pg-rules .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 19px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-rules .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-rules .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-rules .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-rules .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-rules .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 3px;
+}
+.pg-rules .toc a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 2px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+  color: #1c2620;
+}
+.pg-rules .toc a:hover {
+  background: #eef5f1;
+  color: #1f5f4a;
+}
+.pg-rules .row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: 12px 24px;
+  padding: 14px 0;
+  border-top: 1px solid #e3ded2;
+  align-items: start;
+}
+.pg-rules .row b {
+  font-size: 18px;
+}
+.pg-rules .ph {
+  background: #fff1d6;
+  color: #8a5a00;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+.pg-rules p {
+  margin: 0;
+}

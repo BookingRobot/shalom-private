@@ -1,0 +1,130 @@
+.pg-flights {
+  margin: 0;
+  background: #f4f1ea;
+  color: #1c2620;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.pg-flights input,
+.pg-flights select,
+.pg-flights button,
+.pg-flights textarea {
+  font: inherit;
+  color: inherit;
+}
+.pg-flights .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+.pg-flights .btn-primary {
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-flights .btn-primary:hover {
+  background: #174b3a;
+  color: #fff;
+}
+.pg-flights .btn-secondary {
+  background: #fff;
+  color: #1f5f4a;
+  border-color: #1f5f4a;
+}
+.pg-flights .btn-secondary:hover {
+  background: #eef5f1;
+  color: #143f31;
+}
+.pg-flights .card {
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+}
+.pg-flights .input {
+  min-height: 54px;
+  border: 2px solid #cfc9bb;
+  border-radius: 2px;
+  padding: 0 16px;
+  background: #fff;
+  font-size: 18px;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.pg-flights .input:focus {
+  outline: 3px solid #9cc9b5;
+  border-color: #1f5f4a;
+}
+.pg-flights .lbl {
+  font-weight: 700;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-flights .opt {
+  flex: 1 1 360px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 24px 22px;
+  border: 2px solid #cfc9bb;
+  border-radius: 2px;
+  background: #fff;
+}
+.pg-flights .opt.on {
+  border-color: #1f5f4a;
+  background: #eef5f1;
+}
+.pg-flights .seg {
+  min-height: 52px;
+  padding: 0 18px;
+  border: 2px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.pg-flights .seg.on {
+  border-color: #1f5f4a;
+  background: #eef5f1;
+  color: #1f5f4a;
+}
+.pg-flights .lang {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #cfc9bb;
+  background: #fff;
+  border-radius: 2px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pg-flights .lang.on {
+  background: #1c2620;
+  color: #fff;
+  border-color: #1c2620;
+}
+.pg-flights .lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-flights .lg i {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  display: inline-block;
+}

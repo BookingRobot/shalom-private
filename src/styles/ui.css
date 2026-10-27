@@ -1,0 +1,36 @@
+/* Shared basics for every booking page (inside .page): links and headings. */
+.page a {
+  color: #1f5f4a;
+}
+.page a:hover {
+  color: #143f31;
+}
+.page h1,
+.page h2,
+.page h3 {
+  font-family: Lora, Georgia, 'Times New Roman', serif;
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+/* Phones: long button labels wrap instead of pushing the page sideways. */
+@media (max-width: 480px) {
+  body .page .btn {
+    white-space: normal;
+    text-align: center;
+    height: auto;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+/* Tap areas of at least 44px for compact controls, without changing the layout. */
+body .page :is(.lang, .acc, .linkbtn, .btn) {
+  position: relative;
+}
+body .page :is(.lang, .acc, .linkbtn, .btn)::after {
+  content: '';
+  position: absolute;
+  inset: -5px -2px;
+}
