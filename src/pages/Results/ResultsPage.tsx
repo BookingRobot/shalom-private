@@ -1748,7 +1748,7 @@ export default function ResultsPage() {
                         className="rooms-indent"
                         style={{
                           position: 'relative',
-                          padding: '14px 14px 18px 48px',
+                          padding: '14px 14px 18px 96px',
                           display: 'flex',
                           flexDirection: 'column',
                           gap: '10px',
@@ -1762,7 +1762,7 @@ export default function ResultsPage() {
                           className="rooms-guide"
                           style={{
                             position: 'absolute',
-                            left: '24px',
+                            left: '44px',
                             top: '0',
                             bottom: '18px',
                             width: '3px',
