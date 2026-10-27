@@ -745,7 +745,7 @@ export default function PaymentPage() {
             ]}
             prices={[
               ['Проживание и лечение', order.stayLabel],
-              [order.transferKind, order.transferLabel],
+              ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
             ]}
             total={order.totalLabel}
             footer={
