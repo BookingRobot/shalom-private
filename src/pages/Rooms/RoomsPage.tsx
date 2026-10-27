@@ -1,12 +1,14 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { ShareOffer } from '../../components/ShareOffer';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter, footerInfo } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { api } from '../../api';
-import { ADVANCE_RATE, guestsLabel, stayRange } from '../../lib/orderSummary';
+import { guestsLabel, orderSummary, stayRange } from '../../lib/orderSummary';
+import { partyLabel, placeLabel, placePrice, stayTotal } from '../../lib/pricing';
 import { daysBetween, nightsWord, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
@@ -38,12 +40,12 @@ class RoomsLogic extends PageLogic {
     const st = this.state;
     const booking = this.props.booking.booking;
     const NIGHTS = daysBetween(toD(booking.checkin), toD(booking.checkout)),
-      PERS = booking.adults + booking.children,
-      ADV = ADVANCE_RATE;
+      G = { adults: booking.adults, children: booking.children };
     const eur = (n) => fmt(n) + ' €';
     const open = st.open || {};
     const sel = ROOM_PROGRAMS.find((p) => p.id === st.prog) || ROOM_PROGRAMS[0];
-    const total = sel.price + SELECTED_ROOM_PRICE.add;
+    const total = stayTotal(sel.price + SELECTED_ROOM_PRICE.add, G);
+    const order = orderSummary({ ...booking, programId: sel.id });
     return {
       guestsLabel: guestsLabel(booking),
       includedName: ROOM_PROGRAMS[0].name,
@@ -51,8 +53,10 @@ class RoomsLogic extends PageLogic {
       nightsLabel: NIGHTS + ' ' + nightsWord(NIGHTS),
       progs: ROOM_PROGRAMS.map((p, i) => {
         const on = p.id === sel.id,
-          t = p.price + SELECTED_ROOM_PRICE.add,
-          d = p.price - ROOM_PROGRAMS[0].price,
+          t = stayTotal(p.price + SELECTED_ROOM_PRICE.add, G),
+          d =
+            placePrice(p.price + SELECTED_ROOM_PRICE.add, G) -
+            placePrice(ROOM_PROGRAMS[0].price + SELECTED_ROOM_PRICE.add, G),
           isO = !!open[p.id];
         return {
           ...p,
@@ -68,9 +72,9 @@ class RoomsLogic extends PageLogic {
               mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
             })),
           included: i === 0,
-          delta: i === 0 ? 'Включена' : '+' + eur(d),
+          delta: i === 0 ? 'Включена' : '+' + eur(d) + ' с человека',
           total: eur(t),
-          ppn: eur(Math.round(t / NIGHTS / PERS)),
+          place: eur(placePrice(p.price + SELECTED_ROOM_PRICE.add, G)),
           border: on ? '#1F5F4A' : '#E3DED2',
           btnCls: on ? 'btn-primary' : 'btn-secondary',
           btnLabel: on ? '✓ Выбрана' : i === 0 ? 'Оставить эту' : 'Улучшить до этой',
@@ -85,7 +89,9 @@ class RoomsLogic extends PageLogic {
         SELECTED_ROOM_PRICE.name +
         ' · ' +
         sel.name +
-        (sel.price > ROOM_PROGRAMS[0].price ? ' (+' + eur(sel.price - ROOM_PROGRAMS[0].price) + ')' : '') +
+        (sel.price > ROOM_PROGRAMS[0].price
+          ? ' (+' + eur(placePrice(sel.price, G) - placePrice(ROOM_PROGRAMS[0].price, G)) + ' с человека)'
+          : '') +
         ' · ' +
         NIGHTS +
         ' ' +
@@ -93,7 +99,11 @@ class RoomsLogic extends PageLogic {
         ' · ' +
         guestsLabel(booking),
       sumTotal: eur(total),
-      sumAdv: eur(Math.ceil(total * ADV)),
+      sumAdv: order.advanceLabel,
+      sumDue: order.dueDate,
+      sumFull: order.fullOnly,
+      placeNote: placeLabel(G),
+      party: partyLabel(G),
     };
   }
 }
@@ -309,11 +319,21 @@ export default function RoomsPage() {
                         Доплата <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{p.delta}</strong>
                       </span>
                     )}
-                    <span style={{ fontSize: '16px', color: '#3E4B44', marginTop: '8px' }}>Итого за заезд</span>
-                    <span style={{ fontSize: '22px', fontWeight: '800', lineHeight: '1.15', whiteSpace: 'nowrap' }}>
-                      {p.total}
+                    <span
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: '800',
+                        lineHeight: '1.15',
+                        whiteSpace: 'nowrap',
+                        marginTop: '8px',
+                      }}
+                    >
+                      {p.place}
                     </span>
-                    <span style={{ fontSize: '15px', color: '#5E6862' }}>≈ {p.ppn} / чел. в сутки</span>
+                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.placeNote}</span>
+                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      Итого {v.party}: <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{p.total}</strong>
+                    </span>
                     <button
                       type="button"
                       className={`btn ${p.btnCls ?? ''}`}
@@ -485,6 +505,14 @@ export default function RoomsPage() {
             </svg>
             Процедуры назначает врач после консультации. Улучшить программу можно и на месте — по наличию.
           </div>
+          {/* Посоветоваться с семьёй: send the offer or get told about a price change */}
+          <section
+            className="card"
+            style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: '10px' }}
+          >
+            <h2 style={{ fontSize: '20px' }}>Хотите посоветоваться?</h2>
+            <ShareOffer />
+          </section>
         </div>
         {/* Sticky summary */}
         <div
@@ -514,8 +542,15 @@ export default function RoomsPage() {
               <span style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                 <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>{v.sumTotal}</strong>
                 <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                  сейчас только аванс <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{v.sumAdv}</strong>,
-                  остальное при заезде
+                  {v.sumFull ? (
+                    'оплата сразу всей суммы'
+                  ) : (
+                    <>
+                      цена фиксируется после депозита{' '}
+                      <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{v.sumAdv}</strong>, остальное — до{' '}
+                      {v.sumDue}
+                    </>
+                  )}
                 </span>
               </span>
             </div>

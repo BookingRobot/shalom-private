@@ -347,3 +347,46 @@
     left: 10px !important;
   }
 }
+
+/* Quick filters: meals, procedures per day, room features */
+.pg-results .qf {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-results .qf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.pg-results .qf-lbl {
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 104px;
+}
+.pg-results .qf-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pg-results .qf-chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid #cfc9bb;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1c2620;
+  cursor: pointer;
+}
+.pg-results .qf-chip:hover {
+  border-color: #1f5f4a;
+}
+.pg-results .qf-chip.on {
+  background: #1f5f4a;
+  border-color: #1f5f4a;
+  color: #fff;
+}

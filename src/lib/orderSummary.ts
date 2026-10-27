@@ -1,10 +1,9 @@
 import { api } from '../api';
 import type { Booking } from '../data/booking';
+import { TODAY } from '../data/demo';
 import { MONTHS, daysBetween, nightsWord, plural, shortDate, toD } from './dates';
 import { fmt } from './format';
-
-/** Advance paid online: 4 % of accommodation + programme, rounded up to a euro. */
-export const ADVANCE_RATE = 0.04;
+import { flightPackage, partyLabel, paymentPlan, perPersonOf, placeLabel, placePrice, stayTotal } from './pricing';
 
 const eur = (n: number) => fmt(n) + ' €';
 
@@ -25,6 +24,7 @@ export function guestsLabel(b: Pick<Booking, 'adults' | 'children'>) {
 /** Transfer price: group = per seat, individual = per car; one or two legs. */
 export function transferPrice(b: Booking) {
   const t = b.transfer;
+  if (b.flightPackage) return 0; // the group transfer is part of the flight package
   if (t.mode === 'none') return 0;
   const { prices } = api.getTransferOptions();
   const P = prices as Record<string, Record<string, number>>;
@@ -44,10 +44,15 @@ export function orderSummary(b: Booking) {
   const nights = daysBetween(toD(b.checkin), toD(b.checkout));
   const { programs, roomPrice } = api.getRoomPrograms(b.hotelId, b.roomId);
   const program = programs.find((p) => p.id === b.programId) || programs[0];
-  const stay = program.price + roomPrice.add;
+  const base2 = program.price + roomPrice.add; // tariff for two adults sharing
+  const g = { adults: b.adults, children: b.children };
+  const stay = stayTotal(base2, g);
+  const place = placePrice(base2, g);
   const transfer = transferPrice(b);
-  const total = stay + transfer;
-  const advance = Math.ceil(stay * ADVANCE_RATE);
+  const flight = b.flightPackage ? flightPackage(g) : 0;
+  const total = stay + transfer + flight;
+  const plan = paymentPlan(b.checkin, g, b.flightPackage, total, TODAY);
+  const advance = plan.deposit;
   return {
     dates: stayRange(b.checkin, b.checkout) + ' · ' + nights + ' ' + nightsWord(nights),
     nights,
@@ -59,12 +64,27 @@ export function orderSummary(b: Booking) {
     /** "Программа «Миди» · 3 процедуры в день" */
     programFull: program.name + ' · ' + program.perDay,
     guests: guestsLabel(b),
+    roomName: b.adults === 1 ? 'Одноместное размещение' : 'Двухместный',
     stay,
     stayLabel: eur(stay),
+    /** price of one adult place — the number agents quote */
+    place,
+    placeLabel: eur(place),
+    /** "на человека в двухместном номере" / "за одного · одноместный номер" */
+    placeNote: placeLabel(g),
+    /** "1 069 € × 2" when everybody pays the same place price */
+    stayCalc: b.children || b.adults === 1 ? '' : eur(place) + ' × ' + b.adults,
+    /** single supplement included in a solo guest's price */
+    singleExtra: b.adults === 1 ? place - perPersonOf(base2) : 0,
+    party: partyLabel(g),
+    flight,
+    flightLabel: eur(flight),
+    flightPackage: b.flightPackage,
     transfer,
     transferLabel: eur(transfer),
-    transferKind:
-      b.transfer.mode === 'none'
+    transferKind: b.flightPackage
+      ? 'Групповой трансфер — в пакете с перелётом'
+      : b.transfer.mode === 'none'
         ? 'Трансфер не нужен'
         : `Трансфер ${b.transfer.mode === 'group' ? 'групповой' : 'индивидуальный'}, ${b.transfer.back ? 'туда и обратно' : 'в одну сторону'}`,
     /** short route for the guest details step */
@@ -90,7 +110,13 @@ export function orderSummary(b: Booking) {
           'санаторий',
     total,
     totalLabel: eur(total),
+    /** deposit that fixes the price (35 € per person, +100 € per person with flights) */
     advance,
     advanceLabel: eur(advance),
+    rest: plan.rest,
+    restLabel: eur(plan.rest),
+    /** the rest is due by this date; free cancellation until then */
+    dueDate: shortDate(plan.due),
+    fullOnly: plan.fullOnly,
   };
 }

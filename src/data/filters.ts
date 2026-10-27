@@ -25,15 +25,12 @@ export const FILTER_GROUPS = {
     ['doctor', 'Консультация врача включена', ICON_PATHS.doctor],
     ['samebld', 'Всё в одном здании', BUILDING_ICON],
     ['pool', 'Бассейн', ICON_PATHS.pool],
-    ['meals3', 'Трёхразовое питание', ICON_PATHS.meals],
     ['transfer', 'Трансфер из аэропорта', CAR_ICON],
+    ['ru', 'Врач говорит по-русски', 'M4 4h16v12H7l-3 3zM8 9h8M8 12h5'],
   ],
   comfort: [
     ['lift', 'Лифт', FILTER_ICONS.lift],
-    ['ac', 'Кондиционер', ICON_PATHS.ac],
-    ['balcony', 'Балкон', ICON_PATHS.balcony],
     ['shower', 'Душ без высокого порога', ICON_PATHS.shower],
-    ['ru', 'Врач говорит по-русски', 'M4 4h16v12H7l-3 3zM8 9h8M8 12h5'],
   ],
   stars: [
     ['s3', '3 звезды', FILTER_ICONS.star],
@@ -47,6 +44,22 @@ export const FILTER_GROUPS = {
     ['p-resp', 'Дыхательные пути', FILTER_ICONS.resp],
     ['p-digest', 'Пищеварение', FILTER_ICONS.digest],
     ['p-diab', 'Диабет', FILTER_ICONS.diab],
+  ],
+  // What guests ask about most: meals and procedures per day (pick one), room features (any)
+  meals: [
+    ['meals2', '2 раза (полупансион)'],
+    ['meals3', '3 раза'],
+    ['mfull', 'Полный пансион'],
+  ],
+  procs: [
+    ['proc3', '3 в день'],
+    ['proc5', '5 в день'],
+  ],
+  room: [
+    ['ac', 'Кондиционер', ICON_PATHS.ac],
+    ['balcony', 'Балкон', ICON_PATHS.balcony],
+    ['twin', 'Две отдельные кровати', ICON_PATHS.bed2],
+    ['newbld', 'Новый корпус', BUILDING_ICON],
   ],
   beds: [
     ['double', 'Двуспальная', ICON_PATHS.bed1],

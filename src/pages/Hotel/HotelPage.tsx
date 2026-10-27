@@ -12,6 +12,7 @@ import { ICON_PATHS, amenity } from '../../data/iconPaths';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { RoomCard } from '../../components/RoomCard';
+import { eur, placePrice, quote } from '../../lib/pricing';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -36,6 +37,7 @@ class HotelLogic extends PageLogic {
     return this._rv();
   }
   _rv() {
+    const GQ = { adults: this.props.booking.booking.adults, children: this.props.booking.booking.children };
     const {
       about: EGLE_ABOUT,
       photos: EGLE_PHOTOS,
@@ -164,8 +166,11 @@ class HotelLogic extends PageLogic {
         return {
           name: pp[0],
           sub: (pp[1] || '') + ' · ' + p.meals,
-          price: fmt(p.priceN + addN) + ' €',
-          diff: pi === 0 ? 'самая доступная' : '+' + fmt(p.priceN - PROGS[0].priceN) + ' € к цене',
+          price: eur(quote(p.priceN + addN, GQ, this.props.booking.booking.flightPackage).perPerson) + ' / чел.',
+          diff:
+            pi === 0
+              ? 'самая доступная'
+              : '+' + eur(placePrice(p.priceN, GQ) - placePrice(PROGS[0].priceN, GQ)) + ' с человека',
           diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
           border: on ? '#1F5F4A' : '#CFC9BB',
           bg: on ? '#EEF5F1' : '#fff',
@@ -206,7 +211,11 @@ class HotelLogic extends PageLogic {
             month: checkin.getUTCMonth(),
             year: checkin.getUTCFullYear(),
           }),
-        pill: busy ? 'Нет мест на ваши даты' : r.add ? 'Номер +' + fmt(addN) + ' €' : 'Включён в цену программы',
+        pill: busy
+          ? 'Нет мест на ваши даты'
+          : r.add
+            ? 'Номер +' + eur(placePrice(addN, GQ)) + ' с человека'
+            : 'Включён в цену программы',
         progLine: 'с программой ' + p0[0].replace('Программа ', '') + ' · ' + (p0[1] || '') + ' · ' + PROGS[0].meals,
         price: fmt(cheapest),
         adv,
@@ -217,7 +226,7 @@ class HotelLogic extends PageLogic {
         progRows,
         roomText: 'Что ещё есть в номере: телефон, спутниковое ТВ, гардероб, сейф, фен, халат, тапочки.',
         selName: sp.title.split(' — ')[0],
-        selPrice: fmt(sp.priceN + addN) + ' €',
+        selPrice: eur(quote(sp.priceN + addN, GQ, this.props.booking.booking.flightPackage).total),
         detBtn: 'Программы для этого номера (' + PROGS.length + ') и что входит',
         detChev: dOpen ? 'rotate(180deg)' : 'none',
         border: r.top ? '#1F5F4A' : '#E3DED2',

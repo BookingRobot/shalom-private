@@ -230,3 +230,47 @@
     gap: 12px;
   }
 }
+
+/* Payment schedule: when — what — how much */
+.pg-payment .pay-steps {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+}
+.pg-payment .pay-steps-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #3e4b44;
+  padding: 10px 16px;
+  background: #f4f1ea;
+}
+.pg-payment .pay-step {
+  display: grid;
+  grid-template-columns: minmax(130px, auto) 1fr auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 10px 16px;
+  border-top: 1px solid #e3ded2;
+  font-size: 16px;
+}
+.pg-payment .pay-when {
+  font-weight: 700;
+  color: #1c2620;
+}
+.pg-payment .pay-what {
+  color: #3e4b44;
+}
+.pg-payment .pay-sum {
+  font-size: 18px;
+  white-space: nowrap;
+}
+@media (max-width: 520px) {
+  .pg-payment .pay-step {
+    grid-template-columns: 1fr auto;
+  }
+  .pg-payment .pay-what {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

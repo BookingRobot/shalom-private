@@ -3,9 +3,10 @@ import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layou
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
-import { OrderSummary } from '../../components/OrderSummary';
+import { orderPriceRows, OrderSummary } from '../../components/OrderSummary';
 import { orderSummary } from '../../lib/orderSummary';
-import { shortDate, toD } from '../../lib/dates';
+import { shortDate } from '../../lib/dates';
+import { TODAY } from '../../data/demo';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -26,51 +27,51 @@ class PaymentLogic extends PageLogic {
     return this._rv();
   }
   _rv() {
-    const plan = this.state.plan ?? 'adv';
-    const adv = plan === 'adv';
-    // Минимальный аванс — 4 % от проживания и лечения, округляем вверх до евро.
-    // Вся сумма = проживание и лечение + трансфер (на месте ничего не доплачивать).
+    // Agents' terms: a deposit (35 € per person, +100 € per person with flights) fixes the price;
+    // the rest is paid before a set date, until which cancellation is free. Close to arrival — pay in full.
     const booking = this.props.booking.booking;
     const order = orderSummary(booking);
+    const plan = order.fullOnly ? 'full' : (this.state.plan ?? 'adv');
+    const adv = plan === 'adv';
     const TOTAL = order.total;
-    const checkinDay = shortDate(toD(booking.checkin));
-    const advN = order.advance,
-      restN = TOTAL - advN,
-      stayRestN = order.stay - advN;
     const eur = (n: number) => fmt(n) + '\u00a0€';
-    const advAmt = fmt(advN),
-      restAmt = fmt(restN),
+    const advAmt = fmt(order.advance),
+      restAmt = fmt(order.rest),
       totalAmt = fmt(TOTAL);
-    const amount = adv ? advAmt + '\u00a0€' : totalAmt + '\u00a0€';
-    /** "2 052 € в санатории и 120 € за трансфер" or just the sanatorium part */
-    const restSplit = order.transfer
-      ? eur(stayRestN) + ' в санатории и ' + eur(order.transfer) + ' за трансфер'
-      : 'в санатории';
+    const TODAY_LABEL = 'сегодня, ' + shortDate(TODAY);
     return {
       advAmt,
       restAmt,
-      stayRestAmt: fmt(stayRestN),
-      transferAmt: order.transfer ? fmt(order.transfer) : '',
       totalAmt,
-      fullIncludes: order.transfer ? 'Проживание, лечение и трансфер.' : 'Проживание и лечение.',
+      dueDate: order.dueDate,
+      fullOnly: order.fullOnly,
+      depositRule: booking.flightPackage
+        ? '35\u00a0€ за санаторий и 100\u00a0€ за перелёт с человека'
+        : '35\u00a0€ с человека',
+      fullIncludes: order.flight
+        ? 'Санаторий, перелёт и трансфер.'
+        : order.transfer
+          ? 'Проживание, лечение и трансфер.'
+          : 'Проживание и лечение.',
       advCls: adv ? 'on' : '',
       fullCls: adv ? '' : 'on',
       pickAdv: () => this.setState({ plan: 'adv' }),
       pickFull: () => this.setState({ plan: 'full' }),
-      amount,
-      schedule: adv
-        ? 'График: ' +
-          advAmt +
-          '\u00a0€ — сегодня, 27 октября. ' +
-          restAmt +
-          '\u00a0€ — при заезде ' +
-          checkinDay +
-          (order.transfer ? ': ' + restSplit + '.' : ' в санатории.')
-        : 'График: ' + totalAmt + '\u00a0€ — сегодня, 27 октября. На месте доплачивать ничего не нужно.',
+      amount: adv ? advAmt + '\u00a0€' : totalAmt + '\u00a0€',
+      steps: adv
+        ? [
+            { when: TODAY_LABEL, what: 'депозит — цена зафиксирована', sum: eur(order.advance) },
+            { when: 'до ' + order.dueDate, what: 'остаток, до этой даты отмена бесплатная', sum: eur(order.rest) },
+            { when: 'при заезде', what: 'ничего не доплачиваете', sum: '0\u00a0€' },
+          ]
+        : [
+            { when: TODAY_LABEL, what: 'вся сумма', sum: eur(TOTAL) },
+            { when: 'при заезде', what: 'ничего не доплачиваете', sum: '0\u00a0€' },
+          ],
       rest: adv
-        ? 'Остаток ' + restAmt + '\u00a0€ — при заезде' + (order.transfer ? ': ' + restSplit : ', в санатории')
-        : 'Всё оплачено, включая трансфер. На месте ничего доплачивать не нужно',
-      payLabel: adv ? 'Оплатить аванс ' + advAmt + '\u00a0€' : 'Оплатить ' + totalAmt + '\u00a0€',
+        ? 'Остаток ' + restAmt + '\u00a0€ — до ' + order.dueDate + ', отмена до этой даты бесплатная'
+        : 'Всё оплачено. На месте ничего доплачивать не нужно',
+      payLabel: adv ? 'Внести депозит ' + advAmt + '\u00a0€' : 'Оплатить ' + totalAmt + '\u00a0€',
     };
   }
 }
@@ -138,23 +139,25 @@ export default function PaymentPage() {
             >
               <h2 style={{ fontSize: '24px' }}>Сумма к оплате сейчас</h2>
               <div className="plan-list">
-                <button type="button" className={`choice plan plan-main ${v.advCls ?? ''}`} onClick={v.pickAdv}>
-                  <span className={`radio ${v.advCls ?? ''}`}>
-                    <i />
-                  </span>
-                  <span className="plan-body">
-                    <span className="plan-head">
-                      <strong className="plan-title">
-                        Минимальный аванс — <span className="nowrap">{v.advAmt}&nbsp;€</span>
-                      </strong>
-                      <span className="plan-badge">Так платят 9 из 10 гостей</span>
+                {v.fullOnly ? null : (
+                  <button type="button" className={`choice plan plan-main ${v.advCls ?? ''}`} onClick={v.pickAdv}>
+                    <span className={`radio ${v.advCls ?? ''}`}>
+                      <i />
                     </span>
-                    <span className="plan-text">
-                      4&nbsp;% от проживания и лечения — этого достаточно, чтобы санаторий подтвердил бронь. Остальные{' '}
-                      <strong>{v.restAmt}&nbsp;€</strong> — при заезде: наличными, картой или переводом.
+                    <span className="plan-body">
+                      <span className="plan-head">
+                        <strong className="plan-title">
+                          Депозит — <span className="nowrap">{v.advAmt}&nbsp;€</span>
+                        </strong>
+                        <span className="plan-badge">Цена фиксируется</span>
+                      </span>
+                      <span className="plan-text">
+                        {v.depositRule}. Остальные <strong>{v.restAmt}&nbsp;€</strong> — до {v.dueDate}; до этой даты
+                        отмена бесплатная, депозит возвращаем.
+                      </span>
                     </span>
-                  </span>
-                </button>
+                  </button>
+                )}
                 <button type="button" className={`choice plan plan-alt ${v.fullCls ?? ''}`} onClick={v.pickFull}>
                   <span className={`radio ${v.fullCls ?? ''}`}>
                     <i />
@@ -164,40 +167,22 @@ export default function PaymentPage() {
                       Вся сумма — <span className="nowrap">{v.totalAmt}&nbsp;€</span>
                     </strong>
                     <span className="plan-text">
-                      {v.fullIncludes} Ничего не платить на месте — удобно, если оплачивают родственники или
-                      организация.
+                      {v.fullOnly
+                        ? 'До заезда меньше недели — бронь подтверждаем только после полной оплаты.'
+                        : v.fullIncludes + ' Больше ничего не платить — удобно, если оплачивают родственники.'}
                     </span>
                   </span>
                 </button>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '12px',
-                  alignItems: 'start',
-                  padding: '14px 16px',
-                  borderRadius: '2px',
-                  background: '#F4F1EA',
-                  fontSize: '16px',
-                  color: '#3E4B44',
-                }}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  style={{ flex: 'none' }}
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M16 2v4M8 2v4M3 10h18" />
-                </svg>
-                <span>{v.schedule}</span>
+              <div className="pay-steps" aria-label="График оплаты">
+                <div className="pay-steps-title">График оплаты</div>
+                {(v.steps || []).map((x: any) => (
+                  <div className="pay-step" key={x.when}>
+                    <span className="pay-when">{x.when}</span>
+                    <span className="pay-what">{x.what}</span>
+                    <strong className="pay-sum">{x.sum}</strong>
+                  </div>
+                ))}
               </div>
             </section>
             {/* Method */}
@@ -429,7 +414,15 @@ export default function PaymentPage() {
                     <path d="m5 12 5 5L20 7" />
                   </svg>
                   <span>
-                    <b>За [N] и более дней</b> до заезда — отмена бесплатно, аванс возвращаем полностью.
+                    {v.fullOnly ? (
+                      <>
+                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                      </>
+                    ) : (
+                      <>
+                        <b>До {v.dueDate}</b> — отмена бесплатная, депозит возвращаем полностью.
+                      </>
+                    )}
                   </span>
                 </div>
                 <div className="rule">
@@ -468,7 +461,15 @@ export default function PaymentPage() {
                     <path d="M12 8v5M12 16h.01" />
                   </svg>
                   <span>
-                    <b>Менее чем за [N] дней</b> — аванс не возвращается, остальная сумма не взимается.
+                    {v.fullOnly ? (
+                      <>
+                        <b>Незаезд без предупреждения</b> — санаторий может удержать стоимость первых суток.
+                      </>
+                    ) : (
+                      <>
+                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                      </>
+                    )}
                   </span>
                 </div>
                 <div className="rule">
@@ -487,7 +488,7 @@ export default function PaymentPage() {
                     <path d="m5 12 5 5L20 7" />
                   </svg>
                   <span>
-                    <b>По болезни</b> — с медицинской справкой возвращаем аванс полностью в любой срок.
+                    <b>По болезни</b> — с медицинской справкой возвращаем депозит полностью в любой срок.
                   </span>
                 </div>
               </div>
@@ -543,15 +544,12 @@ export default function PaymentPage() {
           <OrderSummary
             details={[
               ['Даты', order.dates],
-              ['Номер', 'Двухместный'],
+              ['Номер', order.roomName],
               ['Программа', order.programName, order.programPerDay],
               ['Гости', 'Mikhail Levin, Irina Levina'],
               ['Трансфер', order.transferPlaces],
             ]}
-            prices={[
-              ['Проживание и лечение', order.stayLabel],
-              ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
-            ]}
+            prices={orderPriceRows(order)}
             total={order.totalLabel}
             footer={
               <div

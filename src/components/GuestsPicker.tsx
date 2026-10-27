@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useBooking } from '../context/BookingContext';
+import { useHelp } from '../context/HelpContext';
 
 const LIMITS = { adults: [1, 4], children: [0, 3] } as const;
 
@@ -17,6 +18,7 @@ export const guestsLabel = (adults: number, children: number) =>
  */
 export function GuestsPicker({ inputClass = 'input' }: { inputClass?: string }) {
   const { booking, update } = useBooking();
+  const help = useHelp();
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const popId = useId();
@@ -146,6 +148,16 @@ export function GuestsPicker({ inputClass = 'input' }: { inputClass?: string }) 
           {row('adults', 'Взрослые', 'от 1 до 4', 'взрослые')}
           <div className="gp-sep" />
           {row('children', 'Дети', 'до 17 лет · до 3', 'дети')}
+          <button
+            type="button"
+            className="gp-more"
+            onClick={() => {
+              setOpen(false);
+              help.open();
+            }}
+          >
+            Нужно 2 номера и больше? Подберёт консультант
+          </button>
           <button type="button" className="btn btn-primary gp-done" onClick={() => setOpen(false)}>
             Готово
           </button>

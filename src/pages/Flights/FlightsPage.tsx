@@ -761,6 +761,22 @@ export default function FlightsPage() {
           {v.showNotice ? (
             <>
               {/* dates mismatch */}
+              {logic.props.booking.booking.flightPackage ? (
+                <div
+                  className="card"
+                  role="note"
+                  style={{
+                    padding: '16px 22px',
+                    background: '#EEF5F1',
+                    borderColor: '#C8DED3',
+                    fontSize: '17px',
+                    color: '#1C2620',
+                  }}
+                >
+                  <strong>Перелёт уже в вашем пакете.</strong> Билеты покупать не нужно: рейс Тель-Авив ⇄ Вильнюс
+                  подберём под ваши даты и пришлём в подтверждении. Ниже можно проверить даты.
+                </div>
+              ) : null}
               <section
                 style={{
                   background: '#fff',

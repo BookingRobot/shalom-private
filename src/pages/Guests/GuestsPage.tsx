@@ -4,7 +4,7 @@ import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layou
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MONTHS_N } from '../../lib/dates';
-import { AdvanceNote, OrderSummary } from '../../components/OrderSummary';
+import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
 import { orderSummary } from '../../lib/orderSummary';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
@@ -486,24 +486,21 @@ export default function GuestsPage() {
                 to="/flights"
                 style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
               >
-                Далее: оплата аванса →
+                Далее: оплата →
               </Link>
             </div>
           </form>
           <OrderSummary
             details={[
               ['Даты', order.dates],
-              ['Номер', 'Двухместный'],
+              ['Номер', order.roomName],
               ['Программа', order.programName, order.programPerDay],
               ['Гости', order.guests],
               ['Трансфер', order.transferRoute],
             ]}
-            prices={[
-              ['Проживание и лечение', order.stayLabel],
-              ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
-            ]}
+            prices={orderPriceRows(order)}
             total={order.totalLabel}
-            footer={<AdvanceNote advance={order.advanceLabel} />}
+            footer={<AdvanceNote order={order} />}
           />
         </div>
         <SiteFooter />

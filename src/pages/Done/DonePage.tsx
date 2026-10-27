@@ -85,7 +85,7 @@ export default function DonePage() {
               <h1 style={{ fontSize: '32px' }}>Спасибо! Заказ № 12345 принят</h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                 <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>
-                  Аванс {o.advanceLabel} оплачен.
+                  Депозит {o.advanceLabel} внесён — цена зафиксирована.
                 </span>
                 <span
                   style={{
@@ -189,9 +189,9 @@ export default function DonePage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">27 октября · сегодня</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Аванс получен</strong>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Депозит получен</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                        Оплата {o.advanceLabel} (4 % от стоимости) прошла успешно.
+                        Оплата {o.advanceLabel} прошла успешно. Цена больше не изменится.
                       </span>
                     </div>
                   </div>
@@ -243,7 +243,7 @@ export default function DonePage() {
                       <span className="chip">{inDay} · с 14:00</span>
                       <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Заезд в санаторий</strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                        Остаток за проживание — {eur(o.stay - o.advance)} на стойке регистрации.
+                        Всё оплачено заранее — на месте доплачивать ничего не нужно.
                       </span>
                     </div>
                   </div>
@@ -558,13 +558,21 @@ export default function DonePage() {
               <div className="card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <h2 style={{ fontSize: '22px' }}>Стоимость и оплата</h2>
                 <div className="row">
-                  <span style={{ color: '#3E4B44' }}>Проживание и программа</span>
+                  <span style={{ color: '#3E4B44' }}>Проживание и программа{o.stayCalc ? ', ' + o.stayCalc : ''}</span>
                   <strong>{o.stayLabel}</strong>
                 </div>
-                <div className="row">
-                  <span style={{ color: '#3E4B44' }}>{o.transferKind}</span>
-                  <strong>{o.transferLabel}</strong>
-                </div>
+                {o.flight ? (
+                  <div className="row">
+                    <span style={{ color: '#3E4B44' }}>Перелёт и трансфер</span>
+                    <strong>{o.flightLabel}</strong>
+                  </div>
+                ) : null}
+                {o.transfer ? (
+                  <div className="row">
+                    <span style={{ color: '#3E4B44' }}>{o.transferKind}</span>
+                    <strong>{o.transferLabel}</strong>
+                  </div>
+                ) : null}
                 <div className="row" style={{ borderTop: '1px solid #E3DED2', paddingTop: '10px', fontSize: '18px' }}>
                   <strong>Всего</strong>
                   <strong style={{ fontSize: '20px' }}>{o.totalLabel}</strong>
@@ -583,14 +591,16 @@ export default function DonePage() {
                     gap: '2px',
                   }}
                 >
-                  <span style={{ color: '#1F5F4A', fontSize: '15px', fontWeight: '700' }}>Осталось оплатить</span>
+                  <span style={{ color: '#1F5F4A', fontSize: '15px', fontWeight: '700' }}>
+                    Осталось оплатить до {o.dueDate}
+                  </span>
                   <strong style={{ fontSize: '28px', lineHeight: '1.1', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
                     {eur(o.total - o.advance)}
                   </strong>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '16px' }}>
-                  <span>В санатории — {eur(o.stay - o.advance)}</span>
-                  <span>За трансфер — {o.transferLabel}</span>
+                  <span>Картой или переводом — пришлём ссылку на оплату и напомним за неделю.</span>
+                  <span>До {o.dueDate} отмена бесплатная.</span>
                 </div>
                 <div
                   style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', fontSize: '14px', color: '#3E4B44' }}
@@ -609,7 +619,7 @@ export default function DonePage() {
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 16v-4M12 8h.01" />
                   </svg>
-                  Порядок оплаты трансфера уточним в подтверждении.
+                  При заезде доплачивать ничего не нужно.
                 </div>
               </div>
             </aside>

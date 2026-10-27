@@ -1,6 +1,9 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { GuestsPicker } from '../../components/GuestsPicker';
+import { DateModeTabs, FlexDates } from '../../components/FlexDates';
+import { FlightToggle } from '../../components/FlightToggle';
+import { PlaceChips, PlaceSearch } from '../../components/PlaceSearch';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
@@ -137,6 +140,12 @@ class MainLogic extends PageLogic {
     const curNights = daysBetween(inD, outD);
     const { booking, update } = this.props.booking;
     return {
+      flexMode: !!st.flex,
+      setFlex: (flex) => this.setState({ flex }),
+      flexPick: (a, b) => {
+        const d = toD(a);
+        this.setState({ sel: { in: a, out: b }, flex: false, month: d.getUTCMonth(), year: d.getUTCFullYear() });
+      },
       hotels: POPULAR_SANATORIUMS,
       dest: booking.dest,
       destOptions: RESORTS,
@@ -288,45 +297,9 @@ export default function MainPage() {
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                   <label className="lbl" htmlFor="city">
-                    Курорт
+                    Курорт или санаторий
                   </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
-                      <circle cx="12" cy="10" r="2.5" />
-                    </svg>
-                    <select id="city" className="input" value={v.dest} onChange={v.setDest}>
-                      {v.destOptions.map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      aria-hidden="true"
-                      style={{ position: 'absolute', right: '12px', top: '16px', pointerEvents: 'none' }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
+                  <PlaceSearch />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                   <label className="lbl" htmlFor="datein">
@@ -400,9 +373,24 @@ export default function MainPage() {
                   Найти санаторий
                 </Link>
               </div>
-              <div style={{ fontSize: '14px', color: '#5E6862' }}>
-                {v.nightsLabel} · После поиска покажем полную стоимость за всех гостей.
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px 16px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <FlightToggle />
+                <span style={{ fontSize: '14px', color: '#5E6862' }}>
+                  {v.nightsLabel} · Покажем цену на человека и итог за всех гостей.
+                </span>
               </div>
+              <PlaceChips />
+              <Link to="/results?wizard=1" className="wz-link">
+                Не знаете, какой санаторий выбрать? Ответьте на 3 вопроса — подскажем →
+              </Link>
             </form>
           </div>
         </section>
@@ -455,7 +443,7 @@ export default function MainPage() {
               >
                 <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
               </svg>
-              Аванс 1–10 %, остальное при заезде
+              Депозит 35 € — и цена зафиксирована
             </div>
           </div>
         </section>
@@ -770,8 +758,10 @@ export default function MainPage() {
                 <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Оплатите аванс</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Остаток — при заезде в санаторий.</span>
+                <strong style={{ fontSize: '15px' }}>Внесите депозит</strong>
+                <span style={{ fontSize: '14px', color: '#3E4B44' }}>
+                  35 € с человека, остаток — за 3 месяца до заезда.
+                </span>
               </div>
             </div>
           </div>
@@ -883,114 +873,121 @@ export default function MainPage() {
                   Закрыть
                 </button>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '15px', color: '#3E4B44' }}>Быстрый выбор:</span>
-                <button type="button" className="preset" onClick={v.p7}>
-                  7 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.p10}>
-                  10 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.p14}>
-                  14 ночей
-                </button>
-                <button type="button" className="preset" onClick={v.p21}>
-                  21 ночь
-                </button>
-                <span style={{ marginLeft: 'auto', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  <span className="lg">
-                    <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
-                    дешевле
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#FFF6E3', border: '1px solid #F0DDB8' }} />
-                    обычная цена
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#FCEDE9', border: '1px solid #F0CFC6' }} />
-                    дороже
-                  </span>
-                  <span className="lg">
-                    <i style={{ background: '#E8E6E1' }} />
-                    прошедшие дни
-                  </span>
-                  <span className="lg">
-                    <i
-                      style={{
-                        background: 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)',
-                        border: '1px solid #CFC9BB',
-                      }}
-                    />
-                    нет свободных мест
-                  </span>
-                  <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
-                    <summary
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        cursor: 'pointer',
-                        listStyle: 'none',
-                      }}
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                      </svg>
-                      <span>
-                        <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+              <DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />
+              {v.flexMode ? (
+                <FlexDates onPick={v.flexPick} />
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>Быстрый выбор:</span>
+                    <button type="button" className="preset" onClick={v.p7}>
+                      7 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.p10}>
+                      10 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.p14}>
+                      14 ночей
+                    </button>
+                    <button type="button" className="preset" onClick={v.p21}>
+                      21 ночь
+                    </button>
+                    <span style={{ marginLeft: 'auto', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                      <span className="lg">
+                        <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
+                        дешевле
                       </span>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '20px',
-                          height: '20px',
-                          borderRadius: '50%',
-                          border: '1.5px solid #1F5F4A',
-                          color: '#1F5F4A',
-                          fontSize: '12px',
-                          fontWeight: '800',
-                        }}
-                      >
-                        i
+                      <span className="lg">
+                        <i style={{ background: '#FFF6E3', border: '1px solid #F0DDB8' }} />
+                        обычная цена
                       </span>
-                    </summary>
-                    <div
-                      style={{
-                        marginTop: '8px',
-                        maxWidth: '420px',
-                        background: '#F4F1EA',
-                        borderRadius: '2px',
-                        padding: '10px 12px',
-                        fontSize: '14px',
-                        lineHeight: '1.45',
-                        color: '#1C2620',
-                      }}
-                    >
-                      Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
-                      осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
-                      прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
-                    </div>
-                  </details>
-                </span>
-              </div>
-              <MonthsCalendar
-                months={v.months || []}
-                onPrev={v.calPrev}
-                onNext={v.calNext}
-                planeTitle="Рейс из Израиля"
-              />
+                      <span className="lg">
+                        <i style={{ background: '#FCEDE9', border: '1px solid #F0CFC6' }} />
+                        дороже
+                      </span>
+                      <span className="lg">
+                        <i style={{ background: '#E8E6E1' }} />
+                        прошедшие дни
+                      </span>
+                      <span className="lg">
+                        <i
+                          style={{
+                            background: 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)',
+                            border: '1px solid #CFC9BB',
+                          }}
+                        />
+                        нет свободных мест
+                      </span>
+                      <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
+                        <summary
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer',
+                            listStyle: 'none',
+                          }}
+                        >
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                          </svg>
+                          <span>
+                            <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+                          </span>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: '1.5px solid #1F5F4A',
+                              color: '#1F5F4A',
+                              fontSize: '12px',
+                              fontWeight: '800',
+                            }}
+                          >
+                            i
+                          </span>
+                        </summary>
+                        <div
+                          style={{
+                            marginTop: '8px',
+                            maxWidth: '420px',
+                            background: '#F4F1EA',
+                            borderRadius: '2px',
+                            padding: '10px 12px',
+                            fontSize: '14px',
+                            lineHeight: '1.45',
+                            color: '#1C2620',
+                          }}
+                        >
+                          Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
+                          осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
+                          прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
+                        </div>
+                      </details>
+                    </span>
+                  </div>
+                  <MonthsCalendar
+                    months={v.months || []}
+                    onPrev={v.calPrev}
+                    onNext={v.calNext}
+                    planeTitle="Рейс из Израиля"
+                  />
+                </>
+              )}
               <div
                 style={{
                   display: 'flex',
