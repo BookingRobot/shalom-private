@@ -257,8 +257,6 @@ class HotelLogic extends PageLogic {
       sOut = sel.out ? toD(sel.out) : null;
     const m0 = st.month ?? checkin.getUTCMonth(),
       y0 = st.year ?? checkin.getUTCFullYear();
-    const m1 = (m0 + 1) % 12,
-      y1 = m0 === 11 ? y0 + 1 : y0;
     const curPpn = Math.round(totalFor(checkin, nights, 2138) / nights / 2);
     const pickDay = (date) => () => {
       const k = iso(date);
@@ -331,10 +329,7 @@ class HotelLogic extends PageLogic {
       }
       return cells;
     };
-    const months = [
-      { title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) },
-      { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) },
-    ];
+    const months = [{ title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) }];
     const selN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const curTotal = totalFor(checkin, nights, 2138),
       newTotal = selN ? totalFor(sIn, selN, 2138) : 0,

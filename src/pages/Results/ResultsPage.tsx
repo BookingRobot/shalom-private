@@ -571,8 +571,6 @@ class ResultsLogic extends PageLogic {
       sOut = ss.out ? toD(ss.out) : null;
     const sm0 = st.sm ?? checkin.getUTCMonth(),
       sy0 = st.sy ?? checkin.getUTCFullYear();
-    const sm1 = (sm0 + 1) % 12,
-      sy1 = sm0 === 11 ? sy0 + 1 : sy0;
     const AVG = 100;
     const avgPpn = (d) => {
       const n = daysBetween(TODAY, d),
@@ -685,10 +683,7 @@ class ResultsLogic extends PageLogic {
         const m = sm0 + 1;
         this.setState({ sm: m % 12, sy: m > 11 ? sy0 + 1 : sy0 });
       },
-      sMonths: [
-        { title: MONTHS_N[sm0] + ' ' + sy0, cells: sCells(sy0, sm0) },
-        { title: MONTHS_N[sm1] + ' ' + sy1, cells: sCells(sy1, sm1) },
-      ],
+      sMonths: [{ title: MONTHS_N[sm0] + ' ' + sy0, cells: sCells(sy0, sm0) }],
       sCalHint: !sIn
         ? 'Нажмите день заезда'
         : !sOut

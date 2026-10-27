@@ -127,12 +127,7 @@ class MainLogic extends PageLogic {
       }
       return cells;
     };
-    const m1 = (m0 + 1) % 12,
-      y1 = m0 === 11 ? y0 + 1 : y0;
-    const months = [
-      { title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) },
-      { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) },
-    ];
+    const months = [{ title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) }];
     const nights = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const preset = (n) => () => {
       const i = sIn || inD;

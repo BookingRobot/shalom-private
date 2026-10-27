@@ -178,8 +178,6 @@ class FlightsLogic extends PageLogic {
       }
       return out;
     };
-    const m1 = (m0 + 1) % 12,
-      y1 = m0 === 11 ? y0 + 1 : y0;
     const selN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     return {
       t,
@@ -282,10 +280,7 @@ class FlightsLogic extends PageLogic {
         this.setState({ m: m % 12, y: m > 11 ? y0 + 1 : y0 });
       },
       wds: t.wd.map((x) => ({ t: x })),
-      months: [
-        { title: t.monthsN[m0] + ' ' + y0, cells: cells(y0, m0) },
-        { title: t.monthsN[m1] + ' ' + y1, cells: cells(y1, m1) },
-      ],
+      months: [{ title: t.monthsN[m0] + ' ' + y0, cells: cells(y0, m0) }],
       calHint: !sIn ? t.calHintIn : !sOut ? t.calHintOut : t.calHintDone,
       selLine: sIn ? fmtD(sIn) + (sOut ? ' → ' + fmtD(sOut) + ' · ' + selN + ' ' + t.nights : ' → …') : '—',
       applyOff: !selN,

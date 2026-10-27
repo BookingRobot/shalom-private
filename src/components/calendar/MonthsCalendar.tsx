@@ -45,8 +45,8 @@ export function MonthsCalendar({
   onPrev,
   onNext,
   weekdays = WEEKDAYS_RU,
-  prevLabel = 'Предыдущие месяцы',
-  nextLabel = 'Следующие месяцы',
+  prevLabel = 'Предыдущий месяц',
+  nextLabel = 'Следующий месяц',
   planeTitle,
   gap = 16,
 }: Props) {
