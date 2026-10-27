@@ -29,8 +29,8 @@ export function OrderSummary({
   total,
   footer,
 }: {
-  /** [label, value] rows: dates, room, programme, guests… */
-  details: [string, ReactNode][];
+  /** [label, value, second line?] rows: dates, room, programme, guests… */
+  details: [string, ReactNode, ReactNode?][];
   /** [label, amount] rows */
   prices: [string, ReactNode][];
   total: ReactNode;
@@ -60,10 +60,11 @@ export function OrderSummary({
           <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
         </div>
         <div style={section}>
-          {details.map(([name, value]) => (
+          {details.map(([name, value, sub]) => (
             <div style={row} key={name}>
               <span style={label}>{name}</span>
               <span style={detailValue}>{value}</span>
+              {sub ? <span style={{ ...detailValue, gridColumn: '1 / -1', marginTop: '-12px' }}>{sub}</span> : null}
             </div>
           ))}
         </div>

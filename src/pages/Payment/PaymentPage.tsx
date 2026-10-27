@@ -4,7 +4,7 @@ import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { OrderSummary } from '../../components/OrderSummary';
-import { ADVANCE_RATE, orderSummary } from '../../lib/orderSummary';
+import { orderSummary } from '../../lib/orderSummary';
 import { shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
@@ -29,22 +29,32 @@ class PaymentLogic extends PageLogic {
     const plan = this.state.plan ?? 'adv';
     const method = this.state.method ?? 'card';
     const adv = plan === 'adv';
-    // Минимальный аванс — 4 % от суммы бронирования (проживание и программа), округляем вверх до евро
+    // Минимальный аванс — 4 % от проживания и лечения, округляем вверх до евро.
+    // Вся сумма = проживание и лечение + трансфер (на месте ничего не доплачивать).
     const booking = this.props.booking.booking;
-    const TOTAL = orderSummary(booking).stay,
-      ADV_RATE = ADVANCE_RATE,
-      ILS = 3.85;
+    const order = orderSummary(booking);
+    const ILS = 3.85;
+    const TOTAL = order.total;
     const checkinDay = shortDate(toD(booking.checkin));
-    const advN = Math.ceil(TOTAL * ADV_RATE),
-      restN = TOTAL - advN;
+    const advN = order.advance,
+      restN = TOTAL - advN,
+      stayRestN = order.stay - advN;
+    const eur = (n: number) => fmt(n) + '\u00a0€';
     const advAmt = fmt(advN),
       restAmt = fmt(restN),
       totalAmt = fmt(TOTAL);
     const amount = adv ? advAmt + '\u00a0€' : totalAmt + '\u00a0€';
+    /** "2 052 € в санатории и 120 € за трансфер" or just the sanatorium part */
+    const restSplit = order.transfer
+      ? eur(stayRestN) + ' в санатории и ' + eur(order.transfer) + ' за трансфер'
+      : 'в санатории';
     return {
       advAmt,
       restAmt,
+      stayRestAmt: fmt(stayRestN),
+      transferAmt: order.transfer ? fmt(order.transfer) : '',
       totalAmt,
+      fullIncludes: order.transfer ? 'Проживание, лечение и трансфер.' : 'Проживание и лечение.',
       advCls: adv ? 'on' : '',
       fullCls: adv ? '' : 'on',
       pickAdv: () => this.setState({ plan: 'adv' }),
@@ -67,9 +77,11 @@ class PaymentLogic extends PageLogic {
           restAmt +
           '\u00a0€ — при заезде ' +
           checkinDay +
-          ' в санатории.'
+          (order.transfer ? ': ' + restSplit + '.' : ' в санатории.')
         : 'График: ' + totalAmt + '\u00a0€ — сегодня, 27 октября. На месте доплачивать ничего не нужно.',
-      rest: adv ? 'Остаток ' + restAmt + '\u00a0€ — в санатории при заезде' : 'На месте ничего доплачивать не нужно',
+      rest: adv
+        ? 'Остаток ' + restAmt + '\u00a0€ — при заезде' + (order.transfer ? ': ' + restSplit : ', в санатории')
+        : 'Всё оплачено, включая трансфер. На месте ничего доплачивать не нужно',
       payLabel:
         method === 'bit' && (adv ? advN : TOTAL) * ILS <= 5000
           ? 'Оплатить в Bit ' + fmt(Math.round((adv ? advN : TOTAL) * ILS)) + '\u00a0₪'
@@ -158,10 +170,21 @@ export default function PaymentPage() {
                     <span className="plan-amount">
                       {v.advAmt}&nbsp;€ <small>сейчас</small>
                     </span>
-                    <span className="plan-note">4&nbsp;% от стоимости бронирования</span>
+                    <span className="plan-note">4&nbsp;% от проживания и лечения</span>
                     <span className="plan-text">Этого достаточно, чтобы санаторий подтвердил бронь.</span>
                     <span className="plan-rest">
-                      Остальные <strong>{v.restAmt}&nbsp;€</strong> — при заезде: наличными, картой или переводом.
+                      Остальные <strong>{v.restAmt}&nbsp;€</strong> — при заезде:
+                      {v.transferAmt ? (
+                        <span className="plan-rest-list">
+                          <span>
+                            <strong>{v.stayRestAmt}&nbsp;€</strong> — санаторию
+                          </span>
+                          <span>
+                            <strong>{v.transferAmt}&nbsp;€</strong> — за трансфер
+                          </span>
+                        </span>
+                      ) : null}{' '}
+                      <span className="plan-rest-how">Наличными, картой или переводом.</span>
                     </span>
                     <span className="plan-badge">Так платят 9 из 10 гостей</span>
                   </span>
@@ -176,7 +199,9 @@ export default function PaymentPage() {
                       {v.totalAmt}&nbsp;€ <small>сейчас</small>
                     </span>
                     <span className="plan-note">Ничего не платить на месте</span>
-                    <span className="plan-text">Удобно, если оплачивают родственники или организация.</span>
+                    <span className="plan-text">
+                      {v.fullIncludes} Удобно, если оплачивают родственники или организация.
+                    </span>
                   </span>
                 </button>
               </div>
@@ -718,7 +743,7 @@ export default function PaymentPage() {
             details={[
               ['Даты', order.dates],
               ['Номер', 'Двухместный'],
-              ['Программа', order.program],
+              ['Программа', order.programName, order.programPerDay],
               ['Гости', 'Mikhail Levin, Irina Levina'],
               ['Трансфер', order.transferPlaces],
             ]}

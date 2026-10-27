@@ -1125,7 +1125,7 @@ export default function TransferPage() {
             details={[
               ['Даты', order.dates],
               ['Номер', 'Двухместный'],
-              ['Программа', order.program],
+              ['Программа', order.programName, order.programPerDay],
               ['Гости', order.guests],
             ]}
             prices={[

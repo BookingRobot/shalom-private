@@ -102,7 +102,7 @@
 .pg-payment .radio {
   width: 28px;
   height: 28px;
-  border-radius: 2px;
+  border-radius: 50%;
   border: 2px solid #8a968f;
   flex: none;
   display: flex;
@@ -118,7 +118,7 @@
   display: block;
   width: 14px;
   height: 14px;
-  border-radius: 2px;
+  border-radius: 50%;
   background: #1f5f4a;
 }
 .pg-payment .chk {
@@ -198,7 +198,7 @@
   margin-top: 8px;
   background: #fff1d6;
   color: #8a5a00;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 2px;
@@ -226,4 +226,14 @@
     padding: 14px;
     gap: 12px;
   }
+}
+
+.pg-payment .plan-rest-list {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0;
+  color: #1c2620;
+}
+.pg-payment .plan-rest-how {
+  display: block;
 }

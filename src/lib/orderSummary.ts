@@ -52,6 +52,10 @@ export function orderSummary(b: Booking) {
     dates: stayRange(b.checkin, b.checkout) + ' · ' + nights + ' ' + nightsWord(nights),
     nights,
     program: program.short,
+    /** "«Миди»" */
+    programName: program.name.replace('Программа ', ''),
+    /** "3 процедуры в день" */
+    programPerDay: program.perDay,
     /** "Программа «Миди» · 3 процедуры в день" */
     programFull: program.name + ' · ' + program.perDay,
     guests: guestsLabel(b),

@@ -494,7 +494,7 @@ export default function GuestsPage() {
             details={[
               ['Даты', order.dates],
               ['Номер', 'Двухместный'],
-              ['Программа', order.program],
+              ['Программа', order.programName, order.programPerDay],
               ['Гости', order.guests],
               ['Трансфер', order.transferRoute],
             ]}
