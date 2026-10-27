@@ -552,31 +552,15 @@ export default function TransferPage() {
                       Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2 часов.
                     </p>
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
-                      gap: '12px',
-                    }}
-                  >
-                    {(v.cities || []).map((c: any, _i0: number) => (
-                      <Fragment key={_i0}>
-                        <button
-                          type="button"
-                          className={`choice ${c.cls ?? ''}`}
-                          onClick={c.pick}
-                          style={{ minHeight: '80px' }}
-                        >
-                          {' '}
-                          <span className={`radio ${c.cls ?? ''}`}>
-                            <i />
-                          </span>{' '}
-                          <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <strong style={{ fontSize: '18px' }}>{c.from}</strong>
-                            <span style={{ color: '#3E4B44', fontSize: '15px' }}>{c.info}</span>
-                          </span>{' '}
-                        </button>
-                      </Fragment>
+                  <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
+                    {(v.cities || []).map((c: any, i: number) => (
+                      <button key={i} type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
+                        <span className={`radio ${c.cls ?? ''}`}>
+                          <i />
+                        </span>
+                        <span className="rowpick-name">{c.from}</span>
+                        <span className="rowpick-info">{c.info}</span>
+                      </button>
                     ))}
                   </div>
                   <div
@@ -957,28 +941,14 @@ export default function TransferPage() {
                                 }}
                               >
                                 <div className="lbl">Куда отвезти {v.outDay}?</div>
-                                <div
-                                  style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit,minmax(min(200px,100%),1fr))',
-                                    gap: '10px',
-                                  }}
-                                >
-                                  {(v.backCities || []).map((c: any, _i0: number) => (
-                                    <Fragment key={_i0}>
-                                      <button
-                                        type="button"
-                                        className={`choice ${c.cls ?? ''}`}
-                                        onClick={c.pick}
-                                        style={{ minHeight: '50px', padding: '12px 16px' }}
-                                      >
-                                        {' '}
-                                        <span className={`radio ${c.cls ?? ''}`}>
-                                          <i />
-                                        </span>{' '}
-                                        <strong style={{ fontSize: '17px' }}>{c.to}</strong>{' '}
-                                      </button>
-                                    </Fragment>
+                                <div className="rowlist" role="radiogroup" aria-label="Куда отвезти">
+                                  {(v.backCities || []).map((c: any, i: number) => (
+                                    <button key={i} type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
+                                      <span className={`radio ${c.cls ?? ''}`}>
+                                        <i />
+                                      </span>
+                                      <span className="rowpick-name">{c.to}</span>
+                                    </button>
                                   ))}
                                 </div>
                                 <div

@@ -128,3 +128,48 @@
 .pg-transfer .acc:hover {
   text-decoration: underline;
 }
+
+/* Compact single-choice list (pick-up / drop-off place) */
+.pg-transfer .rowlist {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e3ded2;
+  border-radius: 2px;
+  background: #fff;
+}
+.pg-transfer .rowpick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: none;
+  border-top: 1px solid #eeeae1;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.pg-transfer .rowpick:first-child {
+  border-top: none;
+}
+.pg-transfer .rowpick:hover {
+  background: #fafbf9;
+}
+.pg-transfer .rowpick.on {
+  background: #eef5f1;
+}
+.pg-transfer .rowpick .radio {
+  width: 22px;
+  height: 22px;
+}
+.pg-transfer .rowpick-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c2620;
+}
+.pg-transfer .rowpick-info {
+  font-size: 15px;
+  color: #5e6862;
+}
