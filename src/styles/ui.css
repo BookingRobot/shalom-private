@@ -1133,3 +1133,173 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     padding-right: 16px;
   }
 }
+
+/* ── Date-picker dialog: fits a laptop screen (legend in a side column, compact cells,
+      the confirm row always visible at the bottom) ── */
+.cal-dlg {
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.cal-dlg > * {
+  flex-shrink: 0;
+}
+.cal-dlg > div:last-child {
+  position: sticky;
+  bottom: -16px;
+  margin-bottom: -16px;
+  padding-bottom: 16px;
+  background: #fff;
+  z-index: 2;
+}
+.cal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 24px;
+  align-items: start;
+}
+.cal-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 1px solid #e3ded2;
+  padding-left: 20px;
+}
+.cal-side-h {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3e4b44;
+}
+.cal-pgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.page .cal-pgrid .preset {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 15px;
+}
+.cal-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid #e3ded2;
+}
+.page .cal-legend .lg {
+  font-size: 14px;
+  gap: 8px;
+}
+.cal-fly {
+  font-size: 14px;
+  color: #3e4b44;
+  margin-top: 4px;
+}
+.cal-fly > div {
+  font-size: 13px !important;
+}
+.cal-dlg .months-calendar .cell {
+  min-height: 46px;
+  font-size: 18px;
+  gap: 3px;
+}
+.cal-dlg .months-calendar .cell small {
+  font-size: 12.5px;
+}
+.cal-dlg .months-calendar .wd {
+  padding: 2px 0;
+}
+.cal-dlg .months-calendar > div {
+  min-width: 0;
+}
+.cal-dlg .months-calendar .navbtn {
+  width: 42px;
+  height: 42px;
+}
+@media (max-width: 760px) {
+  .cal-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .cal-side {
+    display: contents;
+  }
+  .cal-side-h {
+    order: -3;
+  }
+  .cal-pgrid {
+    order: -2;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .page .cal-pgrid .preset {
+    padding: 0 2px;
+    font-size: 14px;
+  }
+  .cal-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 0;
+  }
+  .page .cal-legend .lg {
+    font-size: 13px;
+  }
+  .cal-dlg > div:last-child {
+    gap: 10px !important;
+  }
+  .cal-dlg > div:last-child > div:first-child {
+    gap: 14px !important;
+  }
+  .cal-dlg > div:last-child > div:first-child > svg {
+    display: none;
+  }
+  .cal-dlg .months-calendar {
+    gap: 6px !important;
+  }
+  .cal-dlg .months-calendar .navbtn {
+    width: 34px;
+    height: 34px;
+  }
+  .cal-dlg .months-calendar .cell {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .cal-dlg .months-calendar .cell small {
+    font-size: 11px;
+  }
+  .cal-dlg .months-calendar .cell > span[title] {
+    top: 2px !important;
+    right: 2px !important;
+  }
+  .cal-dlg .months-calendar .cell > span[title] svg {
+    width: 11px;
+    height: 11px;
+  }
+}
+/* flexible dates inside the wide dialog: best-date options in two columns */
+@media (min-width: 900px) {
+  .cal-dlg .fd-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .cal-dlg .fd-list > span {
+    grid-column: 1 / -1;
+  }
+  .cal-dlg .fd-opt {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 8px 14px;
+  }
+  .cal-dlg .fd-opt .fd-go {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  .cal-dlg .fd-opt .fd-sum {
+    grid-column: 1;
+    font-size: 15px;
+  }
+}

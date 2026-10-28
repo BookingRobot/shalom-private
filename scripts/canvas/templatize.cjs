@@ -176,13 +176,14 @@ async function searchBand(p, { city }) {
       tpl.parentNode.insertBefore(loop, tpl);
       loop.appendChild(tpl);
       // exact (presets + grid) vs flexible
-      const presetRow = presets[0].parentElement;
+      const calBody = dialog.querySelector('.cal-body');
+      const presetRow = calBody || presets[0].parentElement;
       const exact = document.createElement('sc-if');
       exact.setAttribute('value', '⟦exactOn⟧');
       exact.setAttribute('hint-placeholder-val', '⟦true⟧');
       presetRow.parentNode.insertBefore(exact, presetRow);
       exact.appendChild(presetRow);
-      exact.appendChild(mc);
+      if (!calBody) exact.appendChild(mc);
       exact.insertAdjacentHTML(
         'afterend',
         '<sc-if value="⟦flexOn⟧" hint-placeholder-val="⟦false⟧">' + flexHtml + '</sc-if>',
