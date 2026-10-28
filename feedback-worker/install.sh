@@ -11,6 +11,7 @@ SVC=br-shalom-feedback
 PORT=${PORT:-8787}
 DOMAIN=${DOMAIN:-coding.ateisiu.lt}
 URLPATH=/br-shalom-feedback
+REF=${REF:-main}
 ORIGINS=https://shalom.bookingrobot.eu,http://localhost:5173,http://localhost:4173
 
 ok() { echo "  ✔ $*"; }
@@ -47,7 +48,7 @@ step "3/6 Programos failai iš GitHub"
 mkdir -p "$APP"
 for f in worker.js server.mjs; do
   curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.raw" \
-    "https://api.github.com/repos/$REPO/contents/feedback-worker/$f?ref=main" -o "$APP/$f.new" ||
+    "https://api.github.com/repos/$REPO/contents/feedback-worker/$f?ref=$REF" -o "$APP/$f.new" ||
     die "nepavyko parsisiųsti $f — tokenas turi matyti br-shalom (Contents: Read and write)"
   mv "$APP/$f.new" "$APP/$f"
 done
