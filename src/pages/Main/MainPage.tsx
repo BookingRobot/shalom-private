@@ -664,7 +664,7 @@ export default function MainPage() {
                       </div>
                       <Link
                         className="btn btn-secondary"
-                        to="/hotel"
+                        to={'/hotel?h=' + h.id}
                         style={{ minHeight: '42px', fontSize: '15px', padding: '0 16px' }}
                       >
                         Посмотреть →

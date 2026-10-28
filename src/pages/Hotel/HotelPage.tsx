@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
@@ -11,11 +11,14 @@ import { transferBySanatorium } from '../../data/transferPolicy';
 import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
-import { ICON_PATHS, amenity } from '../../data/iconPaths';
+import { ICON_PATHS } from '../../data/iconPaths';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { GuestsPicker, guestsLabel } from '../../components/GuestsPicker';
 import { RoomCard } from '../../components/RoomCard';
+import { HOTEL_TABS, HotelTabContent, type HotelTab } from '../../components/hotel/HotelTabs';
+import { pick as pickIcon } from '../../components/hotel/illustrations';
+import { hotelInfo } from '../../data/hotelInfo';
 import { eur, placePrice, quote } from '../../lib/pricing';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
@@ -32,7 +35,19 @@ class HotelLogic extends PageLogic {
   constructor(props: PageServices) {
     super(props);
     const b = props.booking.booking;
-    this.state = { i: 0, det: {}, sec: {}, in: b.checkin, out: b.checkout };
+    // which sanatorium: ?h=<id> in the link, else the one in the order; #treat etc. opens a tab
+    const loc = typeof window !== 'undefined' ? window.location : null;
+    const q = loc ? new URLSearchParams(loc.search).get('h') : null;
+    const hash = loc ? loc.hash.replace('#', '') : '';
+    this.state = {
+      i: 0,
+      det: {},
+      sec: {},
+      in: b.checkin,
+      out: b.checkout,
+      hid: hotelInfo(q || b.hotelId).id,
+      tab: HOTEL_TABS.some(([k]) => k === hash) ? hash : 'rooms',
+    };
   }
   syncBooking(st) {
     return { checkin: st.in, checkout: st.out };
@@ -43,14 +58,17 @@ class HotelLogic extends PageLogic {
   _rv() {
     const GQ = { adults: this.props.booking.booking.adults, children: this.props.booking.booking.children };
     const {
+      info,
       about: EGLE_ABOUT,
       photos: EGLE_PHOTOS,
       allPhotos: EGLE_ALL_PHOTOS,
       programs: EGLE_PROGRAMS,
       rooms: EGLE_ROOMS,
+      busyKeys,
       specializations: EGLE_SPECIALIZATIONS,
       transferCars: TRANSFER_CARS,
-    } = api.getSanatorium(this.props.booking.booking.hotelId);
+    } = api.getSanatorium(this.state.hid);
+    const isEgle = info.id === 'egle-comfort';
 
     const det = this.state.det || {},
       sec = this.state.sec || {};
@@ -87,22 +105,6 @@ class HotelLogic extends PageLogic {
     const nightsLabel = nights + ' ' + nightsWord(nights);
     // ---- Room-first: each room priced with the cheapest programme; programmes are upgrades inside ----
     const PROGS = (EGLE_PROGRAMS as any[])
-      .concat([
-        {
-          n: 3,
-          title: 'Программа «Премиум» — 5 процедур в день + массаж',
-          price: '2 550',
-          prog: [
-            amenity('meals', 'Полный пансион, диетическое меню'),
-            amenity('doctor', 'Консультация врача'),
-            amenity('proc', '5 процедур в день'),
-            amenity('massage', 'Массаж каждый день'),
-            amenity('pool', 'Бассейны без ограничений'),
-          ],
-          details:
-            'Для взрослого в цену включено:\n— Всё, что в программе «Макси»\n— Ежедневный классический массаж 30 мин\n— Полный пансион: завтрак, обед, полдник, ужин, диетическое меню по назначению врача\n\nПроцедуры назначает врач после консультации.',
-        },
-      ])
       .map((p) => ({
         ...p,
         priceN: totalFor(checkin, nights, toNum(p.price)),
@@ -155,7 +157,7 @@ class HotelLogic extends PageLogic {
     };
 
     // Room types fully booked on some dates [ПРИМЕР — ИЗ ДАННЫХ О НАЛИЧИИ]: [from, to) per room
-    const ROOM_KEY = { 3: 'egle-comfort:junior' };
+    const ROOM_KEY = busyKeys;
     const ps = st.ps || {};
     const offers = EGLE_ROOMS.map((r) => {
       const dOpen = !!det[r.n];
@@ -205,7 +207,7 @@ class HotelLogic extends PageLogic {
         avail: !busy,
         busyRange: range(checkin, checkout),
         nextFree: freeFrom(rkey),
-        choose: () => this.props.booking.update({ roomId: 'room-' + r.n }),
+        choose: () => this.props.booking.update({ hotelId: info.id, roomId: 'room-' + r.n }),
         openRoomCal: () =>
           this.setState({
             cal: true,
@@ -437,16 +439,43 @@ class HotelLogic extends PageLogic {
       guestsWho: guestsLabel(this.props.booking.booking.adults, this.props.booking.booking.children),
       nightsLabel,
       // Eglė meets its guests itself (data/transferPolicy) — nothing to sell here
-      freeTr: transferBySanatorium(this.props.booking.booking.hotelId || 'egle-comfort')
+      freeTr: transferBySanatorium(info.id)
         ? 'Трансфер аэропорт Вильнюса ⇄ санаторий организует сам санаторий «Эгле» — он включён в стоимость, отдельно заказывать не нужно.'
-        : nights >= 10
-          ? 'У вас ' +
-            nightsLabel +
-            ' — трансфер из аэропорта Вильнюса для вас бесплатный. Остальные направления — по тарифу.'
-          : 'При заезде от 10 ночей трансфер из аэропорта Вильнюса — бесплатно (у вас ' + nightsLabel + ').',
+        : 'Трансфер из аэропорта Вильнюса, Каунаса или Варшавы закажете на шаге «Дорога» — встретим с табличкой и довезём до стойки.',
       offers,
+      noRooms: offers.length === 0,
+      info,
+      isEgle,
+      tab: (st.tab || 'rooms') as HotelTab,
+      setTab: (k: HotelTab) => {
+        this.setState({ tab: k });
+        if (typeof window !== 'undefined') {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search + '#' + k);
+          document.getElementById('hotel-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      },
+      toRooms: () => {
+        this.setState({ tab: 'rooms' });
+        if (typeof window !== 'undefined') {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search + '#rooms');
+          document.getElementById('hotel-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      },
+      openPhoto: (k: number) => this.setState({ lb: true, i: k }),
+      strip: isEgle
+        ? ['Всё в одном здании', 'Врач говорит по-русски', 'Питание 3 раза в день', 'Бассейн и сауны']
+        : info.text.about.amenities.slice(0, 4),
+      tiles: [0, 1, 2, 3].map((k) => {
+        const p = EGLE_PHOTOS[k] || EGLE_PHOTOS[0];
+        return { src: p.src, label: p.alt.replace(/^[^:]+:\s*/, '') };
+      }),
+      trTitle: transferBySanatorium(info.id)
+        ? 'Как добраться — трансфер от санатория'
+        : 'Как добраться и заказать трансфер',
       about: EGLE_ABOUT,
-      specs: EGLE_SPECIALIZATIONS,
+      specs: isEgle
+        ? EGLE_SPECIALIZATIONS
+        : info.text.treatment.profiles.map((p) => ({ t: p, s: '', d: ICON_PATHS.proc })),
       trCars: TRANSFER_CARS,
       times,
       specOpen: !!sec.spec,
@@ -476,8 +505,33 @@ class HotelLogic extends PageLogic {
 }
 
 export default function HotelPage() {
-  usePageTitle('Санаторий Эгле Комфорт');
   const [v, logic] = usePageLogic(HotelLogic);
+  usePageTitle(v.info.name);
+  // opening a sanatorium makes it the sanatorium of the order
+  const { booking, update } = logic.props.booking;
+  // links like /hotel#reviews (and the browser's back button) switch the tab
+  useEffect(() => {
+    const onHash = () => {
+      const k = window.location.hash.replace('#', '');
+      if (HOTEL_TABS.some(([t]) => t === k)) logic.setState({ tab: k });
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [logic]);
+  // the chosen tab stays visible in the tab bar on a phone
+  useEffect(() => {
+    const nav = document.querySelector<HTMLElement>('.ht-tabs');
+    const btn = nav?.querySelector<HTMLElement>('button.on');
+    if (nav && btn) nav.scrollLeft = btn.offsetLeft - nav.offsetLeft - (nav.clientWidth - btn.offsetWidth) / 2;
+  }, [v.tab]);
+  // a photo opened from the "О санатории" tab: the gallery starts at that photo
+  useEffect(() => {
+    if (v.lightbox && logic.state.i) document.getElementById('lbp-' + logic.state.i)?.scrollIntoView();
+  }, [v.lightbox, logic.state.i]);
+  useEffect(() => {
+    if (booking.hotelId !== v.info.id) update({ hotelId: v.info.id });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [v.info.id]);
   return (
     <div className="page pg-hotel">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -498,7 +552,7 @@ export default function HotelPage() {
           }}
         >
           <div style={{ fontSize: '15px', color: '#3E4B44' }}>
-            <Link to="/">Санатории</Link> → <Link to="/results">Друскининкай</Link> → Эгле Комфорт
+            <Link to="/">Санатории</Link> → <Link to={v.info.resortLink}>{v.info.resort}</Link> → {v.info.short}
           </div>
           <div
             style={{
@@ -511,9 +565,12 @@ export default function HotelPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <h1 style={{ fontSize: '32px' }}>Санаторий Эгле Комфорт</h1>
-                <span style={{ color: '#8A6500', fontSize: '20px', letterSpacing: '1px' }} aria-label="4 звезды">
-                  ★★★★
+                <h1 style={{ fontSize: '32px' }}>{v.info.name}</h1>
+                <span
+                  style={{ color: '#8A6500', fontSize: '20px', letterSpacing: '1px' }}
+                  aria-label={v.info.starsN + ' звезды'}
+                >
+                  {'★'.repeat(v.info.starsN)}
                 </span>
               </div>
               <div className="fact" style={{ fontSize: '16px' }}>
@@ -531,7 +588,10 @@ export default function HotelPage() {
                 >
                   <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
                 </svg>
-                Друскининкай · Eglės g. 1 · <Link to="/hotel#reviews">26 отзывов</Link>
+                {v.info.resort} · {v.info.address} ·{' '}
+                <button type="button" className="ht-reviews-link" onClick={() => v.setTab('reviews')}>
+                  {v.info.reviewsN} отзывов
+                </button>
               </div>
             </div>
             <Link className="btn btn-secondary" to="/results" style={{ minHeight: '48px', fontSize: '16px' }}>
@@ -558,7 +618,7 @@ export default function HotelPage() {
               }}
             >
               <img
-                src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
+                src={v.tiles[0].src}
                 alt=""
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -575,13 +635,13 @@ export default function HotelPage() {
                   borderRadius: 'var(--r)',
                 }}
               >
-                Территория
+                {v.tiles[0].label}
               </span>
             </button>
             <button
               type="button"
-              onClick={v.pick2}
-              aria-label="Номер"
+              onClick={v.pick1}
+              aria-label={v.tiles[1].label}
               style={{
                 position: 'relative',
                 padding: '0',
@@ -596,7 +656,7 @@ export default function HotelPage() {
               }}
             >
               <img
-                src="/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg"
+                src={v.tiles[1].src}
                 alt=""
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -613,13 +673,13 @@ export default function HotelPage() {
                   borderRadius: 'var(--r)',
                 }}
               >
-                Номер
+                {v.tiles[1].label}
               </span>
             </button>
             <button
               type="button"
-              onClick={v.pick1}
-              aria-label="Бассейн"
+              onClick={v.pick2}
+              aria-label={v.tiles[2].label}
               style={{
                 position: 'relative',
                 padding: '0',
@@ -634,7 +694,7 @@ export default function HotelPage() {
               }}
             >
               <img
-                src="/img/99a77311bc746e38e051bd1146cc0517.jpg"
+                src={v.tiles[2].src}
                 alt=""
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -651,7 +711,7 @@ export default function HotelPage() {
                   borderRadius: 'var(--r)',
                 }}
               >
-                Бассейн
+                {v.tiles[2].label}
               </span>
             </button>
             <button
@@ -672,7 +732,7 @@ export default function HotelPage() {
               }}
             >
               <img
-                src="/img/d4cc2009f5e9b68736ab9f9a044668e5.jpg"
+                src={v.tiles[3].src}
                 alt=""
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -737,7 +797,7 @@ export default function HotelPage() {
                   }}
                 >
                   <div style={{ color: '#fff', fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '600' }}>
-                    Санаторий Эгле Комфорт — все фото ({v.photoCount})
+                    {v.info.name} — все фото ({v.photoCount})
                   </div>
                   <button
                     type="button"
@@ -770,7 +830,16 @@ export default function HotelPage() {
                 >
                   {(v.allPhotos || []).map((p: any, _i0: number) => (
                     <Fragment key={_i0}>
-                      <figure style={{ margin: '0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <figure
+                        id={'lbp-' + _i0}
+                        style={{
+                          margin: '0',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                          scrollMarginTop: '80px',
+                        }}
+                      >
                         <img
                           src={p.src}
                           alt={p.alt}
@@ -803,213 +872,142 @@ export default function HotelPage() {
               borderRadius: 'var(--r)',
             }}
           >
-            <div className="strip">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M4 3h16v18H4zM12 3v18M8 10V7M16 10V7M8 14v3M16 14v3" />
-              </svg>
-              Всё в одном здании
-            </div>
-            <div className="strip">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4" />
-              </svg>
-              Врач говорит по-русски
-            </div>
-            <div className="strip">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v10M17 3v8" />
-              </svg>
-              Питание 3 раза в день
-            </div>
-            <div className="strip">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6" />
-              </svg>
-              Бассейн и сауны
-            </div>
+            {(v.strip || []).map((x: string) => (
+              <div className="strip" key={x}>
+                <span style={{ color: '#1F5F4A', display: 'inline-flex' }}>{pickIcon(x)}</span>
+                {x}
+              </div>
+            ))}
           </div>
-          <nav style={{ display: 'flex', gap: '30px', borderBottom: '1px solid #E3DED2', flexWrap: 'wrap' }}>
-            <Link className="tab on" to="/hotel#rooms">
-              Номера и программы
-            </Link>
-            <Link className="tab" to="/hotel#treat">
-              Лечение
-            </Link>
-            <Link className="tab" to="/hotel#food">
-              Питание
-            </Link>
-            <Link className="tab" to="/hotel#about">
-              О санатории
-            </Link>
-            <Link className="tab" to="/hotel#reviews">
-              Отзывы (26)
-            </Link>
+          <nav className="ht-tabs" id="hotel-tabs" aria-label="Разделы санатория">
+            {HOTEL_TABS.map(([k, t]) => (
+              <button
+                key={k}
+                type="button"
+                className={v.tab === k ? 'on' : ''}
+                aria-current={v.tab === k ? 'page' : undefined}
+                onClick={() => v.setTab(k)}
+              >
+                {t}
+                {k === 'reviews' ? <small>{v.info.reviewsN}</small> : null}
+              </button>
+            ))}
           </nav>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'start' }}>
-            <div style={{ flex: '1 1 100%', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div
-                style={{
-                  background: '#EEF5F1',
-                  border: '2px solid #1F5F4A',
-                  borderRadius: 'var(--r)',
-                  padding: '14px 20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                  <svg
-                    width="30"
-                    height="30"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    style={{ flex: 'none' }}
-                  >
-                    <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                  </svg>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: '700',
-                        color: '#3E4B44',
-                        textTransform: 'uppercase',
-                        letterSpacing: '.04em',
-                      }}
+            {v.tab === 'rooms' ? (
+              <div style={{ flex: '1 1 100%', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div
+                  style={{
+                    background: '#EEF5F1',
+                    border: '2px solid #1F5F4A',
+                    borderRadius: 'var(--r)',
+                    padding: '14px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '16px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                    <svg
+                      width="30"
+                      height="30"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
                     >
-                      Ваши даты
+                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#3E4B44',
+                          textTransform: 'uppercase',
+                          letterSpacing: '.04em',
+                        }}
+                      >
+                        Ваши даты
+                      </span>
+                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', lineHeight: '1.15' }}>
+                        {v.dateRange}
+                      </strong>
+                    </div>
+                    <span className="hb-nights">{v.nightsLabel}</span>
+                    {/* the guest may land here straight from the home page: guests can be changed right here */}
+                    <span className="hb-guests">
+                      <GuestsPicker inline />
                     </span>
-                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', lineHeight: '1.15' }}>
-                      {v.dateRange}
-                    </strong>
                   </div>
-                  <span className="hb-nights">{v.nightsLabel}</span>
-                  {/* the guest may land here straight from the home page: guests can be changed right here */}
-                  <span className="hb-guests">
-                    <GuestsPicker inline />
-                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={v.openCal}
+                    style={{ minHeight: '50px', fontSize: '16px', padding: '0 20px' }}
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    Изменить даты · когда дешевле?
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={v.openCal}
-                  style={{ minHeight: '50px', fontSize: '16px', padding: '0 20px' }}
+                <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
+                  <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
+                  <div style={{ fontSize: '16px', color: '#3E4B44' }}>
+                    Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить внутри
+                    карточки номера.
+                  </div>
+                </div>
+                {v.noRooms ? (
+                  <div className="ht-cta">
+                    <span>
+                      Цены и свободные номера в {v.info.short} подскажет консультант — ответим в течение часа в рабочее
+                      время.
+                    </span>
+                    <a className="btn btn-primary" href="tel:+37060000000">
+                      Узнать цены
+                    </a>
+                  </div>
+                ) : null}
+                {(v.offers || []).map((o: any, _i0: number) => (
+                  <Fragment key={_i0}>
+                    <RoomCard o={o} nightsLabel={v.nightsLabel} />
+                  </Fragment>
+                ))}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontSize: '15px',
+                    color: '#3E4B44',
+                    background: '#EEF5F1',
+                    borderRadius: 'var(--r)',
+                    padding: '10px 16px',
+                  }}
                 >
                   <svg
                     width="20"
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                  </svg>
-                  Изменить даты · когда дешевле?
-                </button>
-              </div>
-              <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
-                <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
-                <div style={{ fontSize: '16px', color: '#3E4B44' }}>
-                  Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить внутри
-                  карточки номера.
-                </div>
-              </div>
-              {(v.offers || []).map((o: any, _i0: number) => (
-                <Fragment key={_i0}>
-                  <RoomCard o={o} nightsLabel={v.nightsLabel} />
-                </Fragment>
-              ))}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  fontSize: '15px',
-                  color: '#3E4B44',
-                  background: '#EEF5F1',
-                  borderRadius: 'var(--r)',
-                  padding: '10px 16px',
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  style={{ flex: 'none' }}
-                >
-                  <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 8v8M8 12h8" />
-                </svg>
-                Процедуры назначает врач после консультации.
-              </div>
-              <button type="button" className="accrow" onClick={v.toggleTr}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
                     stroke="#1F5F4A"
                     strokeWidth="1.8"
                     strokeLinecap="round"
@@ -1017,518 +1015,429 @@ export default function HotelPage() {
                     aria-hidden="true"
                     style={{ flex: 'none' }}
                   >
-                    <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
+                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 8v8M8 12h8" />
                   </svg>
-                  Как добраться — трансфер от санатория
-                </span>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              {v.trOpen ? (
-                <>
-                  <div
-                    style={{
-                      background: '#fff',
-                      border: '1px solid #E3DED2',
-                      borderTop: 'none',
-                      borderRadius: '0 0 var(--r) var(--r)',
-                      padding: '18px 18px 16px',
-                      marginTop: '-8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '16px',
-                    }}
+                  Процедуры назначает врач после консультации.
+                </div>
+                <button type="button" className="accrow" onClick={v.toggleTr}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
+                    >
+                      <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
+                    </svg>
+                    {v.trTitle}
+                  </span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
-                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '16px' }}>
-                      <span className="ico">
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
-                          <circle cx="12" cy="10" r="2.5" />
-                        </svg>
-                        Из аэропорта Вильнюса — <strong>130 км</strong>
-                      </span>
-                      <span className="ico">
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <circle cx="12" cy="12" r="9" />
-                          <path d="M12 7v5l3 2" />
-                        </svg>
-                        В пути <strong>около 2 часов</strong>
-                      </span>
-                      <span className="ico">
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-                        </svg>
-                        Также из Каунаса, Варшавы, Мариямполе
-                      </span>
-                    </div>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                {v.trOpen ? (
+                  <>
                     <div
                       style={{
+                        background: '#fff',
+                        border: '1px solid #E3DED2',
+                        borderTop: 'none',
+                        borderRadius: '0 0 var(--r) var(--r)',
+                        padding: '18px 18px 16px',
+                        marginTop: '-8px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '10px',
-                        padding: '14px 18px 14px',
-                        background: '#EDF4EF',
-                        border: '1px solid #C8DED3',
-                        borderRadius: 'var(--r)',
+                        gap: '16px',
                       }}
                     >
-                      <div style={{ fontWeight: '800', fontSize: '17px' }}>{v.freeTr}</div>
-                      <div style={{ fontWeight: '700', fontSize: '15px', color: '#3E4B44' }}>Как проходит трансфер</div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          justifyContent: 'space-between',
-                          gap: '4px',
-                          flexWrap: 'nowrap',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/39ad8fe2bfcea92423d717bc9dac8f37.png"
-                            alt="Водитель встречает с табличкой"
-                            style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '15px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                            }}
+                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '16px' }}>
+                        <span className="ico">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
                           >
-                            Встретим с табличкой
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              color: '#3E4B44',
-                              textAlign: 'center',
-                              lineHeight: '1.3',
-                              maxWidth: '160px',
-                            }}
+                            <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
+                            <circle cx="12" cy="10" r="2.5" />
+                          </svg>
+                          Из аэропорта Вильнюса — <strong>130 км</strong>
+                        </span>
+                        <span className="ico">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
                           >
-                            Водитель ждёт в зале прилёта с вашей фамилией
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', marginTop: '30px' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/838118fe86e78736560c2ece8886b813.png"
-                            alt="Водитель укладывает чемодан в багажник"
-                            style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '15px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                            }}
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 7v5l3 2" />
+                          </svg>
+                          В пути <strong>около 2 часов</strong>
+                        </span>
+                        <span className="ico">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
                           >
-                            Поможем с багажом
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              color: '#3E4B44',
-                              textAlign: 'center',
-                              lineHeight: '1.3',
-                              maxWidth: '160px',
-                            }}
-                          >
-                            Чемоданы — в багажник, вам ничего нести не нужно
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', marginTop: '30px' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/565b4c9fbca5b96b414361547b3a452f.png"
-                            alt="Микроавтобус едет к санаторию"
-                            style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '15px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                            }}
-                          >
-                            Довезём до санатория
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              color: '#3E4B44',
-                              textAlign: 'center',
-                              lineHeight: '1.3',
-                              maxWidth: '160px',
-                            }}
-                          >
-                            Остановки по пути — по вашей просьбе
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', marginTop: '30px' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/05b41fccbf0a437d88db58e3ce3a1a91.png"
-                            alt="Гость у стойки регистрации санатория"
-                            style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '15px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                            }}
-                          >
-                            Проводим до стойки
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              color: '#3E4B44',
-                              textAlign: 'center',
-                              lineHeight: '1.3',
-                              maxWidth: '160px',
-                            }}
-                          >
-                            Передадим администратору, обратно — так же
-                          </span>
-                        </div>
+                            <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
+                          </svg>
+                          Также из Каунаса, Варшавы, Мариямполе
+                        </span>
                       </div>
                       <div
                         style={{
-                          fontSize: '14px',
-                          color: '#3E4B44',
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '4px',
-                          paddingTop: '4px',
-                          borderTop: '1px solid #C8DED3',
+                          gap: '10px',
+                          padding: '14px 18px 14px',
+                          background: '#EDF4EF',
+                          border: '1px solid #C8DED3',
+                          borderRadius: 'var(--r)',
                         }}
                       >
-                        <span>
-                          • <strong>Если рейс задерживается</strong> — следим по номеру и ждём без доплаты.
-                        </span>
-                        <span>
-                          • <strong>Обратно</strong> — заберём из санатория за 3 часа до вылета, время подтвердим за
-                          день.
-                        </span>
+                        <div style={{ fontWeight: '800', fontSize: '17px' }}>{v.freeTr}</div>
+                        <div style={{ fontWeight: '700', fontSize: '15px', color: '#3E4B44' }}>
+                          Как проходит трансфер
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            gap: '4px',
+                            flexWrap: 'nowrap',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              flex: '1 1 0',
+                              minWidth: '0',
+                            }}
+                          >
+                            <img
+                              src="/img/39ad8fe2bfcea92423d717bc9dac8f37.png"
+                              alt="Водитель встречает с табличкой"
+                              style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                            />
+                            <span
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: '#1C2620',
+                                textAlign: 'center',
+                                lineHeight: '1.2',
+                              }}
+                            >
+                              Встретим с табличкой
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                color: '#3E4B44',
+                                textAlign: 'center',
+                                lineHeight: '1.3',
+                                maxWidth: '160px',
+                              }}
+                            >
+                              Водитель ждёт в зале прилёта с вашей фамилией
+                            </span>
+                          </div>
+                          <svg
+                            width="30"
+                            height="12"
+                            viewBox="0 0 46 12"
+                            fill="none"
+                            stroke="#7FB49A"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            style={{ flex: 'none', marginTop: '30px' }}
+                          >
+                            <path d="M2 6h30" strokeDasharray="2 4" />
+                            <path d="M36 2l5 4-5 4" />
+                          </svg>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              flex: '1 1 0',
+                              minWidth: '0',
+                            }}
+                          >
+                            <img
+                              src="/img/838118fe86e78736560c2ece8886b813.png"
+                              alt="Водитель укладывает чемодан в багажник"
+                              style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                            />
+                            <span
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: '#1C2620',
+                                textAlign: 'center',
+                                lineHeight: '1.2',
+                              }}
+                            >
+                              Поможем с багажом
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                color: '#3E4B44',
+                                textAlign: 'center',
+                                lineHeight: '1.3',
+                                maxWidth: '160px',
+                              }}
+                            >
+                              Чемоданы — в багажник, вам ничего нести не нужно
+                            </span>
+                          </div>
+                          <svg
+                            width="30"
+                            height="12"
+                            viewBox="0 0 46 12"
+                            fill="none"
+                            stroke="#7FB49A"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            style={{ flex: 'none', marginTop: '30px' }}
+                          >
+                            <path d="M2 6h30" strokeDasharray="2 4" />
+                            <path d="M36 2l5 4-5 4" />
+                          </svg>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              flex: '1 1 0',
+                              minWidth: '0',
+                            }}
+                          >
+                            <img
+                              src="/img/565b4c9fbca5b96b414361547b3a452f.png"
+                              alt="Микроавтобус едет к санаторию"
+                              style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                            />
+                            <span
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: '#1C2620',
+                                textAlign: 'center',
+                                lineHeight: '1.2',
+                              }}
+                            >
+                              Довезём до санатория
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                color: '#3E4B44',
+                                textAlign: 'center',
+                                lineHeight: '1.3',
+                                maxWidth: '160px',
+                              }}
+                            >
+                              Остановки по пути — по вашей просьбе
+                            </span>
+                          </div>
+                          <svg
+                            width="30"
+                            height="12"
+                            viewBox="0 0 46 12"
+                            fill="none"
+                            stroke="#7FB49A"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            style={{ flex: 'none', marginTop: '30px' }}
+                          >
+                            <path d="M2 6h30" strokeDasharray="2 4" />
+                            <path d="M36 2l5 4-5 4" />
+                          </svg>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              flex: '1 1 0',
+                              minWidth: '0',
+                            }}
+                          >
+                            <img
+                              src="/img/05b41fccbf0a437d88db58e3ce3a1a91.png"
+                              alt="Гость у стойки регистрации санатория"
+                              style={{ height: '72px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                            />
+                            <span
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: '#1C2620',
+                                textAlign: 'center',
+                                lineHeight: '1.2',
+                              }}
+                            >
+                              Проводим до стойки
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                color: '#3E4B44',
+                                textAlign: 'center',
+                                lineHeight: '1.3',
+                                maxWidth: '160px',
+                              }}
+                            >
+                              Передадим администратору, обратно — так же
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '14px',
+                            color: '#3E4B44',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            paddingTop: '4px',
+                            borderTop: '1px solid #C8DED3',
+                          }}
+                        >
+                          <span>
+                            • <strong>Если рейс задерживается</strong> — следим по номеру и ждём без доплаты.
+                          </span>
+                          <span>
+                            • <strong>Обратно</strong> — заберём из санатория за 3 часа до вылета, время подтвердим за
+                            день.
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              ) : null}
-              <button type="button" className="accrow" onClick={v.toggleTime}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  </>
+                ) : null}
+                <button type="button" className="accrow" onClick={v.toggleTime}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
+                    >
+                      <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2" />
+                    </svg>
+                    Время заезда и выезда
+                  </span>
                   <svg
-                    width="22"
-                    height="22"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="#1F5F4A"
-                    strokeWidth="1.8"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
-                    style={{ flex: 'none' }}
                   >
-                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2" />
+                    <path d="m6 9 6 6 6-6" />
                   </svg>
-                  Время заезда и выезда
-                </span>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              {v.timeOpen ? (
-                <>
-                  <div
-                    style={{
-                      background: '#fff',
-                      border: '1px solid #E3DED2',
-                      borderTop: 'none',
-                      borderRadius: '0 0 var(--r) var(--r)',
-                      padding: '18px 18px 16px',
-                      marginTop: '-8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '14px',
-                    }}
-                  >
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '14px',
-                          alignItems: 'center',
-                          background: '#EEF5F1',
-                          border: '1px solid #C8DED3',
-                          borderRadius: 'var(--r)',
-                          padding: '14px 16px',
-                        }}
-                      >
+                </button>
+                {v.timeOpen ? (
+                  <>
+                    <div
+                      style={{
+                        background: '#fff',
+                        border: '1px solid #E3DED2',
+                        borderTop: 'none',
+                        borderRadius: '0 0 var(--r) var(--r)',
+                        padding: '18px 18px 16px',
+                        marginTop: '-8px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '14px',
+                      }}
+                    >
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         <div
                           style={{
-                            width: '52px',
-                            height: '52px',
-                            flex: 'none',
-                            background: '#fff',
+                            display: 'flex',
+                            gap: '14px',
+                            alignItems: 'center',
+                            background: '#EEF5F1',
                             border: '1px solid #C8DED3',
                             borderRadius: 'var(--r)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            padding: '14px 16px',
                           }}
                         >
-                          <svg
-                            width="30"
-                            height="30"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1F5F4A"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5M9 11h.01M15 11h.01M9 15h.01M15 15h.01" />
-                          </svg>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span
+                          <div
                             style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#3E4B44',
-                              textTransform: 'uppercase',
-                              letterSpacing: '.04em',
+                              width: '52px',
+                              height: '52px',
+                              flex: 'none',
+                              background: '#fff',
+                              border: '1px solid #C8DED3',
+                              borderRadius: 'var(--r)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                             }}
                           >
-                            Заезд
-                          </span>
-                          <span
-                            style={{
-                              fontFamily: 'Lora,Georgia,serif',
-                              fontSize: '26px',
-                              fontWeight: '600',
-                              lineHeight: '1',
-                              color: '#1C2620',
-                            }}
-                          >
-                            с {v.times?.checkin}
-                          </span>
-                          <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkinDate}</span>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '14px',
-                          alignItems: 'center',
-                          background: '#F7F5F0',
-                          border: '1px solid #E3DED2',
-                          borderRadius: 'var(--r)',
-                          padding: '14px 16px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '52px',
-                            height: '52px',
-                            flex: 'none',
-                            background: '#fff',
-                            border: '1px solid #E3DED2',
-                            borderRadius: 'var(--r)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <svg
-                            width="30"
-                            height="30"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1F5F4A"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M10 17l5-5-5-5M15 12H3M21 3v18" />
-                          </svg>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#3E4B44',
-                              textTransform: 'uppercase',
-                              letterSpacing: '.04em',
-                            }}
-                          >
-                            Выезд
-                          </span>
-                          <span
-                            style={{
-                              fontFamily: 'Lora,Georgia,serif',
-                              fontSize: '26px',
-                              fontWeight: '600',
-                              lineHeight: '1',
-                              color: '#1C2620',
-                            }}
-                          >
-                            до {v.times?.checkout}
-                          </span>
-                          <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkoutDate}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {(v.times?.notes || []).map((n: any, _i0: number) => (
-                        <Fragment key={_i0}>
-                          <div className="ico" style={{ fontSize: '15px', color: '#3E4B44', alignItems: 'flex-start' }}>
                             <svg
-                              width="20"
-                              height="20"
+                              width="30"
+                              height="30"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="#1F5F4A"
@@ -1536,140 +1445,265 @@ export default function HotelPage() {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               aria-hidden="true"
-                              style={{ marginTop: '2px' }}
                             >
-                              <path d={n.d} />
+                              <path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5M9 11h.01M15 11h.01M9 15h.01M15 15h.01" />
                             </svg>
-                            <span>
-                              <strong style={{ color: '#1C2620' }}>{n.t}</strong> — {n.s}
-                            </span>
                           </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : null}
-              <button type="button" className="accrow" onClick={v.toggleSpec}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    style={{ flex: 'none' }}
-                  >
-                    <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
-                  </svg>
-                  Специализации санатория
-                </span>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              {v.specOpen ? (
-                <>
-                  <div
-                    style={{
-                      background: '#fff',
-                      border: '1px solid #E3DED2',
-                      borderTop: 'none',
-                      borderRadius: '0 0 var(--r) var(--r)',
-                      padding: '18px 18px 16px',
-                      marginTop: '-8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '14px',
-                    }}
-                  >
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px' }}>
-                      {(v.specs || []).map((s: any, _i0: number) => (
-                        <Fragment key={_i0}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: '12px',
-                              alignItems: 'flex-start',
-                              background: '#F7F5F0',
-                              border: '1px solid #E3DED2',
-                              borderRadius: 'var(--r)',
-                              padding: '12px 14px',
-                            }}
-                          >
-                            <div
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span
                               style={{
-                                width: '48px',
-                                height: '48px',
-                                flex: 'none',
-                                background: '#EEF5F1',
-                                border: '1px solid #C8DED3',
-                                borderRadius: 'var(--r)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                fontSize: '14px',
+                                fontWeight: '700',
+                                color: '#3E4B44',
+                                textTransform: 'uppercase',
+                                letterSpacing: '.04em',
                               }}
                             >
+                              Заезд
+                            </span>
+                            <span
+                              style={{
+                                fontFamily: 'Lora,Georgia,serif',
+                                fontSize: '26px',
+                                fontWeight: '600',
+                                lineHeight: '1',
+                                color: '#1C2620',
+                              }}
+                            >
+                              с {v.times?.checkin}
+                            </span>
+                            <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkinDate}</span>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '14px',
+                            alignItems: 'center',
+                            background: '#F7F5F0',
+                            border: '1px solid #E3DED2',
+                            borderRadius: 'var(--r)',
+                            padding: '14px 16px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: '52px',
+                              height: '52px',
+                              flex: 'none',
+                              background: '#fff',
+                              border: '1px solid #E3DED2',
+                              borderRadius: 'var(--r)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <svg
+                              width="30"
+                              height="30"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#1F5F4A"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M10 17l5-5-5-5M15 12H3M21 3v18" />
+                            </svg>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                fontWeight: '700',
+                                color: '#3E4B44',
+                                textTransform: 'uppercase',
+                                letterSpacing: '.04em',
+                              }}
+                            >
+                              Выезд
+                            </span>
+                            <span
+                              style={{
+                                fontFamily: 'Lora,Georgia,serif',
+                                fontSize: '26px',
+                                fontWeight: '600',
+                                lineHeight: '1',
+                                color: '#1C2620',
+                              }}
+                            >
+                              до {v.times?.checkout}
+                            </span>
+                            <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkoutDate}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {(v.times?.notes || []).map((n: any, _i0: number) => (
+                          <Fragment key={_i0}>
+                            <div
+                              className="ico"
+                              style={{ fontSize: '15px', color: '#3E4B44', alignItems: 'flex-start' }}
+                            >
                               <svg
-                                width="28"
-                                height="28"
+                                width="20"
+                                height="20"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="#1F5F4A"
-                                strokeWidth="1.7"
+                                strokeWidth="1.8"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 aria-hidden="true"
+                                style={{ marginTop: '2px' }}
                               >
-                                <path d={s.d} />
+                                <path d={n.d} />
                               </svg>
+                              <span>
+                                <strong style={{ color: '#1C2620' }}>{n.t}</strong> — {n.s}
+                              </span>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '0' }}>
-                              <strong style={{ fontSize: '16px', lineHeight: '1.25', color: '#1C2620' }}>{s.t}</strong>
-                              <span style={{ fontSize: '14px', lineHeight: '1.35', color: '#3E4B44' }}>{s.s}</span>
-                            </div>
-                          </div>
-                        </Fragment>
-                      ))}
+                          </Fragment>
+                        ))}
+                      </div>
                     </div>
-                    <div
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', color: '#3E4B44' }}
+                  </>
+                ) : null}
+                <button type="button" className="accrow" onClick={v.toggleSpec}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1F5F4A"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                        style={{ flex: 'none' }}
+                      <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
+                    </svg>
+                    Специализации санатория
+                  </span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                {v.specOpen ? (
+                  <>
+                    <div
+                      style={{
+                        background: '#fff',
+                        border: '1px solid #E3DED2',
+                        borderTop: 'none',
+                        borderRadius: '0 0 var(--r) var(--r)',
+                        padding: '18px 18px 16px',
+                        marginTop: '-8px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '14px',
+                      }}
+                    >
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px' }}>
+                        {(v.specs || []).map((s: any, _i0: number) => (
+                          <Fragment key={_i0}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                gap: '12px',
+                                alignItems: 'flex-start',
+                                background: '#F7F5F0',
+                                border: '1px solid #E3DED2',
+                                borderRadius: 'var(--r)',
+                                padding: '12px 14px',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: '48px',
+                                  height: '48px',
+                                  flex: 'none',
+                                  background: '#EEF5F1',
+                                  border: '1px solid #C8DED3',
+                                  borderRadius: 'var(--r)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <svg
+                                  width="28"
+                                  height="28"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="#1F5F4A"
+                                  strokeWidth="1.7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <path d={s.d} />
+                                </svg>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '0' }}>
+                                <strong style={{ fontSize: '16px', lineHeight: '1.25', color: '#1C2620' }}>
+                                  {s.t}
+                                </strong>
+                                <span style={{ fontSize: '14px', lineHeight: '1.35', color: '#3E4B44' }}>{s.s}</span>
+                              </div>
+                            </div>
+                          </Fragment>
+                        ))}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          fontSize: '15px',
+                          color: '#3E4B44',
+                        }}
                       >
-                        <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01" />
-                      </svg>
-                      При заезде врач проводит осмотр и подбирает процедуры под ваш профиль. Если сомневаетесь, подходит
-                      ли санаторий, — позвоните нам, подскажем.
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#1F5F4A"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          style={{ flex: 'none' }}
+                        >
+                          <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-4M12 8h.01" />
+                        </svg>
+                        При заезде врач проводит осмотр и подбирает процедуры под ваш профиль. Если сомневаетесь,
+                        подходит ли санаторий, — позвоните нам, подскажем.
+                      </div>
                     </div>
-                  </div>
-                </>
-              ) : null}
-            </div>
+                  </>
+                ) : null}
+              </div>
+            ) : (
+              <div style={{ flex: '1 1 100%', minWidth: '0' }}>
+                <HotelTabContent tab={v.tab} info={v.info} onRooms={v.toRooms} onPhoto={v.openPhoto} />
+              </div>
+            )}
             <section
               style={{
                 width: '100%',
@@ -2020,7 +2054,7 @@ export default function HotelPage() {
           </div>
         </>
       ) : null}{' '}
-      <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
+      <HelpWidget ctx={{ ...HELP_CTX, hotel: v.info.name + ', ' + v.info.resort }} pageState={logic.state} />
     </div>
   );
 }

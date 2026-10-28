@@ -83,7 +83,9 @@ const BOARDS = [
       ['button', 'Показать', 'Results-B.dc.html'],
     ],
   },
-  { file: 'Hotel-B.dc.html', title: '3 · Санаторий и выбор номера', route: '/hotel' },
+  { file: 'Hotel-B.dc.html', title: '3 · Санаторий и выбор номера (вкладки работают)', route: '/hotel' },
+  { file: 'Hotel-grand.dc.html', title: 'Санаторий · Гранд Спа Лиетува', route: '/hotel?h=grand-spa-lietuva' },
+  { file: 'Hotel-belorus.dc.html', title: 'Санаторий · Беларусь', route: '/hotel?h=belorus' },
   {
     file: 'Rooms.dc.html',
     title: 'Шаг 1 · Номер и программа',
@@ -233,6 +235,9 @@ const linkFor = (href) => {
   if (!href || !href.startsWith('/') || href.startsWith('//')) return href;
   const [p, hash] = href.split('#');
   const route = p.split('?')[0] || '/';
+  const h = (p.split('?')[1] || '').match(/(?:^|&)h=([a-z-]+)/);
+  const HOTEL_FILE = { 'grand-spa-lietuva': 'Hotel-grand.dc.html', belorus: 'Hotel-belorus.dc.html' };
+  if (route === '/hotel' && h && HOTEL_FILE[h[1]]) return HOTEL_FILE[h[1]];
   const f = ROUTE_FILE[route];
   if (!f) return href;
   return f + (hash ? '#' + hash : '');
@@ -325,6 +330,8 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
   }
   await buildInteractive(b, sizes);
   await buildHotel(b, sizes);
+  await buildHotel(b, sizes, 'Hotel-grand.dc.html', '/hotel?h=grand-spa-lietuva');
+  await buildHotel(b, sizes, 'Hotel-belorus.dc.html', '/hotel?h=belorus');
   fs.writeFileSync(path.join(OUT, 'sizes.json'), JSON.stringify(sizes, null, 1));
   await b.close();
 })();
@@ -734,17 +741,17 @@ async function buildInteractive(b, sizes) {
 }
 
 /* ---------- Hotel board: the photo gallery opens in Play ---------- */
-async function buildHotel(b, sizes) {
-  const file = 'Hotel-B.dc.html';
+/** Sanatorium boards: gallery lightbox, guests pop-over and the working tabs. */
+async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') {
+  if (!sizes[file]) return;
   const lb = await grab(
     b,
-    '/hotel',
-    (p) => p.click('button[aria-label="Территория санатория"]'),
+    route,
+    (p) => p.click('button[aria-label="Все фото"]'),
     () => {
       const d = window.__dc;
-      const imgs = Array.from(document.querySelectorAll('img'));
       const over = Array.from(document.querySelectorAll('div')).find(
-        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 3,
+        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 1,
       );
       over.querySelectorAll('button').forEach((x) => {
         if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть')
@@ -756,35 +763,66 @@ async function buildHotel(b, sizes) {
   // guests chip in the "Ваши даты" bar opens the same +/− pop-over as the search
   const gpop = await grab(
     b,
-    '/hotel',
+    route,
     (p) => p.click('#guests'),
     () => window.__dc.markGuests(document.querySelector('.gp-pop')),
   );
-  const base = await grab(b, '/hotel', null, () => {
+  // content of the other tabs
+  const TABS = ['treat', 'food', 'about', 'reviews'];
+  const tabHtml = {};
+  for (const k of TABS) {
+    tabHtml[k] = await grab(
+      b,
+      route,
+      (p) => p.click('.ht-tabs button >> nth=' + (TABS.indexOf(k) + 1)),
+      () => {
+        const d = window.__dc;
+        const box = document.querySelector('.ht').parentElement;
+        box.querySelectorAll('.ht-cta .btn').forEach((x) => d.on(x, 'click', 'tab_rooms'));
+        box.querySelectorAll('.ht-photos button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+        return box.outerHTML;
+      },
+    );
+  }
+  const base = await grab(b, route, null, () => {
     const d = window.__dc;
-    const first = document.querySelector('button[aria-label="Территория санатория"]');
-    first.parentElement.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+    const gal = document.querySelector('button[aria-label="Все фото"]').parentElement;
+    gal.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+    document.querySelectorAll('.ht-reviews-link').forEach((x) => d.on(x, 'click', 'tab_reviews'));
     const g = document.querySelector('#guests');
     if (g) {
       d.on(g, 'click', 'openGuests');
       d.text(g.querySelector('.gp-inline-t strong'), 'gLabel');
       g.after(d.raw('gpop'));
     }
+    const keys = ['rooms', 'treat', 'food', 'about', 'reviews'];
+    document.querySelectorAll('.ht-tabs button').forEach((x, i) => {
+      d.on(x, 'click', 'tab_' + keys[i]);
+      d.attr(x, 'class', 'tabCls_' + keys[i]);
+      x.removeAttribute('aria-current');
+    });
+    const nav = document.querySelector('.ht-tabs');
+    const rooms = nav.nextElementSibling.firstElementChild;
+    rooms.before(d.raw('rooms-start'));
+    rooms.after(d.raw('rooms-end'));
     document.querySelector('#root .page').appendChild(d.raw('lightbox'));
     return document.getElementById('root').innerHTML;
   });
+  const ifs = (k, html) => `<sc-if value="{{tabOn_${k}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
   const body = IA.finish(post(base), {
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
     gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
+    'rooms-start': '<sc-if value="{{tabOn_rooms}}" hint-placeholder-val="{{true}}">',
+    'rooms-end': '</sc-if>' + TABS.map((k) => ifs(k, IA.finish(post(tabHtml[k]), {}))).join(''),
   });
   const logic = `class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { lb: false, gOpen: false, ad: 2, ch: 0 };
+    this.state = { lb: false, gOpen: false, ad: 2, ch: 0, tab: 'rooms' };
   }
   renderVals() {
     const st = this.state, ad = st.ad, ch = st.ch;
-    return {
+    const v = {
       lbOn: st.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }),
       gOpen: st.gOpen, openGuests: () => this.setState({ gOpen: !st.gOpen }), closeGuests: () => this.setState({ gOpen: false }),
       gLabel: ad + ' ' + (ad === 1 ? 'взрослый' : 'взрослых') + (ch ? ', ' + ch + ' ' + (ch === 1 ? 'ребёнок' : 'ребёнка') : ''),
@@ -793,8 +831,14 @@ async function buildHotel(b, sizes) {
       chMinus: () => ch > 0 && this.setState({ ch: ch - 1 }), chPlus: () => ch < 3 && this.setState({ ch: ch + 1 }),
       adMinusOff: ad <= 1, adPlusOff: ad >= 4, chMinusOff: ch <= 0, chPlusOff: ch >= 3,
     };
+    ['rooms', 'treat', 'food', 'about', 'reviews'].forEach((k) => {
+      v['tab_' + k] = () => this.setState({ tab: k });
+      v['tabOn_' + k] = st.tab === k;
+      v['tabCls_' + k] = st.tab === k ? 'on' : '';
+    });
+    return v;
   }
 }`;
-  fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, '/hotel', body, sizes[file].h, logic));
+  fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, sizes[file].h, logic));
   console.log(file, 'interactive', body.length);
 }
