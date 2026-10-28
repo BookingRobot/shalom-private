@@ -84,7 +84,7 @@ const PLANE =
 const CELLS = `<sc-for list="{{cells}}" as="c" hint-placeholder-count="35"><button type="button" class="cell" onClick="{{c.pick}}" disabled="{{c.off}}" aria-label="{{c.aria}}" style="background:{{c.bg}};border-color:{{c.border}};color:{{c.color}};cursor:{{c.cursor}}"><span>{{c.day}}</span><small style="color:{{c.subColor}}">{{c.sub}}</small><sc-if value="{{c.fly}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:4px;right:5px;line-height:0" title="Рейс из Израиля">${PLANE}</span></sc-if></button></sc-for>`;
 
 const FLEX = `<div class="flex-dates">
-<div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-opts" role="group" aria-label="Месяц"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="9"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.t}}</button></sc-for></div></div>
+<div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-car"><button type="button" class="navbtn" aria-label="Раньше" disabled="{{fdPrevOff}}" onClick="{{fdPrev}}">‹</button><div class="fd-tiles" role="group" aria-label="Месяц" style="--per:6"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="6"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}"><strong>{{m.t}}</strong><span>{{m.y}}</span><small>{{m.from}}</small></button></sc-for></div><button type="button" class="navbtn" aria-label="Позже" disabled="{{fdNextOff}}" onClick="{{fdNext}}">›</button></div></div>
 <div class="fd-row"><span class="fd-lbl">Сколько ночей</span><div class="fd-opts" role="group" aria-label="Сколько ночей"><sc-for list="{{fdNights}}" as="n" hint-placeholder-count="4"><button type="button" class="{{n.cls}}" onClick="{{n.pick}}">{{n.t}}</button></sc-for></div></div>
 <div class="fd-list"><span class="fd-title">{{fdTitle}}</span><sc-if value="{{fdEmpty}}" hint-placeholder-val="{{false}}"><span class="fd-empty">В этом месяце свободных дат нет — выберите другой.</span></sc-if>
 <sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5"><button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}</span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span></button></sc-for>
@@ -167,20 +167,25 @@ class Component extends DCLogic {
     }
     const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
     const preset = (n) => () => { const a = sIn || inD; this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) } }); };
-    // flexible dates
-    const months9 = Array.from({ length: 9 }, (_, i) => new Date(Date.UTC(2026, 9 + i, 1)));
-    const fmD = months9[st.fm];
-    const fdays = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth() + 1, 0)).getUTCDate();
-    let opts = [];
-    for (let i = 1; i <= fdays; i++) {
-      const d = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth(), i));
-      if (d <= TODAY) continue;
-      let sum = 0, ok = true;
-      for (let k = 0; k < st.fn; k++) { const x = addD(d, k); if (SOLD.includes(iso(x))) ok = false; sum += ppn(x); }
-      if (ok) opts.push({ d, sum });
-    }
-    opts = opts.sort((a, b) => a.sum - b.sum).slice(0, 5).sort((a, b) => a.d - b.d);
-    const r10 = (n) => Math.round(n / 10) * 10, minS = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
+    // flexible dates: 24-month carousel, 6 tiles visible
+    const months24 = Array.from({ length: 24 }, (_, i) => new Date(Date.UTC(2026, 9 + i, 1)));
+    const optsFor = (md) => {
+      const nd = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth() + 1, 0)).getUTCDate();
+      const res = [];
+      for (let i = 1; i <= nd; i++) {
+        const d = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth(), i));
+        if (d <= TODAY) continue;
+        let sum = 0, ok = true;
+        for (let k = 0; k < st.fn; k++) { const x = addD(d, k); if (SOLD.includes(iso(x))) ok = false; sum += ppn(x); }
+        if (ok) res.push({ d, sum });
+      }
+      return res;
+    };
+    const r10 = (n) => Math.round(n / 10) * 10;
+    const fo = Math.min(st.fo || 0, 18);
+    const fmD = months24[st.fm];
+    let opts = optsFor(fmD).sort((a, b) => a.sum - b.sum).slice(0, 5).sort((a, b) => a.d - b.d);
+    const minS = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
     // guests
     const ad = st.ad, ch = st.ch;
     // compare
@@ -206,8 +211,13 @@ class Component extends DCLogic {
       selIn: sIn ? shortD(sIn) : '—', selOut: sOut ? shortD(sOut) : '—', selNights: nights ? nights + ' ' + nW(nights) : '—',
       applyOff: !nights,
       applyCal: () => { if (nights) this.setState({ inD: sel.in, outD: sel.out, cal: '', room: false }); },
-      fdMonths: months9.map((x, i) => ({ t: MONTHS_N[x.getUTCMonth()] + (x.getUTCFullYear() !== 2026 ? ' ' + x.getUTCFullYear() : ''),
-        cls: 'qf-chip' + (i === st.fm ? ' on' : ''), pick: () => this.setState({ fm: i }) })),
+      fdMonths: months24.slice(fo, fo + 6).map((x, j) => {
+        const i = fo + j, o = optsFor(x), from = o.length ? Math.min(...o.map((q) => r10(q.sum))) : 0;
+        return { t: MONTHS_N[x.getUTCMonth()], y: String(x.getUTCFullYear()), from: from ? 'от ' + fmt(from) + ' €' : 'нет мест',
+          cls: 'fd-tile' + (i === st.fm ? ' on' : ''), pick: () => this.setState({ fm: i }) };
+      }),
+      fdPrevOff: fo === 0, fdNextOff: fo >= 18,
+      fdPrev: () => this.setState({ fo: Math.max(0, fo - 6) }), fdNext: () => this.setState({ fo: Math.min(18, fo + 6) }),
       fdNights: [7, 10, 14, 21].map((n) => ({ t: n === 7 ? '7 ночей · неделя' : n === 14 ? '14 ночей · 2 недели' : n === 21 ? '21 ночь · 3 недели' : '10 ночей',
         cls: 'qf-chip' + (n === st.fn ? ' on' : ''), pick: () => this.setState({ fn: n }) })),
       fdTitle: 'Самые выгодные даты заезда в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е'),

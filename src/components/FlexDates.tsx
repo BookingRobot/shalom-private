@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useBooking } from '../context/BookingContext';
 import { isSoldOutEverywhere } from '../data/availability';
 import { TODAY } from '../data/demo';
@@ -29,22 +29,14 @@ const NIGHTS = [7, 10, 14, 21];
  * People write "середина мая, 2 недели" or "июнь–июль" far more often than exact dates.
  * With the flight package only flight days are offered as arrival days.
  */
-export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: string) => void }) {
-  const { booking } = useBooking();
-  const start = new Date(Date.UTC(TODAY.getUTCFullYear(), TODAY.getUTCMonth(), 1));
-  const months = Array.from(
-    { length: 9 },
-    (_, i) => new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1)),
-  );
-  const [mi, setMi] = useState(1);
-  const [nights, setNights] = useState(14);
-  const m = months[mi];
+/** Start days in a month for `nights` nights, with the resort-average sum per person. */
+function optionsFor(m: Date, nights: number, flightOnly: boolean) {
   const days = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
-  const options: { d: Date; sum: number }[] = [];
+  const out: { d: Date; sum: number }[] = [];
   for (let i = 1; i <= days; i++) {
     const d = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth(), i));
     if (d <= TODAY) continue;
-    if (booking.flightPackage && !isFlightDay(d)) continue;
+    if (flightOnly && !isFlightDay(d)) continue;
     let sum = 0,
       ok = true;
     for (let k = 0; k < nights; k++) {
@@ -52,31 +44,76 @@ export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: stri
       if (isSoldOutEverywhere(iso(x))) ok = false;
       sum += seasonPpn(x);
     }
-    if (ok) options.push({ d, sum });
+    if (ok) out.push({ d, sum });
   }
-  const best = options
+  return out;
+}
+
+const r10 = (n: number) => Math.round(n / 10) * 10;
+/** 24 months ahead in the carousel; 6 tiles at a time on a laptop, 3 on a phone */
+const MONTHS_AHEAD = 24;
+
+export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: string) => void }) {
+  const { booking } = useBooking();
+  const start = new Date(Date.UTC(TODAY.getUTCFullYear(), TODAY.getUTCMonth(), 1));
+  const months = Array.from(
+    { length: MONTHS_AHEAD },
+    (_, i) => new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1)),
+  );
+  const [mi, setMi] = useState(1);
+  const [nights, setNights] = useState(14);
+  const [off, setOff] = useState(0);
+  const per = useVisibleTiles();
+  const first = Math.min(off, MONTHS_AHEAD - per);
+  const m = months[mi];
+  const best = optionsFor(m, nights, booking.flightPackage)
     .sort((a, b) => a.sum - b.sum)
     .slice(0, 5)
     .sort((a, b) => a.d.getTime() - b.d.getTime());
-  const r10 = (n: number) => Math.round(n / 10) * 10;
   const min = best.length ? Math.min(...best.map((b) => r10(b.sum))) : 0;
   return (
     <div className="flex-dates">
       <div className="fd-row">
         <span className="fd-lbl">Месяц</span>
-        <div className="fd-opts" role="group" aria-label="Месяц">
-          {months.map((x, i) => (
-            <button
-              type="button"
-              key={i}
-              className={`qf-chip ${i === mi ? 'on' : ''}`}
-              aria-pressed={i === mi}
-              onClick={() => setMi(i)}
-            >
-              {MONTHS_N[x.getUTCMonth()]}
-              {x.getUTCFullYear() !== TODAY.getUTCFullYear() ? ' ' + x.getUTCFullYear() : ''}
-            </button>
-          ))}
+        <div className="fd-car">
+          <button
+            type="button"
+            className="navbtn"
+            aria-label="Раньше"
+            disabled={first === 0}
+            onClick={() => setOff(Math.max(0, first - per))}
+          >
+            ‹
+          </button>
+          <div className="fd-tiles" role="group" aria-label="Месяц" style={{ ['--per' as string]: per }}>
+            {months.slice(first, first + per).map((x, j) => {
+              const i = first + j;
+              const opts = optionsFor(x, nights, booking.flightPackage);
+              const from = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
+              return (
+                <button
+                  type="button"
+                  key={i}
+                  className={`fd-tile ${i === mi ? 'on' : ''}`}
+                  aria-pressed={i === mi}
+                  onClick={() => setMi(i)}
+                >
+                  <strong>{MONTHS_N[x.getUTCMonth()]}</strong>
+                  <span>{x.getUTCFullYear()}</span>
+                  <small>{from ? 'от ' + fmt(from) + '\u00a0€' : 'нет мест'}</small>
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            className="navbtn"
+            aria-label="Позже"
+            disabled={first >= MONTHS_AHEAD - per}
+            onClick={() => setOff(Math.min(MONTHS_AHEAD - per, first + per))}
+          >
+            ›
+          </button>
         </div>
       </div>
       <div className="fd-row">
@@ -150,4 +187,17 @@ export function DateModeTabs({ flex, onChange }: { flex: boolean; onChange: (fle
       </button>
     </div>
   );
+}
+
+/** 6 month tiles on a laptop, 3 on a phone. */
+function useVisibleTiles() {
+  const [n, setN] = useState(6);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 600px)');
+    const set = () => setN(mq.matches ? 3 : 6);
+    set();
+    mq.addEventListener('change', set);
+    return () => mq.removeEventListener('change', set);
+  }, []);
+  return n;
 }
