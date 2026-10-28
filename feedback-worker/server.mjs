@@ -23,7 +23,7 @@ const env = {
   FILES_BRANCH: process.env.FILES_BRANCH || 'feedback-files',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || 'https://shalom.bookingrobot.eu',
 };
-const MAX_BODY = 4 * 1024 * 1024;
+const MAX_BODY = 6 * 1024 * 1024;
 // every note becomes a GitHub issue: keep a stranger from flooding the repository
 const PER_IP_HOUR = Number(process.env.PER_IP_HOUR || 20);
 const PER_DAY = Number(process.env.PER_DAY || 300);

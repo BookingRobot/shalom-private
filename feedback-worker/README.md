@@ -2,7 +2,9 @@
 
 Raudonas mygtukas **«Ваши пожелания»** (virš «Свяжитесь со мной») leidžia bet kam svetainėje:
 parodyti vietą puslapyje → automatiškai padaroma ekrano nuotrauka su pažymėta vieta →
-pasirinkti tipą (Предложение / Ошибка / Другое), parašyti tekstą, vardą ir kontaktą.
+pasirinkti tipą (Ошибка / Изменение / Идея / Вопрос) ir svarbą (Мешает / Неудобно / На будущее),
+parašyti trumpai ir plačiau (klaidai — ką darė, ko tikėjosi, kas įvyko), pridėti dar iki 4
+nuotraukų (tik paveikslėliai: dar vienas ekrano kadras, failas, Ctrl+V ar nutempimas), vardą ir kontaktą.
 
 Kiekviena pastaba tampa **GitHub issue** šiame repozitorijume su žymomis
 `atsiliepimas` ir `laukia-peržiūros`. Issue tekstas prasideda „⏸ Nevykdyti — laukia peržiūros“:
@@ -40,6 +42,9 @@ paleidžia paslaugą `br-shalom-feedback` (127.0.0.1:8787, pasileidžia ir po pe
 nginx arba Apache prideda adresą `/br-shalom-feedback` (su atsargine kopija ir `nginx -t`)
 ir pabaigoje per internetą sukuria vieną bandomąjį issue „[Тест] сервер работает“ — jį uždarykite.
 Pabaigoje turi būti **✔ VISKAS VEIKIA**.
+
+Atnaujinus `worker.js` ar `server.mjs` (pvz. po naujos formos versijos), serveryje paleiskite
+`sudo bash install.sh` — jis parsisiųs naujausius failus iš `main` ir perkraus paslaugą.
 
 ## Priežiūra
 

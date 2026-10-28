@@ -1,9 +1,10 @@
 /**
  * «Ваши пожелания» intake — a Cloudflare Worker (free plan is enough).
  *
- * POST multipart: `note` (JSON from src/lib/feedback/submit.ts) and optional `screenshot`.
- *  1. the note (JSON) and the screenshot are saved in the repository branch FILES_BRANCH
- *     (feedback/<month>/<id>.json|.webp) — this is the archive of all notes;
+ * POST multipart: `note` (JSON from src/lib/feedback/submit.ts), optional `screenshot` (the
+ * marked spot) and up to 4 `images` (more screenshots / pictures — images only).
+ *  1. the note (JSON) and the pictures are saved in the repository branch FILES_BRANCH
+ *     (feedback/<month>/<id>.json|.webp, <id>-2.webp …) — this is the archive of all notes;
  *  2. a GitHub issue is opened with the labels «atsiliepimas» and «laukia-peržiūros»
  *     (no one works on it before the label is removed);
  *  3. answers { number, url }.
@@ -18,6 +19,14 @@
 const LABELS = ['atsiliepimas', 'laukia-peržiūros'];
 const HOLD = '> ⏸ **Nevykdyti** — laukia peržiūros. Pradėti darbą tik nuėmus žymą `laukia-peržiūros`.';
 const MAX_SHOT = 2 * 1024 * 1024;
+const MAX_IMAGES = 4;
+const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
+// the file itself must look like a picture, whatever its declared type
+const looksLikeImage = (b) =>
+  (b[0] === 0x89 && b[1] === 0x50) || // png
+  (b[0] === 0xff && b[1] === 0xd8) || // jpeg
+  (b[0] === 0x47 && b[1] === 0x49) || // gif
+  (b[0] === 0x52 && b[1] === 0x49 && b[8] === 0x57 && b[9] === 0x45); // RIFF....WEBP
 
 const cors = (origin, env) => {
   const allowed = (env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim());
@@ -73,31 +82,56 @@ export default {
     try {
       const form = await request.formData();
       const note = JSON.parse(String(form.get('note') || '{}'));
-      const text = String(note.text || '').trim();
-      if (!text || text.length > 5000) return json({ error: 'text' }, 400, headers);
+      const text = String(note.text || note.title || '').trim();
+      if (!text || text.length > 20000) return json({ error: 'text' }, 400, headers);
 
       const now = new Date();
       const month = now.toISOString().slice(0, 7);
       const id = now.toISOString().replace(/[-:T]/g, '').slice(0, 14) + '-' + Math.random().toString(36).slice(2, 7);
       const branch = env.FILES_BRANCH || 'feedback-files';
+      const link = (path, alt) => `![${alt}](https://github.com/${env.REPO}/blob/${branch}/${path}?raw=true)`;
 
-      let shotMd = '_be nuotraukos_';
-      const shot = form.get('screenshot');
-      if (shot && typeof shot !== 'string' && shot.size > 0 && shot.size <= MAX_SHOT) {
-        const ext = shot.type === 'image/png' ? 'png' : 'webp';
-        const path = `feedback/${month}/${id}.${ext}`;
-        await putFile(env, path, b64(await shot.arrayBuffer()), `feedback ${id}: screenshot`);
-        shotMd = `![Ekrano nuotrauka](https://github.com/${env.REPO}/blob/${branch}/${path}?raw=true)`;
+      /** saves one picture, returns its path or null when it is not a picture */
+      const savePicture = async (file, name) => {
+        if (!file || typeof file === 'string' || !file.size || file.size > MAX_SHOT) return null;
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        if (!looksLikeImage(bytes)) return null;
+        const ext = IMAGE_TYPES[file.type] || 'webp';
+        const path = `feedback/${month}/${name}.${ext}`;
+        await putFile(env, path, b64(bytes), `feedback ${id}: ${name}`);
+        return path;
+      };
+
+      let shotMd = '_be pažymėtos vietos nuotraukos_';
+      const shotPath = await savePicture(form.get('screenshot'), id);
+      if (shotPath) shotMd = link(shotPath, 'Pažymėta vieta');
+
+      const imagePaths = [];
+      for (const f of form.getAll('images').slice(0, MAX_IMAGES)) {
+        const path = await savePicture(f, `${id}-${imagePaths.length + 2}`);
+        if (path) imagePaths.push(path);
       }
+      const imagesMd = imagePaths.map((p, i) => link(p, `Paveikslėlis ${i + 2}`)).join('\n\n');
 
       const title = String(note.title || '[Пожелание] ' + text.slice(0, 70)).slice(0, 200);
-      let body = String(note.body || text).replace('{{SCREENSHOT}}', shotMd);
+      let body = String(note.body || text)
+        .replace('{{SCREENSHOT}}', shotMd)
+        .replace('{{IMAGES}}', imagesMd);
       if (!body.startsWith(HOLD)) body = HOLD + '\n\n' + body;
       body += `\n\n<sub>feedback ${id}</sub>`;
 
       const issue = await gh(env, '/issues', { method: 'POST', body: JSON.stringify({ title, body, labels: LABELS }) });
 
-      const record = { id, issue: issue.number, received: now.toISOString(), ...note, body: undefined, title };
+      const record = {
+        id,
+        issue: issue.number,
+        received: now.toISOString(),
+        ...note,
+        body: undefined,
+        title,
+        screenshot: shotPath,
+        images: imagePaths,
+      };
       await putFile(
         env,
         `feedback/${month}/${id}.json`,
