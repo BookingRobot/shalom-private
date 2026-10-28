@@ -53,8 +53,9 @@ window.__dc = {
     const grid = month.children[1];
     grid.querySelectorAll('.cell').forEach((c) => c.remove());
     grid.appendChild(d.raw('cells'));
-    presets[0].parentElement.before(d.raw('exact-start'));
-    mc.after(d.raw('exact-end'));
+    const body = dialog.querySelector('.cal-body');
+    (body || presets[0].parentElement).before(d.raw('exact-start'));
+    (body || mc).after(d.raw('exact-end'));
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
     const footer = sel[0].closest('div[style*="border-top"]') || dialog;
