@@ -14,6 +14,7 @@ import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS, amenity } from '../../data/iconPaths';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
+import { GuestsPicker, guestsLabel } from '../../components/GuestsPicker';
 import { RoomCard } from '../../components/RoomCard';
 import { eur, placePrice, quote } from '../../lib/pricing';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
@@ -433,6 +434,7 @@ class HotelLogic extends PageLogic {
       calRoomOn: !!st.calRoom,
       calRoomName: st.calRoomName || '',
       dateRange: range(checkin, checkout) + ' ' + checkin.getUTCFullYear(),
+      guestsWho: guestsLabel(this.props.booking.booking.adults, this.props.booking.booking.children),
       nightsLabel,
       // Eglė meets its guests itself (data/transferPolicy) — nothing to sell here
       freeTr: transferBySanatorium(this.props.booking.booking.hotelId || 'egle-comfort')
@@ -933,10 +935,10 @@ export default function HotelPage() {
                       {v.dateRange}
                     </strong>
                   </div>
-                  <span
-                    style={{ fontSize: '17px', color: '#1C2620', paddingLeft: '14px', borderLeft: '1px solid #C8DED3' }}
-                  >
-                    {v.nightsLabel} · 2 взрослых
+                  <span className="hb-nights">{v.nightsLabel}</span>
+                  {/* the guest may land here straight from the home page: guests can be changed right here */}
+                  <span className="hb-guests">
+                    <GuestsPicker inline />
                   </span>
                 </div>
                 <button
@@ -964,7 +966,7 @@ export default function HotelPage() {
               <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
                 <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
                 <div style={{ fontSize: '16px', color: '#3E4B44' }}>
-                  Цена за весь заезд для двух гостей — с самой доступной программой. Программу можно улучшить внутри
+                  Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить внутри
                   карточки номера.
                 </div>
               </div>

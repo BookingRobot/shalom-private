@@ -16,7 +16,14 @@ export const guestsLabel = (adults: number, children: number) =>
  * with +/− steppers — adults 1–4 (default 2), children 0–3 (default 0).
  * Reads and writes the shared booking, so every page sees the same guests.
  */
-export function GuestsPicker({ inputClass = 'input' }: { inputClass?: string }) {
+export function GuestsPicker({
+  inputClass = 'input',
+  inline = false,
+}: {
+  inputClass?: string;
+  /** compact "ГОСТИ · 2 взрослых ▾" trigger for info bars (hotel page) instead of a form field */
+  inline?: boolean;
+}) {
   const { booking, update } = useBooking();
   const help = useHelp();
   const [open, setOpen] = useState(false);
@@ -84,65 +91,113 @@ export function GuestsPicker({ inputClass = 'input' }: { inputClass?: string }) 
 
   return (
     <div ref={wrap} style={{ position: 'relative' }}>
-      <svg
-        className="fieldico"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#1F5F4A"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </svg>
-      <button
-        type="button"
-        id="guests"
-        className={`${inputClass} datebtn`}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={popId}
-        title={guestsLabel(adults, children)}
-        onClick={() => setOpen(!open)}
-        style={{ paddingRight: '34px', lineHeight: '1.15' }}
-      >
-        {/* children go on a small second line so the narrow field never wraps mid-phrase */}
-        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>
-          {adults}
-          {NB}
-          {adultsWord(adults)}
-        </span>
-        {children ? (
-          <span style={{ display: 'block', whiteSpace: 'nowrap', fontSize: '13px', fontWeight: 600, color: '#5E6862' }}>
-            + {children}
-            {NB}
-            {childrenWord(children)}
+      {inline ? (
+        <button
+          type="button"
+          id="guests"
+          className="gp-inline"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls={popId}
+          onClick={() => setOpen(!open)}
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1F5F4A"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+          <span className="gp-inline-t">
+            <span className="gp-inline-l">Гости</span>
+            <strong>{guestsLabel(adults, children)}</strong>
           </span>
-        ) : null}
-      </button>
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#1F5F4A"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          right: '12px',
-          top: '16px',
-          pointerEvents: 'none',
-          transform: open ? 'rotate(180deg)' : 'none',
-        }}
-      >
-        <path d="m6 9 6 6 6-6" />
-      </svg>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1F5F4A"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+            style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+      ) : (
+        <>
+          <svg
+            className="fieldico"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1F5F4A"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+          <button
+            type="button"
+            id="guests"
+            className={`${inputClass} datebtn`}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            aria-controls={popId}
+            title={guestsLabel(adults, children)}
+            onClick={() => setOpen(!open)}
+            style={{ paddingRight: '34px', lineHeight: '1.15' }}
+          >
+            {/* children go on a small second line so the narrow field never wraps mid-phrase */}
+            <span style={{ display: 'block', whiteSpace: 'nowrap' }}>
+              {adults}
+              {NB}
+              {adultsWord(adults)}
+            </span>
+            {children ? (
+              <span
+                style={{ display: 'block', whiteSpace: 'nowrap', fontSize: '13px', fontWeight: 600, color: '#5E6862' }}
+              >
+                + {children}
+                {NB}
+                {childrenWord(children)}
+              </span>
+            ) : null}
+          </button>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1F5F4A"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              right: '12px',
+              top: '16px',
+              pointerEvents: 'none',
+              transform: open ? 'rotate(180deg)' : 'none',
+            }}
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </>
+      )}
       {open ? (
         <div id={popId} role="dialog" aria-label="Гости" className="gp-pop">
           {row('adults', 'Взрослые', 'от 1 до 4', 'взрослые')}
