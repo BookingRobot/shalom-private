@@ -8,7 +8,7 @@ import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
 import { transferBySanatorium } from '../../data/transferPolicy';
-import { blockedNights, blockedNote } from '../../lib/stayCheck';
+import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS, amenity } from '../../data/iconPaths';
@@ -277,7 +277,11 @@ class HotelLogic extends PageLogic {
       const k = iso(date);
       if (sel.in && !sel.out && date > toD(sel.in)) {
         const bad = blockedNights(toD(sel.in), date, blocked);
-        if (bad.length) return this.setState({ note: blockedNote(bad) });
+        // the clicked day starts a new stay instead (unless it has no places itself)
+        if (bad.length)
+          return this.setState(
+            blocked(date) ? { note: blockedNote(bad) } : { sel: { in: k, out: null }, note: restartNote(bad, date) },
+          );
         return this.setState({ sel: { in: sel.in, out: k }, note: null });
       }
       if (blocked(date)) return this.setState({ note: blockedNote([date], true) });

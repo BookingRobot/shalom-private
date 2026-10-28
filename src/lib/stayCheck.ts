@@ -28,6 +28,14 @@ export function daysText(days: Date[]): string {
   return parts.join(' и ') + (runs.length > 2 ? ' и другие дни' : '');
 }
 
+/**
+ * The guest went across "нет мест" nights: the clicked day starts a new stay, so the
+ * calendar never gets stuck — the note only explains what happened.
+ */
+export function restartNote(days: Date[], newIn: Date): string {
+  return `${daysText(days)} нет мест, поэтому заезд теперь ${shortDate(newIn)} — выберите день выезда. Или отправьте запрос, поищем вручную.`;
+}
+
 /** Short message for the pop-up under the calendar. */
 export function blockedNote(days: Date[], single = false): string {
   return single

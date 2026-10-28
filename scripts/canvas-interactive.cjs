@@ -161,7 +161,7 @@ class Component extends DCLogic {
       const k = iso(date);
       if (sel.in && !sel.out && date > toD(sel.in)) {
         const bad = badNights(toD(sel.in), date);
-        if (bad.length) return this.setState({ note: noteFor(bad) });
+        if (bad.length) return this.setState(blocked(date) ? { note: noteFor(bad) } : { sel: { in: k, out: null }, note: daysText(bad) + ' нет мест, поэтому заезд теперь ' + shortD(date) + ' — выберите день выезда. Или отправьте запрос, поищем вручную.' });
         return this.setState({ sel: { in: sel.in, out: k }, note: '' });
       }
       if (blocked(date)) return this.setState({ note: noteFor([date], true) });
