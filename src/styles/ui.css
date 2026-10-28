@@ -905,3 +905,231 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 16px;
   color: #3e4b44;
 }
+
+/* Resort story pop-up */
+.page .rs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(18, 34, 27, 0.6);
+  overflow: auto;
+  padding: 28px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.page .rs {
+  background: #fff;
+  border-radius: 3px;
+  width: min(1080px, 100%);
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+.page .rs-hero {
+  position: relative;
+  min-height: 300px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+.page .rs-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(12, 24, 18, 0.75));
+}
+.page .rs-hero-text {
+  position: relative;
+  z-index: 1;
+  padding: 22px 28px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.page .rs-hero-text h2 {
+  font-size: 40px;
+  color: #fff;
+}
+.page .rs-hero-text span {
+  font-size: 19px;
+}
+.page .rs .rs-close {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  right: 16px;
+  min-height: 44px;
+  font-size: 16px;
+  padding: 0 16px;
+}
+.page .rs-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 24px 0;
+  border-bottom: 1px solid #e3ded2;
+  flex-wrap: wrap;
+}
+.page .rs-tabs button {
+  border: none;
+  background: none;
+  padding: 10px 14px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #3e4b44;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+.page .rs-tabs button.on {
+  color: #1f5f4a;
+  border-bottom-color: #1f5f4a;
+}
+.page .rs-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 32px;
+  padding: 22px 28px;
+}
+.page .rs-main {
+  flex: 999 1 460px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 18px;
+  line-height: 1.55;
+}
+.page .rs-main p {
+  margin: 0;
+}
+.page .rs-main h3,
+.page .rs-sans h3 {
+  font-size: 20px;
+  margin-top: 4px;
+}
+.page .rs-sights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 8px 16px;
+}
+.page .rs-sights li {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: #f4f1ea;
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+.page .rs-sights span {
+  color: #3e4b44;
+  font-size: 15px;
+}
+.page .rs-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.page .rs-gallery img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+.page .rs-side {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.page .rs-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 2px;
+}
+.page .rs-video-empty {
+  background: #2b3a33;
+  color: #d9e2dc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  font-size: 14px;
+  padding: 12px;
+}
+.page .rs-facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.page .rs-facts div {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #e3ded2;
+  padding-bottom: 8px;
+}
+.page .rs-facts dt {
+  font-size: 14px;
+  color: #5e6862;
+}
+.page .rs-facts dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.page .rs-san-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.page .rs-san-list a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.page .rs-chip-off {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+  color: #3e4b44;
+}
+.page .rs-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px 18px;
+  flex-wrap: wrap;
+  padding: 16px 28px 22px;
+  border-top: 1px solid #e3ded2;
+  background: #fafbf9;
+  font-size: 15px;
+  color: #3e4b44;
+}
+.page .rs-go {
+  min-height: 52px;
+  font-size: 18px;
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .page .rs-hero {
+    min-height: 220px;
+  }
+  .page .rs-hero-text h2 {
+    font-size: 30px;
+  }
+  .page .rs-body,
+  .page .rs-foot {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

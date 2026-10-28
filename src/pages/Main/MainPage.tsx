@@ -4,6 +4,7 @@ import { GuestsPicker } from '../../components/GuestsPicker';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { FlightToggle } from '../../components/FlightToggle';
 import { ChooseWizard } from '../../components/ChooseWizard';
+import { ResortModal } from '../../components/ResortModal';
 import { PlaceChips, PlaceSearch } from '../../components/PlaceSearch';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -200,6 +201,7 @@ export default function MainPage() {
   usePageTitle('Санатории Литвы — лечение и отдых');
   const [v, logic] = usePageLogic(MainLogic);
   const [wz, setWz] = useState(false);
+  const [resort, setResort] = useState('');
   return (
     <div className="page pg-main">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -478,7 +480,12 @@ export default function MainPage() {
               gap: '14px',
             }}
           >
-            <Link className="card resort" to="/results">
+            <button
+              type="button"
+              className="card resort"
+              data-resort="druskininkai"
+              onClick={() => setResort('druskininkai')}
+            >
               <img src="/img/80cbf81cb33b38c12f41d140c9e34ba7.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
@@ -489,8 +496,13 @@ export default function MainPage() {
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Лечение и минеральные воды</span>
               </div>
-            </Link>
-            <Link className="card resort" to="/results">
+            </button>
+            <button
+              type="button"
+              className="card resort"
+              data-resort="birstonas"
+              onClick={() => setResort('birstonas')}
+            >
               <img src="/img/ac9b1445a29a0df51e1bd45a8a203a39.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
@@ -501,8 +513,8 @@ export default function MainPage() {
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Спокойный отдых у Немана</span>
               </div>
-            </Link>
-            <Link className="card resort" to="/results">
+            </button>
+            <button type="button" className="card resort" data-resort="palanga" onClick={() => setResort('palanga')}>
               <img src="/img/c4c4cd4bcaad10e81718df6ded79f624.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
@@ -511,8 +523,13 @@ export default function MainPage() {
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Отдых у Балтийского моря</span>
               </div>
-            </Link>
-            <Link className="card resort" to="/results">
+            </button>
+            <button
+              type="button"
+              className="card resort"
+              data-resort="anyksciai"
+              onClick={() => setResort('anyksciai')}
+            >
               <img src="/img/213618680529a455a08f4dc13b8abe7e.jpg" alt="" />
               <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
@@ -521,7 +538,7 @@ export default function MainPage() {
                 </div>
                 <span style={{ fontSize: '14px', color: '#3E4B44' }}>Природа и тишина</span>
               </div>
-            </Link>
+            </button>
           </div>
         </section>
         {/* Popular */}
@@ -1057,6 +1074,18 @@ export default function MainPage() {
         onClose={() => setWz(false)}
         onShow={({ hotelId }) => logic.props.navigate('/results?h=' + hotelId)}
       />
+      {resort ? (
+        <ResortModal
+          id={resort}
+          onClose={() => setResort('')}
+          onSwitch={setResort}
+          onChoose={(id) => {
+            logic.props.booking.update({ dest: id });
+            setResort('');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      ) : null}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>
   );

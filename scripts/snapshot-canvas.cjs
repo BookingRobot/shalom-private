@@ -402,6 +402,30 @@ async function buildInteractive(b, sizes) {
       raws.slist = wrapIf('sOpen', list);
       // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
       raws.wizard = await wizardRaws(b, true);
+      // resort story pop-ups
+      const resIds = ['druskininkai', 'birstonas', 'palanga', 'anyksciai'];
+      let resHtml = '';
+      for (let i = 0; i < resIds.length; i++) {
+        const h = await grab(
+          b,
+          route,
+          (p) => p.click('[data-resort="' + resIds[i] + '"]'),
+          (i) => {
+            const d = window.__dc;
+            const o = document.querySelector('.rs-overlay');
+            d.on(o.querySelector('.rs-close'), 'click', 'closeRes');
+            o.querySelectorAll('.rs-tabs button').forEach((t, j) => {
+              d.on(t, 'click', 'openRes' + j);
+              t.removeAttribute('aria-selected');
+            });
+            d.on(o.querySelector('.rs-go'), 'click', 'chooseRes' + i);
+            return o.outerHTML;
+          },
+          i,
+        );
+        resHtml += wrapIf('resOn' + i, IA.finish(post(h), {}));
+      }
+      raws.resorts = resHtml;
     } else {
       raws.wizard = await wizardRaws(b, false);
       const cmp = await grab(
@@ -577,6 +601,9 @@ async function buildInteractive(b, sizes) {
         d.on(city, 'click', 'openSearch');
         city.after(d.raw('slist'));
         document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
+        document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
+        page.appendChild(d.raw('resorts'));
+        d.attr(document.querySelector('#city'), 'value', 'cityLabel');
         page.appendChild(d.raw('wizard'));
         document.querySelectorAll('.ps-chip').forEach((c) => {
           const a = document.createElement('a');

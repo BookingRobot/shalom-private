@@ -196,6 +196,16 @@ class Component extends DCLogic {
     const __f = this.__filters ? this.__filters(st) : {};
     return {
       ...__f,
+      // resort pop-ups (home page): story, tabs to other resorts, "Хочу в …" fills the search field
+      ...Object.fromEntries(
+        ['Друскининкай', 'Бирштонас', 'Паланга', 'Аникщяй'].flatMap((name, i) => [
+          ['resOn' + i, st.res === i],
+          ['openRes' + i, () => this.setState({ res: i })],
+          ['chooseRes' + i, () => this.setState({ res: -1, city: name })],
+        ]),
+      ),
+      closeRes: () => this.setState({ res: -1 }),
+      cityLabel: st.city || 'Друскининкай',
       // page fields
       inLabel: longD(inD), outLabel: longD(outD),
       openCal: () => this.setState({ cal: 'exact', room: false, sel: { in: st.inD, out: st.outD }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
