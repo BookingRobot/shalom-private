@@ -753,23 +753,46 @@ async function buildHotel(b, sizes) {
       return over.outerHTML;
     },
   );
+  // guests chip in the "Ваши даты" bar opens the same +/− pop-over as the search
+  const gpop = await grab(
+    b,
+    '/hotel',
+    (p) => p.click('#guests'),
+    () => window.__dc.markGuests(document.querySelector('.gp-pop')),
+  );
   const base = await grab(b, '/hotel', null, () => {
     const d = window.__dc;
     const first = document.querySelector('button[aria-label="Территория санатория"]');
     first.parentElement.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+    const g = document.querySelector('#guests');
+    if (g) {
+      d.on(g, 'click', 'openGuests');
+      d.text(g.querySelector('.gp-inline-t strong'), 'gLabel');
+      g.after(d.raw('gpop'));
+    }
     document.querySelector('#root .page').appendChild(d.raw('lightbox'));
     return document.getElementById('root').innerHTML;
   });
   const body = IA.finish(post(base), {
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
+    gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
   });
   const logic = `class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { lb: false };
+    this.state = { lb: false, gOpen: false, ad: 2, ch: 0 };
   }
   renderVals() {
-    return { lbOn: this.state.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }) };
+    const st = this.state, ad = st.ad, ch = st.ch;
+    return {
+      lbOn: st.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }),
+      gOpen: st.gOpen, openGuests: () => this.setState({ gOpen: !st.gOpen }), closeGuests: () => this.setState({ gOpen: false }),
+      gLabel: ad + ' ' + (ad === 1 ? 'взрослый' : 'взрослых') + (ch ? ', ' + ch + ' ' + (ch === 1 ? 'ребёнок' : 'ребёнка') : ''),
+      gAd: String(ad), gCh: String(ch),
+      adMinus: () => ad > 1 && this.setState({ ad: ad - 1 }), adPlus: () => ad < 4 && this.setState({ ad: ad + 1 }),
+      chMinus: () => ch > 0 && this.setState({ ch: ch - 1 }), chPlus: () => ch < 3 && this.setState({ ch: ch + 1 }),
+      adMinusOff: ad <= 1, adPlusOff: ad >= 4, chMinusOff: ch <= 0, chPlusOff: ch >= 3,
+    };
   }
 }`;
   fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, '/hotel', body, sizes[file].h, logic));
