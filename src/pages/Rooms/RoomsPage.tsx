@@ -218,21 +218,13 @@ export default function RoomsPage() {
                   border: `2px solid ${p.border ?? ''}`,
                 }}
               >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                  <div
-                    style={{
-                      flex: '1 1 560px',
-                      minWidth: '0',
-                      padding: '18px 22px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                {/* compact: facts in one wrapping line, price and button side by side — 3–4 programmes fit a laptop screen */}
+                <div className="pc-row">
+                  <div className="pc-main">
+                    <div className="pc-head">
                       <svg
-                        width="22"
-                        height="22"
+                        width="20"
+                        height="20"
                         viewBox="-1 -1 26 26"
                         fill="none"
                         stroke="#1F5F4A"
@@ -244,159 +236,63 @@ export default function RoomsPage() {
                       >
                         <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
                       </svg>
-                      <h2 style={{ fontSize: '19px' }}>{p.name}</h2>
+                      <h2 className="pc-name">{p.name}</h2>
+                      {p.included ? (
+                        <span className="status-tag">✓ Включена в цену</span>
+                      ) : (
+                        <span className="pc-delta">Доплата {p.delta}</span>
+                      )}
                     </div>
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
-                        gap: '10px',
-                      }}
-                    >
-                      {(p.value || []).map((v: any, _i1: number) => (
-                        <Fragment key={_i1}>
-                          <div
-                            style={{
-                              background: '#EEF5F1',
-                              border: '1px solid #C8DED3',
-                              borderRadius: '2px',
-                              padding: '8px 12px',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '4px',
-                            }}
+                    <ul className="pc-facts">
+                      {(p.value || []).map((f: any, _i1: number) => (
+                        <li key={_i1}>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="-1 -1 26 26"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.9"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <svg
-                                width="18"
-                                height="18"
-                                viewBox="-1 -1 26 26"
-                                fill="none"
-                                stroke="#1F5F4A"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                                style={{ flex: 'none' }}
-                              >
-                                <path d={v.d} />
-                              </svg>
-                              <span
-                                style={{
-                                  fontFamily: 'Lora,Georgia,serif',
-                                  fontSize: '18px',
-                                  fontWeight: '700',
-                                  lineHeight: '1',
-                                  color: '#1F5F4A',
-                                }}
-                              >
-                                {v.big}
-                              </span>
-                            </div>
-                            <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.25' }}>{v.label}</span>
-                            <span style={{ fontSize: '15px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
-                          </div>
-                        </Fragment>
+                            <path d={f.d} />
+                          </svg>
+                          <strong>{f.big}</strong> {f.label}
+                          {f.sub ? <span className="pc-sub"> · {f.sub}</span> : null}
+                        </li>
                       ))}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      flex: '0 0 260px',
-                      padding: '18px 20px',
-                      margin: '14px 0',
-                      borderLeft: '1px solid #E3DED2',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {p.included ? (
-                      <span className="status-tag">✓ Включена в цену</span>
-                    ) : (
-                      <span style={{ fontSize: '16px', color: '#3E4B44' }}>
-                        Доплата <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{p.delta}</strong>
-                      </span>
-                    )}
-                    <span
-                      style={{
-                        fontSize: '24px',
-                        fontWeight: '800',
-                        lineHeight: '1.15',
-                        whiteSpace: 'nowrap',
-                        marginTop: '8px',
-                      }}
-                    >
-                      {p.place}
-                    </span>
-                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.placeNote}</span>
-                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                      Итого {v.party}: <strong style={{ color: '#1C2620', whiteSpace: 'nowrap' }}>{p.total}</strong>
-                    </span>
-                    <button
-                      type="button"
-                      className={`btn ${p.btnCls ?? ''}`}
-                      onClick={p.pick}
-                      style={{ minHeight: '44px', fontSize: '15px', marginTop: '8px', padding: '0 14px' }}
-                    >
-                      {p.btnLabel}
+                    </ul>
+                    <button type="button" className="pc-more" onClick={p.toggle} aria-expanded={!!p.open}>
+                      {p.toggleLabel}
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                        style={{ transform: p.chev }}
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
                     </button>
                   </div>
+                  <div className="pc-price">
+                    <span className="pc-place">{p.place}</span>
+                    <span className="pc-note">{v.placeNote}</span>
+                    <span className="pc-total">
+                      Итого {v.party}: <strong>{p.total}</strong>
+                    </span>
+                  </div>
+                  <button type="button" className={`btn ${p.btnCls ?? ''} pc-btn`} onClick={p.pick}>
+                    {p.btnLabel}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={p.toggle}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    width: '100%',
-                    border: 'none',
-                    borderTop: '1px solid #E3DED2',
-                    background: '#FAFBF9',
-                    padding: '12px 20px',
-                    minHeight: '52px',
-                    cursor: 'pointer',
-                    fontWeight: '700',
-                    fontSize: '16px',
-                    color: '#1F5F4A',
-                    textAlign: 'left',
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      style={{ flex: 'none' }}
-                    >
-                      <path d="M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6" />
-                    </svg>
-                    {p.toggleLabel}
-                  </span>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    style={{ transform: p.chev }}
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
                 {p.open ? (
                   <>
                     <div
