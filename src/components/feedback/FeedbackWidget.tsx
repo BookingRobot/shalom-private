@@ -146,6 +146,8 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const [hover, setHover] = useState<DOMRect | null>(null);
   const [result, setResult] = useState<{ number?: number; url?: string; copied?: boolean }>({});
   const [error, setError] = useState('');
+  // the intake did not answer: the team can still file the note on GitHub by hand
+  const [failed, setFailed] = useState(false);
   const hoverEl = useRef<Element | null>(null);
 
   // screenshot preview URL
@@ -213,6 +215,7 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
     setShot(null);
     setElement('');
     setError('');
+    setFailed(false);
   };
   const reset = () => {
     close();
@@ -235,30 +238,47 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
     screenshot: noShot ? null : shot,
   });
 
-  const send = async () => {
-    if (!text.trim()) return setError('Напишите хотя бы пару слов.');
-    if (!name.trim()) return setError('Как вас зовут? Так мы поймём, кому ответить.');
+  const checked = () => {
+    const problem = !text.trim()
+      ? 'Напишите хотя бы пару слов.'
+      : !name.trim()
+        ? 'Как вас зовут? Так мы поймём, кому ответить.'
+        : '';
+    if (problem) {
+      setError(problem);
+      return false;
+    }
     try {
       localStorage.setItem(NAME_KEY, name.trim());
     } catch {
       /* ignore */
     }
+    return true;
+  };
+
+  // inside the click: the browser lets us open GitHub and copy the picture
+  const viaGithub = async () => {
+    if (!checked()) return;
     const n = note();
-    if (!hasEndpoint()) {
-      // inside the click: the browser lets us open GitHub and copy the picture
-      window.open(githubIssueUrl(n), '_blank', 'noopener');
-      const copied = n.screenshot ? await copyScreenshot(n.screenshot) : false;
-      setResult({ url: githubIssueUrl(n), copied });
-      setStage('github');
-      return;
-    }
+    window.open(githubIssueUrl(n), '_blank', 'noopener');
+    const copied = n.screenshot ? await copyScreenshot(n.screenshot) : false;
+    setResult({ url: githubIssueUrl(n), copied });
+    setError('');
+    setStage('github');
+  };
+
+  const send = async () => {
+    if (!hasEndpoint()) return viaGithub();
+    if (!checked()) return;
     setStage('sending');
     try {
-      const r = await sendFeedback(n);
+      const r = await sendFeedback(note());
       setResult(r);
+      setFailed(false);
       setStage('done');
     } catch {
       setError('Не получилось отправить. Проверьте интернет и попробуйте ещё раз.');
+      setFailed(true);
       setStage('form');
     }
   };
@@ -436,6 +456,11 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
                   <div className="fb-error" role="alert">
                     {error}
                   </div>
+                ) : null}
+                {failed ? (
+                  <button type="button" className="fb-link" onClick={viaGithub}>
+                    Для команды: создать задачу на GitHub вручную
+                  </button>
                 ) : null}
                 <div className="fb-foot">
                   <span>Сообщение попадёт в список задач команды. Ничего не меняем, пока не проверим.</span>
