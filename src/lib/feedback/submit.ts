@@ -1,13 +1,13 @@
 /**
  * Where a "Ваши пожелания" note goes.
  *
- * 1. VITE_FEEDBACK_URL set (the small worker in feedback-worker/, see its README):
- *    the note and the screenshot are POSTed there; the worker keeps the screenshot in the
- *    repository branch `feedback-files` and opens a GitHub issue labelled
- *    «atsiliepimas» + «laukia-peržiūros» — nobody works on it before it is reviewed.
- * 2. Not set yet: the GitHub "new issue" page opens with everything filled in and the
- *    screenshot is copied to the clipboard — paste it (Ctrl+V) and press Submit.
- *    Works for everyone with access to the repository (the team).
+ * 1. The intake (feedback-worker/, runs on coding.ateisiu.lt — see its README; another
+ *    address can be set with VITE_FEEDBACK_URL): the note and the screenshot are POSTed there;
+ *    it keeps the screenshot in the repository branch `feedback-files` and opens a GitHub
+ *    issue labelled «atsiliepimas» + «laukia-peržiūros» — nobody works on it before review.
+ * 2. Intake not reachable (or VITE_FEEDBACK_URL set to "github"): the GitHub "new issue" page
+ *    opens with everything filled in and the screenshot is copied to the clipboard — paste it
+ *    (Ctrl+V) and press Submit. Works for everyone with access to the repository (the team).
  */
 export type FeedbackType = 'idea' | 'bug' | 'other';
 
@@ -27,7 +27,8 @@ export interface FeedbackNote {
 
 export const REPO = 'BookingRobot-M/br-shalom';
 export const LABELS = ['atsiliepimas', 'laukia-peržiūros'];
-const ENDPOINT = (import.meta.env.VITE_FEEDBACK_URL as string | undefined) || '';
+const SET = (import.meta.env.VITE_FEEDBACK_URL as string | undefined) || '';
+const ENDPOINT = SET === 'github' ? '' : SET || 'https://coding.ateisiu.lt/br-shalom-feedback';
 
 export const TYPE_RU: Record<FeedbackType, string> = { idea: 'Предложение', bug: 'Ошибка', other: 'Другое' };
 const TYPE_LT: Record<FeedbackType, string> = { idea: 'Pasiūlymas', bug: 'Klaida', other: 'Kita' };
@@ -76,7 +77,7 @@ export async function sendFeedback(n: FeedbackNote): Promise<{ number?: number; 
   // the worker puts the screenshot link in place of the marker
   form.append('note', JSON.stringify({ ...rest, title: issueTitle(n), body: issueBody(n, '{{SCREENSHOT}}') }));
   if (screenshot) form.append('screenshot', screenshot, screenshot.type === 'image/png' ? 'shot.png' : 'shot.webp');
-  const res = await fetch(ENDPOINT, { method: 'POST', body: form });
+  const res = await fetch(ENDPOINT, { method: 'POST', body: form, signal: AbortSignal.timeout(30000) });
   if (!res.ok) throw new Error('feedback ' + res.status);
   return res.json();
 }
