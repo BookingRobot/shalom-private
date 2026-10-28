@@ -11,6 +11,7 @@ import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../l
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { FlightChoice } from '../../components/FlightChoice';
+import { sanatoriumTransferName, transferBySanatorium } from '../../data/transferPolicy';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './TransferPage.css';
 
@@ -158,16 +159,21 @@ class TransferLogic extends PageLogic {
         daysBetween(toD(booking.checkin), toD(booking.checkout)) +
         ' ' +
         nightsWord(daysBetween(toD(booking.checkin), toD(booking.checkout))),
-      transferLead: booking.flightPackage
-        ? 'Входит в перелёт: встретим у самолёта в Вильнюсе.'
-        : booking.flights === 'help'
-          ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
-          : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
+      bySan: transferBySanatorium(booking.hotelId),
+      sanName: sanatoriumTransferName(booking.hotelId),
+      flightOurs: !!booking.flightPackage,
+      transferLead: transferBySanatorium(booking.hotelId)
+        ? 'Организует сам ' + sanatoriumTransferName(booking.hotelId) + ' — трансфер уже включён.'
+        : booking.flightPackage
+          ? 'Входит в перелёт: встретим у самолёта в Вильнюсе.'
+          : booking.flights === 'help'
+            ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
+            : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
       total:
         fmt(
           orderSummary(this.props.booking.booking).stay +
             orderSummary(this.props.booking.booking).flight +
-            (booking.flightPackage ? 0 : transferTotal),
+            (booking.flightPackage || transferBySanatorium(booking.hotelId) ? 0 : transferTotal),
         ) + '\u00a0€',
     };
   }
@@ -206,7 +212,7 @@ export default function TransferPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <h1 style={{ fontSize: '32px' }}>Дорога до санатория</h1>
               <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
-                Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации «Эгле Комфорт».
+                Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации санатория.
               </p>
             </div>
             <FlightChoice />
@@ -217,7 +223,29 @@ export default function TransferPage() {
                 <span>{v.transferLead}</span>
               </div>
             </div>
-            {order.flightPackage ? (
+            {v.bySan ? (
+              <section
+                className="card"
+                style={{
+                  padding: '22px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  background: '#EEF5F1',
+                  borderColor: '#C8DED3',
+                }}
+              >
+                <p style={{ margin: '0', fontSize: '18px', color: '#1C2620' }}>
+                  <strong>Трансфер аэропорт Вильнюса ⇄ санаторий организует сам {v.sanName}.</strong> Он уже включён в
+                  стоимость — отдельно заказывать и платить не нужно.
+                </p>
+                <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
+                  {v.flightOurs
+                    ? 'Время вашего рейса передадим санаторию сами — водитель встретит у выхода из зала прилёта.'
+                    : 'Номер рейса и время прилёта передадим санаторию, как только вы их сообщите — на следующем шаге или консультанту.'}
+                </p>
+              </section>
+            ) : order.flightPackage ? (
               <section
                 className="card"
                 style={{

@@ -5,6 +5,7 @@ import { isFlightDay } from '../data/flights';
 import { WEEKDAYS_SHORT, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../lib/dates';
 import { fmt } from '../lib/format';
 import { FLIGHT_PP, PACKAGE_TRANSFER_PP, persons } from '../lib/pricing';
+import { transferBySanatorium } from '../data/transferPolicy';
 
 /** Partner flights Tel Aviv ⇄ Vilnius. [ПРИМЕР ДАННЫХ — ИЗ СИСТЕМЫ БРОНИРОВАНИЯ РЕЙСОВ] */
 const LEG_THERE = { no: 'IZ 2549', from: 'Тель-Авив', to: 'Вильнюс', dep: '13:05', arr: '17:20' };
@@ -61,7 +62,9 @@ export function FlightChoice() {
     outOk = isFlightDay(outD);
   const both = inOk && outOk;
   const n = persons(booking);
-  const pp = FLIGHT_PP + PACKAGE_TRANSFER_PP;
+  // the sanatorium may meet guests itself (Eglė): then the package is the flight only
+  const bySan = transferBySanatorium(booking.hotelId);
+  const pp = FLIGHT_PP + (bySan ? 0 : PACKAGE_TRANSFER_PP);
   const sel = booking.flightPackage
     ? 'with'
     : booking.flights === 'no'
@@ -174,7 +177,10 @@ export function FlightChoice() {
             </span>
             <span>
               {both
-                ? `Прямой рейс Israir, багаж 20 кг, трансфер у самолёта — всё в одной цене. За ${n === 2 ? 'двоих' : n + ' гостей'}: ${fmt(pp * n)} €.`
+                ? (bySan
+                    ? 'Прямой рейс Israir, багаж 20 кг. Трансфер из аэропорта организует санаторий. '
+                    : 'Прямой рейс Israir, багаж 20 кг, трансфер у самолёта — всё в одной цене. ') +
+                  `За ${n === 2 ? 'двоих' : n + ' гостей'}: ${fmt(pp * n)} €.`
                 : 'Недоступно в ваши даты — выберите даты с рейсом выше.'}
             </span>
           </span>
@@ -192,7 +198,9 @@ export function FlightChoice() {
           <span className="fly-opt-t">
             <strong>Билеты у меня уже есть или приеду сам</strong>
             <span>
-              Другой рейс, другой аэропорт, на машине. Номер рейса можно указать ниже — трансфер встретит по нему.
+              {bySan
+                ? 'Другой рейс, другой аэропорт, на машине. Номер рейса передадим санаторию — его трансфер встретит вас.'
+                : 'Другой рейс, другой аэропорт, на машине. Номер рейса можно указать ниже — трансфер встретит по нему.'}
             </span>
           </span>
         </button>

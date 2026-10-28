@@ -7,6 +7,7 @@ import { MONTHS, MONTHS_N, WEEKDAYS_FULL, addD, daysBetween, iso, nightsWord, sh
 import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
+import { transferBySanatorium } from '../../data/transferPolicy';
 import { blockedNights, blockedNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
@@ -168,7 +169,7 @@ class HotelLogic extends PageLogic {
         return {
           name: pp[0],
           sub: (pp[1] || '') + ' · ' + p.meals,
-          price: eur(quote(p.priceN + addN, GQ, this.props.booking.booking.flightPackage).perPerson) + ' / чел.',
+          price: eur(quote(p.priceN + addN, GQ, this.props.booking.booking.flightPackage, true).perPerson) + ' / чел.',
           diff:
             pi === 0
               ? 'самая доступная'
@@ -229,7 +230,7 @@ class HotelLogic extends PageLogic {
         progRows,
         roomText: 'Что ещё есть в номере: телефон, спутниковое ТВ, гардероб, сейф, фен, халат, тапочки.',
         selName: sp.title.split(' — ')[0],
-        selPrice: eur(quote(sp.priceN + addN, GQ, this.props.booking.booking.flightPackage).total),
+        selPrice: eur(quote(sp.priceN + addN, GQ, this.props.booking.booking.flightPackage, true).total),
         detBtn: 'Программы для этого номера (' + PROGS.length + ') и что входит',
         detChev: dOpen ? 'rotate(180deg)' : 'none',
         border: r.top ? '#1F5F4A' : '#E3DED2',
@@ -429,8 +430,10 @@ class HotelLogic extends PageLogic {
       calRoomName: st.calRoomName || '',
       dateRange: range(checkin, checkout) + ' ' + checkin.getUTCFullYear(),
       nightsLabel,
-      freeTr:
-        nights >= 10
+      // Eglė meets its guests itself (data/transferPolicy) — nothing to sell here
+      freeTr: transferBySanatorium(this.props.booking.booking.hotelId || 'egle-comfort')
+        ? 'Трансфер аэропорт Вильнюса ⇄ санаторий организует сам санаторий «Эгле» — он включён в стоимость, отдельно заказывать не нужно.'
+        : nights >= 10
           ? 'У вас ' +
             nightsLabel +
             ' — трансфер из аэропорта Вильнюса для вас бесплатный. Остальные направления — по тарифу.'
@@ -1010,7 +1013,7 @@ export default function HotelPage() {
                   >
                     <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
                   </svg>
-                  Как добраться и заказать трансфер
+                  Как добраться — трансфер от санатория
                 </span>
                 <svg
                   width="20"
@@ -1104,7 +1107,8 @@ export default function HotelPage() {
                         borderRadius: '2px',
                       }}
                     >
-                      <div style={{ fontWeight: '800', fontSize: '17px' }}>Как проходит трансфер</div>
+                      <div style={{ fontWeight: '800', fontSize: '17px' }}>{v.freeTr}</div>
+                      <div style={{ fontWeight: '700', fontSize: '15px', color: '#3E4B44' }}>Как проходит трансфер</div>
                       <div
                         style={{
                           display: 'flex',
@@ -1330,74 +1334,6 @@ export default function HotelPage() {
                           • <strong>Обратно</strong> — заберём из санатория за 3 часа до вылета, время подтвердим за
                           день.
                         </span>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div style={{ fontWeight: '800', fontSize: '17px' }}>Тип автомобиля выберете при оформлении</div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px' }}>
-                        {(v.trCars || []).map((v: any, _i0: number) => (
-                          <Fragment key={_i0}>
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '6px',
-                                background: '#F7F5F0',
-                                border: '1px solid #E3DED2',
-                                borderRadius: '2px',
-                                padding: '12px 12px 10px',
-                                textAlign: 'center',
-                              }}
-                            >
-                              <img
-                                src={v.img}
-                                alt={v.name}
-                                style={{ height: '54px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                              />
-                              <strong style={{ fontSize: '15px', lineHeight: '1.2' }}>{v.name}</strong>
-                              <span style={{ fontSize: '14px', color: '#3E4B44', lineHeight: '1.3' }}>{v.info}</span>
-                              <span style={{ fontSize: '16px', fontWeight: '800', color: '#1F5F4A' }}>{v.price}</span>
-                            </div>
-                          </Fragment>
-                        ))}
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '12px',
-                          background: '#FFF8EC',
-                          border: '1px solid #F0DDB8',
-                          borderRadius: '2px',
-                          padding: '12px 14px',
-                          fontSize: '15px',
-                          color: '#1C2620',
-                        }}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#C9893A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none' }}
-                        >
-                          <circle cx="12" cy="12" r="9" />
-                          <path d="M9 9.5a3 3 0 1 1 3 3v1.5M12 17h.01" />
-                        </svg>
-                        <span>
-                          <strong>Хотите сэкономить?</strong> При оформлении можно отметить «совместная поездка»: если в
-                          тот же день едут другие гости, объединим трансфер — цена ниже на <strong>30 %</strong>, дорога
-                          длиннее не более чем на 30 минут.
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#3E4B44' }}>
-                        {v.freeTr} Трансфер — следующий шаг после выбора программы.
                       </div>
                     </div>
                   </div>

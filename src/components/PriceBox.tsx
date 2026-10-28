@@ -1,6 +1,7 @@
 import { useBooking } from '../context/BookingContext';
 import { toNum } from '../lib/format';
 import { eur, quote } from '../lib/pricing';
+import { transferBySanatorium } from '../data/transferPolicy';
 
 /**
  * Price the way agents quote it: one big number per person (in a double room, or
@@ -12,14 +13,18 @@ export function PriceBox({
   forTwo,
   nightsLabel,
   from = true,
+  hotelId,
 }: {
   forTwo: number | string;
   nightsLabel: string;
   from?: boolean;
+  /** sanatorium of this price (defaults to the one in the order) */
+  hotelId?: string;
 }) {
   const { booking } = useBooking();
   const g = { adults: booking.adults, children: booking.children };
-  const q = quote(toNum(forTwo), g, booking.flightPackage);
+  const bySan = transferBySanatorium(hotelId || booking.hotelId);
+  const q = quote(toNum(forTwo), g, booking.flightPackage, bySan);
   return (
     <div className="pbox">
       <span className="pbox-big">
@@ -34,7 +39,9 @@ export function PriceBox({
           <span>
             Санаторий и лечение — {eur(q.place)}
             <br />
-            Перелёт Тель-Авив ⇄ Вильнюс и трансфер — {eur(q.perPerson - q.place)}
+            {bySan
+              ? 'Перелёт Тель-Авив ⇄ Вильнюс — ' + eur(q.perPerson - q.place) + ' (трансфер — от санатория)'
+              : 'Перелёт Тель-Авив ⇄ Вильнюс и трансфер — ' + eur(q.perPerson - q.place)}
           </span>
         </details>
       ) : null}

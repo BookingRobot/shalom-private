@@ -92,7 +92,7 @@ const BOARDS = [
   },
   {
     file: 'Transfer.dc.html',
-    title: 'Шаг 2 · Дорога: перелёт и трансфер',
+    title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — трансфер от санатория)',
     route: '/transfer',
     links: [
       ['.fly-alt-btn', '', 'Transfer-package.dc.html'],
@@ -202,8 +202,23 @@ const BOARDS = [
     },
   },
   {
+    file: 'Transfer-other.dc.html',
+    title: 'Шаг 2 · Дорога — другой санаторий: трансфер продаём мы',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.evaluate(() => {
+        const k = 'br-shalom:booking';
+        const b = JSON.parse(sessionStorage.getItem(k) || '{}');
+        sessionStorage.setItem(k, JSON.stringify({ ...b, hotelId: 'grand-spa-lietuva' }));
+      });
+      await p.reload({ waitUntil: 'networkidle' });
+    },
+    links: [['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+  },
+  {
     file: 'Transfer-package.dc.html',
-    title: 'Шаг 2 · Дорога — перелёт добавлен (даты с рейсом)',
+    title: 'Шаг 2 · Дорога — перелёт добавлен (Эгле, даты с рейсом)',
     route: '/transfer',
     state: true,
     setup: async (p) => p.click('.fly-alt-btn >> nth=0'),
