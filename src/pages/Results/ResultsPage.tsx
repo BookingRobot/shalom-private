@@ -9,7 +9,7 @@ import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } 
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
 import { isSoldOutEverywhere } from '../../data/availability';
-import { blockedNights, blockedNote, daysText } from '../../lib/stayCheck';
+import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
@@ -676,7 +676,11 @@ class ResultsLogic extends PageLogic {
       const k = iso(date);
       if (ss.in && !ss.out && date > toD(ss.in)) {
         const bad = blockedNights(toD(ss.in), date, sBlocked);
-        if (bad.length) return this.setState({ sNote: blockedNote(bad) });
+        // the clicked day starts a new stay instead (unless it has no places itself)
+        if (bad.length)
+          return this.setState(
+            sBlocked(date) ? { sNote: blockedNote(bad) } : { ss: { in: k, out: null }, sNote: restartNote(bad, date) },
+          );
         return this.setState({ ss: { in: ss.in, out: k }, sNote: null });
       }
       if (sBlocked(date)) return this.setState({ sNote: blockedNote([date], true) });
