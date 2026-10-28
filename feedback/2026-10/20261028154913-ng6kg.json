@@ -1,0 +1,23 @@
+{
+  "id": "20261028154913-ng6kg",
+  "issue": 30,
+  "received": "2026-10-28T15:49:13.336Z",
+  "type": "change",
+  "severity": "annoying",
+  "title": "[Изменение] test",
+  "whatDoing": "",
+  "expected": "",
+  "actual": "",
+  "description": "test",
+  "name": "Mindaugas",
+  "contact": "",
+  "page": "https://shalom.bookingrobot.eu/",
+  "pageTitle": "Санатории Литвы — лечение и отдых · Санатории Литвы",
+  "element": "antraštė „Выберите курорт“",
+  "viewport": "1379×1149",
+  "browser": "Chrome · macOS",
+  "when": "2026-10-28 17:49:12",
+  "text": "test\n\ntest",
+  "screenshot": "feedback/2026-10/20261028154913-ng6kg.webp",
+  "images": []
+}
