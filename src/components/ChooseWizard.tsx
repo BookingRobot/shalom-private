@@ -4,6 +4,7 @@ import { api } from '../api';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
 import { eur, quote } from '../lib/pricing';
+import { WIZ_ICONS } from './wizardIcons';
 
 /**
  * "Помогите выбрать": three questions, one per screen, big buttons — then 2–3
@@ -19,7 +20,7 @@ const GOALS: [Goal, string, string][] = [
   ['heart', 'Сердце, давление, сосуды', 'p-heart'],
   ['diab', 'Диабет, обмен веществ', 'p-diab'],
   ['nerv', 'Нервы, сон, стресс', 'p-nerv'],
-  ['rest', 'Просто отдохнуть и восстановиться', ''],
+  ['rest', 'Просто отдохнуть', ''],
 ];
 const MOBS: [Mob, string, string][] = [
   ['easy', 'Хожу без труда', 'можно жить в корпусе отдельно от процедур'],
@@ -116,7 +117,14 @@ export function ChooseWizard({
       <div role="dialog" aria-modal="true" aria-labelledby="wzTitle" className="wz">
         <div className="wz-head">
           <div>
-            <span className="wz-step">{step < 4 ? `Вопрос ${step} из 3` : 'Подходят вам'}</span>
+            <span className="wz-step">
+              {step < 4 ? `Вопрос ${step} из 3` : 'Подходят вам'}
+              <span className="wz-dots" aria-hidden="true">
+                {[1, 2, 3].map((i) => (
+                  <i key={i} className={i <= Math.min(step, 3) ? 'on' : ''} />
+                ))}
+              </span>
+            </span>
             <h2 id="wzTitle" style={{ fontSize: '26px' }}>
               {step === 1
                 ? 'Что хотите подлечить?'
@@ -137,18 +145,20 @@ export function ChooseWizard({
           </button>
         </div>
         {step === 1 ? (
-          <div className="wz-opts">
+          <div className="wz-opts wz-grid ios-in" key="q1">
             {GOALS.map(([k, t]) => (
               <button type="button" key={k} className="wz-opt" onClick={() => setGoal(k)}>
+                <span className="wz-ico">{WIZ_ICONS[k]}</span>
                 {t}
               </button>
             ))}
           </div>
         ) : null}
         {step === 2 ? (
-          <div className="wz-opts">
+          <div className="wz-opts wz-grid ios-in" key="q2">
             {MOBS.map(([k, t, sub]) => (
               <button type="button" key={k} className="wz-opt" onClick={() => setMob(k)}>
+                <span className="wz-ico">{WIZ_ICONS[k]}</span>
                 {t}
                 <small>{sub}</small>
               </button>
@@ -156,9 +166,10 @@ export function ChooseWizard({
           </div>
         ) : null}
         {step === 3 ? (
-          <div className="wz-opts">
+          <div className="wz-opts wz-grid ios-in" key="q3">
             {BUDGETS.map(([k, t]) => (
               <button type="button" key={k} className="wz-opt" onClick={() => setBudget(k)}>
+                <span className="wz-ico">{WIZ_ICONS[k]}</span>
                 {t}
               </button>
             ))}
