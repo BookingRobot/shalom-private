@@ -1,8 +1,9 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GuestsPicker } from '../../components/GuestsPicker';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { FlightToggle } from '../../components/FlightToggle';
+import { ChooseWizard } from '../../components/ChooseWizard';
 import { PlaceChips, PlaceSearch } from '../../components/PlaceSearch';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -198,6 +199,7 @@ class MainLogic extends PageLogic {
 export default function MainPage() {
   usePageTitle('Санатории Литвы — лечение и отдых');
   const [v, logic] = usePageLogic(MainLogic);
+  const [wz, setWz] = useState(false);
   return (
     <div className="page pg-main">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -392,9 +394,9 @@ export default function MainPage() {
                 </span>
               </div>
               <PlaceChips />
-              <Link to="/results?wizard=1" className="wz-link">
+              <button type="button" className="wz-link" onClick={() => setWz(true)}>
                 Не знаете, какой санаторий выбрать? Ответьте на 3 вопроса — подскажем →
-              </Link>
+              </button>
             </form>
           </div>
         </section>
@@ -1049,6 +1051,12 @@ export default function MainPage() {
           </div>
         </>
       ) : null}{' '}
+      {/* "Не знаете, какой санаторий выбрать?" — the 3-question wizard opens right here */}
+      <ChooseWizard
+        open={wz}
+        onClose={() => setWz(false)}
+        onShow={({ hotelId }) => logic.props.navigate('/results?h=' + hotelId)}
+      />
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>
   );

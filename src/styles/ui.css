@@ -891,3 +891,17 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-weight: 700;
   color: #1f5f4a;
 }
+.page button.wz-link {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  font-family: inherit;
+}
+.page .wz-intro {
+  margin: 4px 0 0;
+  font-size: 16px;
+  color: #3e4b44;
+}

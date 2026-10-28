@@ -328,6 +328,48 @@ const calRawsFor = (isMain) => ({
 });
 const wrapIf = (cond, html) => `<sc-if value="{{${cond}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
 
+/** the "Помогите выбрать" wizard, 3 questions + answer; on Main the answer links to the results board */
+async function wizardRaws(b, toResults) {
+  const wz = [];
+  for (let step = 1; step <= 4; step++) {
+    wz.push(
+      await grab(
+        b,
+        '/results',
+        async (p) => {
+          await p.click('text=Помогите выбрать санаторий');
+          const answers = ['.wz-opt:has-text("Спина и суставы")', '.wz-opt:has-text("нужен лифт")', '.wz-opt:has-text("До 1 000")'];
+          for (let i = 0; i < step - 1; i++) await p.click(answers[i]);
+        },
+        (toResults) => {
+          const d = window.__dc;
+          const o = document.querySelector('.wz-overlay');
+          o.querySelectorAll('.wz-opt').forEach((x) => d.on(x, 'click', 'wzNext'));
+          d.on(o.querySelector('.wz-head .wz-close'), 'click', 'wzClose');
+          d.on(o.querySelector('.wz-back'), 'click', 'wzBack');
+          o.querySelectorAll('.wz-show').forEach((x) => {
+            if (!toResults) return d.on(x, 'click', 'wzClose');
+            const a = document.createElement('a');
+            a.className = x.className;
+            a.setAttribute('href', 'Results-B.dc.html');
+            a.setAttribute('style', 'text-decoration:none');
+            a.textContent = x.textContent;
+            x.replaceWith(a);
+          });
+          const foot = o.querySelectorAll('.wz-foot .btn');
+          if (foot.length) {
+            d.on(foot[0], 'click', 'wzRestart');
+            d.on(foot[1], 'click', 'wzClose');
+          }
+          return o.outerHTML;
+        },
+        toResults,
+      ),
+    );
+  }
+  return wz.map((h, i) => wrapIf('wz' + (i + 1), IA.finish(post(h), {}))).join('');
+}
+
 async function buildInteractive(b, sizes) {
   for (const route of ['/', '/results']) {
     const isMain = route === '/';
@@ -358,37 +400,10 @@ async function buildInteractive(b, sizes) {
         }),
       );
       raws.slist = wrapIf('sOpen', list);
+      // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
+      raws.wizard = await wizardRaws(b, true);
     } else {
-      const wz = [];
-      for (let step = 1; step <= 4; step++) {
-        wz.push(
-          await grab(
-            b,
-            route,
-            async (p) => {
-              await p.click('text=Помогите выбрать санаторий');
-              const answers = ['.wz-opt:has-text("Спина и суставы")', '.wz-opt:has-text("нужен лифт")', '.wz-opt:has-text("До 1 000")'];
-              for (let i = 0; i < step - 1; i++) await p.click(answers[i]);
-            },
-            (st) => {
-              const d = window.__dc;
-              const o = document.querySelector('.wz-overlay');
-              o.querySelectorAll('.wz-opt').forEach((x) => d.on(x, 'click', 'wzNext'));
-              d.on(o.querySelector('.wz-head .wz-close'), 'click', 'wzClose');
-              d.on(o.querySelector('.wz-back'), 'click', 'wzBack');
-              o.querySelectorAll('.wz-show').forEach((x) => d.on(x, 'click', 'wzClose'));
-              const foot = o.querySelectorAll('.wz-foot .btn');
-              if (foot.length) {
-                d.on(foot[0], 'click', 'wzRestart');
-                d.on(foot[1], 'click', 'wzClose');
-              }
-              return o.outerHTML;
-            },
-            step,
-          ),
-        );
-      }
-      raws.wizard = wz.map((h, i) => wrapIf('wz' + (i + 1), IA.finish(post(h), {}))).join('');
+      raws.wizard = await wizardRaws(b, false);
       const cmp = await grab(
         b,
         route,
@@ -561,6 +576,8 @@ async function buildInteractive(b, sizes) {
         const city = document.querySelector('#city');
         d.on(city, 'click', 'openSearch');
         city.after(d.raw('slist'));
+        document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
+        page.appendChild(d.raw('wizard'));
         document.querySelectorAll('.ps-chip').forEach((c) => {
           const a = document.createElement('a');
           a.className = c.className;
