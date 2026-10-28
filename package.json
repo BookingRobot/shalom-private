@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/postbuild.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "canvas:snapshot": "node scripts/snapshot-canvas.cjs canvas-out"
   },
   "dependencies": {
     "@fontsource/lora": "^5.3.0",

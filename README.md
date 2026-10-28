@@ -43,3 +43,11 @@ Vienkartiniai nustatymai:
 
 - Nenaudoti litva.lt pavadinimų, nuotraukų ar telefonų. Telefonas — tik `+370 600 00000` (`src/data/contacts.ts`).
 - Kainos, užimtumas ir reisai — pavyzdiniai (`[ПРИМЕР ДАННЫХ]`), „šiandien“ = 2026-10-27 (`src/data/demo.ts`).
+
+## Design canvas = the live site
+
+The Design canvas boards are snapshots of the built site, so comments there match what is online.
+After changes: `npm run build`, `npx vite preview --port 4173`, then
+`NODE_PATH=$(npm root -g) npm run canvas:snapshot` — it writes one `.dc.html` per page and per pop-up state
+(calendar, guests, compare, wizard…) into `canvas-out/`, with images mapped to the canvas asset store and
+links between pages mapped to artboards. Publish those files to the canvas artifact.
