@@ -58,6 +58,8 @@ window.__dc = {
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
     const footer = sel[0].closest('div[style*="border-top"]') || dialog;
+    footer.before(d.raw('foot-start'));
+    footer.after(d.raw('foot-end'));
     const fb = footer.querySelectorAll('.btn');
     d.on(fb[fb.length - 2], 'click', 'closeCal');
     d.on(fb[fb.length - 1], 'click', 'applyCal');
@@ -83,12 +85,12 @@ const PLANE =
 
 const CELLS = `<sc-for list="{{cells}}" as="c" hint-placeholder-count="35"><button type="button" class="cell" onClick="{{c.pick}}" disabled="{{c.off}}" aria-label="{{c.aria}}" style="background:{{c.bg}};border-color:{{c.border}};color:{{c.color}};cursor:{{c.cursor}}"><span>{{c.day}}</span><small style="color:{{c.subColor}}">{{c.sub}}</small><sc-if value="{{c.fly}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:4px;right:5px;line-height:0" title="Рейс из Израиля">${PLANE}</span></sc-if></button></sc-for>`;
 
-const FLEX = `<div class="flex-dates">
-<div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-opts" role="group" aria-label="Месяц"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="9"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.t}}</button></sc-for></div></div>
+const FLEX = (isMain) => `<div class="flex-dates">
+<div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-car"><button type="button" class="navbtn" aria-label="Раньше" disabled="{{fdPrevOff}}" onClick="{{fdPrev}}">‹</button><div class="fd-tiles" role="group" aria-label="Месяц" style="--per:6"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="6"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}"><strong>{{m.t}}</strong><span>{{m.y}}</span><small>{{m.from}}</small></button></sc-for></div><button type="button" class="navbtn" aria-label="Позже" disabled="{{fdNextOff}}" onClick="{{fdNext}}">›</button></div></div>
 <div class="fd-row"><span class="fd-lbl">Сколько ночей</span><div class="fd-opts" role="group" aria-label="Сколько ночей"><sc-for list="{{fdNights}}" as="n" hint-placeholder-count="4"><button type="button" class="{{n.cls}}" onClick="{{n.pick}}">{{n.t}}</button></sc-for></div></div>
 <div class="fd-list"><span class="fd-title">{{fdTitle}}</span><sc-if value="{{fdEmpty}}" hint-placeholder-val="{{false}}"><span class="fd-empty">В этом месяце свободных дат нет — выберите другой.</span></sc-if>
-<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5"><button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}</span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span></button></sc-for>
-<span class="fd-note">Средняя цена по курорту за проживание и лечение. Точную цену покажем в санаториях.</span></div>
+<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5">${isMain ? `<a class="fd-opt" href="Results-B.dc.html" style="text-decoration:none"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></a>` : `<button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></button>`}</sc-for>
+<span class="fd-note">Средняя цена по курорту за проживание и лечение. Выберите вариант — сразу покажем санатории на эти даты.</span></div>
 </div>`;
 
 const GLABEL = `<span style="display:block;white-space:nowrap">{{gAdL}}</span><sc-if value="{{gHasCh}}" hint-placeholder-val="{{false}}"><span style="display:block;white-space:nowrap;font-size:13px;font-weight:600;color:#5E6862">+ {{gChL}}</span></sc-if>`;
@@ -113,8 +115,8 @@ const LOGIC = `
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { inD: '2026-11-09', outD: '2026-11-18', cal: '', room: false, sel: null, m: null, y: null, fm: 1, fn: 14,
-      ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false], cmpDlg: false, price: false };
+    this.state = { inD: '2026-11-09', outD: '2026-11-18', cal: '', room: false, sel: null, m: null, y: null, fn: 14,
+      fm: 8, fo: 5, ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false, false, false, false, false], cmpDlg: false, price: false };
   }
   renderVals() {
     const st = this.state;
@@ -167,26 +169,43 @@ class Component extends DCLogic {
     }
     const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
     const preset = (n) => () => { const a = sIn || inD; this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) } }); };
-    // flexible dates
-    const months9 = Array.from({ length: 9 }, (_, i) => new Date(Date.UTC(2026, 9 + i, 1)));
-    const fmD = months9[st.fm];
-    const fdays = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth() + 1, 0)).getUTCDate();
-    let opts = [];
-    for (let i = 1; i <= fdays; i++) {
-      const d = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth(), i));
-      if (d <= TODAY) continue;
-      let sum = 0, ok = true;
-      for (let k = 0; k < st.fn; k++) { const x = addD(d, k); if (SOLD.includes(iso(x))) ok = false; sum += ppn(x); }
-      if (ok) opts.push({ d, sum });
-    }
-    opts = opts.sort((a, b) => a.sum - b.sum).slice(0, 5).sort((a, b) => a.d - b.d);
-    const r10 = (n) => Math.round(n / 10) * 10, minS = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
+    // flexible dates: 24-month carousel, 6 tiles visible
+    const months24 = Array.from({ length: 24 }, (_, i) => new Date(Date.UTC(2026, 9 + i, 1)));
+    const optsFor = (md) => {
+      const nd = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth() + 1, 0)).getUTCDate();
+      const res = [];
+      for (let i = 1; i <= nd; i++) {
+        const d = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth(), i));
+        if (d <= TODAY || !isFly(d) || !isFly(addD(d, st.fn))) continue;
+        let sum = 0, ok = true;
+        for (let k = 0; k < st.fn; k++) { const x = addD(d, k); if (SOLD.includes(iso(x))) ok = false; sum += ppn(x); }
+        if (ok) res.push({ d, sum });
+      }
+      return res;
+    };
+    const r10 = (n) => Math.round(n / 10) * 10;
+    const fo = Math.min(st.fo || 0, 18);
+    const fmD = months24[st.fm];
+    let opts = optsFor(fmD).sort((a, b) => a.sum - b.sum).slice(0, 5).sort((a, b) => a.d - b.d);
+    const minS = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
     // guests
     const ad = st.ad, ch = st.ch;
     // compare
     const cmp = st.cmp, cmpN = cmp.filter(Boolean).length;
     const cmpT = (i) => () => { const c = cmp.slice(); c[i] = !c[i]; this.setState({ cmp: c }); };
+    const __f = this.__filters ? this.__filters(st) : {};
     return {
+      ...__f,
+      // resort pop-ups (home page): story, tabs to other resorts, "Хочу в …" fills the search field
+      ...Object.fromEntries(
+        ['Друскининкай', 'Бирштонас', 'Паланга', 'Аникщяй'].flatMap((name, i) => [
+          ['resOn' + i, st.res === i],
+          ['openRes' + i, () => this.setState({ res: i })],
+          ['chooseRes' + i, () => this.setState({ res: -1, city: name })],
+        ]),
+      ),
+      closeRes: () => this.setState({ res: -1 }),
+      cityLabel: st.city || 'Друскининкай',
       // page fields
       inLabel: longD(inD), outLabel: longD(outD),
       openCal: () => this.setState({ cal: 'exact', room: false, sel: { in: st.inD, out: st.outD }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
@@ -195,7 +214,7 @@ class Component extends DCLogic {
       calOpen: !!st.cal, calExact: st.cal !== 'flex', calFlex: st.cal === 'flex', tabsOn: !st.room,
       calTitleText: st.room ? 'Свободные даты номера' : 'Выберите даты поездки',
       roomOn: st.room, roomLine: 'Полулюкс · Санаторий Эгле Комфорт — занятые дни закрыты',
-      calHint: !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
+      calHint: st.cal === 'flex' ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами' : !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
       tabExactCls: st.cal !== 'flex' ? 'on' : '', tabFlexCls: st.cal === 'flex' ? 'on' : '',
       calToExact: () => this.setState({ cal: 'exact' }), calToFlex: () => this.setState({ cal: 'flex' }),
       closeCal: () => this.setState({ cal: '', room: false }),
@@ -206,16 +225,21 @@ class Component extends DCLogic {
       selIn: sIn ? shortD(sIn) : '—', selOut: sOut ? shortD(sOut) : '—', selNights: nights ? nights + ' ' + nW(nights) : '—',
       applyOff: !nights,
       applyCal: () => { if (nights) this.setState({ inD: sel.in, outD: sel.out, cal: '', room: false }); },
-      fdMonths: months9.map((x, i) => ({ t: MONTHS_N[x.getUTCMonth()] + (x.getUTCFullYear() !== 2026 ? ' ' + x.getUTCFullYear() : ''),
-        cls: 'qf-chip' + (i === st.fm ? ' on' : ''), pick: () => this.setState({ fm: i }) })),
+      fdMonths: months24.slice(fo, fo + 6).map((x, j) => {
+        const i = fo + j, o = optsFor(x), from = o.length ? Math.min(...o.map((q) => r10(q.sum))) : 0;
+        return { t: MONTHS_N[x.getUTCMonth()], y: String(x.getUTCFullYear()), from: from ? 'от ' + fmt(from) + ' €' : 'нет мест',
+          cls: 'fd-tile' + (i === st.fm ? ' on' : ''), pick: () => this.setState({ fm: i }) };
+      }),
+      fdPrevOff: fo === 0, fdNextOff: fo >= 18,
+      fdPrev: () => this.setState({ fo: Math.max(0, fo - 6) }), fdNext: () => this.setState({ fo: Math.min(18, fo + 6) }),
       fdNights: [7, 10, 14, 21].map((n) => ({ t: n === 7 ? '7 ночей · неделя' : n === 14 ? '14 ночей · 2 недели' : n === 21 ? '21 ночь · 3 недели' : '10 ночей',
         cls: 'qf-chip' + (n === st.fn ? ' on' : ''), pick: () => this.setState({ fn: n }) })),
-      fdTitle: 'Самые выгодные даты заезда в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е'),
+      fdTitle: 'Лучшие даты в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е') + ' — с рейсами туда и обратно',
       fdEmpty: opts.length === 0,
       fdOpts: opts.map((o) => {
         const out = addD(o.d, st.fn);
-        return { when: WD[o.d.getUTCDay()] + ', ' + shortD(o.d) + ' → ' + shortD(out) + (isFly(o.d) ? ' ✈' : ''), sum: fmt(r10(o.sum)), best: r10(o.sum) === minS,
-          pick: () => this.setState({ sel: { in: iso(o.d), out: iso(out) }, cal: 'exact', m: o.d.getUTCMonth(), y: o.d.getUTCFullYear() }) };
+        return { when: WD[o.d.getUTCDay()] + ', ' + shortD(o.d) + ' → ' + WD[out.getUTCDay()] + ', ' + shortD(out), sum: fmt(r10(o.sum)), best: r10(o.sum) === minS,
+          pick: () => this.setState({ inD: iso(o.d), outD: iso(out), sel: null, cal: '', room: false }) };
       }),
       // guests
       gOpen: st.gOpen, openGuests: () => this.setState({ gOpen: !st.gOpen, sOpen: false }), closeGuests: () => this.setState({ gOpen: false }),
@@ -231,8 +255,8 @@ class Component extends DCLogic {
       wzBack: () => this.setState({ wz: Math.max(1, st.wz - 1) }), wzRestart: () => this.setState({ wz: 1 }), wzClose: () => this.setState({ wz: 0 }),
       // compare
       cmpAny: cmpN > 0, cmpDlg: st.cmpDlg, cmpOpen: () => this.setState({ cmpDlg: true }), cmpClose: () => this.setState({ cmpDlg: false }),
-      cmpClear: () => this.setState({ cmp: [false, false, false, false], cmpDlg: false }),
-      cmpOn0: cmp[0], cmpOn1: cmp[1], cmpOn2: cmp[2], cmpOn3: cmp[3], cmpT0: cmpT(0), cmpT1: cmpT(1), cmpT2: cmpT(2), cmpT3: cmpT(3),
+      cmpClear: () => this.setState({ cmp: cmp.map(() => false), cmpDlg: false }),
+      ...Object.fromEntries(cmp.flatMap((on, i) => [['cmpOn' + i, on], ['cmpT' + i, cmpT(i)]])),
       // price calendar ("Когда дешевле?")
       priceOn: st.price, priceOpen: () => this.setState({ price: true }), priceClose: () => this.setState({ price: false }),
     };
@@ -243,4 +267,88 @@ class Component extends DCLogic {
 /** template pieces shared by both boards */
 const calRaws = (calHtml) => ({});
 
-module.exports = { HELPERS, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, finish, calRaws };
+/**
+ * Results filter panel in Play: tiles/checkboxes and chips switch on and off, "Ещё фильтры"
+ * opens the rest, "Свернуть"/"Показать" close it. The list itself stays as on the site.
+ */
+function filtersLogic(cfg) {
+  return LOGIC.replace(
+    /\n}\n$/,
+    `
+  __filters(st) {
+    const FK = ${JSON.stringify(cfg.fkeys)};
+    const FB = ${JSON.stringify(cfg.bases)};
+    const FI = ${JSON.stringify(cfg.init)};
+    const GROUPS = ${JSON.stringify(cfg.groups)};
+    const HOT = ${JSON.stringify(cfg.hotels)};
+    const LBL = ${JSON.stringify(cfg.labels)};
+    const q0 = () => GROUPS.map((g) => (g.one ? [0] : []));
+    const fa = st.fa || FI, qa = st.qa || q0();
+    const fv = st.fv || fa, qv = st.qv || qa;
+    const keysOf = (f, q) => {
+      const ks = [];
+      FK.forEach((k, i) => f[i] && k && ks.push(k));
+      GROUPS.forEach((g, gi) => q[gi].forEach((j) => g.keys[j] && ks.push(g.keys[j])));
+      return ks;
+    };
+    const pass = (ks) => (h) => {
+      const stars = ks.filter((k) => /^s[345]$/.test(k)), other = ks.filter((k) => !/^s[345]$/.test(k));
+      return (!stars.length || stars.some((k) => h.stars === Number(k[1]))) &&
+        other.every((k) => (k === 'shower' ? h.tags.includes('lift') : h.tags.includes(k)));
+    };
+    const pl = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'санаторий' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'санатория' : 'санаториев');
+    const ka = keysOf(fa, qa), kv = keysOf(fv, qv);
+    const nA = HOT.filter(pass(ka)).length, nV = HOT.filter(pass(kv)).length;
+    const cleared = FI.map(() => false);
+    const removeKey = (k) => {
+      const f = fa.slice(), q = qa.map((x) => x.slice());
+      const i = FK.indexOf(k);
+      if (i >= 0) f[i] = false;
+      GROUPS.forEach((g, gi) => {
+        const j = g.keys.indexOf(k);
+        if (j > 0 || (j === 0 && !g.one)) q[gi] = g.one ? [0] : q[gi].filter((x) => x !== j);
+      });
+      this.setState({ fa: f, fv: f, qa: q, qv: q });
+    };
+    const fx = {
+      fOpenV: !!st.fOpen, fClosedV: !st.fOpen, fMoreOn: !!st.fMore, fMoreOff: !st.fMore,
+      fOpenFn: () => this.setState({ fOpen: true, fv: fa, qv: qa }),
+      fClose: () => this.setState({ fOpen: false, fMore: false, fv: fa, qv: qa }),
+      fApply: () => this.setState({ fOpen: false, fMore: false, fa: fv, qa: qv }),
+      fMoreT: () => this.setState({ fMore: !st.fMore }),
+      fReset: () => this.setState({ fv: cleared, qv: q0() }),
+      fResetAll: () => this.setState({ fa: cleared, fv: cleared, qa: q0(), qv: q0() }),
+      hasActive: ka.length > 0,
+      activeList: ka.map((k) => ({ t: LBL[k] || k, off: () => removeKey(k) })),
+      appliedSummary: ka.length ? 'Выбрано: ' + ka.map((k) => LBL[k] || k).join(', ') : 'Условия не выбраны — показаны все санатории',
+      foundLabel: nA === HOT.length ? 'Все ' + nA + ' ' + pl(nA) : 'Подходят ' + nA + ' из ' + HOT.length + ' ' + pl(HOT.length),
+      noneFound: nA === 0,
+      applyLabel: nV === 0 ? 'Ничего не подходит' : 'Показать ' + nV + ' ' + pl(nV),
+      pendCount: kv.length === 0 ? 'Условия не выбраны' : 'Выбрано ' + kv.length + ' ' + (kv.length === 1 ? 'условие' : kv.length < 5 ? 'условия' : 'условий'),
+    };
+    HOT.forEach((h, i) => (fx['hv' + i] = pass(ka)(h)));
+    FB.forEach((base, i) => {
+      fx['fOn' + i] = !!fv[i];
+      fx['fCls' + i] = base + (fv[i] ? ' on' : '');
+      fx['fT' + i] = () => { const v = fv.slice(); v[i] = !v[i]; this.setState({ fv: v }); };
+    });
+    GROUPS.forEach((g, gi) => {
+      for (let j = 0; j < g.n; j++) {
+        const on = qv[gi].includes(j);
+        fx['qfc' + gi + '_' + j] = 'qf-chip' + (on ? ' on' : '');
+        fx['qf' + gi + '_' + j] = () => {
+          const v = qv.map((x) => x.slice());
+          if (g.one) v[gi] = [j];
+          else v[gi] = on ? v[gi].filter((x) => x !== j) : v[gi].concat(j);
+          this.setState({ qv: v });
+        };
+      }
+    });
+    return fx;
+  }
+}
+`,
+  );
+}
+
+module.exports = { HELPERS, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };

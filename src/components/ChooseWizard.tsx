@@ -125,6 +125,11 @@ export function ChooseWizard({
                     ? 'Какой бюджет на человека?'
                     : 'Мы бы посоветовали'}
             </h2>
+            {step < 4 ? (
+              <p className="wz-intro">
+                Ответьте на 3 коротких вопроса — подберём 2–3 санатория по профилю лечения, удобству и бюджету.
+              </p>
+            ) : null}
           </div>
           <button type="button" className="btn btn-secondary wz-close" onClick={onClose}>
             ✕ Закрыть

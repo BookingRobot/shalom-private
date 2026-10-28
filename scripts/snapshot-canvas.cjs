@@ -11,6 +11,25 @@ const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 const IA = require('./canvas-interactive.cjs');
+
+/** sanatorium tags and filter groups, straight from the site's data */
+const DATA = (() => {
+  const r = require('esbuild').buildSync({
+    stdin: {
+      contents: "export {SANATORIUMS} from './src/data/sanatoriums'; export {FILTER_GROUPS} from './src/data/filters';",
+      resolveDir: path.join(__dirname, '..'),
+      loader: 'ts',
+    },
+    bundle: true,
+    write: false,
+    format: 'cjs',
+    platform: 'node',
+    logLevel: 'silent',
+  });
+  const m = { exports: {} };
+  new Function('module', 'exports', 'require', r.outputFiles[0].text)(m, m.exports, require);
+  return m.exports;
+})();
 const { searchBand, linkButtons } = require('./canvas/templatize.cjs');
 const SEARCH_LOGIC = fs.readFileSync(path.join(__dirname, 'canvas', 'search-logic.js'), 'utf8');
 
@@ -275,6 +294,7 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     await ctx.close();
   }
   await buildInteractive(b, sizes);
+  await buildHotel(b, sizes);
   fs.writeFileSync(path.join(OUT, 'sizes.json'), JSON.stringify(sizes, null, 1));
   await b.close();
 })();
@@ -297,18 +317,68 @@ const CAL_RAWS = {
   'tabs-start': '<sc-if value="{{tabsOn}}" hint-placeholder-val="{{true}}">',
   'tabs-end': '</sc-if>',
   'exact-start': '<sc-if value="{{calExact}}" hint-placeholder-val="{{true}}">',
-  'exact-end': '</sc-if><sc-if value="{{calFlex}}" hint-placeholder-val="{{false}}">' + IA.FLEX + '</sc-if>',
+  'exact-end': '</sc-if>',
+  'foot-start': '<sc-if value="{{calExact}}" hint-placeholder-val="{{true}}">',
+  'foot-end': '</sc-if>',
   cells: IA.CELLS,
 };
+/** flexible dates sit after the exact calendar; on Main an option links to the results board */
+const calRawsFor = (isMain) => ({
+  ...CAL_RAWS,
+  'exact-end': '</sc-if><sc-if value="{{calFlex}}" hint-placeholder-val="{{false}}">' + IA.FLEX(isMain) + '</sc-if>',
+});
 const wrapIf = (cond, html) => `<sc-if value="{{${cond}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
+
+/** the "Помогите выбрать" wizard, 3 questions + answer; on Main the answer links to the results board */
+async function wizardRaws(b, toResults) {
+  const wz = [];
+  for (let step = 1; step <= 4; step++) {
+    wz.push(
+      await grab(
+        b,
+        '/results',
+        async (p) => {
+          await p.click('text=Помогите выбрать санаторий');
+          const answers = ['.wz-opt:has-text("Спина и суставы")', '.wz-opt:has-text("нужен лифт")', '.wz-opt:has-text("До 1 000")'];
+          for (let i = 0; i < step - 1; i++) await p.click(answers[i]);
+        },
+        (toResults) => {
+          const d = window.__dc;
+          const o = document.querySelector('.wz-overlay');
+          o.querySelectorAll('.wz-opt').forEach((x) => d.on(x, 'click', 'wzNext'));
+          d.on(o.querySelector('.wz-head .wz-close'), 'click', 'wzClose');
+          d.on(o.querySelector('.wz-back'), 'click', 'wzBack');
+          o.querySelectorAll('.wz-show').forEach((x) => {
+            if (!toResults) return d.on(x, 'click', 'wzClose');
+            const a = document.createElement('a');
+            a.className = x.className;
+            a.setAttribute('href', 'Results-B.dc.html');
+            a.setAttribute('style', 'text-decoration:none');
+            a.textContent = x.textContent;
+            x.replaceWith(a);
+          });
+          const foot = o.querySelectorAll('.wz-foot .btn');
+          if (foot.length) {
+            d.on(foot[0], 'click', 'wzRestart');
+            d.on(foot[1], 'click', 'wzClose');
+          }
+          return o.outerHTML;
+        },
+        toResults,
+      ),
+    );
+  }
+  return wz.map((h, i) => wrapIf('wz' + (i + 1), IA.finish(post(h), {}))).join('');
+}
 
 async function buildInteractive(b, sizes) {
   for (const route of ['/', '/results']) {
     const isMain = route === '/';
+    let filterCfg = null;
     const file = isMain ? 'Main.dc.html' : 'Results-B.dc.html';
     const cal = IA.finish(
       post(await grab(b, route, (p) => p.click('#datein'), () => window.__dc.markCal(document.querySelector('[role="dialog"]')))),
-      CAL_RAWS,
+      calRawsFor(isMain),
     );
     const gpop = IA.finish(
       post(await grab(b, route, (p) => p.click('#guests'), () => window.__dc.markGuests(document.querySelector('.gp-pop')))),
@@ -331,37 +401,34 @@ async function buildInteractive(b, sizes) {
         }),
       );
       raws.slist = wrapIf('sOpen', list);
-    } else {
-      const wz = [];
-      for (let step = 1; step <= 4; step++) {
-        wz.push(
-          await grab(
-            b,
-            route,
-            async (p) => {
-              await p.click('text=Помогите выбрать санаторий');
-              const answers = ['.wz-opt:has-text("Спина и суставы")', '.wz-opt:has-text("нужен лифт")', '.wz-opt:has-text("До 1 000")'];
-              for (let i = 0; i < step - 1; i++) await p.click(answers[i]);
-            },
-            (st) => {
-              const d = window.__dc;
-              const o = document.querySelector('.wz-overlay');
-              o.querySelectorAll('.wz-opt').forEach((x) => d.on(x, 'click', 'wzNext'));
-              d.on(o.querySelector('.wz-head .wz-close'), 'click', 'wzClose');
-              d.on(o.querySelector('.wz-back'), 'click', 'wzBack');
-              o.querySelectorAll('.wz-show').forEach((x) => d.on(x, 'click', 'wzClose'));
-              const foot = o.querySelectorAll('.wz-foot .btn');
-              if (foot.length) {
-                d.on(foot[0], 'click', 'wzRestart');
-                d.on(foot[1], 'click', 'wzClose');
-              }
-              return o.outerHTML;
-            },
-            step,
-          ),
+      // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
+      raws.wizard = await wizardRaws(b, true);
+      // resort story pop-ups
+      const resIds = ['druskininkai', 'birstonas', 'palanga', 'anyksciai'];
+      let resHtml = '';
+      for (let i = 0; i < resIds.length; i++) {
+        const h = await grab(
+          b,
+          route,
+          (p) => p.click('[data-resort="' + resIds[i] + '"]'),
+          (i) => {
+            const d = window.__dc;
+            const o = document.querySelector('.rs-overlay');
+            d.on(o.querySelector('.rs-close'), 'click', 'closeRes');
+            o.querySelectorAll('.rs-tabs button').forEach((t, j) => {
+              d.on(t, 'click', 'openRes' + j);
+              t.removeAttribute('aria-selected');
+            });
+            d.on(o.querySelector('.rs-go'), 'click', 'chooseRes' + i);
+            return o.outerHTML;
+          },
+          i,
         );
+        resHtml += wrapIf('resOn' + i, IA.finish(post(h), {}));
       }
-      raws.wizard = wz.map((h, i) => wrapIf('wz' + (i + 1), IA.finish(post(h), {}))).join('');
+      raws.resorts = resHtml;
+    } else {
+      raws.wizard = await wizardRaws(b, false);
       const cmp = await grab(
         b,
         route,
@@ -397,9 +464,127 @@ async function buildInteractive(b, sizes) {
         },
       );
       raws.price = wrapIf('priceOn', IA.finish(post(price), {}));
+      // filter panel, closed "more" and open "more"
+      const panel = async (more, keys) =>
+        grab(
+          b,
+          route,
+          async (p) => {
+            await p.click('text=Раскрыть фильтры');
+            if (more) await p.click('.morebtn');
+          },
+          ({ more, keys }) => {
+            const d = window.__dc;
+            const sec = Array.from(document.querySelectorAll('section')).find(
+              (x) => x.querySelector('button.acc') && /Свернуть/.test(x.textContent),
+            );
+            const accs = sec.querySelectorAll('button.acc');
+            d.on(accs[0], 'click', 'fClose');
+            if (more) d.on(accs[1], 'click', 'fMoreT');
+            else d.on(sec.querySelector('.morebtn'), 'click', 'fMoreT');
+            sec.querySelectorAll('.btn-primary').forEach((x) => {
+              d.on(x, 'click', 'fApply');
+              d.text(x, 'applyLabel');
+            });
+            Array.from(sec.querySelectorAll('span'))
+              .filter((x) => /^(Выбрано \d|Условия не выбраны)/.test(x.textContent.trim()) && !x.children.length)
+              .forEach((x) => d.text(x, 'pendCount'));
+            Array.from(sec.querySelectorAll('button')).filter((x) => /Сбросить/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'fReset'));
+            sec.querySelectorAll('input[type="number"]').forEach((i) => i.removeAttribute('value'));
+            const found = [];
+            sec.querySelectorAll('input[type="checkbox"]').forEach((inp) => {
+              const lab = inp.closest('label');
+              const k = lab.textContent.trim();
+              found.push({ k, on: inp.checked, base: lab.className.replace(/\bon\b/, '').trim() });
+              const i = keys ? keys.indexOf(k) : -1;
+              if (i >= 0) {
+                d.on(inp, 'change', 'fT' + i);
+                d.attr(inp, 'checked', 'fOn' + i);
+                d.attr(lab, 'class', 'fCls' + i);
+              }
+            });
+            const groups = [];
+            sec.querySelectorAll('.qf-opts').forEach((g, gi) => {
+              const chips = g.querySelectorAll('.qf-chip');
+              groups.push({ n: chips.length, one: /Любое/.test(chips[0].textContent) });
+              chips.forEach((c, ci) => {
+                d.on(c, 'click', 'qf' + gi + '_' + ci);
+                d.attr(c, 'class', 'qfc' + gi + '_' + ci);
+                c.removeAttribute('aria-pressed');
+                if (!groups[gi].one) c.textContent = c.textContent.replace(/^✓\s*/, '');
+              });
+            });
+            return { html: sec.outerHTML, found, groups };
+          },
+          { more, keys },
+        );
+      const probe = await panel(true, null);
+      const fkeys = probe.found.map((x) => x.k);
+      const pClosed = await panel(false, fkeys);
+      const pOpen = await panel(true, fkeys);
+      raws['fclosed-start'] = '<sc-if value="{{fClosedV}}" hint-placeholder-val="{{true}}">';
+      raws['fclosed-end'] =
+        '</sc-if><sc-if value="{{fOpenV}}" hint-placeholder-val="{{false}}">' +
+        wrapIf('fMoreOff', IA.finish(post(pClosed.html), {})) +
+        wrapIf('fMoreOn', IA.finish(post(pOpen.html), {})) +
+        '</sc-if>';
+      const FG = DATA.FILTER_GROUPS;
+      const labels = {};
+      Object.values(FG).forEach((g) => g.forEach((e) => (labels[e[0]] = e[1])));
+      const keyOfLabel = (t) => {
+        const hit = Object.values(FG)
+          .flat()
+          .filter((e) => t.startsWith(e[1]))
+          .sort((a, b) => b[1].length - a[1].length)[0];
+        return hit ? hit[0] : '';
+      };
+      const groupKeys = [FG.meals, FG.procs, FG.room].map((g) => g.map((e) => e[0]));
+      // hotels in list order (the base page is captured with no filters, so all of them)
+      const order = await grab(
+        b,
+        route,
+        (p) => p.click('text=Сбросить всё'),
+        () => Array.from(document.querySelectorAll('article[id^="h-"]')).map((a) => a.id.slice(2)),
+      );
+      filterCfg = {
+        fkeys: fkeys.map(keyOfLabel),
+        bases: probe.found.map((x) => x.base),
+        init: probe.found.map((x) => x.on),
+        groups: probe.groups.map((g, gi) => ({ ...g, keys: g.one ? [''].concat(groupKeys[gi]) : groupKeys[gi] })),
+        hotels: order.map((id) => {
+          const h = DATA.SANATORIUMS.find((x) => x.id === id);
+          return { tags: h.tags, stars: h.starsN };
+        }),
+        labels,
+        order,
+      };
+      // the "Выбрано:" row with removable chips
+      raws.actrow = await grab(b, route, null, () => {
+        const d = window.__dc;
+        const lab = Array.from(document.querySelectorAll('span')).find((x) => x.textContent.trim() === 'Выбрано:');
+        const row = lab.parentElement;
+        const chips = Array.from(row.querySelectorAll('button')).filter((x) => !/Сбросить/.test(x.textContent));
+        const first = chips[0];
+        chips.slice(1).forEach((x) => x.remove());
+        d.on(first, 'click', 'a.off');
+        first.firstChild.textContent = '\u27E6a.t\u27E7';
+        first.before(d.raw('actfor-start'));
+        first.after(d.raw('actfor-end'));
+        Array.from(row.querySelectorAll('button'))
+          .filter((x) => /Сбросить/.test(x.textContent))
+          .forEach((x) => d.on(x, 'click', 'fResetAll'));
+        return row.outerHTML;
+      });
+      raws.actrow = wrapIf(
+        'hasActive',
+        IA.finish(post(raws.actrow), {
+          'actfor-start': '<sc-for list="{{activeList}}" as="a" hint-placeholder-count="2">',
+          'actfor-end': '</sc-for>',
+        }),
+      );
     }
-    // the page itself, with fields wired to the logic
-    const base = await grab(b, route, null, (isMain) => {
+    // the page itself, with fields wired to the logic (Results: all sanatoriums, filters applied by the logic)
+    const base = await grab(b, route, isMain ? null : (p) => p.click('text=Сбросить всё'), (isMain) => {
       const d = window.__dc;
       ['#datein', '#dateout'].forEach((s, i) => {
         const el = document.querySelector(s);
@@ -416,6 +601,11 @@ async function buildInteractive(b, sizes) {
         const city = document.querySelector('#city');
         d.on(city, 'click', 'openSearch');
         city.after(d.raw('slist'));
+        document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
+        document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
+        page.appendChild(d.raw('resorts'));
+        d.attr(document.querySelector('#city'), 'value', 'cityLabel');
+        page.appendChild(d.raw('wizard'));
         document.querySelectorAll('.ps-chip').forEach((c) => {
           const a = document.createElement('a');
           a.className = c.className;
@@ -429,9 +619,28 @@ async function buildInteractive(b, sizes) {
         btns.filter((x) => /Помогите выбрать санаторий/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'wzOpen'));
         btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
         btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
+        // "Раскрыть фильтры" opens the panel in place (see filtersLogic)
+        btns
+          .filter((x) => /Раскрыть фильтры/.test(x.textContent))
+          .forEach((x) => {
+            d.on(x, 'click', 'fOpenFn');
+            const sec = x.closest('section');
+            sec.before(d.raw('fclosed-start'));
+            sec.after(d.raw('fclosed-end'));
+          });
         document.querySelectorAll('.cmp-check input').forEach((x, i) => {
           d.on(x, 'change', 'cmpT' + i);
           d.attr(x, 'checked', 'cmpOn' + i);
+        });
+        // filter state shown on the page
+        const sum = Array.from(document.querySelectorAll('span')).find((x) => /^(Условия не выбраны|Выбрано:)/.test(x.textContent.trim()) && !x.children.length && x.closest('section'));
+        d.text(sum, 'appliedSummary');
+        const h2 = Array.from(document.querySelectorAll('h2')).find((x) => /^(Все \d|Подходят \d)/.test(x.textContent.trim()));
+        d.text(h2, 'foundLabel');
+        h2.parentElement.before(d.raw('actrow'));
+        document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
+          a.before(d.raw('hv-start-' + i));
+          a.after(d.raw('hv-end'));
         });
         const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
         ask.after(d.raw('cmp'));
@@ -441,11 +650,58 @@ async function buildInteractive(b, sizes) {
       page.appendChild(d.raw('calmodal'));
       return document.getElementById('root').innerHTML;
     }, isMain);
+    if (filterCfg) {
+      filterCfg.order.forEach((_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'));
+      raws['hv-end'] = '</sc-if>';
+    }
     const body = IA.finish(post(base), raws);
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, IA.LOGIC));
+    const logic = filterCfg ? IA.filtersLogic(filterCfg) : IA.LOGIC;
+    fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }
+}
+
+/* ---------- Hotel board: the photo gallery opens in Play ---------- */
+async function buildHotel(b, sizes) {
+  const file = 'Hotel-B.dc.html';
+  const lb = await grab(
+    b,
+    '/hotel',
+    (p) => p.click('button[aria-label="Территория санатория"]'),
+    () => {
+      const d = window.__dc;
+      const imgs = Array.from(document.querySelectorAll('img'));
+      const over = Array.from(document.querySelectorAll('div')).find(
+        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 3,
+      );
+      over.querySelectorAll('button').forEach((x) => {
+        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть') d.on(x, 'click', 'lbClose');
+      });
+      return over.outerHTML;
+    },
+  );
+  const base = await grab(b, '/hotel', null, () => {
+    const d = window.__dc;
+    const first = document.querySelector('button[aria-label="Территория санатория"]');
+    first.parentElement.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+    document.querySelector('#root .page').appendChild(d.raw('lightbox'));
+    return document.getElementById('root').innerHTML;
+  });
+  const body = IA.finish(post(base), {
+    lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
+  });
+  const logic = `class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lb: false };
+  }
+  renderVals() {
+    return { lbOn: this.state.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }) };
+  }
+}`;
+  fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, '/hotel', body, sizes[file].h, logic));
+  console.log(file, 'interactive', body.length);
 }

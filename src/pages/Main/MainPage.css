@@ -183,3 +183,10 @@
   border-radius: 2px;
   display: inline-block;
 }
+.pg-main button.resort {
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  width: 100%;
+}

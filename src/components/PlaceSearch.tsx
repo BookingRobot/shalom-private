@@ -55,6 +55,11 @@ export function PlaceSearch() {
   const [active, setActive] = useState(0);
   const wrap = useRef<HTMLDivElement>(null);
   const listId = useId();
+  // the resort may be set from elsewhere (resort pop-up): show it in the field
+  useEffect(() => {
+    if (!open) setQ(resortLabel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resortLabel]);
   const list = open ? matches(q === resortLabel ? '' : q).slice(0, 8) : [];
 
   useEffect(() => {
