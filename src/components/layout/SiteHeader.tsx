@@ -12,10 +12,12 @@ type Tone = 'light' | 'dark';
  */
 export function HeaderBar({
   minHeight = 64,
+  maxWidth = 1180,
   tone = 'light',
   children,
 }: {
   minHeight?: number;
+  maxWidth?: number;
   tone?: Tone;
   children: ReactNode;
 }) {
@@ -26,7 +28,7 @@ export function HeaderBar({
     >
       <div
         style={{
-          maxWidth: '1180px',
+          maxWidth: `${maxWidth}px`,
           margin: '0 auto',
           padding: '0 24px',
           minHeight: `${minHeight}px`,
@@ -50,7 +52,9 @@ export function Brand({
   gap = 12,
   tone = 'light',
   name = SITE_NAME,
+  round = 0,
 }: {
+  round?: number;
   logo?: number;
   size?: number;
   gap?: number;
@@ -70,7 +74,7 @@ export function Brand({
         margin: '-4px 0',
       }}
     >
-      <LogoMark size={logo} />
+      <LogoMark size={logo} round={round} />
       <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: `${size}px`, fontWeight: '700' }}>{name}</span>
     </Link>
   );

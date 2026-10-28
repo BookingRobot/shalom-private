@@ -59,9 +59,9 @@ export const PhoneIcon = (p: IconProps) => (
 );
 
 /** Brand mark: green square with a stylised fir tree. */
-export const LogoMark = ({ size = 38 }: { size?: number }) => (
+export const LogoMark = ({ size = 38, round = 0 }: { size?: number; round?: number }) => (
   <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-    <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
+    <rect x="1" y="1" width="38" height="38" rx={round} fill="#1F5F4A" />
     <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
   </svg>
 );
