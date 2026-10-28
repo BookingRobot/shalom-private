@@ -548,6 +548,30 @@
   color: #b3261e;
   font-weight: 600;
 }
+.fb-pin {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 6px 12px;
+}
+.fb-pin .fb-hint {
+  grid-column: 1 / -1;
+}
+.fb-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  font-size: 15px;
+  color: #3e4b44;
+  cursor: pointer;
+}
+.fb-remember input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #1f5f4a;
+}
 .fb-what {
   font-size: 15px;
   color: #5e6862;
@@ -639,8 +663,12 @@
   .fb-send {
     min-width: 0;
   }
-  .fb-two {
+  .fb-two,
+  .fb-pin {
     grid-template-columns: 1fr;
+  }
+  .fb-remember {
+    min-height: 36px;
   }
   .fb-panel .fb-seg button {
     font-size: 14px;
@@ -652,4 +680,11 @@
   .fb-mark-bar {
     animation: none;
   }
+}
+
+/* page styles give their own inputs room for an icon: not here */
+.page .fb-panel .fb-field input,
+.page .fb-panel .fb-field textarea {
+  padding: 10px 14px;
+  font-weight: 500;
 }

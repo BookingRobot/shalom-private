@@ -8,6 +8,8 @@
  *   REPO             BookingRobot-M/br-shalom
  *   FILES_BRANCH     feedback-files
  *   ALLOWED_ORIGINS  https://shalom.bookingrobot.eu,…
+ *   PIN_HASH         the form code as pbkdf2:<iterations>:<salt>:<hash> (install.sh makes it;
+ *                    empty = no code asked)
  *   PORT / HOST      8787 / 127.0.0.1 (the web server in front adds HTTPS)
  *
  *   node server.mjs           start
@@ -22,12 +24,23 @@ const env = {
   REPO: process.env.REPO || 'BookingRobot-M/br-shalom',
   FILES_BRANCH: process.env.FILES_BRANCH || 'feedback-files',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || 'https://shalom.bookingrobot.eu',
+  PIN_HASH: process.env.PIN_HASH || '',
 };
 const MAX_BODY = 6 * 1024 * 1024;
 // every note becomes a GitHub issue: keep a stranger from flooding the repository
 const PER_IP_HOUR = Number(process.env.PER_IP_HOUR || 20);
 const PER_DAY = Number(process.env.PER_DAY || 300);
-const HOP = new Set(['host', 'connection', 'keep-alive', 'transfer-encoding', 'upgrade', 'content-length']);
+// hop-by-hop headers, and the address headers a client could fake (we set x-client-ip ourselves)
+const HOP = new Set([
+  'host',
+  'connection',
+  'keep-alive',
+  'transfer-encoding',
+  'upgrade',
+  'content-length',
+  'x-client-ip',
+  'cf-connecting-ip',
+]);
 
 const hits = new Map();
 let day = { key: '', n: 0 };
@@ -80,6 +93,7 @@ export function createServer(handler = worker, cfg = env) {
       const headers = new Headers();
       for (const [k, v] of Object.entries(req.headers))
         if (v !== undefined && !HOP.has(k)) headers.set(k, Array.isArray(v) ? v.join(', ') : v);
+      headers.set('x-client-ip', clientIp(req));
       const hasBody = !['GET', 'HEAD', 'OPTIONS'].includes(req.method || 'GET');
       const request = new Request('http://localhost' + (req.url || '/'), {
         method: req.method,
@@ -132,6 +146,7 @@ async function check() {
     say(r.ok, r.ok ? `žyma ${l} yra` : `žymos ${l} nėra (HTTP ${r.status})`);
     if (!r.ok) bad++;
   }
+  say(true, env.PIN_HASH ? 'formos kodas nustatytas' : 'formos kodas nenustatytas — siųsti gali bet kas');
   const issues = await get('/issues?per_page=1');
   say(
     issues.ok,

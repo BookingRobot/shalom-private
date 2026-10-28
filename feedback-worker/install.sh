@@ -59,6 +59,25 @@ echo '{ "type": "module", "private": true }' >"$APP/package.json"
 ok "$APP"
 
 step "4/6 Nustatymai ir patikra"
+# the form code: only its hash is kept (PBKDF2-SHA256, 100 000 rounds, own salt)
+OLD_PIN_HASH=""
+[ -f "$ENVF" ] && OLD_PIN_HASH=$(sed -n 's/^PIN_HASH=//p' "$ENVF")
+PIN_HASH=$OLD_PIN_HASH
+if [ -n "${FEEDBACK_PIN:-}" ] || [ -z "$OLD_PIN_HASH" ]; then
+  P=${FEEDBACK_PIN:-}
+  if [ -z "$P" ]; then
+    read -rsp "  Formos kodas (jį vesite pastabų formoje; Enter — be kodo): " P </dev/tty
+    echo
+  fi
+  if [ "$P" = "-" ] || [ -z "$P" ]; then
+    PIN_HASH=""
+  else
+    PIN_HASH=$(P="$P" "$NODE" -e 'const c=require("crypto");const s=c.randomBytes(16);const h=c.pbkdf2Sync(process.env.P,s,100000,32,"sha256");process.stdout.write("pbkdf2:100000:"+s.toString("base64")+":"+h.toString("base64"))')
+    TEST_PIN=$P
+  fi
+  unset P
+fi
+if [ -n "$PIN_HASH" ]; then ok "formos kodas: saugoma tik jo maiša (hash)"; else ok "formos kodas: nenustatytas — siųsti gali bet kas"; fi
 umask 077
 cat >"$ENVF" <<EOF
 GITHUB_TOKEN=$GITHUB_TOKEN
@@ -67,6 +86,7 @@ FILES_BRANCH=feedback-files
 ALLOWED_ORIGINS=$ORIGINS
 PORT=$PORT
 HOST=127.0.0.1
+PIN_HASH=$PIN_HASH
 EOF
 chmod 600 "$ENVF"
 umask 022
@@ -222,7 +242,8 @@ echo "── Bandymas per internetą (sukurs vieną bandomąjį issue — vėlia
 RES=""
 for TRY in 1 2 3 4; do
   RES=$(curl -sS -m 40 -X POST "https://$DOMAIN$URLPATH" -H "Origin: https://shalom.bookingrobot.eu" \
-    -F 'note={"type":"other","text":"Проверка: сервер coding.ateisiu.lt работает","name":"install.sh","title":"[Тест] сервер работает"}' 2>&1 || true)
+    -F 'note={"type":"other","text":"Проверка: сервер coding.ateisiu.lt работает","name":"install.sh","title":"[Тест] сервер работает"}' \
+    -F "pin=${TEST_PIN:-}" 2>&1 || true)
   case "$RES" in *'"number"'*) break ;; esac
   [ "$TRY" -lt 4 ] && echo "  dar neatsako ($TRY/4), bandau po 10 s…" && sleep 10
 done

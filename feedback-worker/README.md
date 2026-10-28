@@ -46,6 +46,22 @@ Pabaigoje turi būti **✔ VISKAS VEIKIA**.
 Atnaujinus `worker.js` ar `server.mjs` (pvz. po naujos formos versijos), serveryje paleiskite
 `sudo bash install.sh` — jis parsisiųs naujausius failus iš `main` ir perkraus paslaugą.
 
+## Formos kodas
+
+Siųsti pastabą galima tik su **kodu** (laukas „Код доступа“). Kodą tikrina serveris: svetainės
+kode ir repozitorijoje jo nėra, serveryje (`/etc/br-shalom-feedback.env`, matomas tik root)
+saugoma tik jo maiša `PIN_HASH` (PBKDF2-SHA256, 100 000 kartų, atsitiktinė druska).
+Po 5 neteisingų bandymų iš to paties adreso siuntimas užrakinamas valandai.
+Kodas neįrašomas nei į issue, nei į archyvo JSON. Naršyklė jį prisimena tik pažymėjus
+„Запомнить на этом устройстве“.
+
+```bash
+sudo FEEDBACK_PIN=naujas_kodas bash install.sh   # nustatyti / pakeisti kodą
+sudo FEEDBACK_PIN=- bash install.sh              # išjungti kodą (siųsti galės bet kas)
+```
+
+Jei kodas dar nenustatytas, `install.sh` jo paklaus pats.
+
 ## Priežiūra
 
 ```bash
