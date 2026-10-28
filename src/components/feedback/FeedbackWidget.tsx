@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { captureScreenshot } from '../../lib/feedback/screenshot';
 import {
+  FeedbackRefused,
   SEVERITY_RU,
   TYPE_RU,
   copyScreenshot,
@@ -22,6 +23,7 @@ import './FeedbackWidget.css';
 type Stage = 'idle' | 'marking' | 'capturing' | 'form' | 'sending' | 'done' | 'github';
 
 const NAME_KEY = 'br-shalom:feedback-name';
+const PIN_KEY = 'br-shalom:feedback-code';
 const TYPES: [FeedbackType, string][] = [
   ['bug', 'M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'],
   ['change', 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'],
@@ -54,11 +56,20 @@ const pic = (blob: Blob, main: boolean, label: string): Pic => ({
   label,
 });
 
-const readName = () => {
+const read = (key: string) => {
   try {
-    return localStorage.getItem(NAME_KEY) || '';
+    return localStorage.getItem(key) || '';
   } catch {
     return '';
+  }
+};
+const readName = () => read(NAME_KEY);
+const keep = (key: string, value: string) => {
+  try {
+    if (value) localStorage.setItem(key, value);
+    else localStorage.removeItem(key);
+  } catch {
+    /* ignore */
   }
 };
 
@@ -161,6 +172,9 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const [description, setDescription] = useState('');
   const [name, setName] = useState(readName);
   const [contact, setContact] = useState('');
+  // the team's code (checked on the server); remembered on this device only if asked
+  const [pin, setPin] = useState(() => read(PIN_KEY));
+  const [rememberPin, setRememberPin] = useState(true);
   const [pics, setPics] = useState<Pic[]>([]);
   // what the next marking is for: the main screenshot or one more
   const [adding, setAdding] = useState(false);
@@ -353,6 +367,7 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       actual: type === 'bug' && !actual.trim(),
       description: type !== 'bug' && !description.trim(),
       name: !name.trim(),
+      pin: hasEndpoint() && !pin.trim(),
     };
     setBad(miss);
     const first = Object.keys(miss).find((k) => miss[k]);
@@ -360,18 +375,16 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       setError(
         first === 'name'
           ? 'Как вас зовут? Так мы поймём, кому ответить.'
-          : first === 'title'
-            ? 'Напишите коротко, о чём сообщение.'
-            : 'Заполните отмеченные поля.',
+          : first === 'pin'
+            ? 'Введите код доступа — без него сообщение не отправится.'
+            : first === 'title'
+              ? 'Напишите коротко, о чём сообщение.'
+              : 'Заполните отмеченные поля.',
       );
       document.querySelector<HTMLElement>(`.fb-panel [data-f="${first}"]`)?.focus();
       return false;
     }
-    try {
-      localStorage.setItem(NAME_KEY, name.trim());
-    } catch {
-      /* ignore */
-    }
+    keep(NAME_KEY, name.trim());
     return true;
   };
 
@@ -392,14 +405,25 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
     setError('');
     setStage('sending');
     try {
-      const r = await sendFeedback(note());
+      const r = await sendFeedback(note(), pin.trim());
+      keep(PIN_KEY, rememberPin ? pin.trim() : '');
       setResult(r);
       setFailed(false);
       setStage('done');
-    } catch {
+    } catch (e) {
+      setStage('form');
+      if (e instanceof FeedbackRefused) {
+        setFailed(false);
+        if (e.reason === 'pin') {
+          keep(PIN_KEY, '');
+          setBad({ pin: true });
+          setError('Неверный код доступа. Проверьте и попробуйте ещё раз.');
+          document.querySelector<HTMLElement>('.fb-panel [data-f="pin"]')?.focus();
+        } else setError('Слишком много неверных попыток. Попробуйте снова через час.');
+        return;
+      }
       setError('Не получилось отправить. Проверьте интернет и попробуйте ещё раз.');
       setFailed(true);
-      setStage('form');
     }
   };
 
@@ -740,6 +764,36 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
                       />
                     </label>
                   </div>
+
+                  {hasEndpoint() ? (
+                    <div className="fb-pin">
+                      <label className={'fb-field' + (bad.pin ? ' bad' : '')}>
+                        <span>Код доступа</span>
+                        <input
+                          className="input"
+                          data-f="pin"
+                          type="password"
+                          value={pin}
+                          autoComplete="off"
+                          spellCheck={false}
+                          maxLength={100}
+                          onChange={(e) => {
+                            setPin(e.target.value);
+                            if (bad.pin) fixed('pin');
+                          }}
+                        />
+                      </label>
+                      <label className="fb-remember">
+                        <input
+                          type="checkbox"
+                          checked={rememberPin}
+                          onChange={(e) => setRememberPin(e.target.checked)}
+                        />
+                        Запомнить на этом устройстве
+                      </label>
+                      <p className="fb-hint">Код знает команда сайта. Его проверяет сервер, на сайте его нет.</p>
+                    </div>
+                  ) : null}
 
                   <details className="fb-what">
                     <summary>Что отправится?</summary>

@@ -15,8 +15,49 @@
  *   REPO            BookingRobot-M/br-shalom
  *   FILES_BRANCH    feedback-files
  *   ALLOWED_ORIGINS https://shalom.bookingrobot.eu,http://localhost:5173
+ *   PIN_HASH        optional: the code the form asks for, as pbkdf2:<iterations>:<salt b64>:<hash b64>
+ *                   (PBKDF2-SHA256; only the hash is kept, the code itself is nowhere)
  */
 const LABELS = ['atsiliepimas', 'laukia-peržiūros'];
+
+// wrong codes: 5 per address (and 200 in all) per hour, then the form waits
+const FAILS_PER_IP = 5;
+const FAILS_ALL = 200;
+const fails = new Map();
+let failsAll = [];
+const hourAgo = () => Date.now() - 3600e3;
+function locked(ip) {
+  failsAll = failsAll.filter((t) => t > hourAgo());
+  const mine = (fails.get(ip) || []).filter((t) => t > hourAgo());
+  fails.set(ip, mine);
+  return mine.length >= FAILS_PER_IP || failsAll.length >= FAILS_ALL;
+}
+function failed(ip) {
+  const now = Date.now();
+  fails.set(ip, [...(fails.get(ip) || []), now]);
+  failsAll.push(now);
+}
+
+const fromB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+/** the typed code against the stored hash, in constant time */
+async function pinOk(pin, spec) {
+  const [alg, iter, salt, hash] = String(spec).split(':');
+  if (alg !== 'pbkdf2' || !pin) return false;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+  const bits = new Uint8Array(
+    await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: fromB64(salt), iterations: Number(iter) },
+      key,
+      256,
+    ),
+  );
+  const want = fromB64(hash);
+  if (bits.length !== want.length) return false;
+  let d = 0;
+  for (let i = 0; i < bits.length; i++) d |= bits[i] ^ want[i];
+  return d === 0;
+}
 const HOLD = '> ⏸ **Nevykdyti** — laukia peržiūros. Pradėti darbą tik nuėmus žymą `laukia-peržiūros`.';
 const MAX_SHOT = 2 * 1024 * 1024;
 const MAX_IMAGES = 4;
@@ -81,6 +122,14 @@ export default {
 
     try {
       const form = await request.formData();
+      if (env.PIN_HASH) {
+        const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-client-ip') || 'unknown';
+        if (locked(ip)) return json({ error: 'locked' }, 429, headers);
+        if (!(await pinOk(String(form.get('pin') || ''), env.PIN_HASH))) {
+          failed(ip);
+          return json({ error: 'pin' }, 401, headers);
+        }
+      }
       const note = JSON.parse(String(form.get('note') || '{}'));
       const text = String(note.text || note.title || '').trim();
       if (!text || text.length > 20000) return json({ error: 'text' }, 400, headers);

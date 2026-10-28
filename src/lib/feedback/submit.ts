@@ -122,9 +122,18 @@ export function githubIssueUrl(n: FeedbackNote) {
 
 const ext = (b: Blob) => (b.type === 'image/png' ? 'png' : b.type === 'image/jpeg' ? 'jpg' : 'webp');
 
+/** The intake refused the note: a wrong code, or too many wrong codes (try again in an hour). */
+export class FeedbackRefused extends Error {
+  constructor(public reason: 'pin' | 'locked') {
+    super(reason);
+  }
+}
+
 /** Sends the note to the endpoint; returns the issue number and link. */
-export async function sendFeedback(n: FeedbackNote): Promise<{ number?: number; url?: string }> {
+export async function sendFeedback(n: FeedbackNote, pin = ''): Promise<{ number?: number; url?: string }> {
   const form = new FormData();
+  // the code goes on its own: it is checked on the server and never stored with the note
+  form.append('pin', pin);
   const { screenshot, images, ...rest } = n;
   // the intake puts the picture links in place of the markers
   form.append(
@@ -139,6 +148,8 @@ export async function sendFeedback(n: FeedbackNote): Promise<{ number?: number; 
   if (screenshot) form.append('screenshot', screenshot, 'shot.' + ext(screenshot));
   images.forEach((b, i) => form.append('images', b, `image-${i + 1}.${ext(b)}`));
   const res = await fetch(ENDPOINT, { method: 'POST', body: form, signal: AbortSignal.timeout(45000) });
+  if (res.status === 401) throw new FeedbackRefused('pin');
+  if (res.status === 429) throw new FeedbackRefused('locked');
   if (!res.ok) throw new Error('feedback ' + res.status);
   return res.json();
 }
