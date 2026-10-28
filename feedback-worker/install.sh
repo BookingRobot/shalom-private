@@ -106,6 +106,30 @@ step "6/6 Adresas https://$DOMAIN$URLPATH"
 WEB=""
 if command -v nginx >/dev/null 2>&1 && systemctl is-active --quiet nginx; then WEB=nginx; fi
 if [ -z "$WEB" ] && command -v apache2ctl >/dev/null 2>&1 && systemctl is-active --quiet apache2; then WEB=apache; fi
+if [ -z "$WEB" ] && command -v caddy >/dev/null 2>&1 && systemctl is-active --quiet caddy; then WEB=caddy; fi
+if [ -z "$WEB" ]; then
+  BUSY=$(ss -ltnpH '( sport = :80 or sport = :443 )' 2>/dev/null || true)
+  if [ -n "$BUSY" ]; then
+    echo "  80/443 prievadus užima:"
+    echo "$BUSY" | sed 's/^/    /'
+    die "nežinau, kaip šią programą sukonfigūruoti — atsiųskite šį tekstą"
+  fi
+  # nothing serves the web here yet: Caddy gets the HTTPS certificate by itself
+  echo "  80/443 laisvi — diegiu Caddy (žiniatinklio serveris su automatiniu HTTPS)…"
+  command -v apt-get >/dev/null 2>&1 || die "reikia apt (Ubuntu/Debian)"
+  apt-get install -y debian-keyring debian-archive-keyring apt-transport-https curl gnupg >/dev/null
+  curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key |
+    gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt >/etc/apt/sources.list.d/caddy-stable.list
+  apt-get update >/dev/null
+  apt-get install -y caddy >/dev/null
+  cp /etc/caddy/Caddyfile "/etc/caddy/Caddyfile.bak-$SVC" 2>/dev/null || true
+  echo "# Sites on this server (installed by br-shalom install.sh)" >/etc/caddy/Caddyfile
+  if command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -q "Status: active"; then
+    ufw allow 80/tcp >/dev/null && ufw allow 443/tcp >/dev/null && ok "ufw: atidaryti 80 ir 443"
+  fi
+  WEB=caddy
+fi
 
 if [ "$WEB" = nginx ]; then
   mkdir -p /etc/nginx/snippets
@@ -149,14 +173,49 @@ EOF
     a2disconf $SVC >/dev/null
     die "apache nepriėmė pakeitimo, grąžinau kaip buvo. Atsiųskite:  apache2ctl configtest"
   fi
-else
-  die "neradau nginx ar apache. Nukreipkite https://$DOMAIN$URLPATH į http://127.0.0.1:$PORT (iki 5 MB) ir paleiskite skriptą dar kartą"
+elif [ "$WEB" = caddy ]; then
+  CF=/etc/caddy/Caddyfile
+  if grep -q "$URLPATH" "$CF" 2>/dev/null; then
+    ok "caddy: $CF jau turi $URLPATH"
+  elif grep -qE "^[^#]*\b${DOMAIN//./\\.}\b[^#]*\{" "$CF" 2>/dev/null; then
+    die "$CF jau turi $DOMAIN bloką — į jį įrašykite:  handle $URLPATH { reverse_proxy 127.0.0.1:$PORT }  ir:  systemctl reload caddy"
+  else
+    cp "$CF" "$CF.bak-$SVC-2" 2>/dev/null || true
+    cat >>"$CF" <<EOF
+
+# «Ваши пожелания» (shalom.bookingrobot.eu) → GitHub issues
+$DOMAIN {
+	handle $URLPATH {
+		request_body {
+			max_size 5MB
+		}
+		reverse_proxy 127.0.0.1:$PORT
+	}
+	handle {
+		respond "$DOMAIN" 200
+	}
+}
+EOF
+  fi
+  if caddy validate --config "$CF" --adapter caddyfile >/dev/null 2>&1; then
+    systemctl enable caddy >/dev/null 2>&1 || true
+    systemctl reload caddy 2>/dev/null || systemctl restart caddy
+    ok "caddy: $CF (HTTPS sertifikatą gauna pats, per kelias sekundes)"
+  else
+    [ -f "$CF.bak-$SVC-2" ] && cp "$CF.bak-$SVC-2" "$CF"
+    die "caddy nepriėmė nustatymų, grąžinau kaip buvo. Atsiųskite:  caddy validate --config $CF --adapter caddyfile"
+  fi
 fi
 
 echo
 echo "── Bandymas per internetą (sukurs vieną bandomąjį issue — vėliau jį uždarykite)"
-RES=$(curl -sS -m 40 -X POST "https://$DOMAIN$URLPATH" -H "Origin: https://shalom.bookingrobot.eu" \
-  -F 'note={"type":"other","text":"Проверка: сервер coding.ateisiu.lt работает","name":"install.sh","title":"[Тест] сервер работает"}' || true)
+RES=""
+for TRY in 1 2 3 4; do
+  RES=$(curl -sS -m 40 -X POST "https://$DOMAIN$URLPATH" -H "Origin: https://shalom.bookingrobot.eu" \
+    -F 'note={"type":"other","text":"Проверка: сервер coding.ateisiu.lt работает","name":"install.sh","title":"[Тест] сервер работает"}' 2>&1 || true)
+  case "$RES" in *'"number"'*) break ;; esac
+  [ "$TRY" -lt 4 ] && echo "  dar neatsako ($TRY/4), bandau po 10 s…" && sleep 10
+done
 echo "  atsakymas: $RES"
 case "$RES" in
   *'"number"'*) echo; echo "  ✔ VISKAS VEIKIA. Bandomasis issue sukurtas — galite jį uždaryti." ;;
