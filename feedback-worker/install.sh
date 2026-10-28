@@ -19,6 +19,9 @@ die() { echo "  ✘ $*" >&2; exit 1; }
 step() { echo; echo "── $*"; }
 
 [ "$(id -u)" = 0 ] || die "Paleiskite su sudo:  sudo bash install.sh"
+# first install: a live test issue at the end; an update only checks the address
+FIRST=1
+[ -f "$ENVF" ] && FIRST=0
 
 step "1/6 GitHub tokenas"
 if [ -z "${GITHUB_TOKEN:-}" ] && [ -f "$ENVF" ]; then
@@ -208,6 +211,13 @@ EOF
 fi
 
 echo
+if [ "$FIRST" = 0 ] && [ "${TEST:-}" != 1 ]; then
+  echo "── Patikra per internetą"
+  CODE=$(curl -s -o /dev/null -w '%{http_code}' -m 30 -X OPTIONS "https://$DOMAIN$URLPATH" -H "Origin: https://shalom.bookingrobot.eu" || true)
+  [ "$CODE" = 204 ] || die "https://$DOMAIN$URLPATH atsako $CODE (turi būti 204). Atsiųskite:  journalctl -u $SVC -n 30"
+  echo "  ✔ VISKAS VEIKIA (atnaujinta). Bandomojo issue nekūriau — jei reikia:  sudo TEST=1 bash install.sh"
+  exit 0
+fi
 echo "── Bandymas per internetą (sukurs vieną bandomąjį issue — vėliau jį uždarykite)"
 RES=""
 for TRY in 1 2 3 4; do
