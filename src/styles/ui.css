@@ -1303,3 +1303,35 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     font-size: 15px;
   }
 }
+
+/* Results header: "Фильтры" sits next to "Помогите выбрать санаторий" — no extra band */
+.res-tools {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.page .btn.btn-secondary.f-btn.on {
+  background: #1f5f4a;
+  border-color: #1f5f4a;
+  color: #fff;
+}
+.f-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+}
+.f-badge:empty {
+  display: none;
+}
+.page .btn.f-btn.on .f-badge {
+  background: #fff;
+  color: #1f5f4a;
+}
