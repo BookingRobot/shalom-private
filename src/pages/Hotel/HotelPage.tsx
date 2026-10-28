@@ -509,6 +509,15 @@ export default function HotelPage() {
   usePageTitle(v.info.name);
   // opening a sanatorium makes it the sanatorium of the order
   const { booking, update } = logic.props.booking;
+  // links like /hotel#reviews (and the browser's back button) switch the tab
+  useEffect(() => {
+    const onHash = () => {
+      const k = window.location.hash.replace('#', '');
+      if (HOTEL_TABS.some(([t]) => t === k)) logic.setState({ tab: k });
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [logic]);
   // the chosen tab stays visible in the tab bar on a phone
   useEffect(() => {
     const nav = document.querySelector<HTMLElement>('.ht-tabs');
