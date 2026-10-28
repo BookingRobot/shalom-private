@@ -1,0 +1,127 @@
+/* Home page: "Какой санаторий подойдёт вам?" — help card that opens the 3-question wizard */
+.page .choose-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 40px;
+  padding: 14px 28px 14px 22px;
+  background: #edf4ef;
+  border: 1px solid #cfe0d5;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(28, 38, 32, 0.04);
+}
+.page .choose-art {
+  display: block;
+  width: 300px;
+  height: auto;
+}
+.page .choose-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.page .choose-card h2 {
+  margin: 0;
+  font-family: Manrope, 'Segoe UI', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #1c2620;
+  text-wrap: balance;
+}
+.page .choose-card p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #3e4b44;
+}
+.page .choose-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1.5px solid #1f5f4a;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f5f4a;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(28, 38, 32, 0.06);
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+.page .choose-btn:hover {
+  background: #f4f9f6;
+  box-shadow: 0 2px 10px rgba(31, 95, 74, 0.14);
+}
+.page .choose-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.2);
+}
+.page .choose-btn svg {
+  transition: transform 0.15s;
+}
+.page .choose-btn:hover svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 1240px) {
+  .page .choose-card {
+    gap: 16px 28px;
+  }
+  .page .choose-art {
+    width: 250px;
+  }
+}
+/* tablet: picture beside the text, the button below the text */
+@media (max-width: 1080px) {
+  .page .choose-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px 28px;
+    padding: 18px 22px;
+  }
+  .page .choose-art {
+    grid-row: span 2;
+    width: 230px;
+  }
+  .page .choose-btn {
+    justify-self: start;
+  }
+}
+/* phone: everything one under the other, the button full width */
+@media (max-width: 600px) {
+  .page .choose-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px 16px 18px;
+  }
+  .page .choose-art {
+    grid-row: auto;
+    width: 220px;
+    max-width: 100%;
+    justify-self: center;
+  }
+  .page .choose-card h2 {
+    font-size: 22px;
+  }
+  .page .choose-card p {
+    font-size: 17px;
+  }
+  .page .choose-btn {
+    justify-self: stretch;
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page .choose-btn svg {
+    transition: none;
+  }
+}

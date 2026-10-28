@@ -5,7 +5,8 @@ import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { FlightToggle } from '../../components/FlightToggle';
 import { ChooseWizard } from '../../components/ChooseWizard';
 import { ResortModal } from '../../components/ResortModal';
-import { PlaceChips, PlaceSearch } from '../../components/PlaceSearch';
+import { PlaceSearch } from '../../components/PlaceSearch';
+import { ChooseCard } from '../../components/ChooseCard';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
@@ -20,6 +21,23 @@ import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic'
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './MainPage.css';
+
+const RESORT_CARDS = [
+  {
+    id: 'druskininkai',
+    name: 'Друскининкай',
+    sub: 'Лечение и минеральные воды',
+    img: '/img/80cbf81cb33b38c12f41d140c9e34ba7.jpg',
+  },
+  {
+    id: 'birstonas',
+    name: 'Бирштонас',
+    sub: 'Спокойный отдых у Немана',
+    img: '/img/ac9b1445a29a0df51e1bd45a8a203a39.jpg',
+  },
+  { id: 'palanga', name: 'Паланга', sub: 'Отдых у Балтийского моря', img: '/img/c4c4cd4bcaad10e81718df6ded79f624.jpg' },
+  { id: 'anyksciai', name: 'Аникщяй', sub: 'Природа и тишина', img: '/img/213618680529a455a08f4dc13b8abe7e.jpg' },
+];
 
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
@@ -159,7 +177,6 @@ class MainLogic extends PageLogic {
       if (bad.length) return this.setState({ note: blockedNote(bad) });
       this.setState({ sel: { in: iso(i), out: iso(addD(i, n)) }, note: null });
     };
-    const curNights = daysBetween(inD, outD);
     const { booking, update } = this.props.booking;
     return {
       flexMode: !!st.flex,
@@ -176,7 +193,6 @@ class MainLogic extends PageLogic {
       setDest: (e) => update({ dest: e.target.value }),
       inLabel: longDate(inD),
       outLabel: longDate(outD),
-      nightsLabel: curNights + ' ' + nightsWord(curNights),
       calOpen: !!st.calOpen,
       calNote: st.note || '',
       calNoteClose: () => this.setState({ note: null }),
@@ -229,39 +245,19 @@ export default function MainPage() {
   return (
     <div className="page pg-main">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        {/* Hero with header on top */}
-        <section
-          style={{
-            position: 'relative',
-            minHeight: '420px',
-            background: '#1E3A2F',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <img
-            src="/img/94582b10c29a7431c8ced47b9345bb6d.jpg"
-            alt=""
-            style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: '0',
-              background: 'linear-gradient(90deg,rgba(18,34,27,.72) 0%,rgba(18,34,27,.35) 55%,rgba(18,34,27,.15) 100%)',
-            }}
-          />
-          <HeaderBar tone="dark" minHeight={64}>
-            <Brand tone="dark" gap={10} />
-            <MainNav tone="dark" gap={28} size={16} />
-            <HeaderAside gap={16} wrap={false}>
-              <PhoneLink tone="dark" gap={8} />
-              <div style={{ position: 'relative' }}>
-                <select
-                  className="input"
-                  aria-label="Язык"
-                  style={{ padding: '0 30px 0 12px', minHeight: '40px', width: 'auto', fontSize: '14px' }}
-                >
+        {/* Hero: lake photo, header, heading and the search card */}
+        <section className="hero">
+          <img className="hero-bg" src="/img/hero-lake.jpg" alt="" />
+          <div className="hero-shade" />
+          <HeaderBar tone="dark" minHeight={80} maxWidth={1340}>
+            <div className="hero-left">
+              <Brand tone="dark" logo={36} size={26} gap={14} round={5} />
+              <MainNav tone="dark" gap={34} size={17} />
+            </div>
+            <HeaderAside gap={36} wrap={false}>
+              <PhoneLink tone="dark" size={19} icon={22} gap={10} />
+              <div className="lang">
+                <select aria-label="Язык">
                   <option>RU</option>
                   <option>LT</option>
                   <option>EN</option>
@@ -271,69 +267,38 @@ export default function MainPage() {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2.5"
+                  stroke="#1C2620"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                   aria-hidden="true"
-                  style={{ position: 'absolute', right: '10px', top: '12px', pointerEvents: 'none' }}
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </div>
             </HeaderAside>
           </HeaderBar>
-          <div
-            style={{
-              position: 'relative',
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '16px 24px 32px',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '18px',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '640px' }}>
-              <h1 style={{ color: '#fff', fontSize: '40px', lineHeight: '1.1', textWrap: 'pretty' }}>
-                Санаторное лечение и&nbsp;отдых в&nbsp;Литве
-              </h1>
-              <p style={{ margin: '0', color: '#E6F0EA', fontSize: '18px', lineHeight: '1.4' }}>
-                Выберите санаторий, сравните программы и забронируйте на русском языке.
-              </p>
-              <p style={{ margin: '0', color: '#fff', fontSize: '16px', fontWeight: '600' }}>
-                Друскининкай · Бирштонас · Паланга · Аникщяй
-              </p>
-            </div>
+          <div className="hero-in">
+            <h1>
+              Санаторное лечение
+              <br />
+              и&nbsp;отдых в&nbsp;Литве
+            </h1>
+            <p className="hero-sub">Выберите санаторий, сравните программы и забронируйте на русском языке.</p>
             <form
-              className="card"
+              className="card search"
               onSubmit={(e) => {
                 e.preventDefault();
                 logic.props.navigate('/results');
               }}
-              style={{
-                padding: '16px 18px 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                boxShadow: '0 10px 30px rgba(0,0,0,.18)',
-              }}
             >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit,minmax(min(170px,100%),1fr))',
-                  gap: '12px',
-                  alignItems: 'end',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <div className="search-grid">
+                <div className="sf sf-dest">
                   <label className="lbl" htmlFor="city">
                     Курорт или санаторий
                   </label>
                   <PlaceSearch />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div className="sf">
                   <label className="lbl" htmlFor="datein">
                     Заезд
                   </label>
@@ -357,7 +322,7 @@ export default function MainPage() {
                     </button>
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div className="sf">
                   <label className="lbl" htmlFor="dateout">
                     Выезд
                   </label>
@@ -381,228 +346,71 @@ export default function MainPage() {
                     </button>
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div className="sf">
                   <label className="lbl" htmlFor="guests">
                     Гости
                   </label>
                   <GuestsPicker inputClass="input" />
                 </div>
-                <Link className="btn btn-primary" to="/results" style={{ minHeight: '50px' }}>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="m21 21-4.3-4.3" />
-                  </svg>
+                <Link className="btn btn-primary search-go" to="/results">
                   Найти санаторий
                 </Link>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px 16px',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <FlightToggle />
-                <span style={{ fontSize: '14px', color: '#5E6862' }}>
-                  {v.nightsLabel} · Покажем цену на человека и итог за всех гостей.
-                </span>
-              </div>
-              <PlaceChips />
-              <button type="button" className="wz-link" onClick={() => setWz(true)}>
-                Не знаете, какой санаторий выбрать? Ответьте на 3 вопроса — подскажем →
-              </button>
+              <FlightToggle plain />
             </form>
           </div>
         </section>
-        {/* Three facts */}
-        <section style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
-          <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '4px 24px', display: 'flex', flexWrap: 'wrap' }}>
-            <div className="fact">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
-              </svg>
-              Помощь на русском
-            </div>
-            <div className="fact">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-              </svg>
-              Трансфер до санатория
-            </div>
-            <div className="fact">
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
-              </svg>
-              Депозит 35 € — и цена зафиксирована
-            </div>
-          </div>
-        </section>
         {/* Resorts */}
-        <section
-          style={{
-            maxWidth: '1180px',
-            margin: '0 auto',
-            padding: '36px 24px 10px',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <h2 style={{ fontSize: '28px' }}>Выберите курорт</h2>
-            <p style={{ margin: '0', color: '#3E4B44', fontSize: '16px' }}>
-              Лечение, природа или отдых у моря — найдите свой вариант.
-            </p>
+        <section className="sec sec-resorts">
+          <div className="sec-head">
+            <h2>Выберите курорт</h2>
+            <p>Лечение, природа или отдых у моря — найдите свой вариант.</p>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit,minmax(min(200px,100%),1fr))',
-              gap: '14px',
-            }}
-          >
-            <button
-              type="button"
-              className="card resort"
-              data-resort="druskininkai"
-              onClick={() => setResort('druskininkai')}
-            >
-              <img src="/img/80cbf81cb33b38c12f41d140c9e34ba7.jpg" alt="" />
-              <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
-                    Друскининкай
-                  </span>
-                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
-                </div>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Лечение и минеральные воды</span>
-              </div>
-            </button>
-            <button
-              type="button"
-              className="card resort"
-              data-resort="birstonas"
-              onClick={() => setResort('birstonas')}
-            >
-              <img src="/img/ac9b1445a29a0df51e1bd45a8a203a39.jpg" alt="" />
-              <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
-                    Бирштонас
-                  </span>
-                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
-                </div>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Спокойный отдых у Немана</span>
-              </div>
-            </button>
-            <button type="button" className="card resort" data-resort="palanga" onClick={() => setResort('palanga')}>
-              <img src="/img/c4c4cd4bcaad10e81718df6ded79f624.jpg" alt="" />
-              <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>Паланга</span>
-                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
-                </div>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Отдых у Балтийского моря</span>
-              </div>
-            </button>
-            <button
-              type="button"
-              className="card resort"
-              data-resort="anyksciai"
-              onClick={() => setResort('anyksciai')}
-            >
-              <img src="/img/213618680529a455a08f4dc13b8abe7e.jpg" alt="" />
-              <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>Аникщяй</span>
-                  <span style={{ color: '#1F5F4A', fontSize: '18px' }}>→</span>
-                </div>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Природа и тишина</span>
-              </div>
-            </button>
+          <div className="resorts">
+            {RESORT_CARDS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className="card resort"
+                data-resort={r.id}
+                onClick={() => setResort(r.id)}
+              >
+                <img src={r.img} alt="" />
+                <span className="resort-txt">
+                  <span className="resort-name">{r.name}</span>
+                  <span className="resort-sub">{r.sub}</span>
+                </span>
+                <svg
+                  className="resort-go"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+            ))}
           </div>
         </section>
+        {/* Not sure which one: the 3-question wizard (keeps the search above as it is) */}
+        <div className="sec sec-choose">
+          <ChooseCard onOpen={() => setWz(true)} />
+        </div>
         {/* Popular */}
-        <section
-          style={{
-            maxWidth: '1180px',
-            margin: '0 auto',
-            padding: '30px 24px 10px',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'end',
-              justifyContent: 'space-between',
-              gap: '16px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <h2 style={{ fontSize: '28px' }}>Популярные санатории</h2>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '16px' }}>
-                Ориентировочные цены. Точную стоимость покажем после поиска.
-              </p>
-            </div>
-            <Link to="/results" style={{ fontWeight: '700', fontSize: '16px' }}>
-              Все санатории →
+        <section className="sec sec-popular">
+          <div className="sec-head sec-head-row">
+            <h2>Популярные санатории</h2>
+            <Link className="see-all" to="/results">
+              Смотреть все →
             </Link>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))',
-              gap: '16px',
-            }}
-          >
+          <div className="pop-grid">
             {(v.hotels || []).map((h: any, _i0: number) => (
               <Fragment key={_i0}>
                 <article className="card hcard">
@@ -675,69 +483,14 @@ export default function MainPage() {
               </Fragment>
             ))}
           </div>
-        </section>
-        {/* Help band */}
-        <section style={{ maxWidth: '1180px', margin: '30px auto 0', padding: '0 24px', width: '100%' }}>
-          <div
-            style={{
-              background: '#EEF5F1',
-              border: '1px solid #C8DED3',
-              borderRadius: 'var(--r)',
-              padding: '18px 22px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
-              </svg>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '700' }}>
-                  Поможем выбрать санаторий
-                </div>
-                <div style={{ fontSize: '15px', color: '#3E4B44' }}>
-                  Объясним программы, условия проживания и трансфера.
-                </div>
-              </div>
-            </div>
-            <a className="btn btn-secondary" href="tel:+37060000000" style={{ minHeight: '48px' }}>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-              </svg>
-              +370&nbsp;600 00000
-            </a>
-          </div>
+          <p className="pop-note">Цены ориентировочные — точную стоимость покажем после поиска.</p>
         </section>
         {/* Three steps */}
         <section
           style={{
-            maxWidth: '1180px',
+            maxWidth: '1340px',
             margin: '0 auto',
-            padding: '28px 24px 36px',
+            padding: '36px 24px 36px',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -816,7 +569,7 @@ export default function MainPage() {
         <footer style={{ background: '#1C2620', color: '#D9E2DC', marginTop: 'auto' }}>
           <div
             style={{
-              maxWidth: '1180px',
+              maxWidth: '1340px',
               margin: '0 auto',
               padding: '16px 24px',
               display: 'flex',
@@ -1098,7 +851,7 @@ export default function MainPage() {
           </div>
         </>
       ) : null}{' '}
-      {/* "Не знаете, какой санаторий выбрать?" — the 3-question wizard opens right here */}
+      {/* "Какой санаторий подойдёт вам?" — the 3-question wizard opens right here */}
       <ChooseWizard
         open={wz}
         onClose={() => setWz(false)}

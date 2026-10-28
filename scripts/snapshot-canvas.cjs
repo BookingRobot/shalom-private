@@ -670,7 +670,7 @@ async function buildInteractive(b, sizes) {
           const city = document.querySelector('#city');
           d.on(city, 'click', 'openSearch');
           city.after(d.raw('slist'));
-          document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
+          document.querySelectorAll('.wz-link, .choose-btn').forEach((x) => d.on(x, 'click', 'wzOpen'));
           document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
           page.appendChild(d.raw('resorts'));
           d.attr(document.querySelector('#city'), 'value', 'cityLabel');
