@@ -294,6 +294,7 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     await ctx.close();
   }
   await buildInteractive(b, sizes);
+  await buildHotel(b, sizes);
   fs.writeFileSync(path.join(OUT, 'sizes.json'), JSON.stringify(sizes, null, 1));
   await b.close();
 })();
@@ -661,4 +662,46 @@ async function buildInteractive(b, sizes) {
     fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }
+}
+
+/* ---------- Hotel board: the photo gallery opens in Play ---------- */
+async function buildHotel(b, sizes) {
+  const file = 'Hotel-B.dc.html';
+  const lb = await grab(
+    b,
+    '/hotel',
+    (p) => p.click('button[aria-label="Территория санатория"]'),
+    () => {
+      const d = window.__dc;
+      const imgs = Array.from(document.querySelectorAll('img'));
+      const over = Array.from(document.querySelectorAll('div')).find(
+        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 3,
+      );
+      over.querySelectorAll('button').forEach((x) => {
+        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть') d.on(x, 'click', 'lbClose');
+      });
+      return over.outerHTML;
+    },
+  );
+  const base = await grab(b, '/hotel', null, () => {
+    const d = window.__dc;
+    const first = document.querySelector('button[aria-label="Территория санатория"]');
+    first.parentElement.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
+    document.querySelector('#root .page').appendChild(d.raw('lightbox'));
+    return document.getElementById('root').innerHTML;
+  });
+  const body = IA.finish(post(base), {
+    lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
+  });
+  const logic = `class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lb: false };
+  }
+  renderVals() {
+    return { lbOn: this.state.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }) };
+  }
+}`;
+  fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, '/hotel', body, sizes[file].h, logic));
+  console.log(file, 'interactive', body.length);
 }
