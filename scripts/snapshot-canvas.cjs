@@ -335,6 +335,7 @@ const CAL_RAWS = {
   'exact-end': '</sc-if>',
   'foot-start': '<sc-if value="{{calExact}}" hint-placeholder-val="{{true}}">',
   'foot-end': '</sc-if>',
+  calnote: IA.CALNOTE,
   cells: IA.CELLS,
 };
 /** flexible dates sit after the exact calendar; on Main an option links to the results board */

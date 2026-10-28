@@ -4,10 +4,12 @@ import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
-import { MONTHS, MONTHS_N, addD, daysBetween, iso, shortDate, toD } from '../../lib/dates';
+import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
 import { isSoldOutEverywhere } from '../../data/availability';
+import { blockedNights, blockedNote, daysText } from '../../lib/stayCheck';
+import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { awardsOf } from '../../data/awards';
@@ -481,6 +483,7 @@ class ResultsLogic extends PageLogic {
               this.setState({
                 sOpen: true,
                 sRoom: { key: rkey, name: r.room, hotel: h.name },
+                sNote: null,
                 ss: { in: null, out: null },
                 sm: checkin.getUTCMonth(),
                 sy: checkin.getUTCFullYear(),
@@ -512,6 +515,10 @@ class ResultsLogic extends PageLogic {
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y0, m0 + 1, 0)).getUTCDate();
       const curP = ppnFor(calH, checkin, base);
+      // nights with no places: this sanatorium, the whole resort, or this room
+      const dayFull = (d: Date) =>
+        soldOut(calH, d) || isSoldOutEverywhere(iso(d)) || (st.cal.roomKey ? roomDayBusy(st.cal.roomKey, d) : false);
+      const stayBad = (a: Date) => blockedNights(a, addD(a, NIGHTS), dayFull);
       const cells: CalendarCell[] = [];
       for (let i = 0; i < lead; i++)
         cells.push({
@@ -530,13 +537,7 @@ class ResultsLogic extends PageLogic {
       for (let d = 1; d <= days; d++) {
         const date = new Date(Date.UTC(y0, m0, d));
         const past = date < TODAY;
-        const so =
-          soldOut(calH, date) ||
-          (st.cal.roomKey
-            ? roomDayBusy(st.cal.roomKey, date) ||
-              roomDayBusy(st.cal.roomKey, addD(date, NIGHTS - 1)) ||
-              overlaps(st.cal.roomKey, date, addD(date, NIGHTS))
-            : false);
+        const so = !past && dayFull(date);
         const p = ppnFor(calH, date, base);
         const isCur = iso(date) === iso(checkin),
           isPick = iso(date) === iso(picked);
@@ -551,17 +552,41 @@ class ResultsLogic extends PageLogic {
           bg,
           border: isPick ? '#1F5F4A' : isCur ? '#1C2620' : 'transparent',
           color: isPick ? '#1F5F4A' : '#1C2620',
-          off: so || past,
+          off: past,
           cursor: so || past ? 'not-allowed' : 'pointer',
           aria: d + ' ' + MONTHS[m0] + (so ? ', нет мест' : ', ' + p + '\u00a0€ за человека в сутки'),
-          pick: () => this.setState({ cal: { ...st.cal, picked: iso(date) } }),
+          // the whole stay must fit between "нет мест" nights
+          pick: () => {
+            if (so) return this.setState({ cal: { ...st.cal, note: blockedNote([date], true) } });
+            const bad = stayBad(date);
+            if (bad.length)
+              return this.setState({
+                cal: {
+                  ...st.cal,
+                  note:
+                    'С ' +
+                    shortDate(date) +
+                    ' на ' +
+                    NIGHTS +
+                    ' ' +
+                    nightsWord(NIGHTS) +
+                    ' не получится: ' +
+                    daysText(bad) +
+                    ' нет мест. Выберите другой день заезда — или отправьте запрос.',
+                },
+              });
+            this.setState({ cal: { ...st.cal, picked: iso(date), note: null } });
+          },
         });
       }
       const newTotal = totalFor(calH, picked, base),
         curTotal = totalFor(calH, checkin, base),
         diff = curTotal - newTotal;
       const off1 = calH.offers[0];
+      const pickedBad = stayBad(picked).length > 0;
       cal = {
+        note: st.cal.note || '',
+        applyOff: pickedBad,
         hotelName: calH.name,
         room: st.cal.roomName || off1.room,
         prog: off1.title.replace(/ — .*$/, ''),
@@ -602,7 +627,11 @@ class ResultsLogic extends PageLogic {
           y = st.cal.year ?? checkin.getUTCFullYear();
         this.setState({ cal: { ...st.cal, month: m % 12, year: m > 11 ? y + 1 : y } });
       },
-      calApply: () => this.setState({ checkin: st.cal.picked || iso(checkin), cal: null }),
+      calApply: () => {
+        if (!cal.applyOff) this.setState({ checkin: st.cal.picked || iso(checkin), cal: null });
+      },
+      calNoteClose: () => this.setState({ cal: { ...st.cal, note: null } }),
+      calNoteAsk: () => this.props.help.open(),
     };
     // ---- Search picker: same two-month range calendar as on the home page ----
     const nW = (n) =>
@@ -634,12 +663,17 @@ class ResultsLogic extends PageLogic {
       );
     };
     const sRoom = st.sOpen && st.sRoom ? st.sRoom : null;
+    // a stay can't cross a "нет мест" night (resort-wide or this room): pop-up instead of selecting
+    const sBlocked = (d: Date) => isSoldOutEverywhere(iso(d)) || (!!sRoom && roomDayBusy(sRoom.key, d));
     const sPick = (date) => () => {
       const k = iso(date);
-      if (!ss.in || (ss.in && ss.out)) this.setState({ ss: { in: k, out: null } });
-      else if (date > toD(ss.in) && !(sRoom && overlaps(sRoom.key, toD(ss.in), date)))
-        this.setState({ ss: { in: ss.in, out: k } });
-      else this.setState({ ss: { in: k, out: null } });
+      if (ss.in && !ss.out && date > toD(ss.in)) {
+        const bad = blockedNights(toD(ss.in), date, sBlocked);
+        if (bad.length) return this.setState({ sNote: blockedNote(bad) });
+        return this.setState({ ss: { in: ss.in, out: k }, sNote: null });
+      }
+      if (sBlocked(date)) return this.setState({ sNote: blockedNote([date], true) });
+      this.setState({ ss: { in: k, out: null }, sNote: null });
     };
     const sCells = (y, m) => {
       const first = new Date(Date.UTC(y, m, 1));
@@ -674,6 +708,8 @@ class ResultsLogic extends PageLogic {
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut),
           between = sIn && sOut && date > sIn && date < sOut;
+        // the first "нет мест" day after check-in still works as the check-out day
+        const canOut = (full || rBusy) && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, sBlocked).length;
         if (past) {
           bg = '#E8E6E1';
           color = '#9AA39E';
@@ -699,8 +735,8 @@ class ResultsLogic extends PageLogic {
           border,
           color,
           subColor,
-          off: past || full || rBusy,
-          cursor: past || full || rBusy ? 'not-allowed' : 'pointer',
+          off: past,
+          cursor: past || ((full || rBusy) && !canOut) ? 'not-allowed' : 'pointer',
           aria:
             d +
             ' ' +
@@ -714,22 +750,29 @@ class ResultsLogic extends PageLogic {
     const sN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const sPreset = (n) => () => {
       const a = sIn || checkin;
-      this.setState({ ss: { in: iso(a), out: iso(addD(a, n)) } });
+      const bad = blockedNights(a, addD(a, n), sBlocked);
+      if (bad.length) return this.setState({ sNote: blockedNote(bad) });
+      this.setState({ ss: { in: iso(a), out: iso(addD(a, n)) }, sNote: null });
     };
+    const sSelBad = !!(sIn && sOut && blockedNights(sIn, sOut, sBlocked).length);
     const searchVals = {
       nightsLabel: NIGHTS + ' ' + nW(NIGHTS),
       sInLabel: longD(checkin),
       sOutLabel: longD(checkout),
       sCalOpen: !!st.sOpen,
+      sCalNote: st.sNote || '',
+      sCalNoteClose: () => this.setState({ sNote: null }),
+      sCalNoteAsk: () => this.props.help.open(),
       sOpenCal: () =>
         this.setState({
+          sNote: null,
           sOpen: true,
           sRoom: null,
           ss: { in: iso(checkin), out: iso(checkout) },
           sm: checkin.getUTCMonth(),
           sy: checkin.getUTCFullYear(),
         }),
-      sCloseCal: () => this.setState({ sOpen: false, sRoom: null }),
+      sCloseCal: () => this.setState({ sOpen: false, sRoom: null, sNote: null }),
       sFlex: !!st.sFlex,
       setSFlex: (sFlex) => this.setState({ sFlex }),
       // a recommended option is the choice: apply the dates and show the list
@@ -758,9 +801,10 @@ class ResultsLogic extends PageLogic {
       sSelIn: sIn ? shortDate(sIn) : '—',
       sSelOut: sOut ? shortDate(sOut) : '—',
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
-      sApplyOff: !sN,
+      sApplyOff: !sN || sSelBad,
       sApplyCal: () => {
-        if (sN && sIn) this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null });
+        if (sN && sIn && !sSelBad)
+          this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null, sNote: null });
       },
       sP7: sPreset(7),
       sP10: sPreset(10),
@@ -2605,6 +2649,7 @@ export default function ResultsPage() {
                   paddingTop: '12px',
                 }}
               >
+                {v.cal?.note ? <CalNotice text={v.cal.note} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
                 <button type="button" className="acc" onClick={v.calClose} style={{ fontSize: '17px' }}>
                   Оставить {v.curRange}
                 </button>
@@ -2613,6 +2658,7 @@ export default function ResultsPage() {
                     type="button"
                     className="btn btn-primary"
                     onClick={v.calApply}
+                    disabled={!!v.cal?.applyOff}
                     style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
                     Применить {v.cal?.newRange}
@@ -2814,6 +2860,7 @@ export default function ResultsPage() {
                   paddingTop: '12px',
                 }}
               >
+                {v.sCalNote ? <CalNotice text={v.sCalNote} onClose={v.sCalNoteClose} onAsk={v.sCalNoteAsk} /> : null}
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Заезд</span>

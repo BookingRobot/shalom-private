@@ -1405,3 +1405,63 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   background: #fff;
   color: #1f5f4a;
 }
+
+/* "нет мест" inside the chosen period: a note slides in above the confirm buttons */
+.cal-note {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: #fff6e3;
+  border: 1px solid #f0ddb8;
+  border-left: 4px solid #c9893a;
+  border-radius: 2px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #1c2620;
+  animation: calNoteIn 0.25s ease-out;
+}
+.cal-note-t {
+  flex: 1 1 260px;
+}
+.cal-note-ask {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 2px solid #1f5f4a;
+  background: #fff;
+  color: #1f5f4a;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.cal-note-ask:hover {
+  background: #eef5f1;
+}
+.cal-note-x {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: none;
+  font-size: 18px;
+  color: #3e4b44;
+  cursor: pointer;
+}
+@keyframes calNoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-note {
+    animation: none;
+  }
+}
