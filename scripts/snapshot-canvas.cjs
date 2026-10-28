@@ -312,6 +312,7 @@ const wrapIf = (cond, html) => `<sc-if value="{{${cond}}}" hint-placeholder-val=
 async function buildInteractive(b, sizes) {
   for (const route of ['/', '/results']) {
     const isMain = route === '/';
+    let filterCfg = null;
     const file = isMain ? 'Main.dc.html' : 'Results-B.dc.html';
     const cal = IA.finish(
       post(await grab(b, route, (p) => p.click('#datein'), () => window.__dc.markCal(document.querySelector('[role="dialog"]')))),
@@ -404,6 +405,70 @@ async function buildInteractive(b, sizes) {
         },
       );
       raws.price = wrapIf('priceOn', IA.finish(post(price), {}));
+      // filter panel, closed "more" and open "more"
+      const panel = async (more, keys) =>
+        grab(
+          b,
+          route,
+          async (p) => {
+            await p.click('text=Раскрыть фильтры');
+            if (more) await p.click('.morebtn');
+          },
+          ({ more, keys }) => {
+            const d = window.__dc;
+            const sec = Array.from(document.querySelectorAll('section')).find(
+              (x) => x.querySelector('button.acc') && /Свернуть/.test(x.textContent),
+            );
+            const accs = sec.querySelectorAll('button.acc');
+            d.on(accs[0], 'click', 'fClose');
+            if (more) d.on(accs[1], 'click', 'fMoreT');
+            else d.on(sec.querySelector('.morebtn'), 'click', 'fMoreT');
+            sec.querySelectorAll('.btn-primary').forEach((x) => d.on(x, 'click', 'fClose'));
+            Array.from(sec.querySelectorAll('button')).filter((x) => /Сбросить/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'fReset'));
+            sec.querySelectorAll('input[type="number"]').forEach((i) => i.removeAttribute('value'));
+            const found = [];
+            sec.querySelectorAll('input[type="checkbox"]').forEach((inp) => {
+              const lab = inp.closest('label');
+              const k = lab.textContent.trim();
+              found.push({ k, on: inp.checked, base: lab.className.replace(/\bon\b/, '').trim() });
+              const i = keys ? keys.indexOf(k) : -1;
+              if (i >= 0) {
+                d.on(inp, 'change', 'fT' + i);
+                d.attr(inp, 'checked', 'fOn' + i);
+                d.attr(lab, 'class', 'fCls' + i);
+              }
+            });
+            const groups = [];
+            sec.querySelectorAll('.qf-opts').forEach((g, gi) => {
+              const chips = g.querySelectorAll('.qf-chip');
+              groups.push({ n: chips.length, one: /Любое/.test(chips[0].textContent) });
+              chips.forEach((c, ci) => {
+                d.on(c, 'click', 'qf' + gi + '_' + ci);
+                d.attr(c, 'class', 'qfc' + gi + '_' + ci);
+                c.removeAttribute('aria-pressed');
+                if (!groups[gi].one) c.textContent = c.textContent.replace(/^✓\s*/, '');
+              });
+            });
+            return { html: sec.outerHTML, found, groups };
+          },
+          { more, keys },
+        );
+      const probe = await panel(true, null);
+      const fkeys = probe.found.map((x) => x.k);
+      const pClosed = await panel(false, fkeys);
+      const pOpen = await panel(true, fkeys);
+      raws['fclosed-start'] = '<sc-if value="{{fClosedV}}" hint-placeholder-val="{{true}}">';
+      raws['fclosed-end'] =
+        '</sc-if><sc-if value="{{fOpenV}}" hint-placeholder-val="{{false}}">' +
+        wrapIf('fMoreOff', IA.finish(post(pClosed.html), {})) +
+        wrapIf('fMoreOn', IA.finish(post(pOpen.html), {})) +
+        '</sc-if>';
+      filterCfg = {
+        keys: fkeys,
+        bases: probe.found.map((x) => x.base),
+        init: probe.found.map((x) => x.on),
+        groups: probe.groups,
+      };
     }
     // the page itself, with fields wired to the logic
     const base = await grab(b, route, null, (isMain) => {
@@ -436,16 +501,14 @@ async function buildInteractive(b, sizes) {
         btns.filter((x) => /Помогите выбрать санаторий/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'wzOpen'));
         btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
         btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
-        // "Раскрыть фильтры" → the board with the filter panel open
+        // "Раскрыть фильтры" opens the panel in place (see filtersLogic)
         btns
           .filter((x) => /Раскрыть фильтры/.test(x.textContent))
           .forEach((x) => {
-            const a = document.createElement('a');
-            a.setAttribute('href', 'Results-filters.dc.html');
-            a.className = x.className;
-            a.setAttribute('style', (x.getAttribute('style') || '') + ';text-decoration:none');
-            a.innerHTML = x.innerHTML;
-            x.replaceWith(a);
+            d.on(x, 'click', 'fOpenFn');
+            const sec = x.closest('section');
+            sec.before(d.raw('fclosed-start'));
+            sec.after(d.raw('fclosed-end'));
           });
         document.querySelectorAll('.cmp-check input').forEach((x, i) => {
           d.on(x, 'change', 'cmpT' + i);
@@ -463,7 +526,8 @@ async function buildInteractive(b, sizes) {
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, IA.LOGIC));
+    const logic = filterCfg ? IA.filtersLogic(filterCfg.keys, filterCfg.bases, filterCfg.init, filterCfg.groups) : IA.LOGIC;
+    fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }
 }

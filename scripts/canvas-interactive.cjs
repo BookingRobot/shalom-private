@@ -193,7 +193,9 @@ class Component extends DCLogic {
     // compare
     const cmp = st.cmp, cmpN = cmp.filter(Boolean).length;
     const cmpT = (i) => () => { const c = cmp.slice(); c[i] = !c[i]; this.setState({ cmp: c }); };
+    const __f = this.__filters ? this.__filters(st) : {};
     return {
+      ...__f,
       // page fields
       inLabel: longD(inD), outLabel: longD(outD),
       openCal: () => this.setState({ cal: 'exact', room: false, sel: { in: st.inD, out: st.outD }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
@@ -255,4 +257,49 @@ class Component extends DCLogic {
 /** template pieces shared by both boards */
 const calRaws = (calHtml) => ({});
 
-module.exports = { HELPERS, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, finish, calRaws };
+/**
+ * Results filter panel in Play: tiles/checkboxes and chips switch on and off, "Ещё фильтры"
+ * opens the rest, "Свернуть"/"Показать" close it. The list itself stays as on the site.
+ */
+function filtersLogic(keys, bases, init, groups) {
+  return LOGIC.replace(
+    /\n}\n$/,
+    `
+  __filters(st) {
+    const F_BASE = ${JSON.stringify(bases)};
+    const F_INIT = ${JSON.stringify(init)};
+    const GROUPS = ${JSON.stringify(groups)};
+    const fv = st.fv || F_INIT;
+    const qf = st.qf || GROUPS.map((g) => (g.one ? [0] : []));
+    const fx = {
+      fOpenV: !!st.fOpen, fClosedV: !st.fOpen, fMoreOn: !!st.fMore, fMoreOff: !st.fMore,
+      fOpenFn: () => this.setState({ fOpen: true }),
+      fClose: () => this.setState({ fOpen: false, fMore: false }),
+      fMoreT: () => this.setState({ fMore: !st.fMore }),
+      fReset: () => this.setState({ fv: F_INIT.map(() => false), qf: GROUPS.map((g) => (g.one ? [0] : [])) }),
+    };
+    F_BASE.forEach((base, i) => {
+      fx['fOn' + i] = !!fv[i];
+      fx['fCls' + i] = base + (fv[i] ? ' on' : '');
+      fx['fT' + i] = () => { const v = fv.slice(); v[i] = !v[i]; this.setState({ fv: v }); };
+    });
+    GROUPS.forEach((g, gi) => {
+      for (let j = 0; j < g.n; j++) {
+        const on = qf[gi].includes(j);
+        fx['qfc' + gi + '_' + j] = 'qf-chip' + (on ? ' on' : '');
+        fx['qf' + gi + '_' + j] = () => {
+          const v = qf.map((x) => x.slice());
+          if (g.one) v[gi] = [j];
+          else v[gi] = on ? v[gi].filter((x) => x !== j) : v[gi].concat(j);
+          this.setState({ qf: v });
+        };
+      }
+    });
+    return fx;
+  }
+}
+`,
+  );
+}
+
+module.exports = { HELPERS, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };
