@@ -25,6 +25,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # «Ваши пожелания» endpoint (feedback-worker/README.md); empty = prefilled GitHub issue
+          VITE_FEEDBACK_URL: ${{ vars.VITE_FEEDBACK_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
