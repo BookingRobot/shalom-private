@@ -215,7 +215,7 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     background: '#1F5F4A',
                     color: '#fff',
                     display: 'flex',
@@ -361,7 +361,7 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     background: '#1F5F4A',
                     color: '#fff',
                     display: 'flex',
@@ -527,7 +527,7 @@ export default function GuestsPage() {
               aria-labelledby="dobTitle"
               style={{
                 background: '#fff',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 width: 'min(760px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -572,7 +572,7 @@ export default function GuestsPage() {
                   flexWrap: 'wrap',
                   padding: '12px 16px',
                   background: '#F4F1EA',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               >
                 <button

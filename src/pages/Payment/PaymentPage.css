@@ -20,7 +20,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
@@ -48,7 +48,7 @@
 .pg-payment .input {
   min-height: 50px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 0 16px;
   background: #fff;
   font-size: 18px;
@@ -75,7 +75,7 @@
 .pg-payment .card {
   background: #fff;
   border: 1px solid #e3ded2;
-  border-radius: 3px;
+  border-radius: var(--r);
 }
 .pg-payment .choice {
   display: flex;
@@ -83,7 +83,7 @@
   gap: 16px;
   padding: 18px 20px;
   border: 2px solid #cfc9bb;
-  border-radius: 3px;
+  border-radius: var(--r);
   background: #fff;
   cursor: pointer;
   text-align: left;
@@ -220,7 +220,7 @@
   font-size: 14px;
   font-weight: 800;
   padding: 2px 8px;
-  border-radius: 2px;
+  border-radius: var(--r);
   white-space: nowrap;
 }
 
@@ -236,7 +236,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #e3ded2;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-payment .pay-steps-title {
   font-size: 15px;

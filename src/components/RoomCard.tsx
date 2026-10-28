@@ -46,7 +46,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             height: '200px',
             alignSelf: 'flex-start',
             margin: '14px 0 14px 14px',
-            borderRadius: '2px',
+            borderRadius: 'var(--r)',
             overflow: 'hidden',
             background: '#2B3A33',
           }}
@@ -75,7 +75,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   fontSize: '14px',
                   fontWeight: '800',
                   padding: '5px 10px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               >
                 Занят на ваши даты
@@ -92,7 +92,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               fontSize: '14px',
               fontWeight: '700',
               padding: '5px 9px',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
             }}
           >
             Фото номера
@@ -283,7 +283,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       padding: '10px 16px',
                       border: `2px solid ${pr.border ?? ''}`,
                       background: pr.bg,
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       cursor: 'pointer',
                       textAlign: 'left',
                     }}
@@ -370,7 +370,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       style={{
                         background: '#EEF5F1',
                         border: '1px solid #C8DED3',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         padding: '14px 16px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -498,7 +498,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 flexDirection: 'column',
                 gap: '3px',
                 background: '#FAF8F3',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 padding: '12px 16px',
               }}
             >

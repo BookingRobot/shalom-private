@@ -37,7 +37,7 @@ const labelText = (size: number): CSSProperties => ({ fontWeight: '700', fontSiz
 const textInput: CSSProperties = {
   minHeight: '48px',
   border: '2px solid #CFC9BB',
-  borderRadius: '2px',
+  borderRadius: 'var(--r)',
   padding: '0 16px',
   font: '500 18px Manrope,sans-serif',
   width: '100%',
@@ -46,7 +46,7 @@ const textInput: CSSProperties = {
 const smallField: CSSProperties = {
   minHeight: '52px',
   border: '2px solid #CFC9BB',
-  borderRadius: '2px',
+  borderRadius: 'var(--r)',
   padding: '0 12px',
   font: '600 17px Manrope,sans-serif',
   width: '100%',
@@ -152,7 +152,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
             aria-labelledby="helpTitle"
             style={{
               background: '#fff',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
               width: 'min(720px,100%)',
               display: 'flex',
               flexDirection: 'column',
@@ -205,7 +205,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   height: '48px',
                   border: '2px solid #CFC9BB',
                   background: '#fff',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -242,7 +242,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                       style={{
                         minHeight: '48px',
                         border: '2px solid #CFC9BB',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         padding: '0 12px',
                         font: '700 17px Manrope,sans-serif',
                         background: '#fff',
@@ -267,7 +267,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     style={{
                       minHeight: '100px',
                       border: '2px solid #CFC9BB',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       padding: '12px 16px',
                       font: '500 17px Manrope,sans-serif',
                       width: '100%',
@@ -284,7 +284,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     gap: '12px',
                     background: '#F7F5F0',
                     border: '1px solid #E3DED2',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     padding: '14px 16px',
                   }}
                 >
@@ -355,7 +355,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                       minHeight: '50px',
                       padding: '0 24px',
                       border: 'none',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       background: '#1F5F4A',
                       color: '#fff',
                       font: '700 18px Manrope,sans-serif',
@@ -423,7 +423,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     minHeight: '48px',
                     padding: '0 22px',
                     border: '2px solid #1F5F4A',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     background: '#fff',
                     color: '#1F5F4A',
                     font: '700 18px Manrope,sans-serif',

@@ -105,7 +105,15 @@ export const AdvanceNote = ({
 }: {
   order: { advanceLabel: string; restLabel: string; dueDate: string; fullOnly: boolean };
 }) => (
-  <div style={{ fontSize: '15px', color: '#3E4B44', background: '#F4F1EA', borderRadius: '2px', padding: '10px 12px' }}>
+  <div
+    style={{
+      fontSize: '15px',
+      color: '#3E4B44',
+      background: '#F4F1EA',
+      borderRadius: 'var(--r)',
+      padding: '10px 12px',
+    }}
+  >
     {order.fullOnly ? (
       <>До заезда меньше недели — оплата сразу всей суммы.</>
     ) : (

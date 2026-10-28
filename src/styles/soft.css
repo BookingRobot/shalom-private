@@ -1,0 +1,211 @@
+/*
+ * Soft look for the whole site: small rounded corners, light shadows and
+ * iPhone-like choices (segmented tabs, light-green selection with a check mark).
+ * Loaded after every other stylesheet; `body .page …` outranks the page styles.
+ */
+:root {
+  --r-sm: 8px;
+  --r: 10px;
+  --r-md: 12px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --line: #e4e0d6;
+  --line-strong: #d1cbbf;
+  --green: #1f5f4a;
+  --sel-bg: #e6f2ea;
+  --sel-bd: #8fc0a6;
+  --sh-xs: 0 1px 2px rgba(28, 38, 32, 0.06);
+  --sh-sm: 0 1px 2px rgba(28, 38, 32, 0.05), 0 3px 10px rgba(28, 38, 32, 0.05);
+  --sh: 0 1px 2px rgba(28, 38, 32, 0.04), 0 8px 24px rgba(28, 38, 32, 0.06);
+  --sh-lg: 0 2px 8px rgba(18, 34, 27, 0.08), 0 30px 80px rgba(18, 34, 27, 0.26);
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='10' fill='%231F5F4A'/%3E%3Cpath d='M5.6 10.3l2.9 2.9 5.9-6.2' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ── surfaces ── */
+body .page .card {
+  border-radius: var(--r-lg);
+  border-color: var(--line);
+  box-shadow: var(--sh);
+}
+body .page .card img {
+  border-radius: var(--r);
+}
+/* a photo along the card's edge is clipped by the card itself */
+body .page .card > img:first-child {
+  border-radius: 0;
+}
+
+/* ── buttons ── */
+body .page .btn {
+  border-radius: var(--r);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+body .page .btn-primary {
+  box-shadow:
+    0 1px 2px rgba(18, 34, 27, 0.14),
+    0 6px 16px rgba(31, 95, 74, 0.2);
+}
+body .page .btn-primary:hover {
+  box-shadow:
+    0 1px 2px rgba(18, 34, 27, 0.16),
+    0 8px 22px rgba(31, 95, 74, 0.26);
+}
+body .page .btn-primary:disabled {
+  box-shadow: none;
+}
+body .page .btn-secondary {
+  border-width: 1.5px;
+  border-color: #a8c7b7;
+  box-shadow: var(--sh-xs);
+}
+body .page .btn-secondary:hover {
+  border-color: var(--green);
+}
+
+/* ── fields ── */
+body .page .input {
+  border-radius: var(--r);
+  border-width: 1.5px;
+  border-color: var(--line-strong);
+  box-shadow: inset 0 1px 2px rgba(28, 38, 32, 0.04);
+}
+body .page .input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.14);
+}
+
+/* ── choices: cards with a radio, tiles, chips ── */
+body .page :is(.choice, .tile, .prog, .pill, .ftog-box, .fd-opt, .fd-tile, .preset, .pick, .navbtn) {
+  border-radius: var(--r-md);
+  border-width: 1.5px;
+  border-color: var(--line-strong);
+  box-shadow: var(--sh-xs);
+}
+body .page :is(.choice, .tile, .prog, .pill, .ftog-box, .fd-opt, .fd-tile, .preset, .pick, .navbtn):hover {
+  border-color: var(--sel-bd);
+}
+body .page :is(.choice, .tile, .prog, .pill, .ftog-box).on {
+  background: var(--sel-bg);
+  border-color: var(--green);
+  box-shadow: none;
+}
+/* month / nights / number chips: light green with a check mark, like iOS */
+body .page :is(.fd-tile, .pick).on {
+  background: var(--sel-bg);
+  border-color: var(--sel-bd);
+  color: #1c2620;
+  box-shadow: none;
+}
+body .page .fd-tile.on strong::before {
+  content: '';
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  margin-right: 6px;
+  vertical-align: -3px;
+  background: var(--check) center / contain no-repeat;
+}
+body .page .fd-tile.on span {
+  color: #5e6862;
+}
+body .page .fd-tile.on small {
+  color: var(--green);
+}
+body .page .pick.on {
+  color: var(--green);
+}
+body .page :is(.qf-chip, .ps-chip) {
+  border-radius: 999px;
+  border-color: var(--line-strong);
+  box-shadow: var(--sh-xs);
+}
+body .page .qf-chip.on {
+  background: var(--sel-bg) var(--check) 10px center / 18px no-repeat;
+  border-color: var(--sel-bd);
+  color: var(--green);
+  font-weight: 700;
+  padding-left: 34px;
+  box-shadow: none;
+}
+body .page .rowpick.on {
+  background: var(--sel-bg);
+}
+
+/* segmented control: grey track, the chosen part lifts out in white */
+body .page .dm-tabs {
+  border: 0;
+  border-radius: var(--r-md);
+  background: #ebe8e1;
+  padding: 4px;
+  gap: 2px;
+  overflow: visible;
+}
+body .page .dm-tabs button {
+  min-height: 40px;
+  border-radius: 9px;
+  background: transparent;
+  color: #3e4b44;
+  font-weight: 600;
+}
+body .page .dm-tabs button.on {
+  background: #fff;
+  color: #1c2620;
+  font-weight: 800;
+  box-shadow:
+    0 1px 2px rgba(28, 38, 32, 0.1),
+    0 3px 8px rgba(28, 38, 32, 0.08);
+}
+
+/* calendar */
+body .page .months-calendar .cell {
+  border-radius: var(--r-sm);
+}
+body .page .lg i {
+  border-radius: 5px;
+}
+body .page .cal-note {
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
+}
+/* the dialog's "✕ Закрыть" reads as a quiet text button */
+body .page .cal-dlg > div:first-child > .btn-secondary {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+body .page .cal-dlg > div:first-child > .btn-secondary:hover {
+  background: var(--sel-bg);
+}
+
+/* booking steps: round step numbers */
+.checkout-steps .step .num {
+  border-radius: 50%;
+  border-width: 1.5px;
+}
+
+/* ── pop-ups: rounder corners, a soft deep shadow, the page blurred behind ── */
+body .page [role='dialog']:not(.gp-pop) {
+  border-radius: var(--r-xl) !important;
+  box-shadow: var(--sh-lg) !important;
+}
+body .page .gp-pop,
+body .page .ps-list {
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh) !important;
+}
+body .page div[style*='position: fixed']:has(> [role='dialog']) {
+  background: rgba(24, 36, 30, 0.42) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* "Дорога": nearby dates with flights read as chips */
+body .page .fly-alt-btn {
+  border-radius: 999px;
+  border-width: 1.5px;
+  box-shadow: var(--sh-xs);
+}

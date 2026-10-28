@@ -7,7 +7,7 @@
   gap: 4px;
   min-height: 60px;
   border: 2px solid transparent;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 4px 2px;
   font-weight: 700;
   font-size: 20px;
@@ -36,7 +36,7 @@
   height: 48px;
   border: 2px solid #cfc9bb;
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   cursor: pointer;
   display: flex;
   align-items: center;

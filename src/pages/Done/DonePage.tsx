@@ -97,7 +97,7 @@ export default function DonePage() {
                     fontWeight: '700',
                     fontSize: '15px',
                     padding: '7px 12px',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                   }}
                 >
                   <svg
@@ -126,7 +126,7 @@ export default function DonePage() {
           <div
             style={{
               background: '#DDEBE2',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
               padding: '18px 24px',
               display: 'flex',
               alignItems: 'center',
@@ -303,7 +303,7 @@ export default function DonePage() {
                 style={{
                   background: '#EEF5F1',
                   border: '1px solid #C8DED3',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '22px 24px',
                   display: 'flex',
                   gap: '18px',
@@ -584,7 +584,7 @@ export default function DonePage() {
                 <div
                   style={{
                     background: '#EEF5F1',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     padding: '12px 16px',
                     display: 'flex',
                     flexDirection: 'column',

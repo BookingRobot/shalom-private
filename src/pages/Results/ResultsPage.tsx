@@ -1590,7 +1590,7 @@ export default function ResultsPage() {
                   gap: '12px',
                   flexWrap: 'wrap',
                   background: '#EEF5F1',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '12px 18px',
                 }}
               >
@@ -1612,7 +1612,7 @@ export default function ResultsPage() {
                         fontWeight: '600',
                         fontSize: '16px',
                         cursor: 'pointer',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                       }}
                     >
                       {a.t}
@@ -1721,7 +1721,7 @@ export default function ResultsPage() {
                         display: 'block',
                         margin: '14px 0 14px 14px',
                         background: '#2B3A33',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         overflow: 'hidden',
                       }}
                     >
@@ -1758,7 +1758,7 @@ export default function ResultsPage() {
                       <div
                         style={{
                           background: '#EEF5F1',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '10px 16px',
                           display: 'flex',
                           alignItems: 'center',
@@ -2043,7 +2043,7 @@ export default function ResultsPage() {
                     flexWrap: 'wrap',
                     background: '#F7F5F0',
                     border: '1px solid #E3DED2',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     overflow: 'hidden',
                   }}
                 >
@@ -2055,7 +2055,7 @@ export default function ResultsPage() {
                       position: 'relative',
                       display: 'block',
                       margin: '12px 0 12px 12px',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       overflow: 'hidden',
                       background: '#C9C4BA',
                     }}
@@ -2084,7 +2084,7 @@ export default function ResultsPage() {
                         fontSize: '14px',
                         fontWeight: '800',
                         padding: '5px 10px',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                       }}
                     >
                       Нет мест
@@ -2178,7 +2178,7 @@ export default function ResultsPage() {
             style={{
               background: '#EEF5F1',
               border: '1px solid #C8DED3',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
               padding: '18px 24px',
               display: 'flex',
               alignItems: 'center',
@@ -2273,7 +2273,7 @@ export default function ResultsPage() {
               aria-labelledby="calTitle"
               style={{
                 background: '#fff',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 maxWidth: '1040px',
                 width: '100%',
                 padding: '18px 24px 16px',
@@ -2315,7 +2315,7 @@ export default function ResultsPage() {
                   gap: '12px',
                   flexWrap: 'wrap',
                   background: '#EEF5F1',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '8px 14px',
                   fontSize: '16px',
                   color: '#1F5F4A',
@@ -2352,7 +2352,7 @@ export default function ResultsPage() {
                   <div
                     style={{
                       border: '1px solid #E3DED2',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -2372,7 +2372,7 @@ export default function ResultsPage() {
                           border: '2px solid #CFC9BB',
                           background: '#fff',
                           cursor: 'pointer',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           fontSize: '20px',
                         }}
                       >
@@ -2389,7 +2389,7 @@ export default function ResultsPage() {
                           border: '2px solid #CFC9BB',
                           background: '#fff',
                           cursor: 'pointer',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           fontSize: '20px',
                         }}
                       >
@@ -2432,7 +2432,7 @@ export default function ResultsPage() {
                               padding: '3px 6px',
                               border: `2px solid ${c.border ?? ''}`,
                               background: c.bg,
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               cursor: c.cursor,
                               display: 'flex',
                               flexDirection: 'column',
@@ -2481,7 +2481,7 @@ export default function ResultsPage() {
                     maxWidth: '320px',
                     background: '#EEF5F1',
                     border: '1px solid #C8DED3',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2496,7 +2496,7 @@ export default function ResultsPage() {
                   <div
                     style={{
                       background: '#fff',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       padding: '12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -2531,13 +2531,15 @@ export default function ResultsPage() {
                       <span style={{ fontSize: '16px' }}>За весь отдых</span>
                       <strong style={{ fontSize: '26px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
                     </div>
-                    <div style={{ background: '#F4F1EA', borderRadius: '2px', padding: '6px 10px', fontSize: '15px' }}>
+                    <div
+                      style={{ background: '#F4F1EA', borderRadius: 'var(--r)', padding: '6px 10px', fontSize: '15px' }}
+                    >
                       На ваши даты — <strong>{v.cal?.curTotal}&nbsp;€</strong>
                     </div>
                     <div
                       style={{
                         background: v.cal?.diffBg,
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         padding: '6px 10px',
                         fontSize: '15px',
                         fontWeight: '800',
@@ -2624,7 +2626,7 @@ export default function ResultsPage() {
                           marginTop: '8px',
                           maxWidth: '420px',
                           background: '#F4F1EA',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '10px 12px',
                           fontSize: '14px',
                           lineHeight: '1.45',
@@ -2699,7 +2701,7 @@ export default function ResultsPage() {
               aria-labelledby="sCalTitle"
               style={{
                 background: '#fff',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 width: 'min(1000px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -2839,7 +2841,7 @@ export default function ResultsPage() {
                               marginTop: '8px',
 
                               background: '#F4F1EA',
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               padding: '10px 12px',
                               fontSize: '14px',
                               lineHeight: '1.45',

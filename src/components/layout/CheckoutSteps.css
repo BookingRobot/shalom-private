@@ -9,7 +9,7 @@
 .checkout-steps .step .num {
   width: 30px;
   height: 30px;
-  border-radius: 2px;
+  border-radius: var(--r);
   border: 2px solid #cfc9bb;
   display: flex;
   align-items: center;

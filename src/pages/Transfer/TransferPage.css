@@ -20,7 +20,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
@@ -48,7 +48,7 @@
 .pg-transfer .input {
   min-height: 50px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 0 16px;
   background: #fff;
   font-size: 18px;
@@ -68,7 +68,7 @@
 .pg-transfer .card {
   background: #fff;
   border: 1px solid #e3ded2;
-  border-radius: 3px;
+  border-radius: var(--r);
 }
 .pg-transfer .choice {
   display: flex;
@@ -76,7 +76,7 @@
   gap: 16px;
   padding: 18px 20px;
   border: 2px solid #cfc9bb;
-  border-radius: 3px;
+  border-radius: var(--r);
   background: #fff;
   cursor: pointer;
   text-align: left;
@@ -134,7 +134,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #e3ded2;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
 }
 .pg-transfer .rowpick {
@@ -231,7 +231,7 @@
   color: #fff;
   font-weight: 800;
   font-size: 18px;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-transfer .fly-days {
   display: flex;
@@ -246,7 +246,7 @@
   padding: 10px 14px;
   border: 1px solid #c8ded3;
   background: #eef5f1;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-transfer .fly-day.no {
   border-color: #f0ddb8;
@@ -280,7 +280,7 @@
   padding: 12px 14px;
   background: #fff6e3;
   border: 1px solid #f0ddb8;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-size: 16px;
   line-height: 1.45;
 }
@@ -306,7 +306,7 @@
   font: inherit;
   font-size: 15px;
   font-weight: 700;
-  border-radius: 2px;
+  border-radius: var(--r);
   cursor: pointer;
 }
 .pg-transfer .fly-alt-btn:hover {
@@ -348,7 +348,7 @@
   font-size: 14px;
   font-weight: 800;
   padding: 2px 8px;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-transfer .fly-legs {
   display: grid;
@@ -356,7 +356,7 @@
   gap: 8px 12px;
   padding: 12px 14px;
   background: #eef5f1;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-transfer .fly-leg {
   display: flex;

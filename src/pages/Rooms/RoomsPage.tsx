@@ -155,7 +155,7 @@ export default function RoomsPage() {
                 objectFit: 'cover',
                 display: 'block',
                 margin: '12px 0 12px 12px',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 flex: 'none',
               }}
             />
@@ -345,7 +345,7 @@ export default function RoomsPage() {
                           flexDirection: 'column',
                           gap: '3px',
                           background: '#FAF8F3',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '12px 16px',
                         }}
                       >
