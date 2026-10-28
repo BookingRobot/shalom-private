@@ -499,3 +499,63 @@ body .page .wz-head .wz-close:hover {
     flex-wrap: wrap;
   }
 }
+
+/* hotel page "Ваши даты" bar: nights, then a tappable guests chip */
+body .page .hb-nights {
+  font-size: 17px;
+  color: #1c2620;
+  padding-left: 14px;
+  border-left: 1px solid #c8ded3;
+}
+body .page .hb-guests {
+  padding-left: 6px;
+  border-left: 1px solid #c8ded3;
+}
+body .page .gp-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 4px 12px 4px 10px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-md);
+  background: transparent;
+  font: inherit;
+  color: #1c2620;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+body .page .gp-inline:hover,
+body .page .gp-inline[aria-expanded='true'] {
+  background: #fff;
+  border-color: var(--sel-bd);
+  box-shadow: var(--sh-xs);
+}
+body .page .gp-inline-t {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+body .page .gp-inline-l {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3e4b44;
+}
+body .page .gp-inline-t strong {
+  font-size: 18px;
+  white-space: nowrap;
+}
+body .page .hb-guests .gp-pop {
+  animation: iosIn 0.2s ease-out;
+}
+@media (max-width: 600px) {
+  body .page .hb-nights {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
