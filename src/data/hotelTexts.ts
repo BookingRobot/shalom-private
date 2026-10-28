@@ -1,3 +1,4 @@
+import { HOTEL_TEXTS_DATA } from './hotelTexts.data';
 /** Texts of the sanatorium tabs. Filled from the sanatoriums' sites; see `sources`. */
 export interface HotelText {
   id: string;
@@ -83,4 +84,4 @@ const EGLE_FALLBACK: HotelText = {
   },
 };
 
-export const HOTEL_TEXTS: Record<string, HotelText> = { 'egle-comfort': EGLE_FALLBACK };
+export const HOTEL_TEXTS: Record<string, HotelText> = { 'egle-comfort': EGLE_FALLBACK, ...HOTEL_TEXTS_DATA };

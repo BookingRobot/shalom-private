@@ -27,6 +27,13 @@ function ToRooms({ onRooms }: { onRooms: () => void }) {
   );
 }
 
+/** Portrait illustration: long hair for women's names (Russian first names ending in -а/-я). */
+const avatarVariant = (name: string, i: number) => {
+  const first = name.split(/\s+/)[0] || '';
+  const female = name ? /[ая]$/i.test(first) : i % 2 === 1;
+  return (female ? 1 : 0) + (i % 2) * 2;
+};
+
 function Treat({ info, onRooms }: { info: HotelInfo; onRooms: () => void }) {
   const t = info.text.treatment;
   const doctors = t.doctors.length
@@ -91,19 +98,21 @@ function Treat({ info, onRooms }: { info: HotelInfo; onRooms: () => void }) {
         </section>
       ) : null}
       <section className="ht-sec">
-        <h3>Врачи</h3>
+        <h3>{t.doctors.length ? 'Врачи и специалисты' : 'Врачи'}</h3>
         <div className="ht-docs">
           {doctors.map((d, i) => (
             <div className="ht-doc" key={d.name + d.specialty}>
-              <DoctorAvatar variant={i} />
+              <DoctorAvatar variant={avatarVariant(d.name, i)} />
               <strong>{d.name || d.specialty}</strong>
               <span>{d.name ? d.specialty : 'консультация при заезде'}</span>
             </div>
           ))}
         </div>
         <span className="ht-foot">
-          Портреты — иллюстрации; фото врачей добавим, когда санаторий их пришлёт. Процедуры назначает врач после
-          консультации.
+          {t.doctors.length
+            ? 'Специалисты — по данным сайта санатория; портреты — иллюстрации. '
+            : 'Портреты — иллюстрации; имена врачей добавим, когда санаторий их пришлёт. '}
+          Процедуры назначает врач после консультации.
         </span>
       </section>
       <ToRooms onRooms={onRooms} />
