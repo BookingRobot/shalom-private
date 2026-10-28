@@ -509,6 +509,12 @@ export default function HotelPage() {
   usePageTitle(v.info.name);
   // opening a sanatorium makes it the sanatorium of the order
   const { booking, update } = logic.props.booking;
+  // the chosen tab stays visible in the tab bar on a phone
+  useEffect(() => {
+    const nav = document.querySelector<HTMLElement>('.ht-tabs');
+    const btn = nav?.querySelector<HTMLElement>('button.on');
+    if (nav && btn) nav.scrollLeft = btn.offsetLeft - nav.offsetLeft - (nav.clientWidth - btn.offsetWidth) / 2;
+  }, [v.tab]);
   // a photo opened from the "О санатории" tab: the gallery starts at that photo
   useEffect(() => {
     if (v.lightbox && logic.state.i) document.getElementById('lbp-' + logic.state.i)?.scrollIntoView();

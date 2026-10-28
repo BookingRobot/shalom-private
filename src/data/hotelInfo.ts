@@ -165,10 +165,11 @@ export const HOTEL_IDS = BASE.map((b) => b.id);
 /** Sanatorium by id; unknown ids show Eglė Comfort (the prototype's example order). */
 export function hotelInfo(id?: string | null): HotelInfo {
   const b = BASE.find((x) => x.id === id) || BASE[0];
-  const text = HOTEL_TEXTS[b.id] || HOTEL_TEXTS['egle-comfort'];
+  const own = HOTEL_TEXTS[b.id];
+  const text = own || HOTEL_TEXTS['egle-comfort'];
   return {
     ...b,
-    address: text.address || b.address,
+    address: (own && own.address) || b.address,
     text,
     reviews: REVIEWS[b.id] || [],
     rating: RATINGS[b.id] || { avg: 9, cats: [] },

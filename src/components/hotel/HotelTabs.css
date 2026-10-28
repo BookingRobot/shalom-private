@@ -460,3 +460,30 @@
   height: 28px;
   display: block;
 }
+@media (max-width: 760px) {
+  .page .ht-stat {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    row-gap: 0;
+    align-items: center;
+    padding: 12px 14px;
+  }
+  .page .ht-stat .ht-ico {
+    grid-row: span 2;
+    margin: 0;
+  }
+  .page .ht-tile {
+    padding: 10px 12px;
+  }
+}
+@media (max-width: 600px) {
+  /* gallery on a phone: only the big photo keeps its caption */
+  .pg-hotel div[style*='nowrap'] > button:nth-child(2) > span,
+  .pg-hotel div[style*='nowrap'] > button:nth-child(3) > span {
+    display: none;
+  }
+  .pg-hotel div[style*='nowrap'] > button:nth-child(4) > span {
+    font-size: 13px !important;
+  }
+}
