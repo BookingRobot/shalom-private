@@ -59,6 +59,7 @@ window.__dc = {
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
     const footer = sel[0].closest('div[style*="border-top"]') || dialog;
+    footer.prepend(d.raw('calnote'));
     footer.before(d.raw('foot-start'));
     footer.after(d.raw('foot-end'));
     const fb = footer.querySelectorAll('.btn');
@@ -84,6 +85,7 @@ window.__dc = {
 const PLANE =
   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F5F4A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z"></path></svg>';
 
+const CALNOTE = `<sc-if value="{{calNoteOn}}" hint-placeholder-val="{{false}}"><div class="cal-note" role="alert"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A5A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><span class="cal-note-t">{{calNote}}</span><a class="cal-note-ask" href="Help.dc.html" style="display:inline-flex;align-items:center;text-decoration:none">Отправить запрос</a><button type="button" class="cal-note-x" onClick="{{calNoteClose}}" aria-label="Скрыть сообщение">✕</button></div></sc-if>`;
 const CELLS = `<sc-for list="{{cells}}" as="c" hint-placeholder-count="35"><button type="button" class="cell" onClick="{{c.pick}}" disabled="{{c.off}}" aria-label="{{c.aria}}" style="background:{{c.bg}};border-color:{{c.border}};color:{{c.color}};cursor:{{c.cursor}}"><span>{{c.day}}</span><small style="color:{{c.subColor}}">{{c.sub}}</small><sc-if value="{{c.fly}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:4px;right:5px;line-height:0" title="Рейс из Израиля">${PLANE}</span></sc-if></button></sc-for>`;
 
 const FLEX = (isMain) => `<div class="flex-dates">
@@ -145,11 +147,25 @@ class Component extends DCLogic {
     const m0 = st.m == null ? inD.getUTCMonth() : st.m, y0 = st.y == null ? inD.getUTCFullYear() : st.y;
     const roomBusy = (d) => st.room && iso(d) >= ROOM[0] && iso(d) < ROOM[1];
     const roomOverlap = (a, b) => st.room && a < toD(ROOM[1]) && b > toD(ROOM[0]);
+    // a stay can't cross a "нет мест" night: pop-up instead of selecting (same rule as the site)
+    const blocked = (d) => SOLD.includes(iso(d)) || roomBusy(d);
+    const badNights = (a, b) => { const r = []; for (let d = a; d < b; d = addD(d, 1)) if (blocked(d)) r.push(d); return r; };
+    const daysText = (ds) => {
+      const runs = [];
+      ds.forEach((d) => { const l = runs[runs.length - 1]; if (l && iso(addD(l[1], 1)) === iso(d)) l[1] = d; else runs.push([d, d]); });
+      const one = ([a, b]) => iso(a) === iso(b) ? shortD(a) : a.getUTCMonth() === b.getUTCMonth() ? a.getUTCDate() + '–' + b.getUTCDate() + ' ' + MONTHS[a.getUTCMonth()] : shortD(a) + ' – ' + shortD(b);
+      return runs.slice(0, 2).map(one).join(' и ') + (runs.length > 2 ? ' и другие дни' : '');
+    };
+    const noteFor = (ds, single) => single ? daysText(ds) + ' нет свободных мест — выберите другой день.' : 'В этот период нет мест: ' + daysText(ds) + '. Выберите даты без дней «нет мест» — или отправьте запрос, поищем вручную.';
     const pick = (date) => () => {
       const k = iso(date);
-      if (!sel.in || (sel.in && sel.out)) this.setState({ sel: { in: k, out: null } });
-      else if (date > toD(sel.in) && !roomOverlap(toD(sel.in), date)) this.setState({ sel: { in: sel.in, out: k } });
-      else this.setState({ sel: { in: k, out: null } });
+      if (sel.in && !sel.out && date > toD(sel.in)) {
+        const bad = badNights(toD(sel.in), date);
+        if (bad.length) return this.setState({ note: noteFor(bad) });
+        return this.setState({ sel: { in: sel.in, out: k }, note: '' });
+      }
+      if (blocked(date)) return this.setState({ note: noteFor([date], true) });
+      this.setState({ sel: { in: k, out: null }, note: '' });
     };
     const first = new Date(Date.UTC(y0, m0, 1)), lead = (first.getUTCDay() + 6) % 7;
     const days = new Date(Date.UTC(y0, m0 + 1, 0)).getUTCDate();
@@ -164,12 +180,17 @@ class Component extends DCLogic {
       if (full || busy) { bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)'; color = '#8A968F'; subColor = '#8A5A00'; }
       if (between) border = '#1F5F4A';
       if (isIn || isOut) { bg = '#1F5F4A'; color = '#fff'; subColor = '#D9E2DC'; border = '#1F5F4A'; }
+      const canOut = (full || busy) && sIn && !sOut && date > sIn && !badNights(sIn, date).length;
       cells.push({ day: d, fly: isFly(date) && !past, sub: past ? '' : full ? 'нет мест' : busy ? 'занят' : isIn ? 'заезд' : isOut ? 'выезд' : p + ' €',
-        bg, border, color, subColor, off: past || full || busy, cursor: past || full || busy ? 'not-allowed' : 'pointer',
+        bg, border, color, subColor, off: past, cursor: past || ((full || busy) && !canOut) ? 'not-allowed' : 'pointer',
         aria: d + ' ' + MONTHS[m0], pick: pick(date) });
     }
     const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
-    const preset = (n) => () => { const a = sIn || inD; this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) } }); };
+    const preset = (n) => () => {
+      const a = sIn || inD, bad = badNights(a, addD(a, n));
+      if (bad.length) return this.setState({ note: noteFor(bad) });
+      this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) }, note: '' });
+    };
     // flexible dates: 24-month carousel, 6 tiles visible
     const months24 = Array.from({ length: 24 }, (_, i) => new Date(Date.UTC(2026, 9 + i, 1)));
     const optsFor = (md) => {
@@ -209,8 +230,9 @@ class Component extends DCLogic {
       cityLabel: st.city || 'Друскининкай',
       // page fields
       inLabel: longD(inD), outLabel: longD(outD),
-      openCal: () => this.setState({ cal: 'exact', room: false, sel: { in: st.inD, out: st.outD }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
-      openRoomCal: () => this.setState({ cal: 'exact', room: true, sel: { in: null, out: null }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
+      openCal: () => this.setState({ cal: 'exact', room: false, note: '', sel: { in: st.inD, out: st.outD }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
+      openRoomCal: () => this.setState({ cal: 'exact', room: true, note: '', sel: { in: null, out: null }, m: inD.getUTCMonth(), y: inD.getUTCFullYear() }),
+      calNoteOn: !!st.note, calNote: st.note || '', calNoteClose: () => this.setState({ note: '' }),
       // calendar
       calOpen: !!st.cal, calExact: st.cal !== 'flex', calFlex: st.cal === 'flex', tabsOn: !st.room,
       calTitleText: st.room ? 'Свободные даты номера' : 'Выберите даты поездки',
@@ -218,7 +240,7 @@ class Component extends DCLogic {
       calHint: st.cal === 'flex' ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами' : !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
       tabExactCls: st.cal !== 'flex' ? 'on' : '', tabFlexCls: st.cal === 'flex' ? 'on' : '',
       calToExact: () => this.setState({ cal: 'exact' }), calToFlex: () => this.setState({ cal: 'flex' }),
-      closeCal: () => this.setState({ cal: '', room: false }),
+      closeCal: () => this.setState({ cal: '', room: false, note: '' }),
       calPrev: () => { const m = m0 - 1; this.setState({ m: (m + 12) % 12, y: m < 0 ? y0 - 1 : y0 }); },
       calNext: () => { const m = m0 + 1; this.setState({ m: m % 12, y: m > 11 ? y0 + 1 : y0 }); },
       calMonth: MONTHS_N[m0] + ' ' + y0, cells,
@@ -355,4 +377,4 @@ function filtersLogic(cfg) {
   );
 }
 
-module.exports = { HELPERS, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };
+module.exports = { HELPERS, CALNOTE, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };

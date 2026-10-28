@@ -11,6 +11,8 @@ import { MonthsCalendar, type CalendarCell } from '../../components/calendar/Mon
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
+import { blockedNights, blockedNote } from '../../lib/stayCheck';
+import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { api } from '../../api';
 import { RESORTS } from '../../data/search';
@@ -62,11 +64,17 @@ class MainLogic extends PageLogic {
     };
     const m0 = st.month ?? inD.getUTCMonth(),
       y0 = st.year ?? inD.getUTCFullYear();
+    // a stay can't cross a "нет мест" night: say so in a pop-up instead of selecting
+    const blocked = (d: Date) => isSoldOutEverywhere(iso(d));
     const pickDay = (date) => () => {
       const k = iso(date);
-      if (!sel.in || (sel.in && sel.out)) this.setState({ sel: { in: k, out: null } });
-      else if (date > toD(sel.in)) this.setState({ sel: { in: sel.in, out: k } });
-      else this.setState({ sel: { in: k, out: null } });
+      if (sel.in && !sel.out && date > toD(sel.in)) {
+        const bad = blockedNights(toD(sel.in), date, blocked);
+        if (bad.length) return this.setState({ note: blockedNote(bad) });
+        return this.setState({ sel: { in: sel.in, out: k }, note: null });
+      }
+      if (blocked(date)) return this.setState({ note: blockedNote([date], true) });
+      this.setState({ sel: { in: k, out: null }, note: null });
     };
     const monthCells = (y, m) => {
       const first = new Date(Date.UTC(y, m, 1));
@@ -100,6 +108,8 @@ class MainLogic extends PageLogic {
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut);
         const between = sIn && sOut && date > sIn && date < sOut;
+        // the first "нет мест" day after check-in still works as the check-out day
+        const canOut = full && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, blocked).length;
         if (past) {
           bg = '#E8E6E1';
           color = '#9AA39E';
@@ -125,9 +135,13 @@ class MainLogic extends PageLogic {
           border,
           color,
           subColor,
-          off: past || full,
-          cursor: past || full ? 'not-allowed' : 'pointer',
-          aria: d + ' ' + MONTHS[m] + (past ? ', недоступно' : ', около ' + p + '\u00a0€ за человека в сутки'),
+          off: past,
+          cursor: past || (full && !canOut) ? 'not-allowed' : 'pointer',
+          aria:
+            d +
+            ' ' +
+            MONTHS[m] +
+            (past ? ', недоступно' : full ? ', нет мест' : ', около ' + p + '\u00a0€ за человека в сутки'),
           pick: pickDay(date),
         });
       }
@@ -137,7 +151,9 @@ class MainLogic extends PageLogic {
     const nights = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const preset = (n) => () => {
       const i = sIn || inD;
-      this.setState({ sel: { in: iso(i), out: iso(addD(i, n)) } });
+      const bad = blockedNights(i, addD(i, n), blocked);
+      if (bad.length) return this.setState({ note: blockedNote(bad) });
+      this.setState({ sel: { in: iso(i), out: iso(addD(i, n)) }, note: null });
     };
     const curNights = daysBetween(inD, outD);
     const { booking, update } = this.props.booking;
@@ -158,14 +174,18 @@ class MainLogic extends PageLogic {
       outLabel: longDate(outD),
       nightsLabel: curNights + ' ' + nightsWord(curNights),
       calOpen: !!st.calOpen,
+      calNote: st.note || '',
+      calNoteClose: () => this.setState({ note: null }),
+      calNoteAsk: () => this.props.help.open(),
       openCal: () =>
         this.setState({
+          note: null,
           calOpen: true,
           sel: { in: iso(inD), out: iso(outD) },
           month: inD.getUTCMonth(),
           year: inD.getUTCFullYear(),
         }),
-      closeCal: () => this.setState({ calOpen: false }),
+      closeCal: () => this.setState({ calOpen: false, note: null }),
       calPrev: () => {
         const m = m0 - 1;
         this.setState({ month: (m + 12) % 12, year: m < 0 ? y0 - 1 : y0 });
@@ -1027,6 +1047,7 @@ export default function MainPage() {
                   paddingTop: '12px',
                 }}
               >
+                {v.calNote ? <CalNotice text={v.calNote} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Заезд</span>

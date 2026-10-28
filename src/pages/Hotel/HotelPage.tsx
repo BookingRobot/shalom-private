@@ -7,6 +7,8 @@ import { MONTHS, MONTHS_N, WEEKDAYS_FULL, addD, daysBetween, iso, nightsWord, sh
 import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
+import { blockedNights, blockedNote } from '../../lib/stayCheck';
+import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS, amenity } from '../../data/iconPaths';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
@@ -207,7 +209,8 @@ class HotelLogic extends PageLogic {
             cal: true,
             calRoom: rkey,
             calRoomName: r.name,
-            sel: { in: iso(checkin), out: iso(checkout) },
+            note: null,
+            sel: { in: null, out: null },
             month: checkin.getUTCMonth(),
             year: checkin.getUTCFullYear(),
           }),
@@ -267,11 +270,17 @@ class HotelLogic extends PageLogic {
     const m0 = st.month ?? checkin.getUTCMonth(),
       y0 = st.year ?? checkin.getUTCFullYear();
     const curPpn = Math.round(totalFor(checkin, nights, 2138) / nights / 2);
+    // a stay can't cross a "нет мест" night (resort-wide or this room): pop-up instead of selecting
+    const blocked = (d: Date) => isSoldOutEverywhere(iso(d)) || (st.calRoom ? roomDayBusy(st.calRoom, d) : false);
     const pickDay = (date) => () => {
       const k = iso(date);
-      if (!sel.in || (sel.in && sel.out)) this.setState({ sel: { in: k, out: null } });
-      else if (date > toD(sel.in)) this.setState({ sel: { in: sel.in, out: k } });
-      else this.setState({ sel: { in: k, out: null } });
+      if (sel.in && !sel.out && date > toD(sel.in)) {
+        const bad = blockedNights(toD(sel.in), date, blocked);
+        if (bad.length) return this.setState({ note: blockedNote(bad) });
+        return this.setState({ sel: { in: sel.in, out: k }, note: null });
+      }
+      if (blocked(date)) return this.setState({ note: blockedNote([date], true) });
+      this.setState({ sel: { in: k, out: null }, note: null });
     };
     const monthCells = (y, m) => {
       const first = new Date(Date.UTC(y, m, 1));
@@ -305,6 +314,8 @@ class HotelLogic extends PageLogic {
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut),
           between = sIn && sOut && date > sIn && date < sOut;
+        // the first "нет мест" day after check-in still works as the check-out day
+        const canOut = full && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, blocked).length;
         if (past) {
           bg = '#E8E6E1';
           color = '#9AA39E';
@@ -330,9 +341,13 @@ class HotelLogic extends PageLogic {
           border,
           color,
           subColor,
-          off: past || full,
-          cursor: past || full ? 'not-allowed' : 'pointer',
-          aria: d + ' ' + MONTHS[m] + (past ? ', недоступно' : ', ' + p + '\u00a0€ за человека в сутки'),
+          off: past,
+          cursor: past || (full && !canOut) ? 'not-allowed' : 'pointer',
+          aria:
+            d +
+            ' ' +
+            MONTHS[m] +
+            (past ? ', недоступно' : full ? ', нет мест' : ', ' + p + '\u00a0€ за человека в сутки'),
           pick: pickDay(date),
         });
       }
@@ -345,12 +360,19 @@ class HotelLogic extends PageLogic {
       diff = curTotal - newTotal;
     const preset = (n) => () => {
       const a = sIn || checkin;
-      this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) } });
+      const bad = blockedNights(a, addD(a, n), blocked);
+      if (bad.length) return this.setState({ note: blockedNote(bad) });
+      this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) }, note: null });
     };
+    const selBlocked = !!(sIn && sOut && blockedNights(sIn, sOut, blocked).length);
     const calVals = {
       calOpen: !!st.cal,
+      calNote: st.note || '',
+      calNoteClose: () => this.setState({ note: null }),
+      calNoteAsk: () => this.props.help.open(),
       openCal: () =>
         this.setState({
+          note: null,
           cal: true,
           calRoom: null,
           calRoomName: null,
@@ -358,7 +380,7 @@ class HotelLogic extends PageLogic {
           month: checkin.getUTCMonth(),
           year: checkin.getUTCFullYear(),
         }),
-      closeCal: () => this.setState({ cal: false }),
+      closeCal: () => this.setState({ cal: false, note: null }),
       calPrev: () => {
         const m = m0 - 1;
         this.setState({ month: (m + 12) % 12, year: m < 0 ? y0 - 1 : y0 });
@@ -392,9 +414,9 @@ class HotelLogic extends PageLogic {
               : 'та же цена',
       diffBg: !selN || selN !== nights ? '#EEF5F1' : diff > 0 ? '#DFF0E4' : diff < 0 ? '#FBE3DE' : '#F4F1EA',
       diffColor: diff > 0 ? '#1F5F4A' : diff < 0 ? '#B3261E' : '#3E4B44',
-      applyOff: !(sIn && sOut),
+      applyOff: !(sIn && sOut) || selBlocked,
       applyCal: () => {
-        if (sIn && sOut) this.setState({ in: iso(sIn), out: iso(sOut), cal: false });
+        if (sIn && sOut && !selBlocked) this.setState({ in: iso(sIn), out: iso(sOut), cal: false, note: null });
       },
       p7: preset(7),
       p10: preset(10),
@@ -1989,6 +2011,7 @@ export default function HotelPage() {
                   paddingTop: '12px',
                 }}
               >
+                {v.calNote ? <CalNotice text={v.calNote} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
                 <div className="cal-cmp">
                   <div
                     style={{
