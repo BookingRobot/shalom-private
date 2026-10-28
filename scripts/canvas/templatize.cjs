@@ -70,11 +70,25 @@ async function searchBand(p, { city }) {
       parent.insertBefore(loop, first);
       loop.appendChild(first);
     };
+    // month carousel: 6 tiles of 24 months, ‹ › move the window
+    const car = fx.querySelector('.fd-car');
+    const nav = car.querySelectorAll(':scope > .navbtn');
+    nav[0].setAttribute('data-dc-on', 'click:fdPrev');
+    nav[0].removeAttribute('disabled');
+    nav[0].setAttribute('data-dc-disabled', 'fdPrevOff');
+    nav[1].setAttribute('data-dc-on', 'click:fdNext');
+    nav[1].removeAttribute('disabled');
+    nav[1].setAttribute('data-dc-disabled', 'fdNextOff');
+    const tile = car.querySelector('.fd-tile');
+    tile.setAttribute('class', 'fd-tile ⟦m.cls⟧');
+    tile.removeAttribute('aria-pressed');
+    tile.querySelector('strong').textContent = '⟦m.label⟧';
+    tile.querySelector('span').textContent = '⟦m.year⟧';
+    tile.querySelector('small').textContent = '⟦m.from⟧';
+    tile.setAttribute('data-dc-on', 'click:m.pick');
+    loopOf(tile, '⟦fdMonths⟧', 'm');
     const opts = fx.querySelectorAll('.fd-opts');
-    [
-      [opts[0], '⟦fdMonths⟧', 'm'],
-      [opts[1], '⟦fdNights⟧', 'n'],
-    ].forEach(([box, list, as]) => {
+    [[opts[0], '⟦fdNights⟧', 'n']].forEach(([box, list, as]) => {
       const chip = box.querySelector('.qf-chip');
       chip.setAttribute('class', 'qf-chip ⟦' + as + '.cls⟧');
       chip.removeAttribute('aria-pressed');

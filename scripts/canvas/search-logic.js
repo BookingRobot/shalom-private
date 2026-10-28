@@ -115,23 +115,29 @@ class Component extends DCLogic {
     const fm = st.fm != null ? st.fm : 1,
       fn = st.fn || 14;
     const start = new Date(Date.UTC(TODAY.getUTCFullYear(), TODAY.getUTCMonth(), 1));
+    // 24 months ahead, 6 tiles visible; each tile shows the cheapest "от X €" for the chosen nights
     const months = [];
-    for (let i = 0; i < 9; i++) months.push(new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1)));
-    const fmD = months[fm];
-    const fdim = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth() + 1, 0)).getUTCDate();
-    let opts = [];
-    for (let i = 1; i <= fdim; i++) {
-      const d = new Date(Date.UTC(fmD.getUTCFullYear(), fmD.getUTCMonth(), i));
-      if (d <= TODAY) continue;
-      let sum = 0,
-        ok = true;
-      for (let k = 0; k < fn; k++) {
-        const x = addD(d, k);
-        if (SOLD.indexOf(iso(x)) >= 0) ok = false;
-        sum += priceOf(x);
+    for (let i = 0; i < 24; i++) months.push(new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1)));
+    const fo = Math.min(st.fo || 0, 18);
+    const optsFor = (md) => {
+      const res = [];
+      const dim = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth() + 1, 0)).getUTCDate();
+      for (let i = 1; i <= dim; i++) {
+        const d = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth(), i));
+        if (d <= TODAY) continue;
+        let sum = 0,
+          ok = true;
+        for (let k = 0; k < fn; k++) {
+          const x = addD(d, k);
+          if (SOLD.indexOf(iso(x)) >= 0) ok = false;
+          sum += priceOf(x);
+        }
+        if (ok) res.push({ d, sum: Math.round(sum / 10) * 10 });
       }
-      if (ok) opts.push({ d, sum: Math.round(sum / 10) * 10 });
-    }
+      return res;
+    };
+    const fmD = months[fm];
+    let opts = optsFor(fmD);
     opts = opts.sort((a, b) => a.sum - b.sum).slice(0, 5).sort((a, b) => a.d - b.d);
     const minSum = opts.length ? Math.min.apply(null, opts.map((o) => o.sum)) : 0;
     const NL = { 7: '7 ночей · неделя', 10: '10 ночей', 14: '14 ночей · 2 недели', 21: '21 ночь · 3 недели' };
@@ -209,11 +215,22 @@ class Component extends DCLogic {
       tabFlex: st.flex ? 'on' : '',
       tabExactFn: () => this.setState({ flex: false }),
       tabFlexFn: () => this.setState({ flex: true }),
-      fdMonths: months.map((m, i) => ({
-        label: MONTHS_N[m.getUTCMonth()] + (m.getUTCFullYear() !== TODAY.getUTCFullYear() ? ' ' + m.getUTCFullYear() : ''),
-        cls: i === fm ? 'on' : '',
-        pick: () => this.setState({ fm: i }),
-      })),
+      fdMonths: months.slice(fo, fo + 6).map((m, j) => {
+        const i = fo + j,
+          o = optsFor(m),
+          from = o.length ? Math.min.apply(null, o.map((x) => x.sum)) : 0;
+        return {
+          label: MONTHS_N[m.getUTCMonth()],
+          year: String(m.getUTCFullYear()),
+          from: from ? 'от ' + fmt(from) + ' €' : 'нет мест',
+          cls: i === fm ? 'on' : '',
+          pick: () => this.setState({ fm: i }),
+        };
+      }),
+      fdPrevOff: fo === 0,
+      fdNextOff: fo >= 18,
+      fdPrev: () => this.setState({ fo: Math.max(0, fo - 6) }),
+      fdNext: () => this.setState({ fo: Math.min(18, fo + 6) }),
       fdNights: [7, 10, 14, 21].map((n) => ({ label: NL[n], cls: n === fn ? 'on' : '', pick: () => this.setState({ fn: n }) })),
       fdTitle: 'Самые выгодные даты заезда в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е'),
       fdList: opts.map((o) => {

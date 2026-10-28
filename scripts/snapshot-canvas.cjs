@@ -429,6 +429,17 @@ async function buildInteractive(b, sizes) {
         btns.filter((x) => /Помогите выбрать санаторий/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'wzOpen'));
         btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
         btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
+        // "Раскрыть фильтры" → the board with the filter panel open
+        btns
+          .filter((x) => /Раскрыть фильтры/.test(x.textContent))
+          .forEach((x) => {
+            const a = document.createElement('a');
+            a.setAttribute('href', 'Results-filters.dc.html');
+            a.className = x.className;
+            a.setAttribute('style', (x.getAttribute('style') || '') + ';text-decoration:none');
+            a.innerHTML = x.innerHTML;
+            x.replaceWith(a);
+          });
         document.querySelectorAll('.cmp-check input').forEach((x, i) => {
           d.on(x, 'change', 'cmpT' + i);
           d.attr(x, 'checked', 'cmpOn' + i);
