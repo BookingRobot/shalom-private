@@ -394,3 +394,108 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
     animation: none;
   }
 }
+
+/* "Помогите выбрать": answers as picture tiles — recognised at a glance, the caption confirms */
+body .page .wz-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+body .page .wz-grid .wz-opt {
+  flex: 0 1 calc((100% - 24px) / 3);
+}
+body .page .wz-grid .wz-opt {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 150px;
+  padding: 18px 14px 16px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.25;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-xs);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+body .page .wz-grid .wz-opt:hover,
+body .page .wz-grid .wz-opt:focus-visible {
+  border-color: var(--sel-bd);
+  background: #fff;
+  box-shadow: var(--sh);
+  transform: translateY(-2px);
+}
+body .page .wz-grid .wz-opt:active {
+  background: var(--sel-bg);
+  transform: none;
+}
+body .page .wz-grid .wz-opt small {
+  font-size: 14px;
+  line-height: 1.35;
+}
+body .page .wz-ico {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--sel-bg);
+  color: var(--green);
+}
+body .page .wz-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+body .page .wz-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+body .page .wz-dots i {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: #dcd7cc;
+}
+body .page .wz-dots i.on {
+  background: var(--green);
+}
+body .page .wz {
+  width: min(760px, 100%);
+}
+@media (max-width: 520px) {
+  body .page .wz-grid {
+    gap: 10px;
+  }
+  body .page .wz-grid .wz-opt {
+    flex-basis: calc((100% - 10px) / 2);
+  }
+  body .page .wz-grid .wz-opt {
+    min-height: 132px;
+    font-size: 16px;
+  }
+}
+body .page .wz-head .wz-close {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  white-space: nowrap;
+}
+body .page .wz-head .wz-close:hover {
+  background: var(--sel-bg);
+}
+@media (max-width: 520px) {
+  body .page .wz-head .wz-close {
+    padding: 0 8px;
+  }
+  body .page .wz-step {
+    flex-wrap: wrap;
+  }
+}
