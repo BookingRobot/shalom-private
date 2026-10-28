@@ -77,7 +77,7 @@ class PaymentLogic extends PageLogic {
 }
 
 export default function PaymentPage() {
-  usePageTitle('Шаг 5 из 5 — оплата');
+  usePageTitle('Шаг 4 из 4 — оплата');
   const [v, logic] = usePageLogic(PaymentLogic);
   const order = orderSummary(logic.props.booking.booking);
   return (
@@ -106,7 +106,7 @@ export default function PaymentPage() {
             <PhoneLink />
           </HeaderAside>
         </HeaderBar>
-        <CheckoutSteps current={5} />
+        <CheckoutSteps current={4} />
         <div
           style={{
             maxWidth: '1180px',

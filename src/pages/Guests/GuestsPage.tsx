@@ -165,7 +165,7 @@ class GuestsLogic extends PageLogic {
 }
 
 export default function GuestsPage() {
-  usePageTitle('Шаг 3 из 5 — данные гостей');
+  usePageTitle('Шаг 3 из 4 — данные гостей');
   const [v, logic] = usePageLogic(GuestsLogic);
   const order = orderSummary(logic.props.booking.booking);
   return (
@@ -194,7 +194,7 @@ export default function GuestsPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              logic.props.navigate('/flights');
+              logic.props.navigate('/payment');
             }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
@@ -479,11 +479,11 @@ export default function GuestsPage() {
               }}
             >
               <Link className="btn btn-secondary" to="/transfer">
-                ← Назад к трансферу
+                ← Назад: дорога
               </Link>
               <Link
                 className="btn btn-primary"
-                to="/flights"
+                to="/payment"
                 style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
               >
                 Далее: оплата →

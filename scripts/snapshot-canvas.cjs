@@ -44,7 +44,7 @@ const ROUTE_FILE = {
   '/rooms': 'Rooms.dc.html',
   '/transfer': 'Transfer.dc.html',
   '/guests': 'Guests.dc.html',
-  '/flights': 'Flights.dc.html',
+  '/flights': 'Transfer.dc.html',
   '/payment': 'Payment.dc.html',
   '/done': 'Done.dc.html',
   '/rules': 'Rules.dc.html',
@@ -90,10 +90,17 @@ const BOARDS = [
     route: '/rooms',
     setup: async (p) => p.click('text=Отправить предложение семье'),
   },
-  { file: 'Transfer.dc.html', title: 'Шаг 2 · Трансфер', route: '/transfer' },
+  {
+    file: 'Transfer.dc.html',
+    title: 'Шаг 2 · Дорога: перелёт и трансфер',
+    route: '/transfer',
+    links: [
+      ['.fly-alt-btn', '', 'Transfer-package.dc.html'],
+      ['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+    ],
+  },
   { file: 'Guests.dc.html', title: 'Шаг 3 · Данные гостей', route: '/guests' },
-  { file: 'Flights.dc.html', title: 'Шаг 4 · Рейсы из Израиля', route: '/flights' },
-  { file: 'Payment.dc.html', title: 'Шаг 5 · Оплата', route: '/payment' },
+  { file: 'Payment.dc.html', title: 'Шаг 4 · Оплата', route: '/payment' },
   { file: 'Done.dc.html', title: '🏁 Финиш · Заказ принят', route: '/done' },
   { file: 'Rules.dc.html', title: 'Справка · Условия и отмена', route: '/rules' },
   { file: 'Help.dc.html', title: 'Справка · Форма «Свяжитесь со мной» (на всех страницах)', route: '/?help=1' },
@@ -196,13 +203,14 @@ const BOARDS = [
   },
   {
     file: 'Transfer-package.dc.html',
-    title: 'Шаг 2 · Трансфер в пакете с перелётом',
-    route: '/results',
+    title: 'Шаг 2 · Дорога — перелёт добавлен (даты с рейсом)',
+    route: '/transfer',
     state: true,
-    setup: async (p) => {
-      await p.click('.ftog-box');
-      await p.goto(BASE + '/transfer', { waitUntil: 'networkidle' });
-    },
+    setup: async (p) => p.click('.fly-alt-btn >> nth=0'),
+    links: [
+      ['.fly-opts .choice', 'Билеты у меня уже есть', 'Transfer.dc.html'],
+      ['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+    ],
   },
 ];
 
@@ -222,7 +230,10 @@ const post = (html) =>
     .replace(/(src|href)="\/img\/([0-9a-f]{32})\.[a-z]+"/g, '$1="/_blob/$2"')
     .replace(/url\(&quot;\/img\/([0-9a-f]{32})\.[a-z]+&quot;\)/g, 'url(&quot;/_blob/$1&quot;)')
     .replace(/url\(\/img\/([0-9a-f]{32})\.[a-z]+\)/g, 'url(/_blob/$1)')
-    .replace(/href="([^"]*)"/g, (_, href) => 'href="' + linkFor(href.replace(/&amp;/g, '&')).replace(/&/g, '&amp;') + '"')
+    .replace(
+      /href="([^"]*)"/g,
+      (_, href) => 'href="' + linkFor(href.replace(/&amp;/g, '&')).replace(/&/g, '&amp;') + '"',
+    )
     .replace(/\{\{/g, '{&#123;');
 
 /** full .dc.html document */
@@ -274,9 +285,13 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
         } else if (i.value) i.setAttribute('value', i.value);
       });
       document.querySelectorAll('textarea').forEach((t) => (t.textContent = t.value));
-      document.querySelectorAll('select').forEach((s) =>
-        Array.from(s.options).forEach((o) => (o.selected ? o.setAttribute('selected', '') : o.removeAttribute('selected'))),
-      );
+      document
+        .querySelectorAll('select')
+        .forEach((s) =>
+          Array.from(s.options).forEach((o) =>
+            o.selected ? o.setAttribute('selected', '') : o.removeAttribute('selected'),
+          ),
+        );
       const dialog = document.querySelector('[role="dialog"]');
       const bottom = dialog ? dialog.getBoundingClientRect().bottom + window.scrollY + 40 : 0;
       return {
@@ -339,7 +354,11 @@ async function wizardRaws(b, toResults) {
         '/results',
         async (p) => {
           await p.click('text=Помогите выбрать санаторий');
-          const answers = ['.wz-opt:has-text("Спина и суставы")', '.wz-opt:has-text("нужен лифт")', '.wz-opt:has-text("До 1 000")'];
+          const answers = [
+            '.wz-opt:has-text("Спина и суставы")',
+            '.wz-opt:has-text("нужен лифт")',
+            '.wz-opt:has-text("До 1 000")',
+          ];
           for (let i = 0; i < step - 1; i++) await p.click(answers[i]);
         },
         (toResults) => {
@@ -377,28 +396,47 @@ async function buildInteractive(b, sizes) {
     let filterCfg = null;
     const file = isMain ? 'Main.dc.html' : 'Results-B.dc.html';
     const cal = IA.finish(
-      post(await grab(b, route, (p) => p.click('#datein'), () => window.__dc.markCal(document.querySelector('[role="dialog"]')))),
+      post(
+        await grab(
+          b,
+          route,
+          (p) => p.click('#datein'),
+          () => window.__dc.markCal(document.querySelector('[role="dialog"]')),
+        ),
+      ),
       calRawsFor(isMain),
     );
     const gpop = IA.finish(
-      post(await grab(b, route, (p) => p.click('#guests'), () => window.__dc.markGuests(document.querySelector('.gp-pop')))),
+      post(
+        await grab(
+          b,
+          route,
+          (p) => p.click('#guests'),
+          () => window.__dc.markGuests(document.querySelector('.gp-pop')),
+        ),
+      ),
       {},
     );
     const raws = { glabel: IA.GLABEL, gpop: wrapIf('gOpen', gpop), calmodal: wrapIf('calOpen', cal) };
     if (isMain) {
       const list = post(
-        await grab(b, route, (p) => p.click('#city'), () => {
-          const ul = document.querySelector('.ps-list');
-          ul.querySelectorAll('li').forEach((li) => {
-            const a = document.createElement('a');
-            a.href = '/results';
-            a.style.cssText = 'display:flex;flex-direction:column;text-decoration:none;color:inherit';
-            a.innerHTML = li.innerHTML;
-            li.innerHTML = '';
-            li.appendChild(a);
-          });
-          return ul.outerHTML;
-        }),
+        await grab(
+          b,
+          route,
+          (p) => p.click('#city'),
+          () => {
+            const ul = document.querySelector('.ps-list');
+            ul.querySelectorAll('li').forEach((li) => {
+              const a = document.createElement('a');
+              a.href = '/results';
+              a.style.cssText = 'display:flex;flex-direction:column;text-decoration:none;color:inherit';
+              a.innerHTML = li.innerHTML;
+              li.innerHTML = '';
+              li.appendChild(a);
+            });
+            return ul.outerHTML;
+          },
+        ),
       );
       raws.slist = wrapIf('sOpen', list);
       // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
@@ -459,7 +497,9 @@ async function buildInteractive(b, sizes) {
         () => {
           const d = window.__dc;
           const dlg = document.querySelector('[role="dialog"]');
-          dlg.querySelectorAll('button[aria-label="Закрыть"], .acc, .btn-primary').forEach((x) => d.on(x, 'click', 'priceClose'));
+          dlg
+            .querySelectorAll('button[aria-label="Закрыть"], .acc, .btn-primary')
+            .forEach((x) => d.on(x, 'click', 'priceClose'));
           return d.fixedRoot(dlg).outerHTML;
         },
       );
@@ -489,7 +529,9 @@ async function buildInteractive(b, sizes) {
             Array.from(sec.querySelectorAll('span'))
               .filter((x) => /^(Выбрано \d|Условия не выбраны)/.test(x.textContent.trim()) && !x.children.length)
               .forEach((x) => d.text(x, 'pendCount'));
-            Array.from(sec.querySelectorAll('button')).filter((x) => /Сбросить/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'fReset'));
+            Array.from(sec.querySelectorAll('button'))
+              .filter((x) => /Сбросить/.test(x.textContent))
+              .forEach((x) => d.on(x, 'click', 'fReset'));
             sec.querySelectorAll('input[type="number"]').forEach((i) => i.removeAttribute('value'));
             const found = [];
             sec.querySelectorAll('input[type="checkbox"]').forEach((inp) => {
@@ -584,73 +626,85 @@ async function buildInteractive(b, sizes) {
       );
     }
     // the page itself, with fields wired to the logic (Results: all sanatoriums, filters applied by the logic)
-    const base = await grab(b, route, isMain ? null : (p) => p.click('text=Сбросить всё'), (isMain) => {
-      const d = window.__dc;
-      ['#datein', '#dateout'].forEach((s, i) => {
-        const el = document.querySelector(s);
-        d.text(el, i ? 'outLabel' : 'inLabel');
-        d.on(el, 'click', 'openCal');
-      });
-      const g = document.querySelector('#guests');
-      g.innerHTML = '';
-      g.appendChild(d.raw('glabel'));
-      d.on(g, 'click', 'openGuests');
-      g.parentElement.appendChild(d.raw('gpop'));
-      const page = document.querySelector('#root .page');
-      if (isMain) {
-        const city = document.querySelector('#city');
-        d.on(city, 'click', 'openSearch');
-        city.after(d.raw('slist'));
-        document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
-        document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
-        page.appendChild(d.raw('resorts'));
-        d.attr(document.querySelector('#city'), 'value', 'cityLabel');
-        page.appendChild(d.raw('wizard'));
-        document.querySelectorAll('.ps-chip').forEach((c) => {
-          const a = document.createElement('a');
-          a.className = c.className;
-          a.href = '/results';
-          a.style.cssText = 'display:inline-flex;align-items:center;text-decoration:none';
-          a.textContent = c.textContent;
-          c.replaceWith(a);
+    const base = await grab(
+      b,
+      route,
+      isMain ? null : (p) => p.click('text=Сбросить всё'),
+      (isMain) => {
+        const d = window.__dc;
+        ['#datein', '#dateout'].forEach((s, i) => {
+          const el = document.querySelector(s);
+          d.text(el, i ? 'outLabel' : 'inLabel');
+          d.on(el, 'click', 'openCal');
         });
-      } else {
-        const btns = Array.from(document.querySelectorAll('button'));
-        btns.filter((x) => /Помогите выбрать санаторий/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'wzOpen'));
-        btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
-        btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
-        // "Фильтры" (next to the wizard button) opens / closes the panel in place (see filtersLogic)
-        const fb = document.querySelector('.f-btn');
-        d.on(fb, 'click', 'fToggle');
-        d.attr(fb, 'class', 'fBtnCls');
-        d.text(fb.querySelector('.f-badge'), 'fBadge');
-        const slot = document.querySelector('.f-slot');
-        slot.before(d.raw('fclosed-start'));
-        slot.after(d.raw('fclosed-end'));
-        slot.remove();
-        document.querySelectorAll('.cmp-check input').forEach((x, i) => {
-          d.on(x, 'change', 'cmpT' + i);
-          d.attr(x, 'checked', 'cmpOn' + i);
-        });
-        // filter state shown on the page
-        d.attr(fb, 'title', 'appliedSummary');
-        const h2 = Array.from(document.querySelectorAll('h2')).find((x) => /^(Все \d|Подходят \d)/.test(x.textContent.trim()));
-        d.text(h2, 'foundLabel');
-        h2.parentElement.before(d.raw('actrow'));
-        document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
-          a.before(d.raw('hv-start-' + i));
-          a.after(d.raw('hv-end'));
-        });
-        const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
-        ask.after(d.raw('cmp'));
-        page.appendChild(d.raw('wizard'));
-        page.appendChild(d.raw('price'));
-      }
-      page.appendChild(d.raw('calmodal'));
-      return document.getElementById('root').innerHTML;
-    }, isMain);
+        const g = document.querySelector('#guests');
+        g.innerHTML = '';
+        g.appendChild(d.raw('glabel'));
+        d.on(g, 'click', 'openGuests');
+        g.parentElement.appendChild(d.raw('gpop'));
+        const page = document.querySelector('#root .page');
+        if (isMain) {
+          const city = document.querySelector('#city');
+          d.on(city, 'click', 'openSearch');
+          city.after(d.raw('slist'));
+          document.querySelectorAll('.wz-link').forEach((x) => d.on(x, 'click', 'wzOpen'));
+          document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
+          page.appendChild(d.raw('resorts'));
+          d.attr(document.querySelector('#city'), 'value', 'cityLabel');
+          page.appendChild(d.raw('wizard'));
+          document.querySelectorAll('.ps-chip').forEach((c) => {
+            const a = document.createElement('a');
+            a.className = c.className;
+            a.href = '/results';
+            a.style.cssText = 'display:inline-flex;align-items:center;text-decoration:none';
+            a.textContent = c.textContent;
+            c.replaceWith(a);
+          });
+        } else {
+          const btns = Array.from(document.querySelectorAll('button'));
+          btns
+            .filter((x) => /Помогите выбрать санаторий/.test(x.textContent))
+            .forEach((x) => d.on(x, 'click', 'wzOpen'));
+          btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
+          btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
+          // "Фильтры" (next to the wizard button) opens / closes the panel in place (see filtersLogic)
+          const fb = document.querySelector('.f-btn');
+          d.on(fb, 'click', 'fToggle');
+          d.attr(fb, 'class', 'fBtnCls');
+          d.text(fb.querySelector('.f-badge'), 'fBadge');
+          const slot = document.querySelector('.f-slot');
+          slot.before(d.raw('fclosed-start'));
+          slot.after(d.raw('fclosed-end'));
+          slot.remove();
+          document.querySelectorAll('.cmp-check input').forEach((x, i) => {
+            d.on(x, 'change', 'cmpT' + i);
+            d.attr(x, 'checked', 'cmpOn' + i);
+          });
+          // filter state shown on the page
+          d.attr(fb, 'title', 'appliedSummary');
+          const h2 = Array.from(document.querySelectorAll('h2')).find((x) =>
+            /^(Все \d|Подходят \d)/.test(x.textContent.trim()),
+          );
+          d.text(h2, 'foundLabel');
+          h2.parentElement.before(d.raw('actrow'));
+          document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
+            a.before(d.raw('hv-start-' + i));
+            a.after(d.raw('hv-end'));
+          });
+          const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
+          ask.after(d.raw('cmp'));
+          page.appendChild(d.raw('wizard'));
+          page.appendChild(d.raw('price'));
+        }
+        page.appendChild(d.raw('calmodal'));
+        return document.getElementById('root').innerHTML;
+      },
+      isMain,
+    );
     if (filterCfg) {
-      filterCfg.order.forEach((_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'));
+      filterCfg.order.forEach(
+        (_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'),
+      );
       raws['hv-end'] = '</sc-if>';
     }
     const body = IA.finish(post(base), raws);
@@ -677,7 +731,8 @@ async function buildHotel(b, sizes) {
         (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 3,
       );
       over.querySelectorAll('button').forEach((x) => {
-        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть') d.on(x, 'click', 'lbClose');
+        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть')
+          d.on(x, 'click', 'lbClose');
       });
       return over.outerHTML;
     },

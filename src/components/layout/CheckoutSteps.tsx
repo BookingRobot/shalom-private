@@ -1,22 +1,24 @@
 import { Fragment } from 'react';
 import './CheckoutSteps.css';
 
-export const STEP_LABELS_RU = ['Номер', 'Трансфер', 'Гости', 'Рейсы', 'Оплата', 'Готово'];
+export const STEP_LABELS_RU = ['Номер', 'Дорога', 'Гости', 'Оплата', 'Готово'];
 
 /**
- * Progress of the booking: 5 steps and the finish flag.
- * `current` is 1–5 for a step, 6 when the order is placed.
+ * Progress of the booking: 4 steps and the finish flag
+ * (Номер → Дорога → Гости → Оплата → Готово).
+ * `current` is 1–4 for a step, 5 when the order is placed.
  */
 export function CheckoutSteps({
   current,
   labels = STEP_LABELS_RU,
   compact = false,
 }: {
-  current: 1 | 2 | 3 | 4 | 5 | 6;
+  current: 1 | 2 | 3 | 4 | 5;
   labels?: string[];
   compact?: boolean;
 }) {
-  const finished = current === 6;
+  const steps = labels.slice(0, -1);
+  const finished = current > steps.length;
   return (
     <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
       <div
@@ -32,7 +34,7 @@ export function CheckoutSteps({
           flexWrap: 'wrap',
         }}
       >
-        {labels.slice(0, 5).map((label, i) => {
+        {steps.map((label, i) => {
           const n = i + 1;
           const state = n < current ? 'done' : n === current ? 'on' : '';
           return (
@@ -73,7 +75,7 @@ export function CheckoutSteps({
           >
             <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
           </svg>
-          {labels[5]}
+          {labels[labels.length - 1]}
         </div>
       </div>
     </div>

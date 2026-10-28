@@ -1158,6 +1158,28 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 24px;
   align-items: start;
 }
+.cal-body-wide {
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+.cal-cmp {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cal-cmp > div {
+  min-width: 190px;
+}
+.cal-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.cal-legend-top {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
 .cal-side {
   display: flex;
   flex-direction: column;
@@ -1239,10 +1261,46 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     font-size: 14px;
   }
   .cal-legend {
+    order: 2;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 6px 14px;
     margin-top: 0;
+  }
+  .cal-cmp {
+    width: 100%;
+  }
+  .cal-cmp > div:first-child {
+    display: none !important;
+  }
+  .cal-cmp > div {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 8px 10px !important;
+  }
+  .cal-btns {
+    width: 100%;
+    gap: 8px;
+  }
+  .page .cal-btns .btn {
+    flex: 1 1 0;
+    padding: 0 8px !important;
+    font-size: 15px !important;
+    min-height: 48px !important;
+  }
+  .pc-grid button {
+    padding: 3px 2px !important;
+    min-height: 46px !important;
+  }
+  .pc-grid button > span:nth-child(2) {
+    font-size: 12px !important;
+  }
+  .pc-grid button > span:nth-child(3) {
+    font-size: 10px !important;
+  }
+  .pc-grid button > span[title] svg {
+    width: 10px;
+    height: 10px;
   }
   .page .cal-legend .lg {
     font-size: 13px;
@@ -1268,7 +1326,19 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     font-size: 16px;
   }
   .cal-dlg .months-calendar .cell small {
-    font-size: 11px;
+    font-size: 10px;
+    text-align: center;
+  }
+  .cal-dlg .months-calendar .cell {
+    padding: 3px 0;
+  }
+  .cal-dlg .months-calendar [style*='repeat(7'] {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+  .cal-dlg {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
   }
   .cal-dlg .months-calendar .cell > span[title] {
     top: 2px !important;

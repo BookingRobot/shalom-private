@@ -183,3 +183,208 @@
     padding-left: 14px;
   }
 }
+
+/* ── "Дорога": flight first, then the transfer ── */
+.pg-transfer .choice:disabled {
+  cursor: not-allowed;
+  background: #f7f5f0;
+  border-color: #e3ded2;
+}
+.pg-transfer .choice:disabled .fly-opt-t,
+.pg-transfer .choice:disabled .radio {
+  opacity: 0.6;
+}
+.pg-transfer .road-sec {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pg-transfer .road-h {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.pg-transfer .road-h > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pg-transfer .road-h h2 {
+  font-size: 24px;
+}
+.pg-transfer .road-h span:not(.road-num) {
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-transfer .road-h-out {
+  margin-bottom: -10px;
+}
+.pg-transfer .road-num {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f5f4a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  border-radius: 2px;
+}
+.pg-transfer .fly-days {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pg-transfer .fly-day {
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border: 1px solid #c8ded3;
+  background: #eef5f1;
+  border-radius: 2px;
+}
+.pg-transfer .fly-day.no {
+  border-color: #f0ddb8;
+  background: #fff6e3;
+}
+.pg-transfer .fly-day-l {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #3e4b44;
+}
+.pg-transfer .fly-day strong {
+  font-size: 18px;
+}
+.pg-transfer .fly-day-s {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f5f4a;
+}
+.pg-transfer .fly-day.no .fly-day-s {
+  color: #8a5a00;
+}
+.pg-transfer .fly-warn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff6e3;
+  border: 1px solid #f0ddb8;
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.pg-transfer .fly-warn p {
+  margin: 0;
+}
+.pg-transfer .fly-alt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pg-transfer .fly-alt > span {
+  font-weight: 700;
+  font-size: 15px;
+}
+.pg-transfer .fly-alt-btn {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 2px solid #1f5f4a;
+  background: #fff;
+  color: #1f5f4a;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.pg-transfer .fly-alt-btn:hover {
+  background: #eef5f1;
+}
+.pg-transfer .fly-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-transfer .fly-opts .choice {
+  padding: 12px 16px;
+  min-height: 0;
+  align-items: flex-start;
+}
+.pg-transfer .fly-opts .radio {
+  margin-top: 2px;
+}
+.pg-transfer .fly-opt-t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  color: #3e4b44;
+}
+.pg-transfer .fly-opt-t strong {
+  font-size: 18px;
+  color: #1c2620;
+}
+.pg-transfer .fly-opt-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pg-transfer .fly-price {
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+.pg-transfer .fly-legs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  background: #eef5f1;
+  border-radius: 2px;
+}
+.pg-transfer .fly-leg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  color: #3e4b44;
+}
+.pg-transfer .fly-leg strong {
+  font-size: 17px;
+  color: #1c2620;
+}
+.pg-transfer .fly-leg-dir {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pg-transfer .fly-legs-note {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: #3e4b44;
+}
+@media (max-width: 640px) {
+  .pg-transfer .fly-legs {
+    grid-template-columns: 1fr;
+  }
+  .pg-transfer .road-sec {
+    padding: 16px;
+  }
+}
