@@ -10,6 +10,7 @@ export const MEALS_ICON = 'M7 3v18M5 3v5a2 2 0 0 0 4 0V3M17 3c-2 0-3 2-3 5v3h3v1
 
 export const POPULAR_SANATORIUMS = [
   {
+    id: 'egle-comfort',
     name: 'Эгле Комфорт',
     stars: '★★★★',
     sub: 'Друскининкай · 26 отзывов',
@@ -21,6 +22,7 @@ export const POPULAR_SANATORIUMS = [
     price: 106,
   },
   {
+    id: 'grand-spa-lietuva',
     name: 'Гранд Спа Лиетува',
     stars: '★★★★',
     sub: 'Друскининкай · 20 отзывов',
@@ -32,6 +34,7 @@ export const POPULAR_SANATORIUMS = [
     price: 90,
   },
   {
+    id: 'gradiali',
     name: 'Градиали',
     stars: '★★★★',
     sub: 'Паланга · 17 отзывов',
@@ -43,6 +46,7 @@ export const POPULAR_SANATORIUMS = [
     price: 106,
   },
   {
+    id: 'belorus',
     name: 'Беларусь',
     stars: '★★★',
     sub: 'Друскининкай · 17 отзывов',
@@ -54,6 +58,7 @@ export const POPULAR_SANATORIUMS = [
     price: 90,
   },
   {
+    id: 'egle-birstonas',
     name: 'Эгле Комфорт Бирштонас',
     stars: '',
     sub: 'Бирштонас · 35 отзывов',
@@ -65,6 +70,7 @@ export const POPULAR_SANATORIUMS = [
     price: 119,
   },
   {
+    id: 'draugyste',
     name: 'Минерал SPA Драугисте',
     stars: '',
     sub: 'Друскининкай · 5 отзывов',

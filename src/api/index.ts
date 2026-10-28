@@ -7,15 +7,9 @@
  */
 import { POPULAR_SANATORIUMS } from '../data/popular';
 import { EXTRA_PROGRAMS, ROOM_SETS, SANATORIUMS } from '../data/sanatoriums';
-import {
-  EGLE_ABOUT,
-  EGLE_ALL_PHOTOS,
-  EGLE_PHOTOS,
-  EGLE_PROGRAMS,
-  EGLE_ROOMS,
-  EGLE_SPECIALIZATIONS,
-  TRANSFER_CARS,
-} from '../data/egleComfort';
+import { EGLE_ABOUT, EGLE_SPECIALIZATIONS, TRANSFER_CARS } from '../data/egleComfort';
+import { hotelInfo } from '../data/hotelInfo';
+import { roomsAndPrograms } from '../data/sanatoriumRooms';
 import { ROOM_PROGRAMS, SELECTED_ROOM_PRICE } from '../data/programs';
 import { PICKUP_PLACES, TRANSFER_PRICES, VEHICLES } from '../data/transfer';
 
@@ -37,14 +31,15 @@ export const api = {
     return { sanatoriums: SANATORIUMS, roomSets: ROOM_SETS, extraPrograms: EXTRA_PROGRAMS };
   },
 
-  /** Sanatorium page: description, photos, rooms, programmes, transfer cars. */
-  getSanatorium(_id: string) {
+  /** Sanatorium page: description, photos, tabs, rooms, programmes, transfer cars. */
+  getSanatorium(id: string) {
+    const info = hotelInfo(id);
     return {
+      info,
       about: EGLE_ABOUT,
-      photos: EGLE_PHOTOS,
-      allPhotos: EGLE_ALL_PHOTOS,
-      programs: EGLE_PROGRAMS,
-      rooms: EGLE_ROOMS,
+      photos: info.photos,
+      allPhotos: info.photos,
+      ...roomsAndPrograms(info.id),
       specializations: EGLE_SPECIALIZATIONS,
       transferCars: TRANSFER_CARS,
     };

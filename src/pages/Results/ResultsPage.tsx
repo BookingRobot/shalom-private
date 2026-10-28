@@ -828,6 +828,7 @@ class ResultsLogic extends PageLogic {
       // Not available on the chosen dates [ПРИМЕР — ИЗ ДАННЫХ О НАЛИЧИИ]
       soldHotels: [
         {
+          id: 'upa',
           name: 'Санаторий Упа',
           stars: '★★★',
           sub: 'Друскининкай · у парка Вийя',
@@ -835,6 +836,7 @@ class ResultsLogic extends PageLogic {
           next: 'с 23 ноября',
         },
         {
+          id: 'spa-vilnius',
           name: 'SPA Vilnius Друскининкай',
           stars: '★★★★',
           sub: 'Друскининкай · у реки Неман',
@@ -1716,7 +1718,7 @@ export default function ResultsPage() {
                 >
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0' }}>
                     <Link
-                      to="/hotel"
+                      to={'/hotel?h=' + h.id}
                       style={{
                         flex: '0 0 400px',
                         maxWidth: 'calc(100% - 28px)',
@@ -1748,7 +1750,7 @@ export default function ResultsPage() {
                     >
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                         <h2 style={{ fontSize: '23px' }}>
-                          <Link to="/hotel" style={{ textDecoration: 'none', color: '#1C2620' }}>
+                          <Link to={'/hotel?h=' + h.id} style={{ textDecoration: 'none', color: '#1C2620' }}>
                             {h.name}
                           </Link>
                         </h2>
@@ -2001,7 +2003,7 @@ export default function ResultsPage() {
                             <path d="M12 16v-4M12 8h.01" />
                           </svg>
                           Процедуры подбирает врач после консультации. Специализации, время заезда и трансфер —
-                          <Link to="/hotel">на странице санатория</Link>.
+                          <Link to={'/hotel?h=' + h.id}>на странице санатория</Link>.
                         </div>
                       </div>
                     </>
@@ -2052,7 +2054,7 @@ export default function ResultsPage() {
                   }}
                 >
                   <Link
-                    to="/hotel"
+                    to={'/hotel?h=' + u.id}
                     style={{
                       flex: '0 0 240px',
                       minHeight: '150px',
@@ -2106,7 +2108,7 @@ export default function ResultsPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
                       <h3 style={{ fontSize: '20px', color: '#3E4B44' }}>
-                        <Link to="/hotel" style={{ color: '#3E4B44', textDecoration: 'none' }}>
+                        <Link to={'/hotel?h=' + u.id} style={{ color: '#3E4B44', textDecoration: 'none' }}>
                           {u.name}
                         </Link>
                       </h3>
@@ -2153,7 +2155,7 @@ export default function ResultsPage() {
                   >
                     <Link
                       className="btn btn-secondary"
-                      to="/hotel"
+                      to={'/hotel?h=' + u.id}
                       style={{
                         minHeight: '46px',
                         fontSize: '15px',
