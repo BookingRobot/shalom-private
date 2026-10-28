@@ -58,6 +58,8 @@ window.__dc = {
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
     const footer = sel[0].closest('div[style*="border-top"]') || dialog;
+    footer.before(d.raw('foot-start'));
+    footer.after(d.raw('foot-end'));
     const fb = footer.querySelectorAll('.btn');
     d.on(fb[fb.length - 2], 'click', 'closeCal');
     d.on(fb[fb.length - 1], 'click', 'applyCal');
@@ -83,12 +85,12 @@ const PLANE =
 
 const CELLS = `<sc-for list="{{cells}}" as="c" hint-placeholder-count="35"><button type="button" class="cell" onClick="{{c.pick}}" disabled="{{c.off}}" aria-label="{{c.aria}}" style="background:{{c.bg}};border-color:{{c.border}};color:{{c.color}};cursor:{{c.cursor}}"><span>{{c.day}}</span><small style="color:{{c.subColor}}">{{c.sub}}</small><sc-if value="{{c.fly}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:4px;right:5px;line-height:0" title="Рейс из Израиля">${PLANE}</span></sc-if></button></sc-for>`;
 
-const FLEX = `<div class="flex-dates">
+const FLEX = (isMain) => `<div class="flex-dates">
 <div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-car"><button type="button" class="navbtn" aria-label="Раньше" disabled="{{fdPrevOff}}" onClick="{{fdPrev}}">‹</button><div class="fd-tiles" role="group" aria-label="Месяц" style="--per:6"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="6"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}"><strong>{{m.t}}</strong><span>{{m.y}}</span><small>{{m.from}}</small></button></sc-for></div><button type="button" class="navbtn" aria-label="Позже" disabled="{{fdNextOff}}" onClick="{{fdNext}}">›</button></div></div>
 <div class="fd-row"><span class="fd-lbl">Сколько ночей</span><div class="fd-opts" role="group" aria-label="Сколько ночей"><sc-for list="{{fdNights}}" as="n" hint-placeholder-count="4"><button type="button" class="{{n.cls}}" onClick="{{n.pick}}">{{n.t}}</button></sc-for></div></div>
 <div class="fd-list"><span class="fd-title">{{fdTitle}}</span><sc-if value="{{fdEmpty}}" hint-placeholder-val="{{false}}"><span class="fd-empty">В этом месяце свободных дат нет — выберите другой.</span></sc-if>
-<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5"><button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}</span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span></button></sc-for>
-<span class="fd-note">Средняя цена по курорту за проживание и лечение. Точную цену покажем в санаториях.</span></div>
+<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5">${isMain ? `<a class="fd-opt" href="Results-B.dc.html" style="text-decoration:none"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></a>` : `<button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></button>`}</sc-for>
+<span class="fd-note">Средняя цена по курорту за проживание и лечение. Выберите вариант — сразу покажем санатории на эти даты.</span></div>
 </div>`;
 
 const GLABEL = `<span style="display:block;white-space:nowrap">{{gAdL}}</span><sc-if value="{{gHasCh}}" hint-placeholder-val="{{false}}"><span style="display:block;white-space:nowrap;font-size:13px;font-weight:600;color:#5E6862">+ {{gChL}}</span></sc-if>`;
@@ -113,8 +115,8 @@ const LOGIC = `
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { inD: '2026-11-09', outD: '2026-11-18', cal: '', room: false, sel: null, m: null, y: null, fm: 1, fn: 14,
-      ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false], cmpDlg: false, price: false };
+    this.state = { inD: '2026-11-09', outD: '2026-11-18', cal: '', room: false, sel: null, m: null, y: null, fn: 14,
+      fm: 8, fo: 5, ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false], cmpDlg: false, price: false };
   }
   renderVals() {
     const st = this.state;
@@ -174,7 +176,7 @@ class Component extends DCLogic {
       const res = [];
       for (let i = 1; i <= nd; i++) {
         const d = new Date(Date.UTC(md.getUTCFullYear(), md.getUTCMonth(), i));
-        if (d <= TODAY) continue;
+        if (d <= TODAY || !isFly(d) || !isFly(addD(d, st.fn))) continue;
         let sum = 0, ok = true;
         for (let k = 0; k < st.fn; k++) { const x = addD(d, k); if (SOLD.includes(iso(x))) ok = false; sum += ppn(x); }
         if (ok) res.push({ d, sum });
@@ -200,7 +202,7 @@ class Component extends DCLogic {
       calOpen: !!st.cal, calExact: st.cal !== 'flex', calFlex: st.cal === 'flex', tabsOn: !st.room,
       calTitleText: st.room ? 'Свободные даты номера' : 'Выберите даты поездки',
       roomOn: st.room, roomLine: 'Полулюкс · Санаторий Эгле Комфорт — занятые дни закрыты',
-      calHint: !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
+      calHint: st.cal === 'flex' ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами' : !sIn ? 'Нажмите день заезда' : !sOut ? 'Теперь нажмите день выезда' : 'Можно поменять: нажмите новый день заезда',
       tabExactCls: st.cal !== 'flex' ? 'on' : '', tabFlexCls: st.cal === 'flex' ? 'on' : '',
       calToExact: () => this.setState({ cal: 'exact' }), calToFlex: () => this.setState({ cal: 'flex' }),
       closeCal: () => this.setState({ cal: '', room: false }),
@@ -220,12 +222,12 @@ class Component extends DCLogic {
       fdPrev: () => this.setState({ fo: Math.max(0, fo - 6) }), fdNext: () => this.setState({ fo: Math.min(18, fo + 6) }),
       fdNights: [7, 10, 14, 21].map((n) => ({ t: n === 7 ? '7 ночей · неделя' : n === 14 ? '14 ночей · 2 недели' : n === 21 ? '21 ночь · 3 недели' : '10 ночей',
         cls: 'qf-chip' + (n === st.fn ? ' on' : ''), pick: () => this.setState({ fn: n }) })),
-      fdTitle: 'Самые выгодные даты заезда в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е'),
+      fdTitle: 'Лучшие даты в ' + MONTHS[fmD.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е') + ' — с рейсами туда и обратно',
       fdEmpty: opts.length === 0,
       fdOpts: opts.map((o) => {
         const out = addD(o.d, st.fn);
-        return { when: WD[o.d.getUTCDay()] + ', ' + shortD(o.d) + ' → ' + shortD(out) + (isFly(o.d) ? ' ✈' : ''), sum: fmt(r10(o.sum)), best: r10(o.sum) === minS,
-          pick: () => this.setState({ sel: { in: iso(o.d), out: iso(out) }, cal: 'exact', m: o.d.getUTCMonth(), y: o.d.getUTCFullYear() }) };
+        return { when: WD[o.d.getUTCDay()] + ', ' + shortD(o.d) + ' → ' + WD[out.getUTCDay()] + ', ' + shortD(out), sum: fmt(r10(o.sum)), best: r10(o.sum) === minS,
+          pick: () => this.setState({ inD: iso(o.d), outD: iso(out), sel: null, cal: '', room: false }) };
       }),
       // guests
       gOpen: st.gOpen, openGuests: () => this.setState({ gOpen: !st.gOpen, sOpen: false }), closeGuests: () => this.setState({ gOpen: false }),

@@ -142,9 +142,11 @@ class MainLogic extends PageLogic {
     return {
       flexMode: !!st.flex,
       setFlex: (flex) => this.setState({ flex }),
+      // a recommended option is the choice: set the dates and show sanatoriums right away
       flexPick: (a, b) => {
-        const d = toD(a);
-        this.setState({ sel: { in: a, out: b }, flex: false, month: d.getUTCMonth(), year: d.getUTCFullYear() });
+        this.setState({ in: a, out: b, flex: false, calOpen: false });
+        this.props.booking.update({ checkin: a, checkout: b });
+        this.props.navigate('/results');
       },
       hotels: POPULAR_SANATORIUMS,
       dest: booking.dest,
@@ -171,11 +173,13 @@ class MainLogic extends PageLogic {
         this.setState({ month: m % 12, year: m > 11 ? y0 + 1 : y0 });
       },
       months,
-      calHint: !sIn
-        ? 'Нажмите день заезда'
-        : !sOut
-          ? 'Теперь нажмите день выезда'
-          : 'Можно поменять: нажмите новый день заезда',
+      calHint: st.flex
+        ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами'
+        : !sIn
+          ? 'Нажмите день заезда'
+          : !sOut
+            ? 'Теперь нажмите день выезда'
+            : 'Можно поменять: нажмите новый день заезда',
       selIn: sIn ? shortDate(sIn) : '—',
       selOut: sOut ? shortDate(sOut) : '—',
       selNights: nights ? nights + ' ' + nightsWord(nights) : '—',
@@ -990,7 +994,7 @@ export default function MainPage() {
               )}
               <div
                 style={{
-                  display: 'flex',
+                  display: v.flexMode ? 'none' : 'flex', // a flexible-dates option goes straight to results
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '16px',

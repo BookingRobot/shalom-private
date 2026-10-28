@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useBooking } from '../context/BookingContext';
 import { isSoldOutEverywhere } from '../data/availability';
 import { TODAY } from '../data/demo';
 import { isFlightDay } from '../data/flights';
@@ -30,13 +29,14 @@ const NIGHTS = [7, 10, 14, 21];
  * With the flight package only flight days are offered as arrival days.
  */
 /** Start days in a month for `nights` nights, with the resort-average sum per person. */
-function optionsFor(m: Date, nights: number, flightOnly: boolean) {
+function optionsFor(m: Date, nights: number) {
   const days = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 0)).getUTCDate();
   const out: { d: Date; sum: number }[] = [];
   for (let i = 1; i <= days; i++) {
     const d = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth(), i));
     if (d <= TODAY) continue;
-    if (flightOnly && !isFlightDay(d)) continue;
+    // recommended options come with flights both ways (Tel Aviv ⇄ Vilnius flies Tue/Thu/Sun)
+    if (!isFlightDay(d) || !isFlightDay(addD(d, nights))) continue;
     let sum = 0,
       ok = true;
     for (let k = 0; k < nights; k++) {
@@ -54,19 +54,20 @@ const r10 = (n: number) => Math.round(n / 10) * 10;
 const MONTHS_AHEAD = 24;
 
 export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: string) => void }) {
-  const { booking } = useBooking();
   const start = new Date(Date.UTC(TODAY.getUTCFullYear(), TODAY.getUTCMonth(), 1));
   const months = Array.from(
     { length: MONTHS_AHEAD },
     (_, i) => new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1)),
   );
-  const [mi, setMi] = useState(1);
+  // most asked-about: next summer — open on it (June selected, March–August in view)
+  const june = months.findIndex((x) => x.getUTCMonth() === 5);
+  const [mi, setMi] = useState(june);
   const [nights, setNights] = useState(14);
-  const [off, setOff] = useState(0);
+  const [off, setOff] = useState(Math.max(0, june - 3));
   const per = useVisibleTiles();
   const first = Math.min(off, MONTHS_AHEAD - per);
   const m = months[mi];
-  const best = optionsFor(m, nights, booking.flightPackage)
+  const best = optionsFor(m, nights)
     .sort((a, b) => a.sum - b.sum)
     .slice(0, 5)
     .sort((a, b) => a.d.getTime() - b.d.getTime());
@@ -88,7 +89,7 @@ export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: stri
           <div className="fd-tiles" role="group" aria-label="Месяц" style={{ ['--per' as string]: per }}>
             {months.slice(first, first + per).map((x, j) => {
               const i = first + j;
-              const opts = optionsFor(x, nights, booking.flightPackage);
+              const opts = optionsFor(x, nights);
               const from = opts.length ? Math.min(...opts.map((o) => r10(o.sum))) : 0;
               return (
                 <button
@@ -140,8 +141,7 @@ export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: stri
       </div>
       <div className="fd-list">
         <span className="fd-title">
-          Самые выгодные даты заезда в {MONTHS[m.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е')}
-          {booking.flightPackage ? ' — только дни с рейсом' : ''}
+          Лучшие даты в {MONTHS[m.getUTCMonth()].replace(/я$/, 'е').replace(/а$/, 'е')} — с рейсами туда и обратно
         </span>
         {best.length === 0 ? (
           <span className="fd-empty">В этом месяце свободных дат нет — выберите другой.</span>
@@ -151,18 +151,23 @@ export function FlexDates({ onPick }: { onPick: (checkin: string, checkout: stri
           return (
             <button type="button" key={iso(d)} className="fd-opt" onClick={() => onPick(iso(d), iso(out))}>
               <span className="fd-when">
-                {WEEKDAYS_SHORT[d.getUTCDay()]}, {shortDate(d)} → {shortDate(out)}
-                {isFlightDay(d) ? <span title="Рейс из Израиля"> ✈</span> : null}
+                {WEEKDAYS_SHORT[d.getUTCDay()]}, {shortDate(d)} → {WEEKDAYS_SHORT[out.getUTCDay()]}, {shortDate(out)}
+                <span className="fd-fly">
+                  <PlaneIcon /> рейс туда · <PlaneIcon back /> обратно
+                </span>
               </span>
               <span className="fd-sum">
                 ≈ {fmt(r10(sum))}&nbsp;€ на человека
                 {r10(sum) === min ? <span className="fd-best">дешевле всего</span> : null}
               </span>
+              <span className="fd-go" aria-hidden="true">
+                →
+              </span>
             </button>
           );
         })}
         <span className="fd-note">
-          Средняя цена по курорту за проживание и лечение. Точную цену покажем в санаториях.
+          Средняя цена по курорту за проживание и лечение. Выберите вариант — сразу покажем санатории на эти даты.
         </span>
       </div>
     </div>
@@ -200,4 +205,23 @@ function useVisibleTiles() {
     return () => mq.removeEventListener('change', set);
   }, []);
   return n;
+}
+
+function PlaneIcon({ back = false }: { back?: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#1F5F4A"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={{ verticalAlign: '-3px', transform: back ? 'scaleX(-1)' : 'none' }}
+    >
+      <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+    </svg>
+  );
 }

@@ -297,9 +297,16 @@ const CAL_RAWS = {
   'tabs-start': '<sc-if value="{{tabsOn}}" hint-placeholder-val="{{true}}">',
   'tabs-end': '</sc-if>',
   'exact-start': '<sc-if value="{{calExact}}" hint-placeholder-val="{{true}}">',
-  'exact-end': '</sc-if><sc-if value="{{calFlex}}" hint-placeholder-val="{{false}}">' + IA.FLEX + '</sc-if>',
+  'exact-end': '</sc-if>',
+  'foot-start': '<sc-if value="{{calExact}}" hint-placeholder-val="{{true}}">',
+  'foot-end': '</sc-if>',
   cells: IA.CELLS,
 };
+/** flexible dates sit after the exact calendar; on Main an option links to the results board */
+const calRawsFor = (isMain) => ({
+  ...CAL_RAWS,
+  'exact-end': '</sc-if><sc-if value="{{calFlex}}" hint-placeholder-val="{{false}}">' + IA.FLEX(isMain) + '</sc-if>',
+});
 const wrapIf = (cond, html) => `<sc-if value="{{${cond}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
 
 async function buildInteractive(b, sizes) {
@@ -308,7 +315,7 @@ async function buildInteractive(b, sizes) {
     const file = isMain ? 'Main.dc.html' : 'Results-B.dc.html';
     const cal = IA.finish(
       post(await grab(b, route, (p) => p.click('#datein'), () => window.__dc.markCal(document.querySelector('[role="dialog"]')))),
-      CAL_RAWS,
+      calRawsFor(isMain),
     );
     const gpop = IA.finish(
       post(await grab(b, route, (p) => p.click('#guests'), () => window.__dc.markGuests(document.querySelector('.gp-pop')))),

@@ -876,3 +876,18 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     font-size: 12px;
   }
 }
+.page .fd-when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.page .fd-fly {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f5f4a;
+}
+.page .fd-go {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f5f4a;
+}

@@ -732,9 +732,9 @@ class ResultsLogic extends PageLogic {
       sCloseCal: () => this.setState({ sOpen: false, sRoom: null }),
       sFlex: !!st.sFlex,
       setSFlex: (sFlex) => this.setState({ sFlex }),
+      // a recommended option is the choice: apply the dates and show the list
       sFlexPick: (a, b) => {
-        const d = toD(a);
-        this.setState({ ss: { in: a, out: b }, sFlex: false, sm: d.getUTCMonth(), sy: d.getUTCFullYear() });
+        this.setState({ checkin: a, nights: daysBetween(toD(a), toD(b)), sOpen: false, sFlex: false, sRoom: null });
       },
       sCalTitle: sRoom ? 'Свободные даты номера' : 'Выберите даты поездки',
       sRoomLine: sRoom ? sRoom.name + ' · ' + sRoom.hotel + ' — занятые дни закрыты' : '',
@@ -747,11 +747,14 @@ class ResultsLogic extends PageLogic {
         this.setState({ sm: m % 12, sy: m > 11 ? sy0 + 1 : sy0 });
       },
       sMonths: [{ title: MONTHS_N[sm0] + ' ' + sy0, cells: sCells(sy0, sm0) }],
-      sCalHint: !sIn
-        ? 'Нажмите день заезда'
-        : !sOut
-          ? 'Теперь нажмите день выезда'
-          : 'Можно поменять: нажмите новый день заезда',
+      sCalHint:
+        st.sFlex && !sRoom
+          ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами'
+          : !sIn
+            ? 'Нажмите день заезда'
+            : !sOut
+              ? 'Теперь нажмите день выезда'
+              : 'Можно поменять: нажмите новый день заезда',
       sSelIn: sIn ? shortDate(sIn) : '—',
       sSelOut: sOut ? shortDate(sOut) : '—',
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
@@ -2864,7 +2867,7 @@ export default function ResultsPage() {
               )}
               <div
                 style={{
-                  display: 'flex',
+                  display: v.sFlex && !v.sRoomLine ? 'none' : 'flex', // a flexible-dates option goes straight to results
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '16px',
