@@ -1,0 +1,23 @@
+{
+  "id": "20261028155544-a0e30",
+  "issue": 32,
+  "received": "2026-10-28T15:55:44.653Z",
+  "type": "change",
+  "severity": "annoying",
+  "title": "[Изменение] asdfas",
+  "whatDoing": "",
+  "expected": "",
+  "actual": "",
+  "description": "dfasdfasdf",
+  "name": "Mindaugas",
+  "contact": "",
+  "page": "https://shalom.bookingrobot.eu/",
+  "pageTitle": "Санатории Литвы — лечение и отдых · Санатории Литвы",
+  "element": "blokas „Гости 2 взрослых“",
+  "viewport": "1379×1149",
+  "browser": "Chrome · macOS",
+  "when": "2026-10-28 17:55:44",
+  "text": "asdfas\n\ndfasdfasdf",
+  "screenshot": "feedback/2026-10/20261028155544-a0e30.webp",
+  "images": []
+}
