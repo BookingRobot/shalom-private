@@ -247,7 +247,7 @@ export default function MainPage() {
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
         {/* Hero: lake photo, header, heading and the search card */}
         <section className="hero">
-          <img className="hero-bg" src="/img/hero-lake.jpg" alt="" />
+          <img className="hero-bg" src="/img/ac698b6af7317a86330ea854eaeb2758.jpg" alt="" />
           <div className="hero-shade" />
           <HeaderBar tone="dark" minHeight={80} maxWidth={1340}>
             <div className="hero-left">
