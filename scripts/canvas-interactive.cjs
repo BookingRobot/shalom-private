@@ -116,7 +116,7 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { inD: '2026-11-09', outD: '2026-11-18', cal: '', room: false, sel: null, m: null, y: null, fn: 14,
-      fm: 8, fo: 5, ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false], cmpDlg: false, price: false };
+      fm: 8, fo: 5, ad: 2, ch: 0, gOpen: false, sOpen: false, wz: 0, cmp: [false, false, false, false, false, false, false, false], cmpDlg: false, price: false };
   }
   renderVals() {
     const st = this.state;
@@ -245,8 +245,8 @@ class Component extends DCLogic {
       wzBack: () => this.setState({ wz: Math.max(1, st.wz - 1) }), wzRestart: () => this.setState({ wz: 1 }), wzClose: () => this.setState({ wz: 0 }),
       // compare
       cmpAny: cmpN > 0, cmpDlg: st.cmpDlg, cmpOpen: () => this.setState({ cmpDlg: true }), cmpClose: () => this.setState({ cmpDlg: false }),
-      cmpClear: () => this.setState({ cmp: [false, false, false, false], cmpDlg: false }),
-      cmpOn0: cmp[0], cmpOn1: cmp[1], cmpOn2: cmp[2], cmpOn3: cmp[3], cmpT0: cmpT(0), cmpT1: cmpT(1), cmpT2: cmpT(2), cmpT3: cmpT(3),
+      cmpClear: () => this.setState({ cmp: cmp.map(() => false), cmpDlg: false }),
+      ...Object.fromEntries(cmp.flatMap((on, i) => [['cmpOn' + i, on], ['cmpT' + i, cmpT(i)]])),
       // price calendar ("Когда дешевле?")
       priceOn: st.price, priceOpen: () => this.setState({ price: true }), priceClose: () => this.setState({ price: false }),
     };
@@ -261,37 +261,76 @@ const calRaws = (calHtml) => ({});
  * Results filter panel in Play: tiles/checkboxes and chips switch on and off, "Ещё фильтры"
  * opens the rest, "Свернуть"/"Показать" close it. The list itself stays as on the site.
  */
-function filtersLogic(keys, bases, init, groups) {
+function filtersLogic(cfg) {
   return LOGIC.replace(
     /\n}\n$/,
     `
   __filters(st) {
-    const F_BASE = ${JSON.stringify(bases)};
-    const F_INIT = ${JSON.stringify(init)};
-    const GROUPS = ${JSON.stringify(groups)};
-    const fv = st.fv || F_INIT;
-    const qf = st.qf || GROUPS.map((g) => (g.one ? [0] : []));
+    const FK = ${JSON.stringify(cfg.fkeys)};
+    const FB = ${JSON.stringify(cfg.bases)};
+    const FI = ${JSON.stringify(cfg.init)};
+    const GROUPS = ${JSON.stringify(cfg.groups)};
+    const HOT = ${JSON.stringify(cfg.hotels)};
+    const LBL = ${JSON.stringify(cfg.labels)};
+    const q0 = () => GROUPS.map((g) => (g.one ? [0] : []));
+    const fa = st.fa || FI, qa = st.qa || q0();
+    const fv = st.fv || fa, qv = st.qv || qa;
+    const keysOf = (f, q) => {
+      const ks = [];
+      FK.forEach((k, i) => f[i] && k && ks.push(k));
+      GROUPS.forEach((g, gi) => q[gi].forEach((j) => g.keys[j] && ks.push(g.keys[j])));
+      return ks;
+    };
+    const pass = (ks) => (h) => {
+      const stars = ks.filter((k) => /^s[345]$/.test(k)), other = ks.filter((k) => !/^s[345]$/.test(k));
+      return (!stars.length || stars.some((k) => h.stars === Number(k[1]))) &&
+        other.every((k) => (k === 'shower' ? h.tags.includes('lift') : h.tags.includes(k)));
+    };
+    const pl = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'санаторий' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'санатория' : 'санаториев');
+    const ka = keysOf(fa, qa), kv = keysOf(fv, qv);
+    const nA = HOT.filter(pass(ka)).length, nV = HOT.filter(pass(kv)).length;
+    const cleared = FI.map(() => false);
+    const removeKey = (k) => {
+      const f = fa.slice(), q = qa.map((x) => x.slice());
+      const i = FK.indexOf(k);
+      if (i >= 0) f[i] = false;
+      GROUPS.forEach((g, gi) => {
+        const j = g.keys.indexOf(k);
+        if (j > 0 || (j === 0 && !g.one)) q[gi] = g.one ? [0] : q[gi].filter((x) => x !== j);
+      });
+      this.setState({ fa: f, fv: f, qa: q, qv: q });
+    };
     const fx = {
       fOpenV: !!st.fOpen, fClosedV: !st.fOpen, fMoreOn: !!st.fMore, fMoreOff: !st.fMore,
-      fOpenFn: () => this.setState({ fOpen: true }),
-      fClose: () => this.setState({ fOpen: false, fMore: false }),
+      fOpenFn: () => this.setState({ fOpen: true, fv: fa, qv: qa }),
+      fClose: () => this.setState({ fOpen: false, fMore: false, fv: fa, qv: qa }),
+      fApply: () => this.setState({ fOpen: false, fMore: false, fa: fv, qa: qv }),
       fMoreT: () => this.setState({ fMore: !st.fMore }),
-      fReset: () => this.setState({ fv: F_INIT.map(() => false), qf: GROUPS.map((g) => (g.one ? [0] : [])) }),
+      fReset: () => this.setState({ fv: cleared, qv: q0() }),
+      fResetAll: () => this.setState({ fa: cleared, fv: cleared, qa: q0(), qv: q0() }),
+      hasActive: ka.length > 0,
+      activeList: ka.map((k) => ({ t: LBL[k] || k, off: () => removeKey(k) })),
+      appliedSummary: ka.length ? 'Выбрано: ' + ka.map((k) => LBL[k] || k).join(', ') : 'Условия не выбраны — показаны все санатории',
+      foundLabel: nA === HOT.length ? 'Все ' + nA + ' ' + pl(nA) : 'Подходят ' + nA + ' из ' + HOT.length + ' ' + pl(HOT.length),
+      noneFound: nA === 0,
+      applyLabel: nV === 0 ? 'Ничего не подходит' : 'Показать ' + nV + ' ' + pl(nV),
+      pendCount: kv.length === 0 ? 'Условия не выбраны' : 'Выбрано ' + kv.length + ' ' + (kv.length === 1 ? 'условие' : kv.length < 5 ? 'условия' : 'условий'),
     };
-    F_BASE.forEach((base, i) => {
+    HOT.forEach((h, i) => (fx['hv' + i] = pass(ka)(h)));
+    FB.forEach((base, i) => {
       fx['fOn' + i] = !!fv[i];
       fx['fCls' + i] = base + (fv[i] ? ' on' : '');
       fx['fT' + i] = () => { const v = fv.slice(); v[i] = !v[i]; this.setState({ fv: v }); };
     });
     GROUPS.forEach((g, gi) => {
       for (let j = 0; j < g.n; j++) {
-        const on = qf[gi].includes(j);
+        const on = qv[gi].includes(j);
         fx['qfc' + gi + '_' + j] = 'qf-chip' + (on ? ' on' : '');
         fx['qf' + gi + '_' + j] = () => {
-          const v = qf.map((x) => x.slice());
+          const v = qv.map((x) => x.slice());
           if (g.one) v[gi] = [j];
           else v[gi] = on ? v[gi].filter((x) => x !== j) : v[gi].concat(j);
-          this.setState({ qf: v });
+          this.setState({ qv: v });
         };
       }
     });

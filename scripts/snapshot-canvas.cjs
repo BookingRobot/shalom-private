@@ -11,6 +11,25 @@ const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 const IA = require('./canvas-interactive.cjs');
+
+/** sanatorium tags and filter groups, straight from the site's data */
+const DATA = (() => {
+  const r = require('esbuild').buildSync({
+    stdin: {
+      contents: "export {SANATORIUMS} from './src/data/sanatoriums'; export {FILTER_GROUPS} from './src/data/filters';",
+      resolveDir: path.join(__dirname, '..'),
+      loader: 'ts',
+    },
+    bundle: true,
+    write: false,
+    format: 'cjs',
+    platform: 'node',
+    logLevel: 'silent',
+  });
+  const m = { exports: {} };
+  new Function('module', 'exports', 'require', r.outputFiles[0].text)(m, m.exports, require);
+  return m.exports;
+})();
 const { searchBand, linkButtons } = require('./canvas/templatize.cjs');
 const SEARCH_LOGIC = fs.readFileSync(path.join(__dirname, 'canvas', 'search-logic.js'), 'utf8');
 
@@ -423,7 +442,13 @@ async function buildInteractive(b, sizes) {
             d.on(accs[0], 'click', 'fClose');
             if (more) d.on(accs[1], 'click', 'fMoreT');
             else d.on(sec.querySelector('.morebtn'), 'click', 'fMoreT');
-            sec.querySelectorAll('.btn-primary').forEach((x) => d.on(x, 'click', 'fClose'));
+            sec.querySelectorAll('.btn-primary').forEach((x) => {
+              d.on(x, 'click', 'fApply');
+              d.text(x, 'applyLabel');
+            });
+            Array.from(sec.querySelectorAll('span'))
+              .filter((x) => /^(Выбрано \d|Условия не выбраны)/.test(x.textContent.trim()) && !x.children.length)
+              .forEach((x) => d.text(x, 'pendCount'));
             Array.from(sec.querySelectorAll('button')).filter((x) => /Сбросить/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'fReset'));
             sec.querySelectorAll('input[type="number"]').forEach((i) => i.removeAttribute('value'));
             const found = [];
@@ -463,15 +488,63 @@ async function buildInteractive(b, sizes) {
         wrapIf('fMoreOff', IA.finish(post(pClosed.html), {})) +
         wrapIf('fMoreOn', IA.finish(post(pOpen.html), {})) +
         '</sc-if>';
+      const FG = DATA.FILTER_GROUPS;
+      const labels = {};
+      Object.values(FG).forEach((g) => g.forEach((e) => (labels[e[0]] = e[1])));
+      const keyOfLabel = (t) => {
+        const hit = Object.values(FG)
+          .flat()
+          .filter((e) => t.startsWith(e[1]))
+          .sort((a, b) => b[1].length - a[1].length)[0];
+        return hit ? hit[0] : '';
+      };
+      const groupKeys = [FG.meals, FG.procs, FG.room].map((g) => g.map((e) => e[0]));
+      // hotels in list order (the base page is captured with no filters, so all of them)
+      const order = await grab(
+        b,
+        route,
+        (p) => p.click('text=Сбросить всё'),
+        () => Array.from(document.querySelectorAll('article[id^="h-"]')).map((a) => a.id.slice(2)),
+      );
       filterCfg = {
-        keys: fkeys,
+        fkeys: fkeys.map(keyOfLabel),
         bases: probe.found.map((x) => x.base),
         init: probe.found.map((x) => x.on),
-        groups: probe.groups,
+        groups: probe.groups.map((g, gi) => ({ ...g, keys: g.one ? [''].concat(groupKeys[gi]) : groupKeys[gi] })),
+        hotels: order.map((id) => {
+          const h = DATA.SANATORIUMS.find((x) => x.id === id);
+          return { tags: h.tags, stars: h.starsN };
+        }),
+        labels,
+        order,
       };
+      // the "Выбрано:" row with removable chips
+      raws.actrow = await grab(b, route, null, () => {
+        const d = window.__dc;
+        const lab = Array.from(document.querySelectorAll('span')).find((x) => x.textContent.trim() === 'Выбрано:');
+        const row = lab.parentElement;
+        const chips = Array.from(row.querySelectorAll('button')).filter((x) => !/Сбросить/.test(x.textContent));
+        const first = chips[0];
+        chips.slice(1).forEach((x) => x.remove());
+        d.on(first, 'click', 'a.off');
+        first.firstChild.textContent = '\u27E6a.t\u27E7';
+        first.before(d.raw('actfor-start'));
+        first.after(d.raw('actfor-end'));
+        Array.from(row.querySelectorAll('button'))
+          .filter((x) => /Сбросить/.test(x.textContent))
+          .forEach((x) => d.on(x, 'click', 'fResetAll'));
+        return row.outerHTML;
+      });
+      raws.actrow = wrapIf(
+        'hasActive',
+        IA.finish(post(raws.actrow), {
+          'actfor-start': '<sc-for list="{{activeList}}" as="a" hint-placeholder-count="2">',
+          'actfor-end': '</sc-for>',
+        }),
+      );
     }
-    // the page itself, with fields wired to the logic
-    const base = await grab(b, route, null, (isMain) => {
+    // the page itself, with fields wired to the logic (Results: all sanatoriums, filters applied by the logic)
+    const base = await grab(b, route, isMain ? null : (p) => p.click('text=Сбросить всё'), (isMain) => {
       const d = window.__dc;
       ['#datein', '#dateout'].forEach((s, i) => {
         const el = document.querySelector(s);
@@ -514,6 +587,16 @@ async function buildInteractive(b, sizes) {
           d.on(x, 'change', 'cmpT' + i);
           d.attr(x, 'checked', 'cmpOn' + i);
         });
+        // filter state shown on the page
+        const sum = Array.from(document.querySelectorAll('span')).find((x) => /^(Условия не выбраны|Выбрано:)/.test(x.textContent.trim()) && !x.children.length && x.closest('section'));
+        d.text(sum, 'appliedSummary');
+        const h2 = Array.from(document.querySelectorAll('h2')).find((x) => /^(Все \d|Подходят \d)/.test(x.textContent.trim()));
+        d.text(h2, 'foundLabel');
+        h2.parentElement.before(d.raw('actrow'));
+        document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
+          a.before(d.raw('hv-start-' + i));
+          a.after(d.raw('hv-end'));
+        });
         const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
         ask.after(d.raw('cmp'));
         page.appendChild(d.raw('wizard'));
@@ -522,11 +605,15 @@ async function buildInteractive(b, sizes) {
       page.appendChild(d.raw('calmodal'));
       return document.getElementById('root').innerHTML;
     }, isMain);
+    if (filterCfg) {
+      filterCfg.order.forEach((_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'));
+      raws['hv-end'] = '</sc-if>';
+    }
     const body = IA.finish(post(base), raws);
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    const logic = filterCfg ? IA.filtersLogic(filterCfg.keys, filterCfg.bases, filterCfg.init, filterCfg.groups) : IA.LOGIC;
+    const logic = filterCfg ? IA.filtersLogic(filterCfg) : IA.LOGIC;
     fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }
