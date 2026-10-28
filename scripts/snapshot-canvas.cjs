@@ -95,8 +95,8 @@ const BOARDS = [
     title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — трансфер от санатория)',
     route: '/transfer',
     links: [
-      ['.fly-alt-btn', '', 'Transfer-package.dc.html'],
-      ['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
     ],
   },
   { file: 'Guests.dc.html', title: 'Шаг 3 · Данные гостей', route: '/guests' },
@@ -214,17 +214,17 @@ const BOARDS = [
       });
       await p.reload({ waitUntil: 'networkidle' });
     },
-    links: [['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
   },
   {
     file: 'Transfer-package.dc.html',
     title: 'Шаг 2 · Дорога — перелёт добавлен (Эгле, даты с рейсом)',
     route: '/transfer',
     state: true,
-    setup: async (p) => p.click('.fly-alt-btn >> nth=0'),
+    setup: async (p) => p.click('.fly-alt-row >> nth=0'),
     links: [
-      ['.fly-opts .choice', 'Билеты у меня уже есть', 'Transfer.dc.html'],
-      ['.fly-opts .choice', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['[role=radiogroup] .ios-row', 'Билеты у меня уже есть', 'Transfer.dc.html'],
+      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
     ],
   },
 ];

@@ -203,9 +203,194 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* "Дорога": nearby dates with flights read as chips */
-body .page .fly-alt-btn {
-  border-radius: 999px;
-  border-width: 1.5px;
+/* ── iPhone-style grouped lists: white rows on the page background, hairline
+      dividers, a radio or a chevron on the row, new parts glide in ── */
+.page .ios-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.page .ios-cap {
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b746f;
+}
+.page .ios-list {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
   box-shadow: var(--sh-xs);
+  overflow: hidden;
+}
+.page .ios-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: #1c2620;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+.page .ios-row + .ios-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 1px solid var(--line);
+}
+.page button.ios-row {
+  cursor: pointer;
+}
+.page button.ios-row:hover {
+  background: #f6f8f6;
+}
+.page .ios-row.on,
+.page button.ios-row.on:hover {
+  background: var(--sel-bg);
+}
+.page button.ios-row:disabled {
+  cursor: not-allowed;
+  background: transparent;
+}
+.page button.ios-row:disabled .ios-main,
+.page button.ios-row:disabled .ios-end,
+.page button.ios-row:disabled .ios-radio {
+  opacity: 0.5;
+}
+.page .ios-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.page .ios-main strong {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.page .ios-sub {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #5e6862;
+}
+.page .ios-end {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #5e6862;
+  white-space: nowrap;
+}
+.page .ios-end.ok,
+.page .ios-link {
+  color: var(--green);
+}
+.page .ios-end.warn {
+  color: #8a5a00;
+}
+.page .ios-ico {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: var(--sel-bg);
+  color: var(--green);
+}
+.page .ios-ico.warn {
+  background: #fff3dc;
+  color: #8a5a00;
+}
+.page .ios-radio {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #b9b3a6;
+  background: #fff;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.page .ios-radio.on {
+  border-color: var(--green);
+  box-shadow:
+    inset 0 0 0 5px #fff,
+    inset 0 0 0 12px var(--green);
+}
+.page .ios-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 0 4px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #3e4b44;
+}
+.page .ios-note-i {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #c9893a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+}
+.page .ios-foot {
+  padding: 0 4px;
+  font-size: 14px;
+  color: #5e6862;
+}
+.page .ios-in {
+  animation: iosIn 0.3s ease-out;
+}
+@keyframes iosIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 560px) {
+  .page .ios-row {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .page .ios-end {
+    white-space: normal;
+  }
+  .page .ios-link {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page .ios-in {
+    animation: none;
+  }
 }

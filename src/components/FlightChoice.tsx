@@ -35,14 +35,16 @@ function flightPairs(checkin: Date, nights: number) {
 
 function Leg({ dir, leg, date }: { dir: string; leg: typeof LEG_THERE; date: Date }) {
   return (
-    <div className="fly-leg">
-      <span className="fly-leg-dir">{dir}</span>
-      <strong>
-        {leg.from} {leg.dep} → {leg.to} {leg.arr}
-      </strong>
-      <span>
-        {dayLabel(date)} · {leg.no} · Israir, прямой
+    <div className="ios-row">
+      <span className="ios-main">
+        <span className="ios-sub">
+          {dir} · {dayLabel(date)}
+        </span>
+        <strong>
+          {leg.from} {leg.dep} → {leg.to} {leg.arr}
+        </strong>
       </span>
+      <span className="ios-end">{leg.no}</span>
     </div>
   );
 }
@@ -87,35 +89,68 @@ export function FlightChoice() {
     help.open();
   };
 
-  const dayChip = (label: string, d: Date, ok: boolean, leg: typeof LEG_THERE) => (
-    <span className={'fly-day ' + (ok ? 'ok' : 'no')}>
-      <span className="fly-day-l">{label}</span>
-      <strong>{dayLabel(d)}</strong>
-      <span className="fly-day-s">
-        {ok ? (
-          <>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              aria-hidden="true"
-            >
-              <path d={PLANE} />
-            </svg>
-            рейс {leg.no}, {leg.dep}
-          </>
-        ) : (
-          'нашего рейса нет'
-        )}
+  const plane = (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={PLANE} />
+    </svg>
+  );
+  const chevron = (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      aria-hidden="true"
+    >
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+  const dayRow = (label: string, d: Date, ok: boolean, leg: typeof LEG_THERE, back = false) => (
+    <div className="ios-row">
+      <span className={'ios-ico ' + (ok ? '' : 'warn')} style={back ? { transform: 'scaleX(-1)' } : undefined}>
+        {plane}
       </span>
-    </span>
+      <span className="ios-main">
+        <span className="ios-sub">{label}</span>
+        <strong>{dayLabel(d)}</strong>
+      </span>
+      <span className={'ios-end ' + (ok ? 'ok' : 'warn')}>
+        {ok ? leg.no + ' · ' + leg.dep + ' → ' + leg.arr : 'нашего рейса нет'}
+      </span>
+    </div>
+  );
+  const option = (key: string, title: string, sub: string, onPick: () => void, end?: string, off = false) => (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={sel === key}
+      className={'ios-row ' + (sel === key ? 'on' : '')}
+      disabled={off}
+      onClick={onPick}
+    >
+      <span className={'ios-radio ' + (sel === key ? 'on' : '')} aria-hidden="true" />
+      <span className="ios-main">
+        <strong>{title}</strong>
+        <span className="ios-sub">{sub}</span>
+      </span>
+      {end ? <span className="ios-end ok">{end}</span> : null}
+    </button>
   );
 
   return (
-    <section className="card road-sec" aria-labelledby="flyTitle">
+    <section className="road-sec" aria-labelledby="flyTitle">
       <div className="road-h">
         <span className="road-num">1</span>
         <div>
@@ -123,108 +158,90 @@ export function FlightChoice() {
           <span>Сначала решим с рейсом — трансфер подстроим под него.</span>
         </div>
       </div>
-      <div className="fly-days">
-        {dayChip('Туда', inD, inOk, LEG_THERE)}
-        {dayChip('Обратно', outD, outOk, LEG_BACK)}
+      <div className="ios-list">
+        {dayRow('Туда', inD, inOk, LEG_THERE)}
+        {dayRow('Обратно', outD, outOk, LEG_BACK, true)}
       </div>
       {!both ? (
-        <div className="fly-warn" role="status">
-          {sel === 'with' ? (
-            <p>
-              <strong>Вы выбрали поездку с перелётом, но в ваши даты наш рейс не летает</strong> — прямые рейсы Israir
-              бывают по вторникам, четвергам и воскресеньям. Выберите даты с рейсом ниже — или другой вариант дороги.
-            </p>
-          ) : (
-            <p>
-              <strong>В ваши даты наша авиакомпания-партнёр не летает</strong> — прямые рейсы Israir бывают по
-              вторникам, четвергам и воскресеньям. Поехать всё равно можно: другой авиакомпанией, через другой аэропорт
-              — или сдвинуть даты.
-            </p>
-          )}
-          {pairs.length ? (
-            <div className="fly-alt">
-              <span>Даты с нашим рейсом туда и обратно:</span>
-              {pairs.map((p) => (
-                <button
-                  type="button"
-                  key={iso(p.a) + p.n}
-                  className="fly-alt-btn"
-                  onClick={() => pickWith({ checkin: iso(p.a), checkout: iso(p.b) })}
-                >
-                  {dayLabel(p.a)} → {dayLabel(p.b)} · {p.n} {nightsWord(p.n)}
-                </button>
-              ))}
-            </div>
-          ) : null}
+        <p className="ios-note ios-in" role="status">
+          <span className="ios-note-i" aria-hidden="true">
+            !
+          </span>
+          <span>
+            {sel === 'with'
+              ? 'Вы выбрали перелёт, но в ваши даты наш рейс не летает. Он летает по вторникам, четвергам и воскресеньям — выберите даты ниже.'
+              : 'Наш прямой рейс Israir летает по вторникам, четвергам и воскресеньям — в ваши даты его нет. Можно сдвинуть даты или поехать иначе.'}
+          </span>
+        </p>
+      ) : null}
+      {pairs.length ? (
+        <div className="ios-sec ios-in">
+          <span className="ios-cap">Даты с нашим рейсом туда и обратно</span>
+          <div className="ios-list">
+            {pairs.map((p) => (
+              <button
+                type="button"
+                key={iso(p.a) + p.n}
+                className="ios-row fly-alt-row"
+                onClick={() => pickWith({ checkin: iso(p.a), checkout: iso(p.b) })}
+              >
+                <span className="ios-main">
+                  <strong>
+                    {dayLabel(p.a)} → {dayLabel(p.b)}
+                  </strong>
+                  <span className="ios-sub">
+                    {p.n} {nightsWord(p.n)} · рейсы {LEG_THERE.no} и {LEG_BACK.no}
+                  </span>
+                </span>
+                <span className="ios-end">
+                  <span className="ios-link">Выбрать</span>
+                  {chevron}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       ) : null}
-      <div className="fly-opts" role="radiogroup" aria-labelledby="flyTitle">
-        <button
-          type="button"
-          role="radio"
-          aria-checked={sel === 'with'}
-          className={'choice ' + (sel === 'with' ? 'on' : '')}
-          disabled={!both}
-          onClick={() => pickWith()}
-        >
-          <span className={'radio ' + (sel === 'with' ? 'on' : '')}>
-            <i />
-          </span>
-          <span className="fly-opt-t">
-            <span className="fly-opt-h">
-              <strong>Добавить наш перелёт в заказ</strong>
-              <span className="fly-price">+{fmt(pp)}&nbsp;€ с человека</span>
-            </span>
-            <span>
-              {both
-                ? (bySan
-                    ? 'Прямой рейс Israir, багаж 20 кг. Трансфер из аэропорта организует санаторий. '
-                    : 'Прямой рейс Israir, багаж 20 кг, трансфер у самолёта — всё в одной цене. ') +
+      <div className="ios-sec">
+        <span className="ios-cap">Как вы доберётесь</span>
+        <div className="ios-list" role="radiogroup" aria-labelledby="flyTitle">
+          {option(
+            'with',
+            'Добавить наш перелёт в заказ',
+            both
+              ? (bySan
+                  ? 'Прямой рейс Israir, багаж 20 кг. Трансфер из аэропорта организует санаторий. '
+                  : 'Прямой рейс Israir, багаж 20 кг, трансфер у самолёта — всё в одной цене. ') +
                   `За ${n === 2 ? 'двоих' : n + ' гостей'}: ${fmt(pp * n)} €.`
-                : 'Недоступно в ваши даты — выберите даты с рейсом выше.'}
-            </span>
-          </span>
-        </button>
-        <button
-          type="button"
-          role="radio"
-          aria-checked={sel === 'own'}
-          className={'choice ' + (sel === 'own' ? 'on' : '')}
-          onClick={pickOwn}
-        >
-          <span className={'radio ' + (sel === 'own' ? 'on' : '')}>
-            <i />
-          </span>
-          <span className="fly-opt-t">
-            <strong>Билеты у меня уже есть или приеду сам</strong>
-            <span>
-              {bySan
-                ? 'Другой рейс, другой аэропорт, на машине. Номер рейса передадим санаторию — его трансфер встретит вас.'
-                : 'Другой рейс, другой аэропорт, на машине. Номер рейса можно указать ниже — трансфер встретит по нему.'}
-            </span>
-          </span>
-        </button>
-        <button
-          type="button"
-          role="radio"
-          aria-checked={sel === 'help'}
-          className={'choice ' + (sel === 'help' ? 'on' : '')}
-          onClick={pickHelp}
-        >
-          <span className={'radio ' + (sel === 'help' ? 'on' : '')}>
-            <i />
-          </span>
-          <span className="fly-opt-t">
-            <strong>Не знаю, как лучше добраться</strong>
-            <span>Консультант подберёт рейс и перезвонит. Заказ сохранится — можно продолжать.</span>
-          </span>
-        </button>
+              : 'В ваши даты недоступно — выберите даты с рейсом выше.',
+            () => pickWith(),
+            '+' + fmt(pp) + ' € / чел.',
+            !both,
+          )}
+          {option(
+            'own',
+            'Билеты у меня уже есть или приеду сам',
+            bySan
+              ? 'Другой рейс, другой аэропорт, на машине. Номер рейса передадим санаторию — его трансфер встретит вас.'
+              : 'Другой рейс, другой аэропорт, на машине. Номер рейса можно указать ниже — трансфер встретит по нему.',
+            pickOwn,
+          )}
+          {option(
+            'help',
+            'Не знаю, как лучше добраться',
+            'Консультант подберёт рейс и перезвонит. Заказ сохранится — можно продолжать.',
+            pickHelp,
+          )}
+        </div>
       </div>
       {sel === 'with' && both ? (
-        <div className="fly-legs">
-          <Leg dir="Туда" leg={LEG_THERE} date={inD} />
-          <Leg dir="Обратно" leg={LEG_BACK} date={outD} />
-          <span className="fly-legs-note">
+        <div className="ios-sec ios-in">
+          <span className="ios-cap">Ваши рейсы · Israir, прямые</span>
+          <div className="ios-list">
+            <Leg dir="Туда" leg={LEG_THERE} date={inD} />
+            <Leg dir="Обратно" leg={LEG_BACK} date={outD} />
+          </div>
+          <span className="ios-foot">
             Билеты выпишем на имена гостей со следующего шага и пришлём на почту и в WhatsApp. Цена билетов фиксируется
             депозитом. [ПРИМЕР ДАННЫХ]
           </span>
