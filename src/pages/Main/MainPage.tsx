@@ -678,7 +678,7 @@ export default function MainPage() {
             style={{
               background: '#EEF5F1',
               border: '1px solid #C8DED3',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
               padding: '18px 22px',
               display: 'flex',
               alignItems: 'center',
@@ -880,7 +880,7 @@ export default function MainPage() {
               aria-labelledby="calTitle"
               style={{
                 background: '#fff',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 width: 'min(1000px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1019,7 +1019,7 @@ export default function MainPage() {
                               marginTop: '8px',
 
                               background: '#F4F1EA',
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               padding: '10px 12px',
                               fontSize: '14px',
                               lineHeight: '1.45',

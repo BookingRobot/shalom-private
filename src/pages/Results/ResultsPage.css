@@ -20,7 +20,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
@@ -48,7 +48,7 @@
 .pg-results .input {
   min-height: 52px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 0 14px;
   background: #fff;
   font-size: 17px;
@@ -68,7 +68,7 @@
 .pg-results .card {
   background: #fff;
   border: 1px solid #e3ded2;
-  border-radius: 3px;
+  border-radius: var(--r);
 }
 .pg-results .chk {
   display: flex;
@@ -102,7 +102,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   border: 2px solid #cfc9bb;
   font-weight: 700;
@@ -130,7 +130,7 @@
   gap: 14px;
   border: 2px solid #1f5f4a;
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 10px 18px;
   cursor: pointer;
   min-height: 64px;
@@ -183,7 +183,7 @@
   accent-color: #1f5f4a;
   margin: 0;
   flex: none;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-results .ftitle {
   font-family: Lora, Georgia, serif;
@@ -201,7 +201,7 @@
   font-size: 14px;
   font-weight: 600;
   padding: 7px 11px;
-  border-radius: 2px;
+  border-radius: var(--r);
   line-height: 1.2;
 }
 .pg-results .srt {
@@ -212,7 +212,7 @@
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .pg-results .srt.on {
   background: #1f5f4a;
@@ -247,7 +247,7 @@
   min-height: 64px;
   padding: 10px 18px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   cursor: pointer;
   font-size: 17px;
@@ -277,7 +277,7 @@
   padding: 0 20px;
   border: 2px solid #cfc9bb;
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-weight: 700;
   font-size: 17px;
   color: #1c2620;
@@ -289,7 +289,7 @@
 .pg-results .sinput {
   min-height: 50px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 0 14px 0 42px;
   background: #fff;
   font-size: 16px;
@@ -316,7 +316,7 @@
   padding: 0 16px;
   border: 2px solid #cfc9bb;
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
@@ -334,7 +334,7 @@
 .pg-results .lg i {
   width: 18px;
   height: 18px;
-  border-radius: 2px;
+  border-radius: var(--r);
   display: inline-block;
 }
 

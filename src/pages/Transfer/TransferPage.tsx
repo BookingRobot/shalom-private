@@ -287,7 +287,7 @@ export default function TransferPage() {
                             fontSize: '14px',
                             fontWeight: '800',
                             padding: '2px 8px',
-                            borderRadius: '2px',
+                            borderRadius: 'var(--r)',
                           }}
                         >
                           Рекомендуем
@@ -373,7 +373,12 @@ export default function TransferPage() {
                           до автовокзала, купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.
                         </p>
                         <div
-                          style={{ padding: '14px 16px', background: '#EEF5F1', borderRadius: '2px', fontSize: '16px' }}
+                          style={{
+                            padding: '14px 16px',
+                            background: '#EEF5F1',
+                            borderRadius: 'var(--r)',
+                            fontSize: '16px',
+                          }}
                         >
                           <strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до
                           стойки санатория. Групповой трансфер — всего 30&nbsp;€ с человека, индивидуальный — от
@@ -419,7 +424,7 @@ export default function TransferPage() {
                           padding: '14px 18px 12px',
                           background: '#EDF4EF',
                           border: '1px solid #C8DED3',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                         }}
                       >
                         <div style={{ fontWeight: '800', fontSize: '17px' }}>От встречи до санатория</div>
@@ -725,7 +730,7 @@ export default function TransferPage() {
                               gap: '16px',
                               padding: '18px 20px',
                               border: '1px solid #E3DED2',
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               background: '#FAF8F3',
                             }}
                           >
@@ -778,7 +783,7 @@ export default function TransferPage() {
                               padding: '18px 20px',
                               border: `2px solid ${v.grpBorder ?? ''}`,
                               background: v.grpBg,
-                              borderRadius: '2px 2px 0 0',
+                              borderRadius: 'var(--r) var(--r) 0 0',
                             }}
                           >
                             <span
@@ -790,7 +795,7 @@ export default function TransferPage() {
                                 justifyContent: 'center',
                                 flex: 'none',
                                 background: '#fff',
-                                borderRadius: '2px',
+                                borderRadius: 'var(--r)',
                                 overflow: 'hidden',
                               }}
                             >
@@ -810,7 +815,7 @@ export default function TransferPage() {
                                     fontSize: '14px',
                                     fontWeight: '800',
                                     padding: '4px 10px',
-                                    borderRadius: '2px',
+                                    borderRadius: 'var(--r)',
                                   }}
                                 >
                                   Самый выгодный
@@ -852,7 +857,7 @@ export default function TransferPage() {
                               marginTop: '-2px',
                               border: `2px solid ${v.indBorder ?? ''}`,
                               borderTop: '1px dashed #C8DED3',
-                              borderRadius: '0 0 2px 2px',
+                              borderRadius: '0 0 var(--r) var(--r)',
                               background: '#FAFBF9',
                               cursor: 'pointer',
                               color: '#1C2620',
@@ -954,7 +959,7 @@ export default function TransferPage() {
                                             justifyContent: 'center',
                                             flex: 'none',
                                             background: '#fff',
-                                            borderRadius: '2px',
+                                            borderRadius: 'var(--r)',
                                             overflow: 'hidden',
                                           }}
                                         >
@@ -990,7 +995,7 @@ export default function TransferPage() {
                               gap: '12px',
                               alignItems: 'flex-start',
                               background: '#FFF1D6',
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               padding: '12px 16px',
                               fontSize: '15px',
                               color: '#1C2620',
@@ -1028,7 +1033,7 @@ export default function TransferPage() {
                           gap: '16px',
                           padding: '20px',
                           border: '2px solid #1F5F4A',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           background: '#fff',
                         }}
                       >
@@ -1114,7 +1119,7 @@ export default function TransferPage() {
                                       padding: '16px',
                                       background: '#FAF8F3',
                                       border: '1px solid #E3DED2',
-                                      borderRadius: '2px',
+                                      borderRadius: 'var(--r)',
                                     }}
                                   >
                                     <div className="lbl">Куда отвезти {v.outDay}?</div>
@@ -1230,7 +1235,7 @@ export default function TransferPage() {
                           gap: '12px',
                           alignItems: 'start',
                           padding: '14px 16px',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           border: '1px solid #E3DED2',
                           fontSize: '16px',
                           color: '#3E4B44',

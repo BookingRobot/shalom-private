@@ -67,7 +67,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   max-width: calc(100vw - 32px);
   background: #fff;
   border: 1px solid #cfc9bb;
-  border-radius: 3px;
+  border-radius: var(--r);
   box-shadow: 0 12px 32px rgba(28, 38, 32, 0.18);
   padding: 16px 18px;
   display: flex;
@@ -204,7 +204,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   color: #1c2620;
   padding: 8px 14px 8px 10px;
   border: 1.5px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   align-self: flex-start;
   line-height: 1.3;
@@ -235,7 +235,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   color: #8a5a00;
   background: #fff1d6;
   padding: 6px 10px;
-  border-radius: 2px;
+  border-radius: var(--r);
   align-self: flex-start;
 }
 
@@ -263,7 +263,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .share-panel {
   border: 1px solid #e3ded2;
   background: #fafbf9;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -329,7 +329,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-wrap: wrap;
   background: #fff;
   border: 2px solid #1f5f4a;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 10px 16px;
   box-shadow: 0 -6px 20px rgba(28, 38, 32, 0.12);
   font-size: 16px;
@@ -357,7 +357,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .cmp-dialog {
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   width: min(1040px, 100%);
   padding: 24px 26px;
   display: flex;
@@ -397,7 +397,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 100%;
   height: 110px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .page .cmp-x {
   align-self: flex-start;
@@ -459,7 +459,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .wz {
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   width: min(720px, 100%);
   padding: 24px 26px;
   display: flex;
@@ -492,7 +492,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   min-height: 60px;
   padding: 12px 18px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   text-align: left;
   font-size: 19px;
@@ -538,14 +538,14 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   align-items: center;
   flex-wrap: wrap;
   border: 1px solid #e3ded2;
-  border-radius: 2px;
+  border-radius: var(--r);
   padding: 12px;
 }
 .page .wz-card img {
   width: 120px;
   height: 84px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: var(--r);
   flex: none;
 }
 .page .wz-body {
@@ -653,7 +653,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   min-height: 52px;
   padding: 10px 16px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   cursor: pointer;
   text-align: left;
@@ -680,7 +680,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 13px;
   font-weight: 800;
   padding: 2px 8px;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .page .fd-note,
 .page .fd-empty {
@@ -690,7 +690,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .dm-tabs {
   display: inline-flex;
   border: 2px solid #1f5f4a;
-  border-radius: 2px;
+  border-radius: var(--r);
   align-self: flex-start;
   overflow: hidden;
 }
@@ -722,7 +722,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   list-style: none;
   background: #fff;
   border: 1px solid #cfc9bb;
-  border-radius: 3px;
+  border-radius: var(--r);
   box-shadow: 0 12px 32px rgba(28, 38, 32, 0.18);
   max-height: 360px;
   overflow: auto;
@@ -801,7 +801,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   color: #1f5f4a;
   border: 2px solid #cfc9bb;
   background: #fff;
-  border-radius: 2px;
+  border-radius: var(--r);
   cursor: pointer;
 }
 .page .fd-car .navbtn:disabled {
@@ -822,7 +822,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 0;
   padding: 8px 10px;
   border: 2px solid #cfc9bb;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: #fff;
   cursor: pointer;
   text-align: left;
@@ -920,7 +920,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .rs {
   background: #fff;
-  border-radius: 3px;
+  border-radius: var(--r);
   width: min(1080px, 100%);
   overflow: hidden;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
@@ -1023,7 +1023,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-direction: column;
   padding: 10px 12px;
   background: #f4f1ea;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-size: 16px;
   line-height: 1.35;
 }
@@ -1040,7 +1040,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 100%;
   height: 120px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .page .rs-side {
   flex: 1 1 300px;
@@ -1052,7 +1052,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 0;
-  border-radius: 2px;
+  border-radius: var(--r);
 }
 .page .rs-video-empty {
   background: #2b3a33;
@@ -1417,7 +1417,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   background: #fff6e3;
   border: 1px solid #f0ddb8;
   border-left: 4px solid #c9893a;
-  border-radius: 2px;
+  border-radius: var(--r);
   font-size: 15px;
   line-height: 1.4;
   color: #1c2620;
@@ -1435,7 +1435,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font: inherit;
   font-size: 15px;
   font-weight: 700;
-  border-radius: 2px;
+  border-radius: var(--r);
   cursor: pointer;
 }
 .cal-note-ask:hover {

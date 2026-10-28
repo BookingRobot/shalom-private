@@ -220,7 +220,7 @@ export default function PaymentPage() {
                     gap: '12px',
                     border: '2px dashed #C8DED3',
                     background: '#FAFBF9',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--r)',
                     padding: '18px 20px',
                   }}
                 >
@@ -312,7 +312,7 @@ export default function PaymentPage() {
                         gap: '8px',
                         minHeight: '48px',
                         padding: '0 18px',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         background: '#1C2620',
                         color: '#fff',
                         fontWeight: '700',
@@ -328,7 +328,7 @@ export default function PaymentPage() {
                         gap: '8px',
                         minHeight: '48px',
                         padding: '0 18px',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                         background: '#fff',
                         border: '2px solid #1C2620',
                         fontWeight: '700',
@@ -494,7 +494,12 @@ export default function PaymentPage() {
               </div>
               <label
                 className="chk"
-                style={{ padding: '14px 16px', border: '2px solid #CFC9BB', borderRadius: '2px', marginTop: '4px' }}
+                style={{
+                  padding: '14px 16px',
+                  border: '2px solid #CFC9BB',
+                  borderRadius: 'var(--r)',
+                  marginTop: '4px',
+                }}
               >
                 {' '}
                 <input type="checkbox" />{' '}
@@ -558,7 +563,7 @@ export default function PaymentPage() {
                   flexDirection: 'column',
                   gap: '4px',
                   background: '#EEF5F1',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '12px 14px',
                 }}
               >

@@ -543,7 +543,7 @@ export default function HotelPage() {
                 padding: '0',
                 border: 'none',
                 background: '#2B3A33',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -566,7 +566,7 @@ export default function HotelPage() {
                   fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               >
                 Территория
@@ -581,7 +581,7 @@ export default function HotelPage() {
                 padding: '0',
                 border: 'none',
                 background: '#2B3A33',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -604,7 +604,7 @@ export default function HotelPage() {
                   fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               >
                 Номер
@@ -619,7 +619,7 @@ export default function HotelPage() {
                 padding: '0',
                 border: 'none',
                 background: '#2B3A33',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -642,7 +642,7 @@ export default function HotelPage() {
                   fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               >
                 Бассейн
@@ -657,7 +657,7 @@ export default function HotelPage() {
                 padding: '0',
                 border: 'none',
                 background: '#2B3A33',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -680,7 +680,7 @@ export default function HotelPage() {
                   fontSize: '14px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                 }}
               />
               <span
@@ -745,7 +745,7 @@ export default function HotelPage() {
                       fontWeight: '800',
                       fontSize: '16px',
                       cursor: 'pointer',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                     }}
                   >
                     Закрыть ✕
@@ -774,7 +774,7 @@ export default function HotelPage() {
                             maxHeight: '680px',
                             objectFit: 'cover',
                             display: 'block',
-                            borderRadius: '2px',
+                            borderRadius: 'var(--r)',
                           }}
                         />
                         <figcaption style={{ color: '#D9E2DC', fontSize: '15px' }}>
@@ -794,7 +794,7 @@ export default function HotelPage() {
               flexWrap: 'wrap',
               background: '#EEF5F1',
               border: '1px solid #C8DED3',
-              borderRadius: '2px',
+              borderRadius: 'var(--r)',
             }}
           >
             <div className="strip">
@@ -889,7 +889,7 @@ export default function HotelPage() {
                 style={{
                   background: '#EEF5F1',
                   border: '2px solid #1F5F4A',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '14px 20px',
                   display: 'flex',
                   alignItems: 'center',
@@ -977,7 +977,7 @@ export default function HotelPage() {
                   fontSize: '15px',
                   color: '#3E4B44',
                   background: '#EEF5F1',
-                  borderRadius: '2px',
+                  borderRadius: 'var(--r)',
                   padding: '10px 16px',
                 }}
               >
@@ -1036,7 +1036,7 @@ export default function HotelPage() {
                       background: '#fff',
                       border: '1px solid #E3DED2',
                       borderTop: 'none',
-                      borderRadius: '0 0 2px 2px',
+                      borderRadius: '0 0 var(--r) var(--r)',
                       padding: '18px 18px 16px',
                       marginTop: '-8px',
                       display: 'flex',
@@ -1104,7 +1104,7 @@ export default function HotelPage() {
                         padding: '14px 18px 14px',
                         background: '#EDF4EF',
                         border: '1px solid #C8DED3',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--r)',
                       }}
                     >
                       <div style={{ fontWeight: '800', fontSize: '17px' }}>{v.freeTr}</div>
@@ -1378,7 +1378,7 @@ export default function HotelPage() {
                       background: '#fff',
                       border: '1px solid #E3DED2',
                       borderTop: 'none',
-                      borderRadius: '0 0 2px 2px',
+                      borderRadius: '0 0 var(--r) var(--r)',
                       padding: '18px 18px 16px',
                       marginTop: '-8px',
                       display: 'flex',
@@ -1394,7 +1394,7 @@ export default function HotelPage() {
                           alignItems: 'center',
                           background: '#EEF5F1',
                           border: '1px solid #C8DED3',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '14px 16px',
                         }}
                       >
@@ -1405,7 +1405,7 @@ export default function HotelPage() {
                             flex: 'none',
                             background: '#fff',
                             border: '1px solid #C8DED3',
-                            borderRadius: '2px',
+                            borderRadius: 'var(--r)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1458,7 +1458,7 @@ export default function HotelPage() {
                           alignItems: 'center',
                           background: '#F7F5F0',
                           border: '1px solid #E3DED2',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '14px 16px',
                         }}
                       >
@@ -1469,7 +1469,7 @@ export default function HotelPage() {
                             flex: 'none',
                             background: '#fff',
                             border: '1px solid #E3DED2',
-                            borderRadius: '2px',
+                            borderRadius: 'var(--r)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1583,7 +1583,7 @@ export default function HotelPage() {
                       background: '#fff',
                       border: '1px solid #E3DED2',
                       borderTop: 'none',
-                      borderRadius: '0 0 2px 2px',
+                      borderRadius: '0 0 var(--r) var(--r)',
                       padding: '18px 18px 16px',
                       marginTop: '-8px',
                       display: 'flex',
@@ -1601,7 +1601,7 @@ export default function HotelPage() {
                               alignItems: 'flex-start',
                               background: '#F7F5F0',
                               border: '1px solid #E3DED2',
-                              borderRadius: '2px',
+                              borderRadius: 'var(--r)',
                               padding: '12px 14px',
                             }}
                           >
@@ -1612,7 +1612,7 @@ export default function HotelPage() {
                                 flex: 'none',
                                 background: '#EEF5F1',
                                 border: '1px solid #C8DED3',
-                                borderRadius: '2px',
+                                borderRadius: 'var(--r)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -1669,7 +1669,7 @@ export default function HotelPage() {
                 width: '100%',
                 background: '#EEF5F1',
                 border: '1px solid #C8DED3',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 padding: '18px 24px',
                 display: 'flex',
                 alignItems: 'center',
@@ -1765,7 +1765,7 @@ export default function HotelPage() {
               aria-labelledby="calTitle"
               style={{
                 background: '#fff',
-                borderRadius: '2px',
+                borderRadius: 'var(--r)',
                 width: 'min(1040px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1792,7 +1792,7 @@ export default function HotelPage() {
                           gap: '8px',
                           background: '#FFF6E3',
                           border: '1px solid #F0DDB8',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '6px 12px',
                           fontSize: '16px',
                           marginTop: '4px',
@@ -1921,7 +1921,7 @@ export default function HotelPage() {
                           marginTop: '8px',
 
                           background: '#F4F1EA',
-                          borderRadius: '2px',
+                          borderRadius: 'var(--r)',
                           padding: '10px 12px',
                           fontSize: '14px',
                           lineHeight: '1.45',
@@ -1952,7 +1952,7 @@ export default function HotelPage() {
                   <div
                     style={{
                       background: '#F4F1EA',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1975,7 +1975,7 @@ export default function HotelPage() {
                   <div
                     style={{
                       background: v.diffBg,
-                      borderRadius: '2px',
+                      borderRadius: 'var(--r)',
                       padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
