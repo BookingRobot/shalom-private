@@ -132,35 +132,28 @@ class ResultsLogic extends PageLogic {
         n: SANATORIUMS.filter((h) => has(h, k) && passWith({ ...pf, [k]: false }, ppr)(h)).length,
         toggle: () => this.setState({ pf: { ...pf, [k]: !pf[k] } }),
       }));
-    // one-of groups (meals, procedures per day): picking one clears the others; applied right away
+    // one-of groups (meals, procedures per day): picking one clears the others; applied with the panel button
     const mkOne = (pairs) => {
       const keys = pairs.map((x) => x[0]);
-      const cur = keys.find((k) => f[k]) || '';
+      const cur = keys.find((k) => pf[k]) || '';
       const setOne = (k) => () => {
-        const nf = { ...f },
-          npf = { ...pf };
-        keys.forEach((x) => {
-          nf[x] = false;
-          npf[x] = false;
-        });
-        if (k && k !== cur) {
-          nf[k] = true;
-          npf[k] = true;
-        }
-        this.setState({ f: nf, pf: npf });
+        const npf = { ...pf };
+        keys.forEach((x) => (npf[x] = false));
+        if (k && k !== cur) npf[k] = true;
+        this.setState({ pf: npf });
       };
       return [{ k: '', t: 'Любое', on: !cur, pick: setOne('') }].concat(
         pairs.map(([k, t]) => ({ k, t, on: cur === k, pick: setOne(k) })),
       );
     };
-    // room features: several at once, applied right away
+    // room features: several at once
     const mkNow = (pairs) =>
       pairs.map(([k, t, d]) => ({
         k,
         t,
         d,
-        on: !!f[k],
-        pick: () => this.setState({ f: { ...f, [k]: !f[k] }, pf: { ...pf, [k]: !f[k] } }),
+        on: !!pf[k],
+        pick: () => this.setState({ pf: { ...pf, [k]: !pf[k] } }),
       }));
 
     const sort = st.sort || 'pop';
@@ -1120,58 +1113,6 @@ export default function ResultsPage() {
               Помогите выбрать санаторий
             </button>
           </div>
-          {/* Quick choices guests ask about most: meals, procedures per day, room */}
-          <section className="card qf" aria-label="Быстрый выбор">
-            <div className="qf-row">
-              <span className="qf-lbl">Питание</span>
-              <div className="qf-opts" role="group" aria-label="Питание">
-                {(v.fMeals || []).map((o: any) => (
-                  <button
-                    type="button"
-                    key={o.k}
-                    className={`qf-chip ${o.on ? 'on' : ''}`}
-                    aria-pressed={o.on}
-                    onClick={o.pick}
-                  >
-                    {o.t}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="qf-row">
-              <span className="qf-lbl">Процедуры</span>
-              <div className="qf-opts" role="group" aria-label="Процедуры в день">
-                {(v.fProcs || []).map((o: any) => (
-                  <button
-                    type="button"
-                    key={o.k}
-                    className={`qf-chip ${o.on ? 'on' : ''}`}
-                    aria-pressed={o.on}
-                    onClick={o.pick}
-                  >
-                    {o.t}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="qf-row">
-              <span className="qf-lbl">Номер</span>
-              <div className="qf-opts" role="group" aria-label="Номер">
-                {(v.fRoom || []).map((o: any) => (
-                  <button
-                    type="button"
-                    key={o.k}
-                    className={`qf-chip ${o.on ? 'on' : ''}`}
-                    aria-pressed={o.on}
-                    onClick={o.pick}
-                  >
-                    {o.on ? '✓ ' : ''}
-                    {o.t}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
           {/* Filters above the list */}
           {v.fClosed ? (
             <>
@@ -1292,6 +1233,58 @@ export default function ResultsPage() {
                       </label>
                     </Fragment>
                   ))}
+                </div>
+                {/* Meals, procedures per day, room — what guests ask about most */}
+                <div className="qf" aria-label="Питание, процедуры, номер">
+                  <div className="qf-row">
+                    <span className="qf-lbl">Питание</span>
+                    <div className="qf-opts" role="group" aria-label="Питание">
+                      {(v.fMeals || []).map((o: any) => (
+                        <button
+                          type="button"
+                          key={o.k}
+                          className={`qf-chip ${o.on ? 'on' : ''}`}
+                          aria-pressed={o.on}
+                          onClick={o.pick}
+                        >
+                          {o.t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="qf-row">
+                    <span className="qf-lbl">Процедуры</span>
+                    <div className="qf-opts" role="group" aria-label="Процедуры в день">
+                      {(v.fProcs || []).map((o: any) => (
+                        <button
+                          type="button"
+                          key={o.k}
+                          className={`qf-chip ${o.on ? 'on' : ''}`}
+                          aria-pressed={o.on}
+                          onClick={o.pick}
+                        >
+                          {o.t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="qf-row">
+                    <span className="qf-lbl">Номер</span>
+                    <div className="qf-opts" role="group" aria-label="Номер">
+                      {(v.fRoom || []).map((o: any) => (
+                        <button
+                          type="button"
+                          key={o.k}
+                          className={`qf-chip ${o.on ? 'on' : ''}`}
+                          aria-pressed={o.on}
+                          onClick={o.pick}
+                        >
+                          {o.on ? '✓ ' : ''}
+                          {o.t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
                 {v.moreOpen ? (
                   <>

@@ -58,7 +58,6 @@ export const FILTER_GROUPS = {
   room: [
     ['ac', 'Кондиционер', ICON_PATHS.ac],
     ['balcony', 'Балкон', ICON_PATHS.balcony],
-    ['twin', 'Две отдельные кровати', ICON_PATHS.bed2],
     ['newbld', 'Новый корпус', BUILDING_ICON],
   ],
   beds: [
