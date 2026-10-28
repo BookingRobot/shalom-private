@@ -519,8 +519,8 @@ class ResultsLogic extends PageLogic {
           fly: false,
           text: '',
           sub: '',
-          bg: '#fff',
-          border: '#F0EDE6',
+          bg: 'transparent',
+          border: 'transparent',
           color: '#1C2620',
           off: true,
           cursor: 'default',
@@ -547,7 +547,7 @@ class ResultsLogic extends PageLogic {
           day: d,
           fly: isFlightDay(date) && !past,
           text: so || past ? (past ? '' : 'Нет мест') : p + '\u00a0€',
-          sub: isPick ? '✓ Новый заезд' : isCur ? 'Ваш заезд' : '',
+          sub: isPick ? '✓ заезд' : isCur ? 'ваш заезд' : '',
           bg,
           border: isPick ? '#1F5F4A' : isCur ? '#1C2620' : 'transparent',
           color: isPick ? '#1F5F4A' : '#1C2620',
@@ -2209,42 +2209,43 @@ export default function ResultsPage() {
               zIndex: '70',
               background: 'rgba(20,28,24,.6)',
               overflow: 'auto',
-              padding: '24px 16px',
+              padding: '16px',
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center',
             }}
           >
             <div
+              className="cal-dlg"
               role="dialog"
               aria-modal="true"
               aria-labelledby="calTitle"
               style={{
                 background: '#fff',
                 borderRadius: '2px',
-                maxWidth: '1120px',
+                maxWidth: '1040px',
                 width: '100%',
-                padding: '28px 32px',
+                padding: '18px 24px 16px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
+                gap: '12px',
                 boxShadow: '0 24px 70px rgba(0,0,0,.4)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '32px' }}>
+                  <h2 id="calTitle" style={{ fontSize: '24px' }}>
                     Выберите дату заезда
                   </h2>
-                  <div style={{ fontSize: '22px', color: '#1C2620' }}>{v.cal?.hotelName}</div>
+                  <div style={{ fontSize: '17px', color: '#1C2620' }}>{v.cal?.hotelName}</div>
                 </div>
                 <button
                   type="button"
                   onClick={v.calClose}
                   aria-label="Закрыть"
                   style={{
-                    width: '48px',
-                    height: '48px',
+                    width: '44px',
+                    height: '44px',
                     border: 'none',
                     background: 'none',
                     cursor: 'pointer',
@@ -2260,33 +2261,19 @@ export default function ResultsPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '14px',
-                  flexWrap: 'wrap',
-                  background: '#F4F1EA',
-                  borderRadius: '2px',
-                  padding: '10px 16px',
-                  fontSize: '17px',
-                }}
-              >
-                2 взрослых · {v.nightsLabel} · {v.cal?.room} · {v.cal?.prog}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
                   gap: '12px',
                   flexWrap: 'wrap',
                   background: '#EEF5F1',
                   borderRadius: '2px',
-                  padding: '12px 16px',
-                  fontSize: '18px',
+                  padding: '8px 14px',
+                  fontSize: '16px',
                   color: '#1F5F4A',
                   fontWeight: '700',
                 }}
               >
                 <svg
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="#1F5F4A"
@@ -2298,24 +2285,27 @@ export default function ResultsPage() {
                   <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
                 </svg>
                 Ваши даты: {v.curRange} · ≈ {v.cal?.curPpn}&nbsp;€ / чел. в сутки
+                <span style={{ fontWeight: '400', color: '#3E4B44' }}>
+                  · 2 взрослых · {v.nightsLabel} · {v.cal?.room} · {v.cal?.prog}
+                </span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '18px', alignItems: 'flex-start' }}>
                 {/* Calendar */}
                 <div
                   style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '8px' }}
                 >
-                  <div style={{ fontSize: '22px', fontWeight: '800' }}>Средняя цена за 1 человека в сутки</div>
-                  <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-6px' }}>
-                    При заезде в выбранный день на {v.nightsLabel}.
+                  <div style={{ fontSize: '17px', fontWeight: '800' }}>Средняя цена за 1 человека в сутки</div>
+                  <div style={{ fontSize: '14px', color: '#3E4B44', marginTop: '-6px' }}>
+                    При заезде в выбранный день на {v.nightsLabel}. Точная сумма за весь отдых — в блоке «Новые даты».
                   </div>
                   <div
                     style={{
                       border: '1px solid #E3DED2',
                       borderRadius: '2px',
-                      padding: '14px',
+                      padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '10px',
+                      gap: '6px',
                     }}
                   >
                     <div
@@ -2326,8 +2316,8 @@ export default function ResultsPage() {
                         onClick={v.calPrev}
                         aria-label="Предыдущий месяц"
                         style={{
-                          width: '46px',
-                          height: '46px',
+                          width: '38px',
+                          height: '38px',
                           border: '2px solid #CFC9BB',
                           background: '#fff',
                           cursor: 'pointer',
@@ -2337,14 +2327,14 @@ export default function ResultsPage() {
                       >
                         ‹
                       </button>
-                      <div style={{ fontSize: '22px', fontWeight: '800' }}>{v.cal?.monthTitle}</div>
+                      <div style={{ fontSize: '18px', fontWeight: '800' }}>{v.cal?.monthTitle}</div>
                       <button
                         type="button"
                         onClick={v.calNext}
                         aria-label="Следующий месяц"
                         style={{
-                          width: '46px',
-                          height: '46px',
+                          width: '38px',
+                          height: '38px',
                           border: '2px solid #CFC9BB',
                           background: '#fff',
                           cursor: 'pointer',
@@ -2374,7 +2364,10 @@ export default function ResultsPage() {
                       <span>СБ</span>
                       <span>ВС</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: '4px' }}>
+                    <div
+                      className="pc-grid"
+                      style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: '4px' }}
+                    >
                       {(v.cal?.cells || []).map((c: any, _i0: number) => (
                         <Fragment key={_i0}>
                           <button
@@ -2384,8 +2377,8 @@ export default function ResultsPage() {
                             aria-label={c.aria}
                             style={{
                               position: 'relative',
-                              minHeight: '76px',
-                              padding: '6px 8px',
+                              minHeight: '50px',
+                              padding: '3px 6px',
                               border: `2px solid ${c.border ?? ''}`,
                               background: c.bg,
                               borderRadius: '2px',
@@ -2393,17 +2386,19 @@ export default function ResultsPage() {
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'flex-start',
-                              gap: '2px',
+                              gap: '0',
                               textAlign: 'left',
                             }}
                           >
-                            <span style={{ fontSize: '15px', color: '#3E4B44' }}>{c.day}</span>
-                            <span style={{ fontSize: '18px', fontWeight: '800', color: c.color }}>{c.text}</span>
-                            <span style={{ fontSize: '14px', color: '#1F5F4A', fontWeight: '700' }}>{c.sub}</span>
+                            <span style={{ fontSize: '13px', color: '#3E4B44' }}>{c.day}</span>
+                            <span style={{ fontSize: '16px', fontWeight: '800', color: c.color }}>{c.text}</span>
+                            <span style={{ fontSize: '12px', color: '#1F5F4A', fontWeight: '700', lineHeight: '1.1' }}>
+                              {c.sub}
+                            </span>
                             {c.fly ? (
                               <>
                                 <span
-                                  style={{ position: 'absolute', top: '6px', right: '6px', lineHeight: '0' }}
+                                  style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}
                                   title="Рейс из Израиля"
                                 >
                                   <svg
@@ -2426,122 +2421,24 @@ export default function ResultsPage() {
                         </Fragment>
                       ))}
                     </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '18px',
-                        flexWrap: 'wrap',
-                        fontSize: '14px',
-                        color: '#3E4B44',
-                        paddingTop: '6px',
-                      }}
-                    >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span
-                          style={{ width: '22px', height: '16px', background: '#E9F4EC', border: '1px solid #C8DED3' }}
-                        />
-                        Дешевле
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span
-                          style={{ width: '22px', height: '16px', background: '#FFF6E3', border: '1px solid #F0DDB8' }}
-                        />
-                        Средняя цена
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span
-                          style={{ width: '22px', height: '16px', background: '#FCEDE9', border: '1px solid #F0CFC6' }}
-                        />
-                        Дороже
-                      </span>
-                      <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
-                        <summary
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'pointer',
-                            listStyle: 'none',
-                          }}
-                        >
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1F5F4A"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                          </svg>
-                          <span>
-                            <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
-                          </span>
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '20px',
-                              height: '20px',
-                              borderRadius: '50%',
-                              border: '1.5px solid #1F5F4A',
-                              color: '#1F5F4A',
-                              fontSize: '12px',
-                              fontWeight: '800',
-                            }}
-                          >
-                            i
-                          </span>
-                        </summary>
-                        <div
-                          style={{
-                            marginTop: '8px',
-                            maxWidth: '420px',
-                            background: '#F4F1EA',
-                            borderRadius: '2px',
-                            padding: '10px 12px',
-                            fontSize: '14px',
-                            lineHeight: '1.45',
-                            color: '#1C2620',
-                          }}
-                        >
-                          Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
-                          осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
-                          прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
-                        </div>
-                      </details>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span
-                          style={{ width: '22px', height: '16px', background: '#E8E6E1', border: '1px solid #D2CFC7' }}
-                        />
-                        Нет мест
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '14px', color: '#5E6862' }}>
-                      Цены в календаре округлены. Итоговая стоимость указана справа.
-                    </div>
                   </div>
                 </div>
                 {/* New dates panel */}
                 <aside
                   style={{
-                    flex: '1 1 300px',
-                    maxWidth: '340px',
+                    flex: '1 1 280px',
+                    maxWidth: '320px',
                     background: '#EEF5F1',
                     border: '1px solid #C8DED3',
                     borderRadius: '2px',
-                    padding: '20px',
+                    padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '12px',
+                    gap: '8px',
                   }}
                 >
                   <div
-                    style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '26px', fontWeight: '600', color: '#1F5F4A' }}
+                    style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '600', color: '#1F5F4A' }}
                   >
                     Новые даты
                   </div>
@@ -2549,85 +2446,151 @@ export default function ResultsPage() {
                     style={{
                       background: '#fff',
                       borderRadius: '2px',
-                      padding: '16px',
+                      padding: '12px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '10px',
+                      gap: '6px',
                     }}
                   >
                     <div style={{ display: 'flex', gap: '24px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '14px', color: '#3E4B44' }}>Заезд</span>
-                        <strong style={{ fontSize: '20px' }}>{v.cal?.newIn}</strong>
+                        <strong style={{ fontSize: '17px' }}>{v.cal?.newIn}</strong>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '14px', color: '#3E4B44' }}>Выезд</span>
-                        <strong style={{ fontSize: '20px' }}>{v.cal?.newOut}</strong>
+                        <strong style={{ fontSize: '17px' }}>{v.cal?.newOut}</strong>
                       </div>
                     </div>
                     <div style={{ fontSize: '16px' }}>2 взрослых · {v.nightsLabel}</div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontSize: '32px', fontWeight: '800', lineHeight: '1' }}>
+                      <span style={{ fontSize: '24px', fontWeight: '800', lineHeight: '1' }}>
                         {v.cal?.newPpn}&nbsp;€
                       </span>
-                      <span style={{ fontSize: '18px', fontWeight: '700' }}>/ чел. в сутки</span>
+                      <span style={{ fontSize: '15px', fontWeight: '700' }}>/ чел. в сутки</span>
                     </div>
                     <div
                       style={{
                         borderTop: '1px solid #E3DED2',
-                        paddingTop: '10px',
+                        paddingTop: '6px',
                         display: 'flex',
                         flexDirection: 'column',
                       }}
                     >
                       <span style={{ fontSize: '16px' }}>За весь отдых</span>
-                      <strong style={{ fontSize: '32px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
+                      <strong style={{ fontSize: '26px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
                     </div>
-                    <div style={{ background: '#F4F1EA', borderRadius: '2px', padding: '10px 12px', fontSize: '16px' }}>
+                    <div style={{ background: '#F4F1EA', borderRadius: '2px', padding: '6px 10px', fontSize: '15px' }}>
                       На ваши даты — <strong>{v.cal?.curTotal}&nbsp;€</strong>
                     </div>
                     <div
                       style={{
                         background: v.cal?.diffBg,
                         borderRadius: '2px',
-                        padding: '10px 12px',
-                        fontSize: '17px',
+                        padding: '6px 10px',
+                        fontSize: '15px',
                         fontWeight: '800',
                         color: v.cal?.diffColor,
                       }}
                     >
                       {v.cal?.diffText}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#3E4B44' }}>Тот же номер и программа.</div>
                   </div>
                   <div
                     style={{
                       display: 'flex',
-                      gap: '10px',
-                      alignItems: 'flex-start',
-                      fontSize: '14px',
+                      gap: '6px 14px',
+                      flexWrap: 'wrap',
+                      fontSize: '13px',
                       color: '#3E4B44',
-                      background: '#fff',
-                      borderRadius: '2px',
-                      padding: '10px 12px',
+                      paddingTop: '4px',
+                      borderTop: '1px solid #C8DED3',
                     }}
                   >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      style={{ flex: 'none' }}
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 16v-4M12 8h.01" />
-                    </svg>
-                    <span>В календаре — средняя цена за сутки. Здесь — точная сумма за весь отдых.</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span
+                        style={{ width: '22px', height: '16px', background: '#E9F4EC', border: '1px solid #C8DED3' }}
+                      />
+                      Дешевле
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span
+                        style={{ width: '22px', height: '16px', background: '#FFF6E3', border: '1px solid #F0DDB8' }}
+                      />
+                      Средняя цена
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span
+                        style={{ width: '22px', height: '16px', background: '#FCEDE9', border: '1px solid #F0CFC6' }}
+                      />
+                      Дороже
+                    </span>
+                    <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
+                      <summary
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          listStyle: 'none',
+                        }}
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#1F5F4A"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
+                        </svg>
+                        <span>
+                          <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+                        </span>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            border: '1.5px solid #1F5F4A',
+                            color: '#1F5F4A',
+                            fontSize: '12px',
+                            fontWeight: '800',
+                          }}
+                        >
+                          i
+                        </span>
+                      </summary>
+                      <div
+                        style={{
+                          marginTop: '8px',
+                          maxWidth: '420px',
+                          background: '#F4F1EA',
+                          borderRadius: '2px',
+                          padding: '10px 12px',
+                          fontSize: '14px',
+                          lineHeight: '1.45',
+                          color: '#1C2620',
+                        }}
+                      >
+                        Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
+                        осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
+                        прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
+                      </div>
+                    </details>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span
+                        style={{ width: '22px', height: '16px', background: '#E8E6E1', border: '1px solid #D2CFC7' }}
+                      />
+                      Нет мест
+                    </span>
                   </div>
                 </aside>
               </div>
@@ -2639,22 +2602,21 @@ export default function ResultsPage() {
                   gap: '16px',
                   flexWrap: 'wrap',
                   borderTop: '1px solid #E3DED2',
-                  paddingTop: '16px',
+                  paddingTop: '12px',
                 }}
               >
                 <button type="button" className="acc" onClick={v.calClose} style={{ fontSize: '17px' }}>
                   Оставить {v.curRange}
                 </button>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
                   <button
                     type="button"
                     className="btn btn-primary"
                     onClick={v.calApply}
-                    style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
+                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
                     Применить {v.cal?.newRange}
                   </button>
-                  <span style={{ fontSize: '14px', color: '#5E6862' }}>Даты изменятся после подтверждения.</span>
                 </div>
               </div>
             </div>

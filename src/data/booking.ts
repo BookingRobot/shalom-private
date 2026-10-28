@@ -23,8 +23,8 @@ export interface Booking {
     /** vehicle for an individual transfer */
     vehicle: string;
   };
-  /** answer on the flights step */
-  flights: 'yes' | 'no' | null;
+  /** "Дорога" step: our flight in the order / own tickets / asked a consultant to help */
+  flights: 'yes' | 'no' | 'help' | null;
   /** package: flight Tel Aviv ⇄ Vilnius + group transfer, chosen in the search */
   flightPackage: boolean;
 }

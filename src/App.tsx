@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { HelpProvider } from './context/HelpContext';
 import { BookingProvider } from './context/BookingContext';
 import { LanguageProvider } from './i18n/LanguageContext';
@@ -10,7 +10,6 @@ const HotelPage = lazy(() => import('./pages/Hotel/HotelPage'));
 const RoomsPage = lazy(() => import('./pages/Rooms/RoomsPage'));
 const TransferPage = lazy(() => import('./pages/Transfer/TransferPage'));
 const GuestsPage = lazy(() => import('./pages/Guests/GuestsPage'));
-const FlightsPage = lazy(() => import('./pages/Flights/FlightsPage'));
 const PaymentPage = lazy(() => import('./pages/Payment/PaymentPage'));
 const DonePage = lazy(() => import('./pages/Done/DonePage'));
 const RulesPage = lazy(() => import('./pages/Rules/RulesPage'));
@@ -48,7 +47,7 @@ export default function App() {
               <Route path="/rooms" element={<RoomsPage />} />
               <Route path="/transfer" element={<TransferPage />} />
               <Route path="/guests" element={<GuestsPage />} />
-              <Route path="/flights" element={<FlightsPage />} />
+              <Route path="/flights" element={<Navigate to="/transfer" replace />} />
               <Route path="/payment" element={<PaymentPage />} />
               <Route path="/done" element={<DonePage />} />
               <Route path="/rules" element={<RulesPage />} />

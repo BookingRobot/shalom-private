@@ -10,6 +10,7 @@ import { orderSummary } from '../../lib/orderSummary';
 import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
+import { FlightChoice } from '../../components/FlightChoice';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './TransferPage.css';
 
@@ -157,6 +158,11 @@ class TransferLogic extends PageLogic {
         daysBetween(toD(booking.checkin), toD(booking.checkout)) +
         ' ' +
         nightsWord(daysBetween(toD(booking.checkin), toD(booking.checkout))),
+      transferLead: booking.flightPackage
+        ? 'Входит в перелёт: встретим у самолёта в Вильнюсе.'
+        : booking.flights === 'help'
+          ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
+          : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
       total:
         fmt(
           orderSummary(this.props.booking.booking).stay +
@@ -168,7 +174,7 @@ class TransferLogic extends PageLogic {
 }
 
 export default function TransferPage() {
-  usePageTitle('Шаг 2 из 5 — трансфер');
+  usePageTitle('Шаг 2 из 4 — дорога');
   const [v, logic] = usePageLogic(TransferLogic);
   const order = orderSummary(logic.props.booking.booking);
   return (
@@ -197,6 +203,20 @@ export default function TransferPage() {
         >
           {/* Main column */}
           <div style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <h1 style={{ fontSize: '32px' }}>Дорога до санатория</h1>
+              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
+                Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации «Эгле Комфорт».
+              </p>
+            </div>
+            <FlightChoice />
+            <div className="road-h road-h-out">
+              <span className="road-num">2</span>
+              <div>
+                <h2>Трансфер до санатория</h2>
+                <span>{v.transferLead}</span>
+              </div>
+            </div>
             {order.flightPackage ? (
               <section
                 className="card"
@@ -209,10 +229,9 @@ export default function TransferPage() {
                   borderColor: '#C8DED3',
                 }}
               >
-                <h1 style={{ fontSize: '30px' }}>Трансфер уже в вашем пакете</h1>
                 <p style={{ margin: '0', fontSize: '18px', color: '#1C2620' }}>
-                  Вы выбрали поездку с перелётом из Тель-Авива. Групповой трансфер аэропорт Вильнюса ⇄ санаторий входит
-                  в цену: встретим с табличкой у выхода, поможем с багажом и довезём до стойки регистрации.
+                  <strong>Групповой трансфер аэропорт Вильнюса ⇄ санаторий уже в цене перелёта:</strong> встретим с
+                  табличкой у выхода, поможем с багажом и довезём до стойки регистрации.
                 </p>
                 <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
                   Нужен отдельный автомобиль? Скажите консультанту — посчитаем доплату.
@@ -220,13 +239,6 @@ export default function TransferPage() {
               </section>
             ) : (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <h1 style={{ fontSize: '32px' }}>Нужен ли вам трансфер до санатория?</h1>
-                  <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
-                    Встретим с табличкой, поможем с багажом и довезём прямо до стойки регистрации санатория «Эгле
-                    Комфорт» в Друскининкай.
-                  </p>
-                </div>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
                   <button
                     type="button"

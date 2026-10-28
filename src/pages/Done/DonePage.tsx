@@ -41,7 +41,7 @@ export default function DonePage() {
           <Brand />
           <PhoneLink />
         </HeaderBar>
-        <CheckoutSteps current={6} compact />
+        <CheckoutSteps current={5} compact />
         <div
           style={{
             maxWidth: '1180px',

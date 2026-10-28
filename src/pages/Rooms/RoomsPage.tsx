@@ -109,7 +109,7 @@ class RoomsLogic extends PageLogic {
 }
 
 export default function RoomsPage() {
-  usePageTitle('Шаг 1 из 5 — номер и программа');
+  usePageTitle('Шаг 1 из 4 — номер и программа');
   const [v, logic] = usePageLogic(RoomsLogic);
   return (
     <div className="page pg-rooms">
@@ -459,7 +459,7 @@ export default function RoomsPage() {
                 to="/transfer"
                 style={{ minHeight: '46px', fontSize: '17px', padding: '0 24px' }}
               >
-                Далее: трансфер →
+                Далее: дорога →
               </Link>
             </div>
           </div>
