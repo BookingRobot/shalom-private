@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { transferBySanatorium } from '../data/transferPolicy';
 import { api } from '../api';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
@@ -76,7 +77,7 @@ export function ChooseWizard({
       adults: booking.adults,
     });
     const scored = (sanatoriums as any[]).map((h) => {
-      const pp = quote(h.price, g, booking.flightPackage).perPerson;
+      const pp = quote(h.price, g, booking.flightPackage, transferBySanatorium(h.id)).perPerson;
       let score = 0;
       const why: string[] = [];
       if (profile && h.tags.includes(profile)) {

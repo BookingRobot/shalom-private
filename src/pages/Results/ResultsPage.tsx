@@ -1,4 +1,5 @@
 import { Fragment, useEffect } from 'react';
+import { transferBySanatorium } from '../../data/transferPolicy';
 import { Link } from 'react-router-dom';
 import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
@@ -421,7 +422,11 @@ class ResultsLogic extends PageLogic {
             return {
               name: pp[0],
               sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
-              price: eur(quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage).perPerson) + ' / чел.',
+              price:
+                eur(
+                  quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
+                    .perPerson,
+                ) + ' / чел.',
               diff:
                 pi === 0
                   ? 'самая доступная'
@@ -489,7 +494,9 @@ class ResultsLogic extends PageLogic {
                 sy: checkin.getUTCFullYear(),
               }),
             selName: sp.title.split(' — ')[0],
-            selPrice: eur(quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage).total),
+            selPrice: eur(
+              quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id)).total,
+            ),
             addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
             detBtn: 'Программы и что входит (' + progs.length + ')',
             detChev: dOpen ? 'rotate(180deg)' : 'none',
@@ -1849,7 +1856,7 @@ export default function ResultsPage() {
                         margin: '14px 0',
                       }}
                     >
-                      <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} />
+                      <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} hotelId={h.id} />
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { transferBySanatorium } from '../data/transferPolicy';
 import { useBooking } from '../context/BookingContext';
 import { toNum } from '../lib/format';
 import { eur, quote } from '../lib/pricing';
@@ -63,7 +64,7 @@ export function Compare({
   const rows: [string, (h: CompareHotel) => string][] = [
     [
       booking.adults === 1 ? 'Цена за одного' : 'Цена на человека',
-      (h) => eur(quote(toNum(h.price), g, booking.flightPackage).perPerson),
+      (h) => eur(quote(toNum(h.price), g, booking.flightPackage, transferBySanatorium(h.id)).perPerson),
     ],
     ['Категория', (h) => '★'.repeat(h.starsN)],
     ['Процедуры', procs],

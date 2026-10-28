@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { useBooking } from '../context/BookingContext';
+import { SANATORIUMS } from '../data/sanatoriums';
 
 const row = {
   display: 'grid',
@@ -36,6 +38,12 @@ export function OrderSummary({
   total: ReactNode;
   footer?: ReactNode;
 }) {
+  // the sanatorium of this order (the prototype's example order is Eglė Comfort)
+  const { booking } = useBooking();
+  const h = SANATORIUMS.find((x) => x.id === booking.hotelId);
+  const img = h && booking.hotelId !== 'egle-comfort' ? h.img : '/img/1efd1efc34d4137ff98a8658a068afc5.jpg';
+  const name = h ? h.name : 'Санаторий Эгле Комфорт';
+  const place = (h ? h.sub.split(' · ')[0] : 'Друскининкай') + ' · ' + '★'.repeat(h ? h.starsN : 4);
   return (
     <aside
       className="card"
@@ -49,15 +57,11 @@ export function OrderSummary({
         top: '16px',
       }}
     >
-      <img
-        src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
-        alt=""
-        style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
-      />{' '}
+      <img src={img} alt="" style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />{' '}
       <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ fontWeight: '800', fontSize: '18px' }}>Санаторий Эгле Комфорт</div>
-          <div style={{ fontSize: '16px', color: '#3E4B44' }}>Друскининкай · ★★★★</div>
+          <div style={{ fontWeight: '800', fontSize: '18px' }}>{name}</div>
+          <div style={{ fontSize: '16px', color: '#3E4B44' }}>{place}</div>
         </div>
         <div style={section}>
           {details.map(([name, value, sub]) => (
@@ -120,13 +124,18 @@ export function orderPriceRows(order: {
   stayCalc: string;
   flight: number;
   flightLabel: string;
+  flightName?: string;
+  sanTransfer?: boolean;
   transfer: number;
   transferKind: string;
   transferLabel: string;
 }): [string, string][] {
   return [
     ['Проживание и лечение' + (order.stayCalc ? ', ' + order.stayCalc : ''), order.stayLabel],
-    ...(order.flight ? [['Перелёт Тель-Авив ⇄ Вильнюс и трансфер', order.flightLabel] as [string, string]] : []),
+    ...(order.flight
+      ? [[order.flightName || 'Перелёт Тель-Авив ⇄ Вильнюс и трансфер', order.flightLabel] as [string, string]]
+      : []),
     ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
+    ...(order.sanTransfer ? [['Трансфер — от санатория', 'включён'] as [string, string]] : []),
   ];
 }

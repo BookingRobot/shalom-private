@@ -41,8 +41,12 @@ export function stayTotal(totalForTwo: number, g: Guests) {
   return place * g.adults + Math.round(perPersonOf(totalForTwo) * CHILD_SHARE) * g.children;
 }
 
-/** Flight + group transfer for the whole party (package option). */
-export const flightPackage = (g: Guests) => (FLIGHT_PP + PACKAGE_TRANSFER_PP) * (g.adults + g.children);
+/**
+ * Flight + group transfer for the whole party (package option). Without our transfer
+ * when the sanatorium meets guests itself (see data/transferPolicy).
+ */
+export const flightPackage = (g: Guests, withTransfer = true) =>
+  (FLIGHT_PP + (withTransfer ? PACKAGE_TRANSFER_PP : 0)) * (g.adults + g.children);
 
 export const persons = (g: Guests) => g.adults + g.children;
 
@@ -77,11 +81,11 @@ export function paymentPlan(arrivalISO: string, g: Guests, withFlight: boolean, 
 }
 
 /** Everything a price box shows for a "for two" tariff. */
-export function quote(totalForTwo: number, g: Guests, withFlight: boolean) {
+export function quote(totalForTwo: number, g: Guests, withFlight: boolean, transferBySanatorium = false) {
   const place = placePrice(totalForTwo, g);
-  const pkgPP = withFlight ? FLIGHT_PP + PACKAGE_TRANSFER_PP : 0;
+  const pkgPP = withFlight ? FLIGHT_PP + (transferBySanatorium ? 0 : PACKAGE_TRANSFER_PP) : 0;
   const stay = stayTotal(totalForTwo, g);
-  const flight = withFlight ? flightPackage(g) : 0;
+  const flight = withFlight ? flightPackage(g, !transferBySanatorium) : 0;
   return {
     /** per adult: stay (+ flight and transfer in the package) */
     perPerson: place + pkgPP,
