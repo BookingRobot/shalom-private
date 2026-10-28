@@ -1,4 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
+import { FeedbackWidget } from './feedback/FeedbackWidget';
 import { useHelp } from '../context/HelpContext';
 import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../data/contacts';
 import { PhoneCodeSelect } from './PhoneCodeSelect';
@@ -84,10 +85,13 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
 
   return (
     <>
+      {/* «Ваши пожелания» sits right above «Свяжитесь со мной» on every page */}
+      <FeedbackWidget bottom={ctx.bottom || '20px'} />
       <button
         type="button"
         dir="ltr"
         lang="ru"
+        data-feedback-ignore
         onClick={open}
         aria-haspopup="dialog"
         style={{

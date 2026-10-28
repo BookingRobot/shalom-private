@@ -204,6 +204,36 @@ const BOARDS = [
     },
   },
   {
+    file: 'Feedback.dc.html',
+    title: 'Ваши пожелания · форма (красная кнопка на всех страницах)',
+    route: '/results',
+    state: true,
+    setup: async (p) => {
+      await p.click('.fb-btn');
+      const box = await p.locator('.f-btn').boundingBox();
+      await p.mouse.move(box.x + 10, box.y + 10);
+      await p.mouse.click(box.x + 10, box.y + 10);
+      await p.waitForSelector('.fb-panel', { timeout: 15000 });
+      await p.fill('.fb-field textarea', 'Хочу, чтобы фильтры были видны сразу, без нажатия.');
+      await p.fill('.fb-two input >> nth=0', 'Ирина');
+      // the screenshot preview is a blob: URL — keep it as a picture in the board
+      await p.evaluate(async () => {
+        const img = document.querySelector('.fb-shot img');
+        if (!img) return;
+        const c = document.createElement('canvas');
+        c.width = 480;
+        c.height = 300;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, (c.width * img.naturalHeight) / img.naturalWidth);
+        img.src = c.toDataURL('image/jpeg', 0.8);
+      });
+      await p.waitForTimeout(200);
+    },
+    links: [
+      ['.fb-x', '', 'Results-B.dc.html'],
+      ['.fb-send', '', 'Results-B.dc.html'],
+    ],
+  },
+  {
     file: 'Transfer-other.dc.html',
     title: 'Шаг 2 · Дорога — другой санаторий: трансфер продаём мы',
     route: '/transfer',
@@ -247,6 +277,11 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 const post = (html) =>
   html
+    // «Ваши пожелания» opens the form board in Play
+    .replace(
+      /<button type="button" class="fb-btn"([^>]*)>([\s\S]*?)<\/button>/,
+      '<a class="fb-btn" href="Feedback.dc.html"$1 style="text-decoration:none">$2</a>',
+    )
     .replace(/(src|href)="\/img\/([0-9a-f]{32})\.[a-z]+"/g, '$1="/_blob/$2"')
     .replace(/url\(&quot;\/img\/([0-9a-f]{32})\.[a-z]+&quot;\)/g, 'url(&quot;/_blob/$1&quot;)')
     .replace(/url\(\/img\/([0-9a-f]{32})\.[a-z]+\)/g, 'url(/_blob/$1)')

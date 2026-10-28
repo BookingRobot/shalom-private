@@ -1,0 +1,8 @@
+name = "br-shalom-feedback"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+REPO = "BookingRobot-M/br-shalom"
+FILES_BRANCH = "feedback-files"
+ALLOWED_ORIGINS = "https://shalom.bookingrobot.eu,http://localhost:5173,http://localhost:4173"
