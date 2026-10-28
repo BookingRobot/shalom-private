@@ -853,6 +853,7 @@ class ResultsLogic extends PageLogic {
       fClosed: !st.fo,
       openF: () => this.setState({ fo: true, pf: { ...f }, ppr: { ...pr } }),
       closeF: () => this.setState({ fo: false, more: false, pf: { ...f }, ppr: { ...pr } }),
+      fBadge: String(sel.length + (pr.min ? 1 : 0) + (pr.max ? 1 : 0) || ''),
       appliedSummary:
         sel.length === 0 && !pr.min && !pr.max
           ? 'Условия не выбраны — показаны все санатории'
@@ -1093,90 +1094,60 @@ export default function ResultsPage() {
                 {v.dateRange} · {v.nightsLabel} · {v.guestsLine}
               </div>
             </div>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={v.wzOpenFn}
-              style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            <div className="res-tools">
+              <button
+                type="button"
+                className={'btn btn-secondary f-btn' + (v.fOpen ? ' on' : '')}
+                onClick={v.fOpen ? v.closeF : v.openF}
+                aria-expanded={!!v.fOpen}
+                title={v.appliedSummary}
+                style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
               >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
-              </svg>
-              Помогите выбрать санаторий
-            </button>
-          </div>
-          {/* Filters above the list */}
-          {v.fClosed ? (
-            <>
-              <section
-                className="card"
-                style={{
-                  padding: '16px 24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <svg
-                    width="30"
-                    height="30"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    style={{ flex: 'none' }}
-                  >
-                    <path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h12M20 17h0" />
-                    <circle cx="16" cy="7" r="2" />
-                    <circle cx="10" cy="12" r="2" />
-                    <circle cx="18" cy="17" r="2" />
-                  </svg>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ fontSize: '22px' }}>Уточните выбор</h2>
-                    <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.appliedSummary}</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={v.openF}
-                  style={{ minHeight: '50px', fontSize: '17px', padding: '0 22px' }}
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
                 >
-                  Раскрыть фильтры
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-              </section>
-            </>
-          ) : null}
+                  <path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h12M20 17h0" />
+                  <circle cx="16" cy="7" r="2" />
+                  <circle cx="10" cy="12" r="2" />
+                  <circle cx="18" cy="17" r="2" />
+                </svg>
+                Фильтры
+                <span className="f-badge">{v.fBadge}</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={v.wzOpenFn}
+                style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
+                </svg>
+                Помогите выбрать санаторий
+              </button>
+            </div>
+          </div>
+          {/* Filters open under the header from the "Фильтры" button; closed, they take no room */}
+          {v.fClosed ? <span hidden className="f-slot" /> : null}
           {v.fOpen ? (
             <>
               <section

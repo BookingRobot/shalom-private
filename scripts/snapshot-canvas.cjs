@@ -69,7 +69,7 @@ const BOARDS = [
     links: [
       ['button', 'Помогите выбрать санаторий', 'Results-wizard.dc.html'],
       ['button', 'Выбрать другие даты', 'Results-roomdates.dc.html'],
-      ['button', 'Раскрыть фильтры', 'Results-filters.dc.html'],
+      ['.f-btn', '', 'Results-filters.dc.html'],
     ],
   },
   {
@@ -77,7 +77,7 @@ const BOARDS = [
     title: 'Результаты · «Уточните выбор» открыт',
     route: '/results',
     state: true,
-    setup: async (p) => p.click('text=Раскрыть фильтры'),
+    setup: async (p) => p.click('.f-btn'),
     links: [
       ['button', 'Свернуть', 'Results-B.dc.html'],
       ['button', 'Показать', 'Results-B.dc.html'],
@@ -470,7 +470,7 @@ async function buildInteractive(b, sizes) {
           b,
           route,
           async (p) => {
-            await p.click('text=Раскрыть фильтры');
+            await p.click('.f-btn');
             if (more) await p.click('.morebtn');
           },
           ({ more, keys }) => {
@@ -619,22 +619,21 @@ async function buildInteractive(b, sizes) {
         btns.filter((x) => /Помогите выбрать санаторий/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'wzOpen'));
         btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
         btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
-        // "Раскрыть фильтры" opens the panel in place (see filtersLogic)
-        btns
-          .filter((x) => /Раскрыть фильтры/.test(x.textContent))
-          .forEach((x) => {
-            d.on(x, 'click', 'fOpenFn');
-            const sec = x.closest('section');
-            sec.before(d.raw('fclosed-start'));
-            sec.after(d.raw('fclosed-end'));
-          });
+        // "Фильтры" (next to the wizard button) opens / closes the panel in place (see filtersLogic)
+        const fb = document.querySelector('.f-btn');
+        d.on(fb, 'click', 'fToggle');
+        d.attr(fb, 'class', 'fBtnCls');
+        d.text(fb.querySelector('.f-badge'), 'fBadge');
+        const slot = document.querySelector('.f-slot');
+        slot.before(d.raw('fclosed-start'));
+        slot.after(d.raw('fclosed-end'));
+        slot.remove();
         document.querySelectorAll('.cmp-check input').forEach((x, i) => {
           d.on(x, 'change', 'cmpT' + i);
           d.attr(x, 'checked', 'cmpOn' + i);
         });
         // filter state shown on the page
-        const sum = Array.from(document.querySelectorAll('span')).find((x) => /^(Условия не выбраны|Выбрано:)/.test(x.textContent.trim()) && !x.children.length && x.closest('section'));
-        d.text(sum, 'appliedSummary');
+        d.attr(fb, 'title', 'appliedSummary');
         const h2 = Array.from(document.querySelectorAll('h2')).find((x) => /^(Все \d|Подходят \d)/.test(x.textContent.trim()));
         d.text(h2, 'foundLabel');
         h2.parentElement.before(d.raw('actrow'));
