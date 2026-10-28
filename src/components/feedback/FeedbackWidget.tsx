@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { captureScreenshot } from '../../lib/feedback/screenshot';
 import {
+  SEVERITY_RU,
   TYPE_RU,
   copyScreenshot,
   githubIssueUrl,
   hasEndpoint,
   sendFeedback,
   type FeedbackNote,
+  type FeedbackSeverity,
   type FeedbackType,
 } from '../../lib/feedback/submit';
+import { IMAGE_TYPES, MAX_PICTURES, MAX_TOTAL, prepareImage } from '../../lib/feedback/images';
 import './FeedbackWidget.css';
 
 /**
@@ -19,24 +22,37 @@ import './FeedbackWidget.css';
 type Stage = 'idle' | 'marking' | 'capturing' | 'form' | 'sending' | 'done' | 'github';
 
 const NAME_KEY = 'br-shalom:feedback-name';
-const TYPES: [FeedbackType, string, string][] = [
-  [
-    'idea',
-    TYPE_RU.idea,
-    'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z',
-  ],
-  [
-    'bug',
-    TYPE_RU.bug,
-    'M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
-  ],
-  ['other', TYPE_RU.other, 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'],
+const TYPES: [FeedbackType, string][] = [
+  ['bug', 'M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'],
+  ['change', 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'],
+  ['idea', 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z'],
+  ['question', 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01'],
 ];
-const PLACEHOLDER: Record<FeedbackType, string> = {
-  idea: 'Что добавить или сделать иначе? Например: «Хочу видеть цену сразу за двоих».',
-  bug: 'Что не так? Что вы нажали и что увидели вместо ожидаемого?',
-  other: 'Напишите, что хотите сообщить.',
+const SEVERITIES: FeedbackSeverity[] = ['blocking', 'annoying', 'later'];
+const DESCRIBE: Record<Exclude<FeedbackType, 'bug'>, [string, string]> = {
+  change: ['Что изменить?', 'Как сейчас и как было бы лучше. Например: «Цену хочу видеть сразу за двоих».'],
+  idea: ['Опишите идею', 'Что добавить на сайт и зачем это гостям.'],
+  question: ['Ваш вопрос', 'Что непонятно на этой странице?'],
 };
+
+interface Pic {
+  id: number;
+  blob: Blob;
+  url: string;
+  /** the screenshot with the marked spot */
+  main: boolean;
+  label: string;
+}
+let picId = 0;
+// phones: no keyboard popping up as soon as the form opens
+const coarse = typeof window !== 'undefined' && !!window.matchMedia?.('(pointer: coarse)').matches;
+const pic = (blob: Blob, main: boolean, label: string): Pic => ({
+  id: ++picId,
+  blob,
+  url: URL.createObjectURL(blob),
+  main,
+  label,
+});
 
 const readName = () => {
   try {
@@ -64,8 +80,9 @@ function meaningful(el: Element | null): Element | null {
   return null;
 }
 
-function describe(el: Element | null): string {
-  if (!el) return '';
+/** The marked spot in words: Russian for the guest, Lithuanian for the team's issue. */
+function describe(el: Element | null): { ru: string; lt: string } {
+  if (!el) return { ru: '', lt: '' };
   const text = (
     el.getAttribute('aria-label') ||
     (el as HTMLElement).innerText ||
@@ -77,19 +94,19 @@ function describe(el: Element | null): string {
     .trim()
     .slice(0, 80);
   const tag = el.tagName.toLowerCase();
-  const kind =
+  const [lt, ru] =
     tag === 'button'
-      ? 'mygtukas'
+      ? ['mygtukas', 'кнопка']
       : tag === 'a'
-        ? 'nuoroda'
+        ? ['nuoroda', 'ссылка']
         : tag === 'img'
-          ? 'paveikslėlis'
+          ? ['paveikslėlis', 'картинка']
           : /^h\d$/.test(tag)
-            ? 'antraštė'
+            ? ['antraštė', 'заголовок']
             : tag === 'input' || tag === 'textarea' || tag === 'select'
-              ? 'laukas'
-              : 'blokas';
-  return `${kind} „${text || tag}“`;
+              ? ['laukas', 'поле']
+              : ['blokas', 'блок'];
+  return { lt: `${lt} „${text || tag}“`, ru: `${ru} «${text || tag}»` };
 }
 
 function browserName() {
@@ -135,38 +152,61 @@ function Icon({ d, size = 20 }: { d: string; size?: number }) {
 
 export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const [stage, setStage] = useState<Stage>('idle');
-  const [type, setType] = useState<FeedbackType>('idea');
-  const [text, setText] = useState('');
+  const [type, setType] = useState<FeedbackType>('change');
+  const [severity, setSeverity] = useState<FeedbackSeverity>('annoying');
+  const [title, setTitle] = useState('');
+  const [whatDoing, setWhatDoing] = useState('');
+  const [expected, setExpected] = useState('');
+  const [actual, setActual] = useState('');
+  const [description, setDescription] = useState('');
   const [name, setName] = useState(readName);
   const [contact, setContact] = useState('');
-  const [shot, setShot] = useState<Blob | null>(null);
-  const [shotUrl, setShotUrl] = useState('');
-  const [noShot, setNoShot] = useState(false);
-  const [element, setElement] = useState('');
+  const [pics, setPics] = useState<Pic[]>([]);
+  // what the next marking is for: the main screenshot or one more
+  const [adding, setAdding] = useState(false);
+  const [element, setElement] = useState({ ru: '', lt: '' });
+  const [shotFailed, setShotFailed] = useState(false);
   const [hover, setHover] = useState<DOMRect | null>(null);
   const [result, setResult] = useState<{ number?: number; url?: string; copied?: boolean }>({});
   const [error, setError] = useState('');
+  const [picError, setPicError] = useState('');
+  const [bad, setBad] = useState<Record<string, boolean>>({});
   // the intake did not answer: the team can still file the note on GitHub by hand
   const [failed, setFailed] = useState(false);
   const hoverEl = useRef<Element | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const picsRef = useRef<Pic[]>([]);
+  picsRef.current = pics;
 
-  // screenshot preview URL
-  useEffect(() => {
-    if (!shot) return setShotUrl('');
-    const u = URL.createObjectURL(shot);
-    setShotUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [shot]);
+  // free the preview URLs when the widget goes away
+  useEffect(() => () => picsRef.current.forEach((p) => URL.revokeObjectURL(p.url)), []);
 
-  const pick = async (el: Element | null) => {
+  const dropPics = (keep: (p: Pic) => boolean) =>
+    setPics((list) => {
+      list.filter((p) => !keep(p)).forEach((p) => URL.revokeObjectURL(p.url));
+      return list.filter(keep);
+    });
+
+  const pickSpot = async (el: Element | null) => {
     setHover(null);
-    setElement(describe(el));
+    const label = describe(el);
     setStage('capturing');
     // the marking layer leaves the page before the picture is taken
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     const blob = await captureScreenshot(el);
-    setShot(blob);
-    setNoShot(false);
+    if (adding) {
+      if (blob) setPics((list) => [...list, pic(blob, false, 'Снимок: ' + (label.ru || 'весь экран'))]);
+      else setPicError('Снимок не получился. Можно добавить картинку с компьютера.');
+    } else {
+      setElement(label);
+      setShotFailed(!blob);
+      setPics((list) => {
+        list.filter((p) => p.main).forEach((p) => URL.revokeObjectURL(p.url));
+        const rest = list.filter((p) => !p.main);
+        return blob ? [pic(blob, true, label.ru ? 'Отмечено: ' + label.ru : 'Весь экран'), ...rest] : rest;
+      });
+    }
+    setAdding(false);
     setStage('form');
   };
 
@@ -183,9 +223,9 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       e.preventDefault();
       e.stopPropagation();
       const el = meaningful(document.elementFromPoint(e.clientX, e.clientY)) || hoverEl.current;
-      pick(el);
+      pickSpot(el);
     };
-    const key = (e: KeyboardEvent) => e.key === 'Escape' && setStage('idle');
+    const key = (e: KeyboardEvent) => e.key === 'Escape' && cancelMarking();
     window.addEventListener('pointermove', move, true);
     window.addEventListener('click', click, true);
     window.addEventListener('keydown', key);
@@ -195,7 +235,7 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       window.removeEventListener('keydown', key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
+  }, [stage, adding]);
 
   useEffect(() => {
     if (stage !== 'form' && stage !== 'done' && stage !== 'github') return;
@@ -208,44 +248,123 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const start = () => {
     setError('');
     setResult({});
+    setAdding(false);
     setStage('marking');
   };
+  const markAgain = () => {
+    setAdding(false);
+    setStage('marking');
+  };
+  const markMore = () => {
+    setPicError('');
+    if (pics.length >= MAX_PICTURES) return setPicError(`Не больше ${MAX_PICTURES} картинок.`);
+    setAdding(true);
+    setStage('marking');
+  };
+  // Esc / «Отмена» while marking: back to the form if it is already open
+  const cancelMarking = () => setStage(adding || pics.length || title ? 'form' : 'idle');
   const close = () => {
     setStage('idle');
-    setShot(null);
-    setElement('');
     setError('');
     setFailed(false);
   };
   const reset = () => {
     close();
-    setText('');
+    dropPics(() => false);
+    setElement({ ru: '', lt: '' });
+    setShotFailed(false);
+    setTitle('');
+    setWhatDoing('');
+    setExpected('');
+    setActual('');
+    setDescription('');
     setContact('');
-    setType('idea');
+    setType('change');
+    setSeverity('annoying');
+    setBad({});
+    setPicError('');
   };
 
+  /** pictures from a file, a paste or a drop — images only */
+  const addFiles = async (files: Blob[]) => {
+    setPicError('');
+    let list = picsRef.current;
+    for (const f of files) {
+      if (list.length >= MAX_PICTURES) {
+        setPicError(`Не больше ${MAX_PICTURES} картинок.`);
+        break;
+      }
+      if (!IMAGE_TYPES.includes(f.type)) {
+        setPicError('Можно добавлять только картинки: PNG, JPG, WebP или GIF.');
+        continue;
+      }
+      const ready = await prepareImage(f);
+      if (!ready) {
+        setPicError('Эту картинку не получилось открыть. Попробуйте другую.');
+        continue;
+      }
+      const total = list.reduce((n, p) => n + p.blob.size, 0) + ready.size;
+      if (total > MAX_TOTAL) {
+        setPicError('Картинок слишком много по объёму — уберите одну.');
+        break;
+      }
+      const name = (f as File).name;
+      list = [...list, pic(ready, false, name && !/^image\.\w+$/.test(name) ? name : 'Картинка')];
+      setPics(list);
+    }
+  };
+
+  const onPaste = (e: React.ClipboardEvent) => {
+    const files = Array.from(e.clipboardData.items)
+      .filter((i) => i.kind === 'file' && i.type.startsWith('image/'))
+      .map((i) => i.getAsFile())
+      .filter((f): f is File => !!f);
+    if (files.length) {
+      e.preventDefault();
+      addFiles(files);
+    }
+  };
+
+  const main = pics.find((p) => p.main) || null;
   const note = (): FeedbackNote => ({
     type,
-    text,
+    severity,
+    title: title.trim(),
+    whatDoing: type === 'bug' ? whatDoing.trim() : '',
+    expected: type === 'bug' ? expected.trim() : '',
+    actual: type === 'bug' ? actual.trim() : '',
+    description: type === 'bug' ? '' : description.trim(),
     name: name.trim(),
     contact: contact.trim(),
     page: window.location.href,
     pageTitle: document.title,
-    element,
+    element: element.lt,
     viewport: window.innerWidth + '×' + window.innerHeight,
     browser: browserName(),
     when: new Date().toLocaleString('lt-LT', { timeZone: 'Europe/Vilnius' }),
-    screenshot: noShot ? null : shot,
+    screenshot: main ? main.blob : null,
+    images: pics.filter((p) => !p.main).map((p) => p.blob),
   });
 
   const checked = () => {
-    const problem = !text.trim()
-      ? 'Напишите хотя бы пару слов.'
-      : !name.trim()
-        ? 'Как вас зовут? Так мы поймём, кому ответить.'
-        : '';
-    if (problem) {
-      setError(problem);
+    const miss: Record<string, boolean> = {
+      title: !title.trim(),
+      expected: type === 'bug' && !expected.trim(),
+      actual: type === 'bug' && !actual.trim(),
+      description: type !== 'bug' && !description.trim(),
+      name: !name.trim(),
+    };
+    setBad(miss);
+    const first = Object.keys(miss).find((k) => miss[k]);
+    if (first) {
+      setError(
+        first === 'name'
+          ? 'Как вас зовут? Так мы поймём, кому ответить.'
+          : first === 'title'
+            ? 'Напишите коротко, о чём сообщение.'
+            : 'Заполните отмеченные поля.',
+      );
+      document.querySelector<HTMLElement>(`.fb-panel [data-f="${first}"]`)?.focus();
       return false;
     }
     try {
@@ -270,6 +389,7 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const send = async () => {
     if (!hasEndpoint()) return viaGithub();
     if (!checked()) return;
+    setError('');
     setStage('sending');
     try {
       const r = await sendFeedback(note());
@@ -282,6 +402,38 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       setStage('form');
     }
   };
+
+  const fixed = (key: string) => {
+    const next = { ...bad, [key]: false };
+    setBad(next);
+    if (!Object.values(next).some(Boolean)) setError('');
+  };
+
+  const field = (
+    key: string,
+    label: string,
+    value: string,
+    set: (v: string) => void,
+    opts: { rows?: number; optional?: boolean; placeholder?: string } = {},
+  ) => (
+    <label className={'fb-field' + (bad[key] ? ' bad' : '')}>
+      <span>
+        {label}
+        {opts.optional ? <em> (по желанию)</em> : null}
+      </span>
+      <textarea
+        data-f={key}
+        rows={opts.rows || 2}
+        value={value}
+        maxLength={5000}
+        placeholder={opts.placeholder}
+        onChange={(e) => {
+          set(e.target.value);
+          if (bad[key]) fixed(key);
+        }}
+      />
+    </label>
+  );
 
   return (
     <div data-feedback-ignore>
@@ -299,16 +451,16 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
           <div className="fb-mark-bar" role="status">
             <span className="fb-mark-dot" aria-hidden="true" />
             <span className="fb-mark-t">
-              <strong>Покажите место на странице</strong>
+              <strong>{adding ? 'Ещё один снимок: покажите место' : 'Покажите место на странице'}</strong>
               <span className="fb-desk">
                 Наведите курсор и нажмите — сделаем снимок экрана с этим местом. Esc — отмена.
               </span>
               <span className="fb-touch">Нажмите на место, о котором хотите написать.</span>
             </span>
-            <button type="button" className="fb-ghost" onClick={() => pick(null)}>
+            <button type="button" className="fb-ghost" onClick={() => pickSpot(null)}>
               Весь экран
             </button>
-            <button type="button" className="fb-ghost" onClick={() => setStage('idle')}>
+            <button type="button" className="fb-ghost" onClick={cancelMarking}>
               Отмена
             </button>
           </div>
@@ -329,11 +481,11 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
 
       {stage === 'form' || stage === 'sending' || stage === 'done' || stage === 'github' ? (
         <div className="fb-overlay" onClick={(e) => e.target === e.currentTarget && close()}>
-          <div className="fb-panel" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
+          <div className="fb-panel" role="dialog" aria-modal="true" aria-labelledby="fbTitle" onPaste={onPaste}>
             <div className="fb-head">
               <div>
                 <h2 id="fbTitle">Ваши пожелания</h2>
-                <span>Предложение, ошибка или вопрос — команда сайта прочитает каждое сообщение.</span>
+                <span>Ошибка, изменение, идея или вопрос — команда сайта прочитает каждое сообщение.</span>
               </div>
               <button type="button" className="fb-x" onClick={close} aria-label="Закрыть">
                 <Icon d="M6 6l12 12M18 6L6 18" />
@@ -361,12 +513,18 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
                   <li>В новой вкладке открылась задача — текст уже заполнен.</li>
                   {result.copied ? (
                     <li>Снимок экрана скопирован — вставьте его в описание: Ctrl+V (на Mac — ⌘V).</li>
-                  ) : shotUrl ? (
+                  ) : null}
+                  {pics.some((p) => !(result.copied && p.main)) ? (
                     <li>
-                      Скачайте снимок и перетащите его в описание:{' '}
-                      <a href={shotUrl} download="snimok.webp">
-                        скачать снимок
-                      </a>
+                      Скачайте {result.copied ? 'остальные картинки' : 'картинки'} и перетащите их в описание:{' '}
+                      {pics
+                        .filter((p) => !(result.copied && p.main))
+                        .map((p, i) => (
+                          <a key={p.id} href={p.url} download={`snimok-${i + 1}.webp`}>
+                            {'снимок ' + (i + 1)}
+                          </a>
+                        ))
+                        .reduce<React.ReactNode[]>((acc, a, i) => (i ? [...acc, ', ', a] : [a]), [])}
                       .
                     </li>
                   ) : null}
@@ -385,95 +543,244 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
                 </div>
               </div>
             ) : (
-              <div className="fb-body">
-                <div className="fb-seg" role="radiogroup" aria-label="Что вы хотите сообщить">
-                  {TYPES.map(([k, t, d]) => (
-                    <button
-                      key={k}
-                      type="button"
-                      role="radio"
-                      aria-checked={type === k}
-                      className={type === k ? 'on' : ''}
-                      onClick={() => setType(k)}
-                    >
-                      <Icon d={d} size={18} />
-                      {t}
-                    </button>
-                  ))}
-                </div>
-                <label className="fb-field">
-                  <span>Что вы хотите сообщить?</span>
-                  <textarea
-                    rows={4}
-                    value={text}
-                    placeholder={PLACEHOLDER[type]}
-                    onChange={(e) => setText(e.target.value)}
-                    autoFocus
-                  />
-                </label>
-                <div className="fb-shot">
-                  {shotUrl && !noShot ? (
-                    <img src={shotUrl} alt="Снимок экрана с отмеченным местом" />
+              <>
+                <div className="fb-body">
+                  <ul className="fb-ctx" aria-label="Отправим автоматически">
+                    <li>
+                      <span>Страница</span>
+                      <strong>{document.title}</strong>
+                    </li>
+                    <li>
+                      <span>Отмечено</span>
+                      <strong>{element.ru || 'весь экран'}</strong>
+                      <button type="button" className="fb-link" onClick={markAgain}>
+                        Отметить другое место
+                      </button>
+                    </li>
+                  </ul>
+
+                  <div className="fb-q">
+                    <span className="fb-q-l" id="fbType">
+                      Что это?
+                    </span>
+                    <div className="fb-seg fb-seg-4" role="radiogroup" aria-labelledby="fbType">
+                      {TYPES.map(([k, d]) => (
+                        <button
+                          key={k}
+                          type="button"
+                          role="radio"
+                          aria-checked={type === k}
+                          className={type === k ? 'on' : ''}
+                          onClick={() => setType(k)}
+                        >
+                          <Icon d={d} size={18} />
+                          {TYPE_RU[k]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="fb-q">
+                    <span className="fb-q-l" id="fbSev">
+                      Насколько важно?
+                    </span>
+                    <div className="fb-seg" role="radiogroup" aria-labelledby="fbSev">
+                      {SEVERITIES.map((k) => (
+                        <button
+                          key={k}
+                          type="button"
+                          role="radio"
+                          aria-checked={severity === k}
+                          className={severity === k ? 'on' : ''}
+                          onClick={() => setSeverity(k)}
+                        >
+                          <i className={'fb-dot fb-dot-' + k} aria-hidden="true" />
+                          {SEVERITY_RU[k]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <label className={'fb-field' + (bad.title ? ' bad' : '')}>
+                    <span>Коротко</span>
+                    <input
+                      className="input"
+                      data-f="title"
+                      value={title}
+                      maxLength={120}
+                      placeholder="Например: «Не вижу цену за двоих»"
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                        if (bad.title) fixed('title');
+                      }}
+                      autoFocus={!coarse}
+                    />
+                    <small className="fb-count" aria-live="polite">
+                      {title.length} из 120
+                    </small>
+                  </label>
+
+                  {type === 'bug' ? (
+                    <div className="fb-group ios-in" key="bug">
+                      {field('whatDoing', 'Что вы делали?', whatDoing, setWhatDoing, {
+                        optional: true,
+                        placeholder: 'Например: выбрал даты и нажал «Найти санаторий».',
+                      })}
+                      {field('expected', 'Что ожидали?', expected, setExpected)}
+                      {field('actual', 'Что произошло?', actual, setActual)}
+                    </div>
                   ) : (
-                    <div className="fb-shot-none">
-                      {noShot ? 'Снимок не отправим.' : 'Снимок не получился — можно отправить без него.'}
+                    <div className="fb-group ios-in" key={type}>
+                      {field('description', DESCRIBE[type][0], description, setDescription, {
+                        rows: 3,
+                        placeholder: DESCRIBE[type][1],
+                      })}
                     </div>
                   )}
-                  <div className="fb-shot-side">
-                    <strong>Снимок экрана</strong>
-                    <span>{element ? 'Отмечено: ' + element : 'Весь экран'}</span>
-                    <button type="button" className="fb-link" onClick={start}>
-                      Отметить другое место
-                    </button>
-                    {shot ? (
-                      <button type="button" className="fb-link" onClick={() => setNoShot(!noShot)}>
-                        {noShot ? 'Вернуть снимок' : 'Отправить без снимка'}
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-                <div className="fb-two">
-                  <label className="fb-field">
-                    <span>Ваше имя</span>
-                    <input
-                      className="input"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      autoComplete="name"
-                    />
-                  </label>
-                  <label className="fb-field">
-                    <span>Как с вами связаться (по желанию)</span>
-                    <input
-                      className="input"
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value)}
-                      placeholder="WhatsApp или e-mail"
-                    />
-                  </label>
-                </div>
-                {error ? (
-                  <div className="fb-error" role="alert">
-                    {error}
-                  </div>
-                ) : null}
-                {failed ? (
-                  <button type="button" className="fb-link" onClick={viaGithub}>
-                    Для команды: создать задачу на GitHub вручную
-                  </button>
-                ) : null}
-                <div className="fb-foot">
-                  <span>Сообщение попадёт в список задач команды. Ничего не меняем, пока не проверим.</span>
-                  <button
-                    type="button"
-                    className="btn btn-primary fb-send"
-                    onClick={send}
-                    disabled={stage === 'sending'}
+
+                  <section
+                    className="fb-pics"
+                    aria-label="Снимки экрана"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      addFiles(Array.from(e.dataTransfer.files));
+                    }}
                   >
-                    {stage === 'sending' ? 'Отправляем…' : 'Отправить'}
-                  </button>
+                    <div className="fb-pics-h">
+                      <strong>Снимки экрана</strong>
+                      <span>
+                        {pics.length} из {MAX_PICTURES}
+                      </span>
+                    </div>
+                    {shotFailed && !main ? (
+                      <p className="fb-hint">Снимок отмеченного места не получился — можно отправить без него.</p>
+                    ) : null}
+                    {pics.length ? null : (
+                      <p className="fb-hint">Снимков пока нет — добавьте, если так будет понятнее.</p>
+                    )}
+                    <ul className="fb-grid">
+                      {pics.map((p) => (
+                        <li key={p.id} className={'fb-tile ios-in' + (p.main ? ' main' : '')}>
+                          <a href={p.url} target="_blank" rel="noreferrer" className="fb-thumb">
+                            <img src={p.url} alt={p.label} />
+                          </a>
+                          <span className="fb-cap" title={p.label}>
+                            {p.label}
+                          </span>
+                          <button
+                            type="button"
+                            className="fb-rm"
+                            aria-label={'Убрать: ' + p.label}
+                            onClick={() => dropPics((x) => x.id !== p.id)}
+                          >
+                            <Icon d="M6 6l12 12M18 6L6 18" size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    <input
+                      ref={fileInput}
+                      type="file"
+                      accept={IMAGE_TYPES.join(',')}
+                      multiple
+                      hidden
+                      onChange={(e) => {
+                        addFiles(Array.from(e.target.files || []));
+                        e.target.value = '';
+                      }}
+                    />
+                    {pics.length < MAX_PICTURES ? (
+                      <div className="fb-adds">
+                        <button type="button" className="fb-add" onClick={markMore}>
+                          <Icon d="M3 7h3l2-3h8l2 3h3v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" size={18} />
+                          Ещё снимок экрана
+                        </button>
+                        <button type="button" className="fb-add" onClick={() => fileInput.current?.click()}>
+                          <Icon d="M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M15.5 9.5h.01" size={18} />
+                          {coarse ? 'Фото из галереи' : 'Картинка с компьютера'}
+                        </button>
+                      </div>
+                    ) : null}
+                    <p className="fb-hint">
+                      {coarse
+                        ? 'Только картинки (PNG, JPG, WebP, GIF).'
+                        : 'Только картинки (PNG, JPG, WebP, GIF). Можно вставить из буфера — Ctrl+V — или перетащить сюда.'}
+                    </p>
+                    {picError ? (
+                      <p className="fb-hint fb-hint-err" role="alert">
+                        {picError}
+                      </p>
+                    ) : null}
+                  </section>
+
+                  <div className="fb-two">
+                    <label className={'fb-field' + (bad.name ? ' bad' : '')}>
+                      <span>Ваше имя</span>
+                      <input
+                        className="input"
+                        data-f="name"
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          if (bad.name) fixed('name');
+                        }}
+                        autoComplete="name"
+                      />
+                    </label>
+                    <label className="fb-field">
+                      <span>
+                        Как с вами связаться<em> (по желанию)</em>
+                      </span>
+                      <input
+                        className="input"
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value)}
+                        placeholder="WhatsApp или e-mail"
+                      />
+                    </label>
+                  </div>
+
+                  <details className="fb-what">
+                    <summary>Что отправится?</summary>
+                    <ul>
+                      <li>Страница и её адрес, отмеченное место.</li>
+                      <li>Снимки экрана и картинки, которые вы добавили.</li>
+                      <li>Размер экрана и браузер — чтобы повторить ошибку.</li>
+                      <li>Телефоны и e-mail на снимках закрываем точками.</li>
+                    </ul>
+                  </details>
+
+                  {error ? (
+                    <div className="fb-error" role="alert">
+                      {error}
+                    </div>
+                  ) : null}
+                  {failed ? (
+                    <button type="button" className="fb-link" onClick={viaGithub}>
+                      Для команды: создать задачу на GitHub вручную
+                    </button>
+                  ) : null}
                 </div>
-              </div>
+                <div className="fb-foot">
+                  <button type="button" className="fb-link fb-clear" onClick={reset} disabled={stage === 'sending'}>
+                    Очистить
+                  </button>
+                  <span className="fb-foot-r">
+                    <button type="button" className="btn btn-secondary" onClick={close} disabled={stage === 'sending'}>
+                      Отмена
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary fb-send"
+                      onClick={send}
+                      disabled={stage === 'sending'}
+                    >
+                      {stage === 'sending' ? 'Отправляем…' : 'Отправить'}
+                    </button>
+                  </span>
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -214,17 +214,24 @@ const BOARDS = [
       await p.mouse.move(box.x + 10, box.y + 10);
       await p.mouse.click(box.x + 10, box.y + 10);
       await p.waitForSelector('.fb-panel', { timeout: 15000 });
-      await p.fill('.fb-field textarea', 'Хочу, чтобы фильтры были видны сразу, без нажатия.');
-      await p.fill('.fb-two input >> nth=0', 'Ирина');
-      // the screenshot preview is a blob: URL — keep it as a picture in the board
+      await p.fill('[data-f=title]', 'Фильтры хочу видеть сразу');
+      await p.fill('[data-f=description]', 'Хочу, чтобы фильтры были видны сразу, без нажатия на кнопку.');
+      await p.fill('[data-f=name]', 'Ирина');
+      // one more screenshot: the whole screen
+      await p.click('text=Ещё снимок экрана');
+      await p.waitForSelector('.fb-mark-bar');
+      await p.click('.fb-mark-bar >> text=Весь экран');
+      await p.waitForSelector('.fb-panel', { timeout: 15000 });
+      // the previews are blob: URLs — keep them as pictures in the board
       await p.evaluate(async () => {
-        const img = document.querySelector('.fb-shot img');
-        if (!img) return;
-        const c = document.createElement('canvas');
-        c.width = 480;
-        c.height = 300;
-        c.getContext('2d').drawImage(img, 0, 0, c.width, (c.width * img.naturalHeight) / img.naturalWidth);
-        img.src = c.toDataURL('image/jpeg', 0.8);
+        document.querySelectorAll('.fb-thumb').forEach((a) => a.removeAttribute('href'));
+        document.querySelectorAll('.fb-thumb img').forEach((img) => {
+          const c = document.createElement('canvas');
+          c.width = 320;
+          c.height = 200;
+          c.getContext('2d').drawImage(img, 0, 0, c.width, (c.width * img.naturalHeight) / img.naturalWidth);
+          img.src = c.toDataURL('image/jpeg', 0.8);
+        });
       });
       await p.waitForTimeout(200);
     },
