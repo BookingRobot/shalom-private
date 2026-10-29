@@ -101,10 +101,11 @@ const BOARDS = [
   },
   {
     file: 'Transfer.dc.html',
-    title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — из Вильнюса и Каунаса бесплатно)',
+    title: 'Шаг 2 · Дорога: перелёт и трансфер — ничего не выбрано за гостя (Эгле: трансфер санатория уже оплачен)',
     route: '/transfer',
     links: [
       ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#trNeed .choice', 'Да, нужен', 'Transfer-yes.dc.html'],
       ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
     ],
   },
@@ -252,6 +253,19 @@ const BOARDS = [
       ['.fb-x', '', 'Results-B.dc.html'],
       ['.fb-send', '', 'Results-B.dc.html'],
     ],
+  },
+  {
+    file: 'Transfer-yes.dc.html',
+    title: 'Шаг 2 · «Да, нужен трансфер» и Вильнюс: где встретить, как ехать и обратно — гость выбирает сам',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.click('text=Билеты у меня уже есть');
+      await p.click('#trNeed .choice >> nth=0');
+      await p.click('#trFrom .rowpick >> nth=0');
+      await p.waitForTimeout(300);
+    },
+    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
   },
   {
     file: 'Transfer-other.dc.html',

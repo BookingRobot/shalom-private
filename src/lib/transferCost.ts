@@ -40,8 +40,11 @@ export function legOf(b: Booking, place: string, t: T = b.transfer): TransferLeg
 }
 
 export function transferLegs(b: Booking, t: T = b.transfer) {
+  // not answered yet (null) counts as no transfer
   const legs: TransferLeg[] =
-    t.mode === 'none' ? [] : [legOf(b, t.place, t), ...(t.back ? [legOf(b, t.backPlace, t)] : [])];
+    !t.mode || t.mode === 'none' || !t.place
+      ? []
+      : [legOf(b, t.place, t), ...(t.back && t.backPlace ? [legOf(b, t.backPlace, t)] : [])];
   const total = legs.reduce((n, l) => n + l.price, 0);
   return {
     legs,

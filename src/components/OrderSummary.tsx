@@ -144,6 +144,6 @@ export function orderPriceRows(order: {
       ? [[order.flightName || 'Перелёт Тель-Авив ⇄ Вильнюс и трансфер', order.flightLabel] as [string, string]]
       : []),
     ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
-    ...(order.sanTransfer ? [['Трансфер — от санатория', 'бесплатно'] as [string, string]] : []),
+    ...(order.sanTransfer ? [['Трансфер санатория', 'уже оплачен'] as [string, string]] : []),
   ];
 }

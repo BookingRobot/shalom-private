@@ -80,7 +80,6 @@ export function FlightChoice() {
       ...(dates ? { ...dates, chosenDates: true } : {}),
       flightPackage: true,
       flights: 'yes',
-      transfer: { ...booking.transfer, mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius' },
     });
   const pickOwn = () => update({ flightPackage: false, flights: 'no' });
   const pickHelp = () => {

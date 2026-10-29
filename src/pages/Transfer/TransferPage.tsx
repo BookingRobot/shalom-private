@@ -6,9 +6,9 @@ import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { api } from '../../api';
 import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
-import { StepNext } from '../../components/StepNext';
+import { StepNext, type Missing } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
-import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../lib/dates';
+import { WEEKDAYS_SHORT, shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { FlightChoice } from '../../components/FlightChoice';
@@ -16,6 +16,7 @@ import { freeTransferPlaces, sanatoriumTransferName, transferBySanatorium } from
 import { legOf, transferLegs } from '../../lib/transferCost';
 import { FLIGHT_BACK, FLIGHT_THERE, flightLine } from '../../data/flights';
 import { usePageTitle } from '../../lib/usePageTitle';
+import type { Booking } from '../../data/booking';
 import './TransferPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -24,32 +25,109 @@ const HELP_CTX: HelpContextInfo = {
   out: '2026-11-18',
 };
 
+/** pick-up spot → the same spot on the way back: «Из аэропорта Вильнюса» → «В аэропорт Вильнюса» */
+const toBack = (t: string) =>
+  t
+    .replace(/^Из аэропорта/, 'В аэропорт')
+    .replace(/^С ЖД вокзала/, 'На ЖД вокзал')
+    .replace(/^С автовокзала/, 'На автовокзал')
+    .replace(/^От отеля/, 'В отель');
+
+type Tr = Booking['transfer'];
+
+/**
+ * «Дорога» → «Трансфер до санатория». Nothing is chosen for the guest: every question starts
+ * with empty choices and the green bubble at «Далее» says what is still to choose. Only what
+ * our flight tells us is filled in (it lands at Vilnius airport and leaves from there).
+ * What the sanatorium or the flight package already pays for is marked «Уже оплачено», but
+ * the guest still says whether they need it.
+ */
 class TransferLogic extends PageLogic {
   constructor(props: PageServices) {
     super(props);
-    const tr = props.booking.booking.transfer;
-    this.state = {
-      need: tr.mode !== 'none',
-      city: tr.place,
-      vehicle: tr.vehicle,
-      place: '',
-      indiv: tr.mode === 'individual',
-      cmp: tr.mode === 'individual',
-      back: tr.back,
-      backSame: tr.backPlace === tr.place,
-      backCity: tr.backPlace,
-    };
+    const tr: Partial<Tr> = props.booking.booking.transfer || {};
+    // an order saved before the guest was asked (old shape): start with empty choices
+    const asked = tr.need !== undefined;
+    this.state = asked
+      ? {
+          need: tr.need ?? null,
+          how: tr.how ?? null,
+          city: tr.place || '',
+          spot: tr.spot || '',
+          vehicle: tr.vehicle || '',
+          back: tr.back ?? null,
+          backSame: tr.backSame ?? null,
+          backCity: tr.backSame === false ? tr.backPlace || '' : '',
+          backSpot: tr.backSame === false ? tr.backSpot || '' : '',
+        }
+      : {};
   }
-  syncBooking(st) {
+  /** what is really chosen; with our flight the places are known from it */
+  eff(st: Record<string, any> = this.state) {
+    const b = this.props.booking.booking;
+    const { places: P } = api.getTransferOptions();
+    const pkg = !!b.flightPackage;
+    const city: string = st.city || (pkg ? 'vilnius' : '');
+    const cur = P.find((c) => c.id === city);
+    const spot: string = !cur
+      ? ''
+      : cur.places.includes(st.spot)
+        ? st.spot
+        : pkg && city === 'vilnius' && !st.spot
+          ? cur.places[0]
+          : '';
+    const need: boolean | null = st.need ?? null;
+    const how: 'group' | 'individual' | null = st.how ?? null;
+    const vehicle: string = st.vehicle || '';
+    const back: boolean | null = st.back ?? null;
+    const backSame: boolean | null = st.backSame ?? (pkg ? true : null);
+    const backCity = backSame === true ? city : backSame === false ? st.backCity || '' : '';
+    const backCur = P.find((c) => c.id === backCity);
+    const backPlaces = backCur ? backCur.places.map(toBack) : [];
+    const backSpot: string =
+      backSame === true ? (spot ? toBack(spot) : '') : backPlaces.includes(st.backSpot) ? st.backSpot : '';
+    const mode: Tr['mode'] =
+      need === false ? 'none' : need && city && (how === 'group' || (how === 'individual' && vehicle)) ? how : null;
+    return { pkg, city, cur, spot, need, how, vehicle, back, backSame, backCity, backCur, backPlaces, backSpot, mode };
+  }
+  syncBooking(st: Record<string, any>) {
+    const e = this.eff(st);
     return {
       transfer: {
-        mode: !st.need ? 'none' : st.indiv ? 'individual' : 'group',
-        back: st.back,
-        place: st.city,
-        backPlace: st.backSame ? st.city : st.backCity,
-        vehicle: st.vehicle,
+        mode: e.mode,
+        need: e.need,
+        how: e.how,
+        back: e.back,
+        place: e.city,
+        spot: e.spot,
+        backSame: e.backSame,
+        backPlace: e.backCity,
+        backSpot: e.backSpot,
+        vehicle: e.vehicle,
       },
     } as const;
+  }
+  /** what the guest has not chosen yet, in the order of the page (the bubble shows the first) */
+  gaps(): Missing[] {
+    const e = this.eff();
+    if (e.need === null) return [{ label: 'нужен ли трансфер', target: '#trNeed' }];
+    if (!e.need) return [];
+    const g: Missing[] = [];
+    const hotel = (document.getElementById('hotelname') as HTMLInputElement | null)?.value.trim();
+    if (!e.city) g.push({ label: 'откуда вас забрать', target: '#trFrom' });
+    else if (!e.spot) g.push({ label: 'где именно вас встретить', target: '#place' });
+    else if (/^От отеля/.test(e.spot) && !hotel) g.push({ label: 'из какого отеля забрать', target: '#hotelname' });
+    if (e.city && !e.how) g.push({ label: 'как поедете', target: '#trHow' });
+    if (e.how === 'individual' && !e.vehicle) g.push({ label: 'какая машина нужна', target: '#trCars' });
+    if (e.back === null) g.push({ label: 'нужен ли трансфер обратно', target: '#trBack' });
+    else if (e.back) {
+      if (e.backSame === null) g.push({ label: 'куда отвезти обратно', target: '#trBackWhere' });
+      else if (e.backSame === false) {
+        if (!e.backCity) g.push({ label: 'город на обратном пути', target: '#trBackCities' });
+        else if (!e.backSpot) g.push({ label: 'куда именно отвезти', target: '#backplace' });
+      }
+    }
+    return g;
   }
   renderVals() {
     return this._rv();
@@ -57,184 +135,249 @@ class TransferLogic extends PageLogic {
   _rv() {
     const booking = this.props.booking.booking;
     const { places: PICKUP_PLACES, vehicles: VEHICLES } = api.getTransferOptions();
-    const TRANSFER_GUESTS = this.props.booking.booking.adults + this.props.booking.booking.children;
-    const need = this.state.need ?? true;
-    const city = this.state.city ?? 'vilnius';
-
-    const cur = PICKUP_PLACES.find((c) => c.id === city) || PICKUP_PLACES[0];
-    const place = cur.places.includes(this.state.place) ? this.state.place : cur.places[0];
-    const back = this.state.back ?? true,
-      backSame = this.state.backSame ?? true,
-      backCity = this.state.backCity ?? 'vilnius';
-    const backCur = PICKUP_PLACES.find((c) => c.id === backCity) || PICKUP_PLACES[0];
-    // Рыночные цены (Vilnius Airport → Druskininkai: частные перевозчики 130–190\u00a0€ за машину) — [ПРОВЕРИТЬ ПО ТАРИФУ ПЕРЕВОЗЧИКА]
-    const vehicle = this.state.vehicle ?? 'car';
-
-    const indiv = !!this.state.indiv;
-    // the same rule as the order summary: free (sanatorium) / in the flight package / our tariff
-    const tNow = {
-      mode: (!need ? 'none' : indiv ? 'individual' : 'group') as 'none' | 'individual' | 'group',
-      back,
-      place: city,
-      backPlace: backSame ? city : backCity,
-      vehicle,
-    };
-    const tr = transferLegs(booking, tNow);
-    const legs = tr.legs.length;
-    const transferTotal = tr.total;
-    const vName = (VEHICLES.find((v) => v.id === vehicle) || VEHICLES[0]).name.toLowerCase();
-    const transferSum = need
-      ? (transferTotal ? fmt(transferTotal) + '\u00a0€' : 'бесплатно') +
-        ' · ' +
-        (indiv ? 'индивидуальный, ' + vName : 'групповой') +
-        (legs === 2 ? ', туда и обратно' : ', в одну сторону')
-      : '0\u00a0€';
+    const GUESTS = booking.adults + booking.children;
+    const e = this.eff();
+    const { city, cur, spot, need, how, vehicle, back, backSame, backCity } = e;
     const bySanH = transferBySanatorium(booking.hotelId);
     const freeCities = freeTransferPlaces(booking.hotelId);
-    const inPkg = !!booking.flightPackage && !bySanH;
-    // a group seat from the chosen city: free / in the package / extra / tariff
-    const seat = legOf(booking, city, { ...tNow, mode: 'group' });
-    const seatPP = Math.round(seat.price / TRANSFER_GUESTS);
-    const carLeg = (vid: string) => legOf(booking, city, { ...tNow, mode: 'individual', vehicle: vid });
-    // our flight is in the order: its number and time are known — the fields are filled by us
-    const ourFlight = !!booking.flightPackage;
+    const pkg = e.pkg;
+    const inPkg = pkg && !bySanH;
+    const sanName = sanatoriumTransferName(booking.hotelId);
+    // prices as the order summary counts them: paid by the sanatorium / in the package / our tariff
+    const tNow: Tr = {
+      mode: (e.mode || 'group') as Tr['mode'],
+      need,
+      how,
+      back: !!back,
+      place: city || 'vilnius',
+      spot,
+      backSame,
+      backPlace: backCity,
+      backSpot: e.backSpot,
+      vehicle: vehicle || 'car',
+    };
+    const tr = transferLegs(booking, { ...tNow, mode: e.mode });
+    const seat = legOf(booking, city || 'vilnius', { ...tNow, mode: 'group' });
+    const seatPP = Math.round(seat.price / GUESTS);
+    const carLeg = (vid: string) => legOf(booking, city || 'vilnius', { ...tNow, mode: 'individual', vehicle: vid });
+    // the stamp «Уже оплачено»: the sanatorium meets guests itself / the flight package
+    const paidBy = bySanH ? 'Уже оплачено' : inPkg ? 'Оплачено в пакете' : '';
+    const ourFlight = pkg;
     const flVal = (typed: string | undefined, line: string) => typed ?? (ourFlight ? line : '');
+    const cityFree = (id: string) => bySanH && freeCities.includes(id);
+    const freeCityNames = freeCities.map((id) => (id === 'vilnius' ? 'Вильнюса' : id === 'kaunas' ? 'Каунаса' : id));
+    const pick = (patch: Record<string, any>) => () => this.setState({ ...patch, askNo: false });
     return {
       ourFlight,
       flightIn: flVal(this.state.flIn, flightLine(FLIGHT_THERE, toD(booking.checkin), true)),
       flightBack: flVal(this.state.flBack, flightLine(FLIGHT_BACK, toD(booking.checkout), false)),
-      setFlightIn: (e: { target: { value: string } }) => this.setState({ flIn: e.target.value }),
-      setFlightBack: (e: { target: { value: string } }) => this.setState({ flBack: e.target.value }),
-      need,
-      noNeed: !need,
-      yesCls: need ? 'on' : '',
-      noCls: need ? '' : 'on',
-      sayYes: () => this.setState({ need: true }),
+      setFlightIn: (ev: { target: { value: string } }) => this.setState({ flIn: ev.target.value }),
+      setFlightBack: (ev: { target: { value: string } }) => this.setState({ flBack: ev.target.value }),
+      // 1. do you need a transfer at all — no answer until the guest gives one
+      need: need === true,
+      noNeed: need === false,
+      yesCls: need === true ? 'on' : '',
+      noCls: need === false ? 'on' : '',
+      sayYes: pick({ need: true }),
       sayNo: () => this.setState({ askNo: true }),
       askNo: !!this.state.askNo,
       confirmNo: () => this.setState({ askNo: false, need: false }),
       keepTransfer: () => this.setState({ askNo: false, need: true }),
-      cityName: cur.name,
+      paidBy,
+      yesTitle: bySanH ? 'Да, нужен трансфер санатория' : 'Да, нужен трансфер',
+      yesSub: bySanH
+        ? sanName.replace(/^с/, 'С') +
+          ' встречает гостей из ' +
+          freeCityNames.join(' и ') +
+          ' — это уже входит в оплату'
+        : inPkg
+          ? 'Групповой из аэропорта Вильнюса — уже в пакете с перелётом'
+          : 'Заберём из аэропорта, с вокзала или от отеля · групповой от 30 € с человека',
+      noSub: bySanH
+        ? 'Цена не изменится — трансфер санатория просто не понадобится'
+        : inPkg
+          ? 'Цена пакета с перелётом не изменится'
+          : 'На машине или общественным транспортом',
+      withNote: bySanH
+        ? 'Из Вильнюса и Каунаса санаторий привезёт вас бесплатно — это уже оплачено.'
+        : inPkg
+          ? 'Групповой трансфер из аэропорта Вильнюса уже оплачен в пакете с перелётом.'
+          : 'Групповой трансфер — всего 30 € с человека, индивидуальный — от 130 € за машину.',
+      transferLead:
+        booking.flights === 'help' && !pkg
+          ? 'Консультант уточнит время, когда подберёт рейс. Отметьте, нужен ли трансфер.'
+          : bySanH
+            ? 'Санаторий сам встречает гостей — это уже оплачено. Отметьте, нужен ли он вам.'
+            : inPkg
+              ? 'Трансфер из аэропорта Вильнюса уже в пакете с перелётом. Отметьте, нужен ли он вам.'
+              : 'Встретим с табличкой, поможем с багажом, довезём до стойки регистрации. Отметьте, нужен ли трансфер.',
+      // 2. from where — nothing chosen unless our flight tells us
+      inDay: shortDate(toD(booking.checkin)),
+      fromNote: pkg
+        ? 'Ваш рейс прилетает в аэропорт Вильнюса — его мы и отметили. Можно выбрать другое место.'
+        : 'Выберите город, где вас встретить. Большинство гостей прилетают в Вильнюс — до санатория около 2 часов.',
       cities: PICKUP_PLACES.map((c) => {
         const g = legOf(booking, c.id, { ...tNow, mode: 'group' });
         return {
           ...c,
           on: c.id === city,
           cls: c.id === city ? 'on' : '',
-          badge: g.kind === 'free' ? 'бесплатно' : g.kind === 'package' ? 'в пакете' : '',
-          pick: () => this.setState({ city: c.id }),
+          // the sanatorium's own shuttle is a group one: a car of your own is paid as usual
+          paid: how === 'individual' ? '' : cityFree(c.id) ? 'уже оплачено' : g.kind === 'package' ? 'в пакете' : '',
+          pick: pick({ city: c.id, spot: '' }),
         };
       }),
-      places: cur.places.map((t) => ({ t })),
-      place,
-      fromHotel: /^От отеля/.test(place),
-      pickPlace: (e) => this.setState({ place: e.target.value }),
-      indiv,
-      cmp: !!this.state.cmp,
-      toggleCmp: () => this.setState(this.state.cmp ? { cmp: false, indiv: false } : { cmp: true }),
-      grpCls: indiv ? '' : 'on',
-      pickGroup: () => this.setState({ indiv: false }),
-      grpBorder: indiv ? '#E3DED2' : '#1F5F4A',
-      grpBg: indiv ? '#fff' : '#EEF5F1',
-      indBorder: this.state.cmp ? '#1F5F4A' : '#CFC9BB',
-      seatPrice:
-        seat.kind === 'free'
-          ? 'Бесплатно'
-          : seat.kind === 'package'
-            ? 'В пакете'
-            : (inPkg ? '+' : '') + fmt(seatPP) + '\u00a0€',
+      cityChosen: !!city,
+      cityName: cur ? cur.name : '',
+      places: cur ? cur.places.map((t) => ({ t })) : [],
+      spot,
+      fromHotel: /^От отеля/.test(spot),
+      pickSpot: (ev: { target: { value: string } }) => this.setState({ spot: ev.target.value }),
+      // 3. how — together with other guests or a car of your own
+      groupCls: how === 'group' ? 'on' : '',
+      indCls: how === 'individual' ? 'on' : '',
+      pickGroupHow: pick({ how: 'group' }),
+      pickIndHow: pick({ how: 'individual' }),
+      isGroup: how === 'group',
+      isInd: how === 'individual',
+      seatPaid: seat.kind === 'free' ? 'Уже оплачено' : seat.kind === 'package' ? 'Оплачено в пакете' : '',
+      seatPrice: (inPkg ? '+' : '') + fmt(seatPP) + ' €',
       seatNote:
         seat.kind === 'free'
-          ? 'организует ' + sanatoriumTransferName(booking.hotelId)
+          ? 'организует ' + sanName
           : seat.kind === 'package'
             ? 'входит в пакет с перелётом'
             : inPkg
               ? 'доплата с человека, в одну сторону'
               : 'с человека, в одну сторону',
-      seatTotal: fmt(seat.price) + '\u00a0€',
-      guestsLabel: TRANSFER_GUESTS + ' гостей',
-      indFrom: (inPkg ? '+' : '') + fmt(carLeg('car').price) + '\u00a0€',
-      vehicles: VEHICLES.map((v) => ({
-        ...v,
-        price: (inPkg ? '+' : '') + fmt(carLeg(v.id).price),
-        cls: indiv && v.id === vehicle ? 'on' : '',
-        pick: () => this.setState({ vehicle: v.id, indiv: true }),
+      seatTotal: seat.kind === 'paid' ? fmt(seat.price) + ' €' : '',
+      guestsLabel: GUESTS + ' гостей',
+      indFrom: (inPkg ? '+' : '') + fmt(carLeg('car').price) + ' €',
+      vehicles: VEHICLES.map((vh) => ({
+        ...vh,
+        price: (inPkg ? '+' : '') + fmt(carLeg(vh.id).price),
+        cls: vh.id === vehicle ? 'on' : '',
+        pick: pick({ vehicle: vh.id }),
       })),
-      back,
-      backSame,
-      backOther: back && !backSame,
-      sameCls: backSame ? 'on' : '',
-      otherCls: backSame ? '' : 'on',
-      sameInfo: cur.name + ', ' + place.toLowerCase().replace(/^(из|с|от)\s/, ''),
-      toggleBack: () => this.setState({ back: !back }),
-      pickSame: () => this.setState({ backSame: true }),
-      pickOther: () => this.setState({ backSame: false }),
-      backCityName: backCur.name,
+      // 4. back — asked separately, nothing chosen
+      outDay: shortDate(toD(booking.checkout)),
+      outWeekday: WEEKDAYS_SHORT[toD(booking.checkout).getUTCDay()],
+      hotelShort: sanName.replace(/^санаторий /, ''),
+      backYesCls: back === true ? 'on' : '',
+      backNoCls: back === false ? 'on' : '',
+      pickBackYes: pick({ back: true }),
+      pickBackNo: pick({ back: false }),
+      backOn: back === true,
+      backPaid: how === 'individual' ? '' : bySanH ? 'Уже оплачено' : inPkg ? 'Оплачено в пакете' : '',
+      backSub:
+        how === 'individual'
+          ? 'Отдельной машиной, как и туда'
+          : bySanH
+            ? 'В Вильнюс и Каунас — уже оплачено санаторием'
+            : inPkg
+              ? 'В аэропорт Вильнюса — в пакете с перелётом'
+              : 'В аэропорт, на вокзал или в отель',
+      sameCls: backSame === true ? 'on' : '',
+      otherCls: backSame === false ? 'on' : '',
+      pickSame: pick({ backSame: true }),
+      pickOther: pick({ backSame: false }),
+      backSame: backSame === true,
+      backOther: backSame === false,
+      sameInfo: !cur
+        ? 'Туда, где вас встретили'
+        : !spot
+          ? cur.name
+          : toBack(spot) + (spot.includes(cur.name.slice(0, 5)) ? '' : ' · ' + cur.name),
       backCities: PICKUP_PLACES.map((c) => ({
         ...c,
         cls: c.id === backCity ? 'on' : '',
-        pick: () => this.setState({ backCity: c.id }),
+        paid: how !== 'individual' && cityFree(c.id) ? 'уже оплачено' : '',
+        pick: pick({ backCity: c.id, backSpot: '' }),
       })),
-      backPlaces: backCur.places.map((t) => ({
-        t: t
-          .replace(/^Из аэропорта/, 'В аэропорт')
-          .replace(/^С ЖД вокзала/, 'На ЖД вокзал')
-          .replace(/^С автовокзала/, 'На автовокзал')
-          .replace(/^Из аэропорта (\S+)/, 'В аэропорт $1')
-          .replace(/^От отеля/, 'В отель')
-          .replace(/^С ЖД вокзала (.+)/, 'На ЖД вокзал $1'),
-      })),
+      backCityChosen: !!backCity && backSame === false,
+      backPlaces: e.backPlaces.map((t) => ({ t })),
+      backSpot: e.backSpot,
+      pickBackSpot: (ev: { target: { value: string } }) => this.setState({ backSpot: ev.target.value }),
       moreOpen: !!this.state.more,
       moreLabel: this.state.more ? 'Свернуть' : 'Подробнее о встрече и поездке',
       toggleMore: () => this.setState({ more: !this.state.more }),
-      transferSum,
-      inDay: shortDate(toD(booking.checkin)),
-      outDay: shortDate(toD(booking.checkout)),
-      outWeekday: WEEKDAYS_SHORT[toD(booking.checkout).getUTCDay()],
-      stayNights:
-        daysBetween(toD(booking.checkin), toD(booking.checkout)) +
-        ' ' +
-        nightsWord(daysBetween(toD(booking.checkin), toD(booking.checkout))),
-      bySan: bySanH,
-      sanName: sanatoriumTransferName(booking.hotelId),
-      flightOurs: !!booking.flightPackage,
-      inPkg,
       // what is already covered, said before the choice
       freeNote: bySanH
-        ? sanatoriumTransferName(booking.hotelId).replace(/^с/, 'С') +
-          ' бесплатно встречает гостей в ' +
+        ? sanName.replace(/^с/, 'С') +
+          ' сам встречает гостей в ' +
           freeCities.map((id) => (id === 'vilnius' ? 'Вильнюсе' : id === 'kaunas' ? 'Каунасе' : id)).join(' и ') +
-          ' — в аэропорту, на вокзале или у отеля. Из других мест — по нашему тарифу.'
+          ' — в аэропорту, на вокзале или у отеля. Это уже входит в оплату. Из других мест — по нашему тарифу.'
         : inPkg
           ? 'Групповой трансфер из аэропорта Вильнюса уже в пакете с перелётом. Другой город или отдельная машина — с доплатой.'
           : '',
-      yesSub: bySanH
-        ? 'Из Вильнюса и Каунаса — бесплатно, из других мест — по тарифу'
-        : inPkg
-          ? 'Групповой из аэропорта Вильнюса — уже в пакете с перелётом'
-          : 'Заберём из аэропорта, с вокзала или от отеля · групповой от 30\u00a0€ с человека',
-      withNote: bySanH
-        ? 'Из Вильнюса и Каунаса санаторий привезёт вас бесплатно.'
-        : inPkg
-          ? 'Групповой трансфер из аэропорта Вильнюса уже оплачен в пакете с перелётом.'
-          : 'Групповой трансфер — всего 30\u00a0€ с человека, индивидуальный — от 130\u00a0€ за машину.',
-      noSub: inPkg ? 'Цена пакета с перелётом не изменится' : 'На машине или общественным транспортом',
-      transferLead:
-        booking.flights === 'help' && !booking.flightPackage
-          ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
-          : bySanH
-            ? 'Выберите, откуда вас забрать — и нужна ли дорога обратно.'
-            : booking.flightPackage
-              ? 'Встретим у самолёта в Вильнюсе — или выберите другое место.'
-              : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
       total:
         fmt(
-          orderSummary(this.props.booking.booking).stay +
-            orderSummary(this.props.booking.booking).flight +
-            transferTotal,
-        ) + '\u00a0€',
+          orderSummary(this.props.booking.booking).stay + orderSummary(this.props.booking.booking).flight + tr.total,
+        ) + ' €',
     };
   }
+}
+
+/** «Уже оплачено»: what the sanatorium or the flight package pays — a stamp, not a choice */
+function PaidStamp({ children }: { children: string }) {
+  return (
+    <span className="paid-stamp">
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m5 12 5 5L20 7" />
+      </svg>
+      {children}
+    </span>
+  );
+}
+
+const Chevron = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#1F5F4A"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    style={{ position: 'absolute', right: '14px', top: '17px', pointerEvents: 'none' }}
+  >
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+function BackFlight({ v, id }: { v: any; id: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <label className="lbl" htmlFor={id} style={{ fontSize: '15px' }}>
+        {v.ourFlight ? 'Ваш рейс и время отправления' : 'Уже есть билеты? Рейс и время отправления'}
+        <span style={{ fontWeight: '400', color: '#5E6862' }}>
+          {' '}
+          · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно, можно сообщить позже'}
+        </span>
+      </label>
+      <input
+        id={id}
+        className="input"
+        type="text"
+        placeholder="Например: LO 772, 16:10"
+        value={v.flightBack}
+        onChange={v.setFlightBack}
+        style={{ minHeight: '44px', fontSize: '16px' }}
+      />
+    </div>
+  );
 }
 
 export default function TransferPage() {
@@ -299,1037 +442,779 @@ export default function TransferPage() {
                 <span>{v.freeNote}</span>
               </div>
             ) : null}
-            {
+            {/* 1. Нужен ли трансфер — nothing is chosen for the guest */}
+            <div id="trNeed" className="tr-q" role="radiogroup" aria-label="Нужен ли трансфер">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={v.need}
+                className={`choice ${v.yesCls}`}
+                onClick={v.sayYes}
+                style={{ flex: '2 1 360px' }}
+              >
+                <span className={`radio ${v.yesCls}`}>
+                  <i />
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: '18px' }}>{v.yesTitle}</strong>
+                    {v.paidBy ? <PaidStamp>{v.paidBy}</PaidStamp> : <span className="tr-reco">Рекомендуем</span>}
+                  </span>
+                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>{v.yesSub}</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={v.noNeed}
+                className={`choice tr-no ${v.noCls}`}
+                onClick={v.sayNo}
+                style={{ flex: '1 1 220px' }}
+              >
+                <span className={`radio ${v.noCls}`}>
+                  <i />
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '17px', fontWeight: '700', color: '#1C2620' }}>Нет, доберусь сам</span>
+                  <span style={{ color: '#5E6862', fontSize: '15px' }}>{v.noSub}</span>
+                </span>
+              </button>
+            </div>
+            {/* Confirmation pop-up when the guest declines the transfer */}
+            {v.askNo ? (
               <>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                  <button
-                    type="button"
-                    className={`choice ${v.yesCls ?? ''}`}
-                    onClick={v.sayYes}
-                    style={{ flex: '2 1 360px' }}
-                  >
-                    <span className={`radio ${v.yesCls ?? ''}`}>
-                      <i />
-                    </span>
-                    <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                        <strong style={{ fontSize: '18px' }}>Да, нужен трансфер</strong>
-                        <span
-                          style={{
-                            background: '#FFF1D6',
-                            color: '#8A5A00',
-                            fontSize: '14px',
-                            fontWeight: '800',
-                            padding: '2px 8px',
-                            borderRadius: 'var(--r)',
-                          }}
-                        >
-                          Рекомендуем
-                        </span>
-                      </span>
-                      <span style={{ color: '#3E4B44', fontSize: '16px' }}>{v.yesSub}</span>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`choice ${v.noCls ?? ''}`}
-                    onClick={v.sayNo}
+                <div
+                  style={{
+                    position: 'fixed',
+                    inset: '0',
+                    zIndex: '60',
+                    background: 'rgba(20,28,24,.55)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '24px',
+                  }}
+                >
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="noTitle"
+                    className="card"
                     style={{
-                      flex: '1 1 220px',
-                      padding: '12px 16px',
-                      minHeight: '56px',
-                      borderWidth: '1px',
-                      gap: '12px',
+                      maxWidth: '560px',
+                      width: '100%',
+                      padding: '28px 30px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      boxShadow: '0 20px 60px rgba(0,0,0,.35)',
                     }}
                   >
-                    <span className={`radio ${v.noCls ?? ''}`} style={{ width: '22px', height: '22px' }}>
-                      <i />
-                    </span>
-                    <span style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>Нет, доберусь сам</span>
-                      <span style={{ color: '#5E6862', fontSize: '15px' }}>{v.noSub}</span>
-                    </span>
-                  </button>
-                </div>
-                {/* Confirmation pop-up when the guest declines the transfer */}
-                {v.askNo ? (
-                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#C9893A"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                        style={{ flex: 'none' }}
+                      >
+                        <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                      </svg>
+                      <h2 id="noTitle" style={{ fontSize: '23px' }}>
+                        Вы уверены, что доберётесь сами?
+                      </h2>
+                    </div>
+                    <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
+                      От аэропорта Вильнюса до санатория — 130 км. Прямого автобуса из аэропорта нет: нужно доехать до
+                      автовокзала, купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.
+                    </p>
                     <div
                       style={{
-                        position: 'fixed',
-                        inset: '0',
-                        zIndex: '60',
-                        background: 'rgba(20,28,24,.55)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '24px',
+                        padding: '14px 16px',
+                        background: '#EEF5F1',
+                        borderRadius: 'var(--r)',
+                        fontSize: '16px',
                       }}
                     >
-                      <div
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="noTitle"
-                        className="card"
-                        style={{
-                          maxWidth: '560px',
-                          width: '100%',
-                          padding: '28px 30px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '16px',
-                          boxShadow: '0 20px 60px rgba(0,0,0,.35)',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                          <svg
-                            width="40"
-                            height="40"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#C9893A"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                            style={{ flex: 'none' }}
-                          >
-                            <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-                          </svg>
-                          <h2 id="noTitle" style={{ fontSize: '23px' }}>
-                            Вы уверены, что доберётесь сами?
-                          </h2>
-                        </div>
-                        <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
-                          От аэропорта Вильнюса до санатория — 130 км. Прямого автобуса из аэропорта нет: нужно доехать
-                          до автовокзала, купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.
-                        </p>
-                        <div
-                          style={{
-                            padding: '14px 16px',
-                            background: '#EEF5F1',
-                            borderRadius: 'var(--r)',
-                            fontSize: '16px',
-                          }}
-                        >
-                          <strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до
-                          стойки санатория. {v.withNote}
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: '12px',
-                            flexWrap: 'wrap',
-                            justifyContent: 'flex-end',
-                            paddingTop: '4px',
-                          }}
-                        >
-                          <button type="button" className="btn btn-secondary" onClick={v.confirmNo}>
-                            Да, доберусь сам
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={v.keepTransfer}
-                            style={{ minHeight: '52px', fontSize: '18px' }}
-                          >
-                            Нет, добавить трансфер
-                          </button>
-                        </div>
-                      </div>
+                      <strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до
+                      стойки санатория. {v.withNote}
                     </div>
-                  </>
-                ) : null}
-                {v.need ? (
-                  <>
                     <div
-                      className="card"
-                      style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '22px' }}
+                      style={{
+                        display: 'flex',
+                        gap: '12px',
+                        flexWrap: 'wrap',
+                        justifyContent: 'flex-end',
+                        paddingTop: '4px',
+                      }}
                     >
-                      {/* Four-step illustrated strip: how the transfer works */}
-                      <div
+                      <button type="button" className="btn btn-secondary" onClick={v.confirmNo}>
+                        Да, доберусь сам
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={v.keepTransfer}
+                        style={{ minHeight: '52px', fontSize: '18px' }}
+                      >
+                        Нет, добавить трансфер
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {v.need ? (
+              <div
+                className="card ios-in"
+                style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '22px' }}
+              >
+                {/* Four-step illustrated strip: how the transfer works */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    padding: '14px 18px 12px',
+                    background: '#EDF4EF',
+                    border: '1px solid #C8DED3',
+                    borderRadius: 'var(--r)',
+                  }}
+                >
+                  <div style={{ fontWeight: '800', fontSize: '17px' }}>От встречи до санатория</div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '4px',
+                      flexWrap: 'nowrap',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                        flex: '1 1 0',
+                        minWidth: '0',
+                      }}
+                    >
+                      <img
+                        src="/img/39ad8fe2bfcea92423d717bc9dac8f37.png"
+                        alt="Водитель встречает с табличкой"
+                        style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                      />
+                      <span
                         style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '8px',
-                          padding: '14px 18px 12px',
-                          background: '#EDF4EF',
-                          border: '1px solid #C8DED3',
-                          borderRadius: 'var(--r)',
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#1C2620',
+                          textAlign: 'center',
+                          lineHeight: '1.2',
+                          maxWidth: '120px',
                         }}
                       >
-                        <div style={{ fontWeight: '800', fontSize: '17px' }}>От встречи до санатория</div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '4px',
-                            flexWrap: 'nowrap',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: '6px',
-                              flex: '1 1 0',
-                              minWidth: '0',
-                            }}
-                          >
-                            <img
-                              src="/img/39ad8fe2bfcea92423d717bc9dac8f37.png"
-                              alt="Водитель встречает с табличкой"
-                              style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                            />
-                            <span
-                              style={{
-                                fontSize: '14px',
-                                fontWeight: '700',
-                                color: '#1C2620',
-                                textAlign: 'center',
-                                lineHeight: '1.2',
-                                maxWidth: '120px',
-                              }}
-                            >
-                              Встретим с табличкой
-                            </span>
-                          </div>
-                          <svg
-                            width="30"
-                            height="12"
-                            viewBox="0 0 46 12"
-                            fill="none"
-                            stroke="#7FB49A"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                            style={{ flex: 'none' }}
-                          >
-                            <path d="M2 6h30" strokeDasharray="2 4" />
-                            <path d="M36 2l5 4-5 4" />
-                          </svg>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: '6px',
-                              flex: '1 1 0',
-                              minWidth: '0',
-                            }}
-                          >
-                            <img
-                              src="/img/838118fe86e78736560c2ece8886b813.png"
-                              alt="Водитель укладывает чемодан в багажник"
-                              style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                            />
-                            <span
-                              style={{
-                                fontSize: '14px',
-                                fontWeight: '700',
-                                color: '#1C2620',
-                                textAlign: 'center',
-                                lineHeight: '1.2',
-                                maxWidth: '120px',
-                              }}
-                            >
-                              Поможем с багажом
-                            </span>
-                          </div>
-                          <svg
-                            width="30"
-                            height="12"
-                            viewBox="0 0 46 12"
-                            fill="none"
-                            stroke="#7FB49A"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                            style={{ flex: 'none' }}
-                          >
-                            <path d="M2 6h30" strokeDasharray="2 4" />
-                            <path d="M36 2l5 4-5 4" />
-                          </svg>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: '6px',
-                              flex: '1 1 0',
-                              minWidth: '0',
-                            }}
-                          >
-                            <img
-                              src="/img/565b4c9fbca5b96b414361547b3a452f.png"
-                              alt="Микроавтобус едет к санаторию"
-                              style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                            />
-                            <span
-                              style={{
-                                fontSize: '14px',
-                                fontWeight: '700',
-                                color: '#1C2620',
-                                textAlign: 'center',
-                                lineHeight: '1.2',
-                                maxWidth: '120px',
-                              }}
-                            >
-                              Довезём до санатория
-                            </span>
-                          </div>
-                          <svg
-                            width="30"
-                            height="12"
-                            viewBox="0 0 46 12"
-                            fill="none"
-                            stroke="#7FB49A"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                            style={{ flex: 'none' }}
-                          >
-                            <path d="M2 6h30" strokeDasharray="2 4" />
-                            <path d="M36 2l5 4-5 4" />
-                          </svg>
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: '6px',
-                              flex: '1 1 0',
-                              minWidth: '0',
-                            }}
-                          >
-                            <img
-                              src="/img/05b41fccbf0a437d88db58e3ce3a1a91.png"
-                              alt="Гость у стойки регистрации санатория"
-                              style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                            />
-                            <span
-                              style={{
-                                fontSize: '14px',
-                                fontWeight: '700',
-                                color: '#1C2620',
-                                textAlign: 'center',
-                                lineHeight: '1.2',
-                                maxWidth: '120px',
-                              }}
-                            >
-                              Проводим до стойки
-                            </span>
-                          </div>
-                        </div>
+                        Встретим с табличкой
+                      </span>
+                    </div>
+                    <svg
+                      width="30"
+                      height="12"
+                      viewBox="0 0 46 12"
+                      fill="none"
+                      stroke="#7FB49A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
+                    >
+                      <path d="M2 6h30" strokeDasharray="2 4" />
+                      <path d="M36 2l5 4-5 4" />
+                    </svg>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                        flex: '1 1 0',
+                        minWidth: '0',
+                      }}
+                    >
+                      <img
+                        src="/img/838118fe86e78736560c2ece8886b813.png"
+                        alt="Водитель укладывает чемодан в багажник"
+                        style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#1C2620',
+                          textAlign: 'center',
+                          lineHeight: '1.2',
+                          maxWidth: '120px',
+                        }}
+                      >
+                        Поможем с багажом
+                      </span>
+                    </div>
+                    <svg
+                      width="30"
+                      height="12"
+                      viewBox="0 0 46 12"
+                      fill="none"
+                      stroke="#7FB49A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
+                    >
+                      <path d="M2 6h30" strokeDasharray="2 4" />
+                      <path d="M36 2l5 4-5 4" />
+                    </svg>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                        flex: '1 1 0',
+                        minWidth: '0',
+                      }}
+                    >
+                      <img
+                        src="/img/565b4c9fbca5b96b414361547b3a452f.png"
+                        alt="Микроавтобус едет к санаторию"
+                        style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#1C2620',
+                          textAlign: 'center',
+                          lineHeight: '1.2',
+                          maxWidth: '120px',
+                        }}
+                      >
+                        Довезём до санатория
+                      </span>
+                    </div>
+                    <svg
+                      width="30"
+                      height="12"
+                      viewBox="0 0 46 12"
+                      fill="none"
+                      stroke="#7FB49A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      style={{ flex: 'none' }}
+                    >
+                      <path d="M2 6h30" strokeDasharray="2 4" />
+                      <path d="M36 2l5 4-5 4" />
+                    </svg>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                        flex: '1 1 0',
+                        minWidth: '0',
+                      }}
+                    >
+                      <img
+                        src="/img/05b41fccbf0a437d88db58e3ce3a1a91.png"
+                        alt="Гость у стойки регистрации санатория"
+                        style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: '#1C2620',
+                          textAlign: 'center',
+                          lineHeight: '1.2',
+                          maxWidth: '120px',
+                        }}
+                      >
+                        Проводим до стойки
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="acc"
+                    onClick={v.toggleMore}
+                    style={{ alignSelf: 'flex-start', fontSize: '15px', minHeight: '36px' }}
+                  >
+                    {v.moreLabel}
+                  </button>
+                  {v.moreOpen ? (
+                    <>
+                      <div
+                        style={{
+                          fontSize: '15px',
+                          color: '#3E4B44',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                          paddingBottom: '4px',
+                        }}
+                      >
+                        <span>
+                          • <strong>Если рейс задерживается</strong> — следим за ним по номеру и ждём без доплаты.
+                        </span>
+                        <span>
+                          • <strong>Остановки по пути</strong> — по вашей просьбе: туалет, кафе, аптека.
+                        </span>
+                        <span>
+                          • <strong>Обратно</strong> — так же: заберём из санатория за 3 часа до вылета, время
+                          подтвердим за день.
+                        </span>
+                        <span>
+                          • <strong>Время в пути</strong> зависит от маршрута — указано рядом с городом ниже.
+                        </span>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+                {/* 2. Откуда забрать — empty until chosen (our flight: Vilnius airport) */}
+                <div id="trFrom" className="tr-block">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>
+                    <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>{v.fromNote}</p>
+                  </div>
+                  <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
+                    {v.cities.map((c: any) => (
+                      <Fragment key={c.id}>
                         <button
                           type="button"
-                          className="acc"
-                          onClick={v.toggleMore}
-                          style={{ alignSelf: 'flex-start', fontSize: '15px', minHeight: '36px' }}
+                          role="radio"
+                          aria-checked={c.on}
+                          className={`rowpick ${c.cls}`}
+                          onClick={c.pick}
                         >
-                          {v.moreLabel}
+                          <span className={`radio ${c.cls}`}>
+                            <i />
+                          </span>
+                          <span className="rowpick-name">
+                            {c.from}
+                            {c.paid ? <span className="rowpick-badge">{c.paid}</span> : null}
+                          </span>
+                          <span className="rowpick-info">{c.info}</span>
                         </button>
-                        {v.moreOpen ? (
-                          <>
+                        {c.on ? (
+                          <div className="rowpick-detail">
                             <div
                               style={{
-                                fontSize: '15px',
-                                color: '#3E4B44',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '6px',
-                                paddingBottom: '4px',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
+                                gap: '14px',
+                                alignItems: 'end',
                               }}
                             >
-                              <span>
-                                • <strong>Если рейс задерживается</strong> — следим за ним по номеру и ждём без доплаты.
-                              </span>
-                              <span>
-                                • <strong>Остановки по пути</strong> — по вашей просьбе: туалет, кафе, аптека.
-                              </span>
-                              <span>
-                                • <strong>Обратно</strong> — так же: заберём из санатория за 3 часа до вылета, время
-                                подтвердим за день.
-                              </span>
-                              <span>
-                                • <strong>Время в пути</strong> зависит от маршрута — указано рядом с городом ниже.
-                              </span>
-                            </div>
-                          </>
-                        ) : null}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>
-                        <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
-                          Большинство гостей Друскининкай прилетают в Вильнюс — дорога до санатория занимает около 2
-                          часов.
-                        </p>
-                      </div>
-                      <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
-                        {(v.cities || []).map((c: any, i: number) => (
-                          <Fragment key={i}>
-                            <button type="button" className={`rowpick ${c.cls ?? ''}`} onClick={c.pick}>
-                              <span className={`radio ${c.cls ?? ''}`}>
-                                <i />
-                              </span>
-                              <span className="rowpick-name">
-                                {c.from}
-                                {c.badge ? <span className="rowpick-badge">{c.badge}</span> : null}
-                              </span>
-                              <span className="rowpick-info">{c.info}</span>
-                            </button>
-                            {c.on ? (
-                              <div className="rowpick-detail">
-                                <div
-                                  style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit,minmax(min(240px,100%),1fr))',
-                                    gap: '14px',
-                                    alignItems: 'end',
-                                  }}
-                                >
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label className="lbl" htmlFor="place">
-                                      Откуда именно вас забрать?
-                                    </label>
-                                    <div style={{ position: 'relative' }}>
-                                      <select
-                                        id="place"
-                                        className="input"
-                                        style={{ paddingRight: '44px' }}
-                                        value={v.place}
-                                        onChange={v.pickPlace}
-                                      >
-                                        {(v.places || []).map((p: any, _i0: number) => (
-                                          <Fragment key={_i0}>
-                                            <option value={p.t}>{p.t}</option>
-                                          </Fragment>
-                                        ))}
-                                      </select>{' '}
-                                      <svg
-                                        width="22"
-                                        height="22"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#1F5F4A"
-                                        strokeWidth="2.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        aria-hidden="true"
-                                        style={{
-                                          position: 'absolute',
-                                          right: '14px',
-                                          top: '17px',
-                                          pointerEvents: 'none',
-                                        }}
-                                      >
-                                        <path d="m6 9 6 6 6-6" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label className="lbl" htmlFor="flight" style={{ fontSize: '15px' }}>
-                                      {v.ourFlight
-                                        ? 'Ваш рейс и время прибытия'
-                                        : 'Уже есть билеты? Рейс и время прибытия'}
-                                      <span style={{ fontWeight: '400', color: '#5E6862' }}>
-                                        {' '}
-                                        ·{' '}
-                                        {v.ourFlight
-                                          ? 'заполнили по вашему перелёту'
-                                          : 'необязательно, можно сообщить позже'}
-                                      </span>
-                                    </label>
-                                    <input
-                                      id="flight"
-                                      className="input"
-                                      type="text"
-                                      placeholder="Например: LO 771, 14:35"
-                                      value={v.flightIn}
-                                      onChange={v.setFlightIn}
-                                      style={{ minHeight: '44px', fontSize: '16px' }}
-                                    />
-                                  </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="place">
+                                  Где именно вас встретить?
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                  <select
+                                    id="place"
+                                    className={'input' + (v.spot ? '' : ' input-empty')}
+                                    style={{ paddingRight: '44px' }}
+                                    value={v.spot}
+                                    onChange={v.pickSpot}
+                                  >
+                                    <option value="" disabled>
+                                      Выберите: аэропорт, вокзал или отель
+                                    </option>
+                                    {v.places.map((p: any) => (
+                                      <option key={p.t} value={p.t}>
+                                        {p.t}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <Chevron />
                                 </div>
                               </div>
-                            ) : null}
-                          </Fragment>
-                        ))}
-                      </div>
-
-                      {v.fromHotel ? (
-                        <>
-                          <div
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                              gap: '16px',
-                              padding: '18px 20px',
-                              border: '1px solid #E3DED2',
-                              borderRadius: 'var(--r)',
-                              background: '#FAF8F3',
-                            }}
-                          >
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1/-1' }}>
-                              <label className="lbl" htmlFor="hotelname">
-                                Из какого отеля вас забрать? <span style={{ color: '#B3261E' }}>*</span>
-                              </label>
-                              <input
-                                id="hotelname"
-                                className="input"
-                                type="text"
-                                placeholder="Название отеля и адрес, например: Artis Centrum Hotels, Liejyklos g. 3"
-                              />
-                              <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                                Водитель будет ждать у главного входа. Если выезжаете из квартиры — укажите адрес и
-                                подъезд.
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1/-1' }}>
-                              <label className="lbl" htmlFor="maplink">
-                                Ссылка на Google Maps{' '}
-                                <span style={{ fontWeight: '600', color: '#5E6862' }}>(не обязательно)</span>
-                              </label>
-                              <input
-                                id="maplink"
-                                className="input"
-                                type="url"
-                                placeholder="https://maps.app.goo.gl/…"
-                              />
-                              <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                                Откройте отель в Google Maps → «Поделиться» → скопируйте ссылку. Так водитель точно не
-                                ошибётся.
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      ) : null}
-                      {/* Transfer type: group (cheapest) by default, individual on request */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div className="lbl" style={{ fontSize: '18px', color: '#1C2620' }}>
-                          Как поедем
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '20px',
-                              flexWrap: 'wrap',
-                              padding: '18px 20px',
-                              border: `2px solid ${v.grpBorder ?? ''}`,
-                              background: v.grpBg,
-                              borderRadius: 'var(--r) var(--r) 0 0',
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: '170px',
-                                height: '84px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flex: 'none',
-                                background: '#fff',
-                                borderRadius: 'var(--r)',
-                                overflow: 'hidden',
-                              }}
-                            >
-                              <img
-                                src="/img/165765111b3ce679a969db85fe7d023f.png"
-                                alt="Микроавтобус"
-                                style={{ width: '170px', height: 'auto', display: 'block' }}
-                              />
-                            </span>
-                            <span style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 300px' }}>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                                <strong style={{ fontSize: '20px' }}>Групповой трансфер</strong>
-                                <span
-                                  style={{
-                                    background: '#1F5F4A',
-                                    color: '#fff',
-                                    fontSize: '14px',
-                                    fontWeight: '800',
-                                    padding: '4px 10px',
-                                    borderRadius: 'var(--r)',
-                                  }}
-                                >
-                                  Самый выгодный
-                                </span>
-                              </span>
-                              <span style={{ fontSize: '16px', color: '#1C2620' }}>
-                                Обычно микроавтобус Mercedes Sprinter / Vito вместе с другими гостями санаториев.
-                              </span>
-                              <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                                {v.cityName} → санаторий · встреча с табличкой · помощь с багажом
-                              </span>
-                            </span>
-                            <span
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-end',
-                                gap: '2px',
-                                flex: '0 0 auto',
-                              }}
-                            >
-                              <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
-                              <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                                {v.seatNote}
-                              </span>
-                              <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                                за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
-                              </span>
-                            </span>
-                          </div>
-                          <label
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '12px',
-                              width: '100%',
-                              minHeight: '52px',
-                              padding: '10px 20px',
-                              marginTop: '-2px',
-                              border: `2px solid ${v.indBorder ?? ''}`,
-                              borderTop: '1px dashed #C8DED3',
-                              borderRadius: '0 0 var(--r) var(--r)',
-                              background: '#FAFBF9',
-                              cursor: 'pointer',
-                              color: '#1C2620',
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={!!v.cmp}
-                              onChange={v.toggleCmp}
-                              style={{
-                                width: '24px',
-                                height: '24px',
-                                accentColor: '#1F5F4A',
-                                margin: '0',
-                                flex: 'none',
-                              }}
-                            />
-                            <span style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
-                              <strong style={{ fontSize: '17px', color: '#1F5F4A' }}>
-                                Хочу ехать с комфортом — отдельной машиной
-                              </strong>
-                              <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                                Только вы, без ожидания и попутчиков · от {v.indFrom} за машину
-                              </span>
-                            </span>
-                            <VanIcon height={26} />
-                          </label>
-                          {v.cmp ? (
-                            <>
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: '10px',
-                                  padding: '4px 16px 16px',
-                                  background: '#FAFBF9',
-                                }}
-                              >
-                                <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                                  Выберите, как поедете. Цены {v.cityName} → санаторий, в одну сторону; обратно —
-                                  столько же.
-                                </span>
-                                <button
-                                  type="button"
-                                  className={`choice ${v.grpCls ?? ''}`}
-                                  onClick={v.pickGroup}
-                                  style={{ justifyContent: 'space-between', minHeight: '64px' }}
-                                >
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                    <span className={`radio ${v.grpCls ?? ''}`}>
-                                      <i />
-                                    </span>
-                                    <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                      <strong style={{ fontSize: '18px' }}>Групповой трансфер</strong>
-                                      <span style={{ color: '#3E4B44', fontSize: '15px' }}>
-                                        Вместе с другими гостями, возможно ожидание до 1 часа
-                                      </span>
-                                    </span>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="flight" style={{ fontSize: '15px' }}>
+                                  {v.ourFlight ? 'Ваш рейс и время прибытия' : 'Уже есть билеты? Рейс и время прибытия'}
+                                  <span style={{ fontWeight: '400', color: '#5E6862' }}>
+                                    {' '}
+                                    ·{' '}
+                                    {v.ourFlight
+                                      ? 'заполнили по вашему перелёту'
+                                      : 'необязательно, можно сообщить позже'}
                                   </span>
-                                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                    <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
-                                    <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                                      {v.seatNote}
-                                    </span>
-                                  </span>
-                                </button>
-                                {(v.vehicles || []).map((k: any, _i0: number) => (
-                                  <Fragment key={_i0}>
-                                    <button
-                                      type="button"
-                                      className={`choice ${k.cls ?? ''}`}
-                                      onClick={k.pick}
-                                      style={{ justifyContent: 'space-between', minHeight: '96px' }}
-                                    >
-                                      {' '}
-                                      <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <span className={`radio ${k.cls ?? ''}`}>
-                                          <i />
-                                        </span>
-                                        <span
-                                          style={{
-                                            width: '150px',
-                                            height: '72px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flex: 'none',
-                                            background: '#fff',
-                                            borderRadius: 'var(--r)',
-                                            overflow: 'hidden',
-                                          }}
-                                        >
-                                          <img
-                                            src={k.img}
-                                            alt=""
-                                            style={{ width: '150px', height: 'auto', display: 'block' }}
-                                          />
-                                        </span>
-                                        <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                          <strong style={{ fontSize: '18px' }}>{k.name}</strong>
-                                          <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
-                                        </span>
-                                      </span>{' '}
-                                      <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>
-                                        {k.price}&nbsp;€
-                                      </strong>{' '}
-                                    </button>
-                                  </Fragment>
-                                ))}
-                                <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                                  Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача
-                                  (23:00–06:00) +20&nbsp;%.
-                                </span>
+                                </label>
+                                <input
+                                  id="flight"
+                                  className="input"
+                                  type="text"
+                                  placeholder="Например: LO 771, 14:35"
+                                  value={v.flightIn}
+                                  onChange={v.setFlightIn}
+                                  style={{ minHeight: '44px', fontSize: '16px' }}
+                                />
                               </div>
-                            </>
-                          ) : null}
-                        </div>
-                        {!v.indiv ? (
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: '12px',
-                              alignItems: 'flex-start',
-                              background: '#FFF1D6',
-                              borderRadius: 'var(--r)',
-                              padding: '12px 16px',
-                              fontSize: '15px',
-                              color: '#1C2620',
-                              maxWidth: '900px',
-                            }}
-                          >
-                            <svg
-                              width="22"
-                              height="22"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#8A5A00"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                              style={{ flex: 'none', marginTop: '1px' }}
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <path d="M12 8v5M12 16h.01" />
-                            </svg>
-                            <span>
-                              <strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями:
-                              возможно ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев
-                              (дорога длиннее на 30–40 минут). Точное время встречи сообщим за день до приезда.
-                            </span>
+                            </div>
                           </div>
                         ) : null}
-                      </div>
-                      {/* Return transfer */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '16px',
-                          padding: '20px',
-                          border: '2px solid #1F5F4A',
-                          borderRadius: 'var(--r)',
-                          background: '#fff',
-                        }}
-                      >
-                        <label
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '14px',
-                            cursor: 'pointer',
-                            fontSize: '18px',
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={!!v.back}
-                            onChange={v.toggleBack}
-                            style={{ width: '26px', height: '26px', accentColor: '#1F5F4A', margin: '0', flex: 'none' }}
-                          />
-                          <span>
-                            <strong style={{ fontSize: '18px' }}>
-                              Обратный трансфер {v.outDay}, {v.outWeekday}
-                            </strong>
-                            <br />
-                            <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                              Из санатория «Эгле Комфорт» — куда вас отвезти?
-                            </span>
-                          </span>
+                      </Fragment>
+                    ))}
+                  </div>
+                  {v.fromHotel ? (
+                    <div className="tr-sub ios-in">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <label className="lbl" htmlFor="hotelname">
+                          Из какого отеля вас забрать? <span style={{ color: '#B3261E' }}>*</span>
                         </label>
-                        {v.back ? (
-                          <>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                                <button
-                                  type="button"
-                                  className={`choice ${v.sameCls ?? ''}`}
-                                  onClick={v.pickSame}
-                                  style={{ flex: '2 1 320px' }}
-                                >
-                                  {' '}
-                                  <span className={`radio ${v.sameCls ?? ''}`}>
-                                    <i />
-                                  </span>{' '}
-                                  <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                    <strong style={{ fontSize: '18px' }}>Туда же, откуда забрали</strong>
-                                    <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.sameInfo}</span>
-                                  </span>{' '}
-                                </button>
-                                <button
-                                  type="button"
-                                  className={`choice ${v.otherCls ?? ''}`}
-                                  onClick={v.pickOther}
-                                  style={{
-                                    flex: '1 1 200px',
-                                    padding: '12px 16px',
-                                    minHeight: '56px',
-                                    borderWidth: '1px',
-                                    gap: '12px',
-                                  }}
-                                >
-                                  <span
-                                    className={`radio ${v.otherCls ?? ''}`}
-                                    style={{ width: '22px', height: '22px' }}
-                                  >
-                                    <i />
-                                  </span>
-                                  <span style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>
-                                      В другое место
-                                    </span>
-                                    <span style={{ color: '#5E6862', fontSize: '15px' }}>
-                                      Другой город, вокзал или отель
-                                    </span>
-                                  </span>
-                                </button>
-                              </div>
-                              {v.backOther ? (
-                                <>
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '14px',
-                                      padding: '16px',
-                                      background: '#FAF8F3',
-                                      border: '1px solid #E3DED2',
-                                      borderRadius: 'var(--r)',
-                                    }}
-                                  >
-                                    <div className="lbl">Куда отвезти {v.outDay}?</div>
-                                    <div className="rowlist" role="radiogroup" aria-label="Куда отвезти">
-                                      {(v.backCities || []).map((c: any, i: number) => (
-                                        <button
-                                          key={i}
-                                          type="button"
-                                          className={`rowpick ${c.cls ?? ''}`}
-                                          onClick={c.pick}
-                                        >
-                                          <span className={`radio ${c.cls ?? ''}`}>
-                                            <i />
-                                          </span>
-                                          <span className="rowpick-name">{c.to}</span>
-                                        </button>
-                                      ))}
-                                    </div>
-                                    <div
-                                      style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                                        gap: '16px',
-                                        alignItems: 'end',
-                                      }}
-                                    >
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="lbl" htmlFor="backplace">
-                                          Куда именно отвезти?
-                                        </label>
-                                        <div style={{ position: 'relative' }}>
-                                          <select id="backplace" className="input" style={{ paddingRight: '44px' }}>
-                                            {(v.backPlaces || []).map((p: any, _i0: number) => (
-                                              <Fragment key={_i0}>
-                                                <option>{p.t}</option>
-                                              </Fragment>
-                                            ))}
-                                          </select>{' '}
-                                          <svg
-                                            width="22"
-                                            height="22"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="#1F5F4A"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            aria-hidden="true"
-                                            style={{
-                                              position: 'absolute',
-                                              right: '14px',
-                                              top: '17px',
-                                              pointerEvents: 'none',
-                                            }}
-                                          >
-                                            <path d="m6 9 6 6 6-6" />
-                                          </svg>
-                                        </div>
-                                      </div>
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="lbl" htmlFor="backflight" style={{ fontSize: '15px' }}>
-                                          {v.ourFlight
-                                            ? 'Ваш рейс и время отправления'
-                                            : 'Уже есть билеты? Рейс и время отправления'}
-                                          <span style={{ fontWeight: '400', color: '#5E6862' }}>
-                                            {' '}
-                                            ·{' '}
-                                            {v.ourFlight
-                                              ? 'заполнили по вашему перелёту'
-                                              : 'необязательно, можно сообщить позже'}
-                                          </span>
-                                        </label>
-                                        <input
-                                          id="backflight"
-                                          className="input"
-                                          type="text"
-                                          placeholder="Например: LO 772, 16:10"
-                                          value={v.flightBack}
-                                          onChange={v.setFlightBack}
-                                          style={{ minHeight: '44px', fontSize: '16px' }}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                </>
-                              ) : null}
-                              {v.backSame ? (
-                                <>
-                                  <div
-                                    style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '420px' }}
-                                  >
-                                    <label className="lbl" htmlFor="backflight2" style={{ fontSize: '15px' }}>
-                                      {v.ourFlight
-                                        ? 'Ваш рейс и время отправления'
-                                        : 'Уже есть билеты? Рейс и время отправления'}
-                                      <span style={{ fontWeight: '400', color: '#5E6862' }}>
-                                        {' '}
-                                        ·{' '}
-                                        {v.ourFlight
-                                          ? 'заполнили по вашему перелёту'
-                                          : 'необязательно, можно сообщить позже'}
-                                      </span>
-                                    </label>
-                                    <input
-                                      id="backflight2"
-                                      className="input"
-                                      type="text"
-                                      placeholder="Например: LO 772, 16:10"
-                                      value={v.flightBack}
-                                      onChange={v.setFlightBack}
-                                      style={{ minHeight: '44px', fontSize: '16px' }}
-                                    />
-                                    <span style={{ fontSize: '15px', color: '#5E6862' }}>
-                                      Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до
-                                      отъезда.
-                                    </span>
-                                  </div>
-                                </>
-                              ) : null}
-                            </div>
-                          </>
-                        ) : null}
+                        <input
+                          id="hotelname"
+                          className="input"
+                          type="text"
+                          placeholder="Название отеля и адрес, например: Artis Centrum Hotels, Liejyklos g. 3"
+                        />
+                        <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                          Водитель будет ждать у главного входа. Если выезжаете из квартиры — укажите адрес и подъезд.
+                        </span>
                       </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '12px',
-                          alignItems: 'start',
-                          padding: '14px 16px',
-                          borderRadius: 'var(--r)',
-                          border: '1px solid #E3DED2',
-                          fontSize: '16px',
-                          color: '#3E4B44',
-                        }}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <label className="lbl" htmlFor="maplink">
+                          Ссылка на Google Maps{' '}
+                          <span style={{ fontWeight: '600', color: '#5E6862' }}>(не обязательно)</span>
+                        </label>
+                        <input id="maplink" className="input" type="url" placeholder="https://maps.app.goo.gl/…" />
+                        <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                          Откройте отель в Google Maps → «Поделиться» → скопируйте ссылку. Так водитель точно не
+                          ошибётся.
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+                {/* 3. Как поедете — after the city, nothing chosen */}
+                {v.cityChosen ? (
+                  <div id="trHow" className="tr-block ios-in">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <h2 style={{ fontSize: '23px' }}>Как поедете?</h2>
+                      <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
+                        Цены: {v.cityName} → санаторий, в одну сторону.
+                      </p>
+                    </div>
+                    <div className="tr-how" role="radiogroup" aria-label="Как поедете">
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={v.isGroup}
+                        className={`choice tr-how-opt ${v.groupCls}`}
+                        onClick={v.pickGroupHow}
                       >
+                        <span className={`radio ${v.groupCls}`}>
+                          <i />
+                        </span>
+                        <span className="tr-how-pic">
+                          <img src="/img/165765111b3ce679a969db85fe7d023f.png" alt="" />
+                        </span>
+                        <span className="tr-how-txt">
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            <strong style={{ fontSize: '19px' }}>Групповой трансфер</strong>
+                            <span className="tr-best">Самый выгодный</span>
+                          </span>
+                          <span>Микроавтобус вместе с другими гостями санаториев · встреча с табличкой</span>
+                        </span>
+                        <span className="tr-how-price">
+                          {v.seatPaid ? (
+                            <PaidStamp>{v.seatPaid}</PaidStamp>
+                          ) : (
+                            <strong style={{ fontSize: '22px' }}>{v.seatPrice}</strong>
+                          )}
+                          <span>{v.seatNote}</span>
+                          {v.seatTotal ? (
+                            <span>
+                              за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
+                            </span>
+                          ) : null}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={v.isInd}
+                        className={`choice tr-how-opt ${v.indCls}`}
+                        onClick={v.pickIndHow}
+                      >
+                        <span className={`radio ${v.indCls}`}>
+                          <i />
+                        </span>
+                        <span className="tr-how-pic">
+                          <VanIcon height={40} />
+                        </span>
+                        <span className="tr-how-txt">
+                          <strong style={{ fontSize: '19px' }}>Отдельная машина — только вы</strong>
+                          <span>Без ожидания и попутчиков, едем сразу</span>
+                        </span>
+                        <span className="tr-how-price">
+                          <strong style={{ fontSize: '22px' }}>от {v.indFrom}</strong>
+                          <span>за машину</span>
+                        </span>
+                      </button>
+                    </div>
+                    {v.isGroup ? (
+                      <div className="tr-warn ios-in">
                         <svg
-                          width="24"
-                          height="24"
+                          width="22"
+                          height="22"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="#8A5A00"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           aria-hidden="true"
-                          style={{ flex: 'none' }}
+                          style={{ flex: 'none', marginTop: '1px' }}
                         >
                           <circle cx="12" cy="12" r="10" />
-                          <path d="M12 16v-4M12 8h.01" />
+                          <path d="M12 8v5M12 16h.01" />
                         </svg>
                         <span>
-                          При проживании от 10 суток санаторий «Эгле» предоставляет трансфер из аэропорта Вильнюса{' '}
-                          <strong>бесплатно</strong>. Ваш заезд — {v.stayNights}; если продлите на сутки, трансфер будет
-                          бесплатным.
+                          <strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями: возможно
+                          ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев (дорога длиннее на
+                          30–40 минут). Точное время встречи сообщим за день до приезда.
                         </span>
                       </div>
-                    </div>
-                  </>
+                    ) : null}
+                    {v.isInd ? (
+                      <div id="trCars" className="tr-cars ios-in" role="radiogroup" aria-label="Какая машина">
+                        <span style={{ fontSize: '16px', fontWeight: '700', color: '#1C2620' }}>
+                          Какая машина нужна?
+                        </span>
+                        {v.vehicles.map((k: any) => (
+                          <button
+                            key={k.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={k.cls === 'on'}
+                            className={`choice ${k.cls}`}
+                            onClick={k.pick}
+                            style={{ justifyContent: 'space-between', minHeight: '88px' }}
+                          >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                              <span className={`radio ${k.cls}`}>
+                                <i />
+                              </span>
+                              <span className="tr-car-pic">
+                                <img src={k.img} alt="" />
+                              </span>
+                              <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                <strong style={{ fontSize: '18px' }}>{k.name}</strong>
+                                <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
+                              </span>
+                            </span>
+                            <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{k.price}&nbsp;€</strong>
+                          </button>
+                        ))}
+                        <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                          Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00)
+                          +20&nbsp;%.
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
                 ) : null}
-                {v.noNeed ? (
-                  <>
-                    <div
-                      className="card"
-                      style={{
-                        padding: '22px 26px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        background: '#EEF5F1',
-                        borderColor: '#C8DED3',
-                      }}
+                {/* 4. Обратно — its own question, nothing chosen */}
+                <div className="tr-block">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <h2 style={{ fontSize: '23px' }}>
+                      Обратно {v.outDay}, {v.outWeekday}: нужен трансфер?
+                    </h2>
+                    <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
+                      Заберём из санатория {v.hotelShort} и отвезём к самолёту, поезду или в отель.
+                    </p>
+                  </div>
+                  <div id="trBack" className="tr-q" role="radiogroup" aria-label="Нужен ли трансфер обратно">
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={v.backOn}
+                      className={`choice ${v.backYesCls}`}
+                      onClick={v.pickBackYes}
+                      style={{ flex: '2 1 320px' }}
                     >
-                      <div style={{ fontWeight: '800', fontSize: '18px' }}>Хорошо, трансфер не добавляем</div>
-                      <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
-                        Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно
-                        добавить позже — просто позвоните.
-                      </p>
+                      <span className={`radio ${v.backYesCls}`}>
+                        <i />
+                      </span>
+                      <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <strong style={{ fontSize: '18px' }}>Да, отвезите обратно</strong>
+                          {v.backPaid ? <PaidStamp>{v.backPaid}</PaidStamp> : null}
+                        </span>
+                        <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.backSub}</span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={v.backNoCls === 'on'}
+                      className={`choice tr-no ${v.backNoCls}`}
+                      onClick={v.pickBackNo}
+                      style={{ flex: '1 1 220px' }}
+                    >
+                      <span className={`radio ${v.backNoCls}`}>
+                        <i />
+                      </span>
+                      <span style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '17px', fontWeight: '700', color: '#1C2620' }}>Нет, обратно сам</span>
+                        <span style={{ color: '#5E6862', fontSize: '15px' }}>Обратный трансфер не нужен</span>
+                      </span>
+                    </button>
+                  </div>
+                  {v.backOn ? (
+                    <div id="trBackWhere" className="tr-sub ios-in">
+                      <div className="lbl" style={{ fontSize: '17px', color: '#1C2620' }}>
+                        Куда отвезти {v.outDay}?
+                      </div>
+                      <div className="tr-q" role="radiogroup" aria-label="Куда отвезти">
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={v.backSame}
+                          className={`choice ${v.sameCls}`}
+                          onClick={v.pickSame}
+                          style={{ flex: '2 1 300px' }}
+                        >
+                          <span className={`radio ${v.sameCls}`}>
+                            <i />
+                          </span>
+                          <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <strong style={{ fontSize: '18px' }}>Туда же, откуда забрали</strong>
+                            <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.sameInfo}</span>
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={v.backOther}
+                          className={`choice ${v.otherCls}`}
+                          onClick={v.pickOther}
+                          style={{ flex: '1 1 220px' }}
+                        >
+                          <span className={`radio ${v.otherCls}`}>
+                            <i />
+                          </span>
+                          <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <strong style={{ fontSize: '18px' }}>В другое место</strong>
+                            <span style={{ color: '#3E4B44', fontSize: '15px' }}>Другой город, вокзал или отель</span>
+                          </span>
+                        </button>
+                      </div>
+                      {v.backOther ? (
+                        <div className="ios-in" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                          <div id="trBackCities" className="rowlist" role="radiogroup" aria-label="Куда отвезти">
+                            {v.backCities.map((c: any) => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                role="radio"
+                                aria-checked={c.cls === 'on'}
+                                className={`rowpick ${c.cls}`}
+                                onClick={c.pick}
+                              >
+                                <span className={`radio ${c.cls}`}>
+                                  <i />
+                                </span>
+                                <span className="rowpick-name">
+                                  {c.to}
+                                  {c.paid ? <span className="rowpick-badge">{c.paid}</span> : null}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                          {v.backCityChosen ? (
+                            <div
+                              className="ios-in"
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
+                                gap: '16px',
+                                alignItems: 'end',
+                              }}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label className="lbl" htmlFor="backplace">
+                                  Куда именно отвезти?
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                  <select
+                                    id="backplace"
+                                    className={'input' + (v.backSpot ? '' : ' input-empty')}
+                                    style={{ paddingRight: '44px' }}
+                                    value={v.backSpot}
+                                    onChange={v.pickBackSpot}
+                                  >
+                                    <option value="" disabled>
+                                      Выберите: аэропорт, вокзал или отель
+                                    </option>
+                                    {v.backPlaces.map((p: any) => (
+                                      <option key={p.t} value={p.t}>
+                                        {p.t}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <Chevron />
+                                </div>
+                              </div>
+                              <BackFlight v={v} id="backflight" />
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      {v.backSame ? (
+                        <div className="ios-in" style={{ maxWidth: '420px' }}>
+                          <BackFlight v={v} id="backflight2" />
+                          <span style={{ display: 'block', marginTop: '8px', fontSize: '15px', color: '#5E6862' }}>
+                            Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.
+                          </span>
+                        </div>
+                      ) : null}
                     </div>
-                  </>
-                ) : null}
-              </>
-            }
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+            {v.noNeed ? (
+              <div
+                className="card ios-in"
+                style={{
+                  padding: '22px 26px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  background: '#EEF5F1',
+                  borderColor: '#C8DED3',
+                }}
+              >
+                <div style={{ fontWeight: '800', fontSize: '18px' }}>Хорошо, трансфер не добавляем</div>
+                <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
+                  Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно добавить
+                  позже — просто позвоните.
+                </p>
+              </div>
+            ) : null}
             <StepNext
               back={{ to: '/rooms', label: '← Назад к номеру' }}
               next={{ to: '/guests', label: 'Далее: данные гостей →' }}
@@ -1340,9 +1225,11 @@ export default function TransferPage() {
               }
               missing={() => {
                 const b = logic.props.booking.booking;
-                return b.flightPackage || b.flights === 'no' || b.flights === 'help'
-                  ? []
-                  : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
+                const fly: Missing[] =
+                  b.flightPackage || b.flights === 'no' || b.flights === 'help'
+                    ? []
+                    : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
+                return [...fly, ...logic.gaps()];
               }}
             />
           </div>

@@ -15,7 +15,12 @@ function load(): Booking {
   let b = DEFAULT_BOOKING;
   try {
     const raw = sessionStorage.getItem(KEY);
-    if (raw) b = { ...DEFAULT_BOOKING, ...JSON.parse(raw) };
+    if (raw) {
+      const saved = JSON.parse(raw);
+      b = { ...DEFAULT_BOOKING, ...saved };
+      // a transfer saved before the guest was asked every question: start with empty choices
+      if (!saved.transfer || saved.transfer.need === undefined) b.transfer = DEFAULT_BOOKING.transfer;
+    }
   } catch {
     /* storage unavailable or corrupted */
   }
