@@ -33,8 +33,28 @@ function ScrollManager() {
   return null;
 }
 
+/** the other pages' code is fetched quietly after the first page: going on is then instant (only the short soft loading) */
+function usePrefetchPages() {
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      void import('./pages/Main/MainPage');
+      void import('./pages/Results/ResultsPage');
+      void import('./pages/Hotel/HotelPage');
+      void import('./pages/Rooms/RoomsPage');
+      void import('./pages/Transfer/TransferPage');
+      void import('./pages/Guests/GuestsPage');
+      void import('./pages/Payment/PaymentPage');
+      void import('./pages/Done/DonePage');
+      void import('./pages/Rules/RulesPage');
+      void import('./pages/Tickets/TicketsPage');
+    }, 1500);
+    return () => window.clearTimeout(t);
+  }, []);
+}
+
 export default function App() {
   const { search } = useLocation();
+  usePrefetchPages();
   const helpInitiallyOpen = new URLSearchParams(search).has('help');
   return (
     <LanguageProvider>
