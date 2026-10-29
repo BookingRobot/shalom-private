@@ -94,7 +94,7 @@ const BOARDS = [
   },
   {
     file: 'Transfer.dc.html',
-    title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — трансфер от санатория)',
+    title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — из Вильнюса и Каунаса бесплатно)',
     route: '/transfer',
     links: [
       ['.fly-alt-row', '', 'Transfer-package.dc.html'],
