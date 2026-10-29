@@ -8,7 +8,7 @@
 .page h1,
 .page h2,
 .page h3 {
-  font-family: Lora, Georgia, 'Times New Roman', serif;
+  font-family: Montserrat, Manrope, 'Segoe UI', Arial, sans-serif;
   margin: 0;
   line-height: 1.2;
   font-weight: 600;
@@ -961,7 +961,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 6px;
 }
 .page .rs-hero-text h2 {
-  font-family: Lora, Georgia, serif;
+  font-family: Montserrat, Manrope, sans-serif;
   font-size: 56px;
   line-height: 1.05;
   color: #fff;
@@ -1044,7 +1044,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   color: #1c2620;
 }
 .page .rs-main h3 {
-  font-family: Lora, Georgia, serif;
+  font-family: Montserrat, Manrope, sans-serif;
   font-size: 25px;
   margin-top: 16px;
 }

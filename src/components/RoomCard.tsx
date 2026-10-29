@@ -438,7 +438,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                         </svg>
                         <span
                           style={{
-                            fontFamily: 'Lora,Georgia,serif',
+                            fontFamily: 'Montserrat,Manrope,sans-serif',
                             fontSize: '32px',
                             fontWeight: '700',
                             lineHeight: '1',

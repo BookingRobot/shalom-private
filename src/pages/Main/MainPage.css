@@ -191,7 +191,11 @@
   width: 100%;
 }
 
-/* ── Hero: lake photo, header, heading, search card ── */
+/* ── Hero: the coast photo, heading, the search card over the photo's lower edge ── */
+.pg-main .site-header {
+  position: relative;
+  z-index: 4;
+}
 .pg-main .hero {
   position: relative;
   /* the search card's pop-ups (places, guests) open over the sections below: no clipping here,
@@ -199,39 +203,33 @@
   z-index: 3;
   display: flex;
   flex-direction: column;
-  background: #2c4a3c;
 }
-.pg-main .hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
-}
+.pg-main .hero-bg,
 .pg-main .hero-shade {
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(10, 24, 18, 0.28) 0, rgba(10, 24, 18, 0) 96px),
-    linear-gradient(90deg, rgba(14, 30, 22, 0.42) 0%, rgba(14, 30, 22, 0.16) 42%, rgba(14, 30, 22, 0) 70%);
+  left: 0;
+  right: 0;
+  top: 0;
+  /* the photo ends a little above the card's bottom: the card lies over its edge */
+  bottom: 46px;
+  width: 100%;
+  height: calc(100% - 46px);
 }
-.pg-main .hero .site-header .navlink {
-  font-weight: 500;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+.pg-main .hero-bg {
+  object-fit: cover;
+  object-position: 50% 45%;
+  background: #4f86b8;
+}
+.pg-main .hero-shade {
+  background:
+    linear-gradient(90deg, rgba(8, 32, 56, 0.55) 0%, rgba(8, 32, 56, 0.28) 40%, rgba(8, 32, 56, 0) 68%),
+    linear-gradient(0deg, rgba(8, 32, 56, 0.18) 0, rgba(8, 32, 56, 0) 30%);
 }
 .pg-main .hero-left {
   display: flex;
   align-items: center;
   gap: 18px 52px;
   flex-wrap: wrap;
-}
-.pg-main .hero-left > a span,
-.pg-main .hero .site-header a[dir='ltr'] {
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
-}
-.pg-main .hero .site-header a[dir='ltr'] {
-  font-weight: 600;
 }
 .pg-main .lang {
   position: relative;
@@ -241,18 +239,16 @@
   -webkit-appearance: none;
   min-height: 46px;
   padding: 0 38px 0 18px;
-  border: 0;
+  border: 1.5px solid #e3ded2;
   border-radius: 10px;
   background: #fff;
   color: #1c2620;
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 .pg-main .lang select:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45);
+  outline: 3px solid #9cc9b5;
 }
 .pg-main .lang svg {
   position: absolute;
@@ -265,29 +261,31 @@
   max-width: 1340px;
   width: 100%;
   margin: 0 auto;
-  padding: 4px 24px 20px;
+  padding: 116px 24px 0;
   display: flex;
   flex-direction: column;
 }
 .pg-main .hero h1 {
   margin: 0;
   color: #fff;
-  font-family: Lora, Georgia, serif;
-  font-size: 46px;
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 54px;
   font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.2px;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 18px rgba(0, 20, 40, 0.35);
 }
 .pg-main .hero-sub {
-  margin: 8px 0 0;
+  margin: 14px 0 0;
+  max-width: 560px;
   color: #fff;
-  font-size: 19px;
+  font-size: 21px;
   line-height: 1.4;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 12px rgba(0, 20, 40, 0.4);
 }
 .pg-main .hero-search {
-  margin-top: 18px;
+  margin-top: 104px;
+  box-shadow: 0 18px 50px rgba(10, 30, 50, 0.18);
 }
 
 /* ── Sections below the hero ── */
@@ -363,7 +361,7 @@ body .pg-main .card.resort {
   min-width: 0;
 }
 .pg-main .resort-name {
-  font-family: Lora, Georgia, serif;
+  font-family: Montserrat, Manrope, sans-serif;
   font-size: 19px;
   font-weight: 700;
   line-height: 1.25;
@@ -411,13 +409,16 @@ body .pg-main .card.resort:hover {
   .pg-main .hero-left {
     gap: 14px 28px;
   }
-  .pg-main .hero-left > a span {
-    font-size: 23px !important;
-  }
 }
 @media (max-width: 1080px) {
   .pg-main .hero-in {
-    padding-top: 14px;
+    padding-top: 80px;
+  }
+  .pg-main .hero h1 {
+    font-size: 44px;
+  }
+  .pg-main .hero-search {
+    margin-top: 70px;
   }
   .pg-main .resorts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -427,26 +428,23 @@ body .pg-main .card.resort:hover {
   }
 }
 @media (max-width: 760px) {
-  /* phone header: name, then the menu in one line, then phone and language */
-  .pg-main .hero .site-header > div {
+  /* phone header: the logo, then the menu, then phone and language */
+  .pg-main .site-header > div {
     gap: 10px 16px !important;
-    padding-top: 10px !important;
-    padding-bottom: 4px !important;
+    padding-top: 12px !important;
+    padding-bottom: 10px !important;
   }
   .pg-main .hero-left {
-    gap: 8px;
+    gap: 10px;
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
   }
-  .pg-main .hero-left > a span {
-    font-size: 22px !important;
-  }
-  .pg-main .hero .site-header nav {
+  .pg-main .site-header nav {
     gap: 6px 18px !important;
     max-width: 100%;
   }
-  .pg-main .hero .site-header .navlink {
+  .pg-main .site-header .navlink {
     font-size: 16px;
     white-space: nowrap;
   }
@@ -457,22 +455,23 @@ body .pg-main .card.resort:hover {
   .pg-main .lang svg {
     top: 13px;
   }
+  .pg-main .hero-in {
+    padding-top: 40px;
+  }
   .pg-main .hero h1 {
-    font-size: 34px;
+    font-size: 33px;
   }
   .pg-main .hero-sub {
     font-size: 17px;
   }
+  .pg-main .hero-search {
+    margin-top: 40px;
+  }
   .pg-main .hero-bg {
-    object-position: 18% 40%;
+    object-position: 62% 40%;
   }
   .pg-main .hero-shade {
-    background: linear-gradient(
-      180deg,
-      rgba(10, 24, 18, 0.45) 0,
-      rgba(10, 24, 18, 0.2) 45%,
-      rgba(10, 24, 18, 0.1) 100%
-    );
+    background: linear-gradient(180deg, rgba(8, 32, 56, 0.5) 0, rgba(8, 32, 56, 0.25) 40%, rgba(8, 32, 56, 0.1) 100%);
   }
   .pg-main .sec-head h2 {
     font-size: 28px;

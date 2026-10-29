@@ -1,6 +1,11 @@
-/** Public contacts shown on the site. Placeholder number — replace before launch. */
-export const PHONE_DISPLAY = '+370 600 00000';
-export const PHONE_TEL = 'tel:+37060000000';
-export const WHATSAPP_URL = 'https://wa.me/37060000000';
+/** Public contacts shown on the site: the travel agency Atlantis travel & tourism (Israel). */
+export const AGENCY = 'Atlantis travel & tourism';
+export const AGENCY_LOGO = '/img/5df2efd7b5bab4d4a08d500848a30611.png';
+export const PHONE_DISPLAY = '+972 3 655 25 22';
+export const PHONE_TEL = 'tel:+97236552522';
+export const WHATSAPP_URL = 'https://wa.me/97236552522';
+export const EMAIL = 'info@atlantistravel.co.il';
+export const MAILTO = 'mailto:' + EMAIL;
+export const ADDRESS = 'Израиль, г. Бат-Ям, ул. Ротшильд 29, 5938109';
 export const SITE_NAME = 'Санатории Литвы';
 export const SITE_URL = 'https://shalom.bookingrobot.eu';

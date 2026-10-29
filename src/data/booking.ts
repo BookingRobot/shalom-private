@@ -40,6 +40,8 @@ export interface Booking {
   flights: 'yes' | 'no' | 'help' | null;
   /** package: flight Tel Aviv ⇄ Vilnius + group transfer, chosen in the search */
   flightPackage: boolean;
+  /** the guest has answered the flight question on the "Дорога" step themselves (nothing is marked for them) */
+  flightAsked: boolean;
   /**
    * What the guest has really chosen in the search card: '' (nothing yet), 'resort:<id>' or
    * 'san:<hotel id>'. The home page keeps the field empty until then and shows what to do next.
@@ -73,6 +75,7 @@ export const DEFAULT_BOOKING: Booking = {
   },
   flights: null,
   flightPackage: false,
+  flightAsked: false,
   chosenPlace: '',
   chosenDates: false,
 };

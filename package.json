@@ -11,8 +11,8 @@
     "canvas:snapshot": "node scripts/snapshot-canvas.cjs canvas-out"
   },
   "dependencies": {
-    "@fontsource/lora": "^5.3.0",
     "@fontsource/manrope": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
     "modern-screenshot": "^4.7.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ADDRESS, AGENCY, EMAIL, MAILTO, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../../data/contacts';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
@@ -248,18 +249,22 @@ export default function RulesPage() {
                 }}
               >
                 <h2 style={{ fontSize: '23px' }}>6. Как с нами связаться</h2>
-                <p>Отвечаем на русском языке круглосуточно. Звоните, пишите в WhatsApp или на почту.</p>
+                <p>
+                  Заказы, оплату и билеты оформляет туристическое агентство {AGENCY}. Отвечаем на русском языке —
+                  звоните, пишите в WhatsApp или на почту.
+                </p>
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  <a className="btn btn-primary" href="tel:+37060000000">
-                    +370&nbsp;600 00000
+                  <a className="btn btn-primary" href={PHONE_TEL} dir="ltr">
+                    {PHONE_DISPLAY}
                   </a>
-                  <a className="btn btn-secondary" href="tel:+37060000001">
-                    +370&nbsp;600 00001
+                  <a className="btn btn-secondary" href={WHATSAPP_URL}>
+                    WhatsApp
                   </a>
-                  <a className="btn btn-secondary" href="mailto:[EMAIL]">
-                    [EMAIL]
+                  <a className="btn btn-secondary" href={MAILTO}>
+                    {EMAIL}
                   </a>
                 </div>
+                <p style={{ margin: 0 }}>Офис: {ADDRESS}</p>
               </section>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
                 <Link className="btn btn-secondary" to="/payment">

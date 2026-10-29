@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ShareOffer } from '../../components/ShareOffer';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
-import { SiteFooter, footerInfo } from '../../components/layout/SiteFooter';
+import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { api } from '../../api';
@@ -188,7 +188,9 @@ export default function RoomsPage() {
               >
                 Ваш номер
               </span>
-              <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>Двухместный номер</strong>
+              <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px' }}>
+                Двухместный номер
+              </strong>
               <span style={{ fontSize: '16px', color: '#3E4B44' }}>
                 Санаторий Эгле Комфорт ★★★★ · 17–18 м² · 2 отдельные кровати · балкон
               </span>
@@ -489,7 +491,7 @@ export default function RoomsPage() {
             </div>
           </div>
         </div>
-        <SiteFooter padding="24px 24px" pinned={false} info={footerInfo(false)} />
+        <SiteFooter padding="24px 24px" pinned={false} />
       </div>{' '}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>

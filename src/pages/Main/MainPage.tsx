@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { PHONE_DISPLAY } from '../../data/contacts';
 import { IconPath } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
@@ -20,7 +21,7 @@ import { RESORTS } from '../../data/search';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { HelpStripBand } from '../../components/layout/HelpStrip';
-import { FooterSlot } from '../../components/layout/SiteFooter';
+import { AgencyBlock, FooterSlot } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './MainPage.css';
 
@@ -248,38 +249,39 @@ export default function MainPage() {
   return (
     <div className="page pg-main">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-        {/* Hero: lake photo, header, heading and the search card */}
-        <section className="hero">
-          <img className="hero-bg" src="/img/ac698b6af7317a86330ea854eaeb2758.jpg" alt="" />
-          <div className="hero-shade" />
-          <HeaderBar tone="dark" minHeight={80} maxWidth={1340}>
-            <div className="hero-left">
-              <Brand tone="dark" logo={36} size={26} gap={14} round={5} />
-              <MainNav tone="dark" gap={26} size={17} />
+        {/* Header on a white bar: the agency logo and the menu stay easy to read */}
+        <HeaderBar minHeight={84} maxWidth={1340}>
+          <div className="hero-left">
+            <Brand logo={36} />
+            <MainNav gap={26} size={17} />
+          </div>
+          <HeaderAside gap={20} wrap={false}>
+            <PhoneLink size={18} icon={20} gap={8} />
+            <div className="lang">
+              <select aria-label="Язык">
+                <option>RU</option>
+                <option>LT</option>
+                <option>EN</option>
+              </select>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#1C2620"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
-            <HeaderAside gap={24} wrap={false}>
-              <PhoneLink tone="dark" size={19} icon={22} gap={10} />
-              <div className="lang">
-                <select aria-label="Язык">
-                  <option>RU</option>
-                  <option>LT</option>
-                  <option>EN</option>
-                </select>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1C2620"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </div>
-            </HeaderAside>
-          </HeaderBar>
+          </HeaderAside>
+        </HeaderBar>
+        {/* Hero: the Baltic coast, the heading, and the search card lying over the photo's lower edge */}
+        <section className="hero">
+          <img className="hero-bg" src="/img/a6cc2c3f70f2ddda6fa11d959e5344b2.jpg" alt="" />
+          <div className="hero-shade" />
           <div className="hero-in">
             <h1>
               Санаторное лечение
@@ -516,7 +518,7 @@ export default function MainPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                fontFamily: 'Lora,Georgia,serif',
+                fontFamily: 'Montserrat,Manrope,sans-serif',
                 fontSize: '16px',
                 fontWeight: '700',
                 color: '#fff',
@@ -540,9 +542,13 @@ export default function MainPage() {
               </Link>
             </div>
             <div style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: '#fff' }}>
-              +370&nbsp;600 00000<span style={{ fontWeight: '600', color: '#D9E2DC' }}>RU ▾</span>
+              <span dir="ltr">{PHONE_DISPLAY}</span>
+              <span style={{ fontWeight: '600', color: '#D9E2DC' }}>RU ▾</span>
             </div>
             <FooterSlot />
+          </div>
+          <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 24px 18px' }}>
+            <AgencyBlock />
           </div>
         </footer>
       </div>{' '}

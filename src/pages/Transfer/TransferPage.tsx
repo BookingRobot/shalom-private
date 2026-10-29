@@ -1208,8 +1208,9 @@ export default function TransferPage() {
               missing={() => {
                 const b = logic.props.booking.booking;
                 const flyDays = isFlightDay(toD(b.checkin)) && isFlightDay(toD(b.checkout));
-                const fly: Missing[] =
-                  b.flights === 'no' || b.flights === 'help' || (b.flightPackage && flyDays)
+                const fly: Missing[] = !b.flightAsked
+                  ? [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }]
+                  : b.flights === 'no' || b.flights === 'help' || (b.flightPackage && flyDays)
                     ? []
                     : b.flights === 'yes' || b.flightPackage
                       ? [

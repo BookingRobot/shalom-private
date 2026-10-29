@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { PHONE_DISPLAY, SITE_NAME } from '../../data/contacts';
+import { ADDRESS, AGENCY, AGENCY_LOGO, EMAIL, MAILTO, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
 import { HelpStripBand, type HelpStripText } from './HelpStrip';
+import './SiteFooter.css';
 
 const linkStyle = { color: '#D9E2DC', textDecoration: 'none' };
 
@@ -18,7 +19,30 @@ export const FooterLinks = () => (
 );
 
 export const footerInfo = (allDay = true) =>
-  `${SITE_NAME} · консультация на русском${allDay ? ' 24/7' : ''} · WhatsApp ${PHONE_DISPLAY}`;
+  `${SITE_NAME} · консультация на русском${allDay ? ' 24/7' : ''} · ${PHONE_DISPLAY}`;
+
+/** Who sells and answers: the agency's logo on a light plate, its address, phone and e-mail. */
+export function AgencyBlock({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
+  return (
+    <div className={'ft-agency' + (tone === 'light' ? ' light' : '')}>
+      <span className="ft-agency-logo">
+        <img src={AGENCY_LOGO} alt={AGENCY} width="148" height="33" />
+      </span>
+      <span className="ft-agency-t">
+        <span>
+          {SITE_NAME} · заказы оформляет туристическое агентство {AGENCY}
+        </span>
+        <span>{ADDRESS}</span>
+        <span>
+          <a href={PHONE_TEL} dir="ltr">
+            {PHONE_DISPLAY}
+          </a>{' '}
+          · <a href={MAILTO}>{EMAIL}</a>
+        </span>
+      </span>
+    </div>
+  );
+}
 
 /** Where «Ваши пожелания» is placed (FeedbackWidget renders its button into it). */
 export const FooterSlot = () => <div id="ftSlot" className="ft-slot" />;
@@ -27,7 +51,7 @@ export const FooterSlot = () => <div id="ftSlot" className="ft-slot" />;
 export function SiteFooter({
   padding = '28px 24px',
   pinned = true,
-  info = footerInfo(),
+  info,
   right = <FooterLinks />,
   help,
 }: {
@@ -55,8 +79,8 @@ export function SiteFooter({
             fontSize: '16px',
           }}
         >
-          <div>{info}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+          {info === undefined ? <AgencyBlock /> : <div>{info}</div>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             {right}
             <FooterSlot />
           </div>

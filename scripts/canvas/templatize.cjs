@@ -147,7 +147,7 @@ async function searchBand(p, { city }) {
       const nav = mc.querySelectorAll(':scope > .navbtn');
       mark(nav[0], 'calPrev');
       mark(nav[1], 'calNext');
-      const title = mc.querySelector('div[style*="Lora"]');
+      const title = mc.querySelector('div[style*="Montserrat"]');
       title.textContent = '⟦monthTitle⟧';
       const cells = Array.from(mc.querySelectorAll('.cell'));
       const tpl = cells.find((c) => c.querySelector('svg')) || cells.find((c) => !c.disabled);
@@ -258,7 +258,8 @@ async function linkButtons(p, rules) {
       );
       for (const b of els) {
         const a = document.createElement('a');
-        for (const at of Array.from(b.attributes)) if (!['type', 'disabled'].includes(at.name)) a.setAttribute(at.name, at.value);
+        for (const at of Array.from(b.attributes))
+          if (!['type', 'disabled'].includes(at.name)) a.setAttribute(at.name, at.value);
         a.setAttribute('href', href);
         a.style.textDecoration = 'none';
         while (b.firstChild) a.appendChild(b.firstChild);

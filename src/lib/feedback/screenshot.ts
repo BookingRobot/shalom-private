@@ -9,7 +9,8 @@ import type { Options } from 'modern-screenshot';
 export const IGNORE = '[data-feedback-ignore]';
 const MAX_BYTES = 1.5 * 1024 * 1024;
 const PERSONAL = /[^\s@<>"'(),;:]+@[^\s@<>"'(),;:]+\.[a-z]{2,}|(?:\+\d[\d\s-]{7,14}\d)/gi;
-const PLACEHOLDER_PHONE = /\+370\s?600\s?00000/;
+/** our own public phone and e-mail stay readable in the picture */
+const PLACEHOLDER_PHONE = /\+972\s?3\s?655\s?25\s?22|info@atlantistravel\.co\.il/;
 
 function redactClone(root: Node) {
   const doc = root.ownerDocument ?? document;

@@ -405,7 +405,8 @@ const BOARDS = [
   },
   {
     file: 'Transfer-fly.dc.html',
-    title: 'Шаг 2 · «Да, добавить наш перелёт»: в ваши даты рейса нет — ближайшие даты с рейсом',
+    title:
+      'Шаг 2 · после нажатия «Да, добавить наш перелёт» (сначала ничего не отмечено): в ваши даты рейса нет — ближайшие даты',
     route: '/transfer',
     state: true,
     setup: async (p) => {
@@ -495,7 +496,7 @@ const docFor = (title, route, body, h, logic) => `<!doctype html>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 ${css}
 /* canvas only: «i» opens its balloon on hover (the site opens it on a tap with a script) */
@@ -590,6 +591,7 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
   await buildHotel(b, sizes);
   await buildHotel(b, sizes, 'Hotel-grand.dc.html', '/hotel?h=grand-spa-lietuva');
   await buildHotel(b, sizes, 'Hotel-belorus.dc.html', '/hotel?h=belorus');
+  await buildHotel(b, sizes, 'Hotel-upa.dc.html', '/hotel?h=upa');
   fs.writeFileSync(path.join(OUT, 'sizes.json'), JSON.stringify(sizes, null, 1));
   await b.close();
 })();
@@ -1262,8 +1264,40 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
       },
     );
   }
-  const base = await grab(b, route, null, () => {
+  // the fold-out rows (transfer, check-in times, specializations) open and close in Play:
+  // mark what is there while they are closed, open them all, the new parts are their contents
+  const openAcc = async (p) => {
+    await p.evaluate(() =>
+      document
+        .querySelectorAll('.accrow')
+        .forEach((x) => Array.from(x.parentElement.children).forEach((c) => c.setAttribute('data-closed', ''))),
+    );
+    const n = await p.$$eval('.accrow', (x) => x.length);
+    for (let i = 0; i < n; i++) await p.click('.accrow >> nth=' + i);
+    await p.waitForTimeout(200);
+  };
+  const base = await grab(b, route, openAcc, () => {
     const d = window.__dc;
+    document.querySelectorAll('.accrow').forEach((btn, i) => {
+      d.on(btn, 'click', 'acc' + i);
+      const parts = [];
+      for (let el = btn.nextElementSibling; el && !el.hasAttribute('data-closed'); el = el.nextElementSibling)
+        parts.push(el);
+      if (parts.length) {
+        parts[0].before(d.raw('acc-start-' + i));
+        parts[parts.length - 1].after(d.raw('acc-end'));
+      }
+    });
+    document.querySelectorAll('[data-closed]').forEach((x) => x.removeAttribute('data-closed'));
+    // «нет мест»: «Свяжитесь со мной» opens the form board
+    document.querySelectorAll('.ht-na-call').forEach((x) => {
+      const a = document.createElement('a');
+      a.className = x.className;
+      a.href = 'Help.dc.html';
+      a.innerHTML = x.innerHTML;
+      a.setAttribute('style', (x.getAttribute('style') || '') + ';text-decoration:none');
+      x.replaceWith(a);
+    });
     const gal = document.querySelector('button[aria-label="Все фото"]').parentElement;
     gal.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
     document.querySelectorAll('.ht-reviews-link').forEach((x) => d.on(x, 'click', 'tab_reviews'));
@@ -1300,7 +1334,12 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     return document.getElementById('root').innerHTML;
   });
   const ifs = (k, html) => `<sc-if value="{{tabOn_${k}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
+  const accN = new Set((base.match(/acc-start-\d+/g) || []).map(String)).size;
+  const accRaws = { 'acc-end': '</sc-if>' };
+  for (let i = 0; i < 12; i++)
+    accRaws['acc-start-' + i] = '<sc-if value="{{accOn' + i + '}}" hint-placeholder-val="{{false}}">';
   const body = IA.finish(post(base), {
+    ...accRaws,
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
     gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
     calmodal: wrapIf('calOpen', cal),
@@ -1339,6 +1378,11 @@ class Component extends CalBase {
       v['tabOn_' + k] = st.tab === k;
       v['tabCls_' + k] = st.tab === k ? 'on' : '';
     });
+    // the fold-out rows under the rooms
+    for (let i = 0; i < ${accN}; i++) {
+      v['acc' + i] = () => this.setState({ ['acc' + i]: !st['acc' + i] });
+      v['accOn' + i] = !!st['acc' + i];
+    }
     return v;
   }
 }`;

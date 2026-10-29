@@ -274,3 +274,70 @@
     grid-row: 2;
   }
 }
+
+/* what is paid today; the full sum and the schedule fold out */
+.pg-payment .pay-now {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #eef5f1;
+  border: 1px solid #c8ded3;
+}
+.pg-payment .pay-now-h {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.pg-payment .pay-rest {
+  padding-left: 14px;
+  border-left: 3px solid #c8ded3;
+}
+.pg-payment .pay-more {
+  border: 1px solid #e3ded2;
+  border-radius: 12px;
+  background: #fff;
+}
+.pg-payment .pay-more > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 16px;
+  font-weight: 700;
+  font-size: 16px;
+  color: #1f5f4a;
+  cursor: pointer;
+}
+.pg-payment .pay-more > summary::-webkit-details-marker {
+  display: none;
+}
+.pg-payment .pay-more > summary::after {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-right: 2.5px solid #1f5f4a;
+  border-bottom: 2.5px solid #1f5f4a;
+  transform: rotate(45deg) translateY(-3px);
+  transition: transform 0.25s;
+}
+.pg-payment .pay-more[open] > summary::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+.pg-payment .pay-more-in {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 16px 16px;
+  animation: payMoreIn 0.4s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+@keyframes payMoreIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}

@@ -27,6 +27,7 @@ import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
+import { specIcon } from '../../data/specIcons';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { GuestsPicker, guestsLabel } from '../../components/GuestsPicker';
@@ -544,7 +545,11 @@ class HotelLogic extends PageLogic {
       about: EGLE_ABOUT,
       specs: isEgle
         ? EGLE_SPECIALIZATIONS
-        : info.text.treatment.profiles.map((p) => ({ t: p, s: '', d: ICON_PATHS.proc })),
+        : info.text.treatment.profiles.map((p) => {
+            // «Опорно-двигательный аппарат: суставы, позвоночник» → title and its line
+            const [t, more] = p.split(/:\s*/);
+            return { t, s: more ? more.charAt(0).toUpperCase() + more.slice(1) : '', d: specIcon(p) };
+          }),
       trCars: TRANSFER_CARS,
       times,
       specOpen: !!sec.spec,
@@ -865,7 +870,14 @@ export default function HotelPage() {
                     borderBottom: '1px solid rgba(255,255,255,.12)',
                   }}
                 >
-                  <div style={{ color: '#fff', fontFamily: 'Lora,Georgia,serif', fontSize: '18px', fontWeight: '600' }}>
+                  <div
+                    style={{
+                      color: '#fff',
+                      fontFamily: 'Montserrat,Manrope,sans-serif',
+                      fontSize: '18px',
+                      fontWeight: '600',
+                    }}
+                  >
                     {v.info.name} — все фото ({v.photoCount})
                   </div>
                   <button
@@ -1005,7 +1017,9 @@ export default function HotelPage() {
                       >
                         Ваши даты
                       </span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', lineHeight: '1.15' }}>
+                      <strong
+                        style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px', lineHeight: '1.15' }}
+                      >
                         {v.dateRange}
                       </strong>
                     </div>
@@ -1568,7 +1582,7 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontFamily: 'Lora,Georgia,serif',
+                                fontFamily: 'Montserrat,Manrope,sans-serif',
                                 fontSize: '26px',
                                 fontWeight: '600',
                                 lineHeight: '1',
@@ -1632,7 +1646,7 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontFamily: 'Lora,Georgia,serif',
+                                fontFamily: 'Montserrat,Manrope,sans-serif',
                                 fontSize: '26px',
                                 fontWeight: '600',
                                 lineHeight: '1',
