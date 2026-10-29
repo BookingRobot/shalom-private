@@ -56,11 +56,11 @@ const smallField: CSSProperties = {
 };
 
 /**
- * Sticky "Свяжитесь со мной" button + support pop-up. Same on every page;
- * dates and destination are prefilled from what the page knows.
+ * The «Свяжитесь со мной» support pop-up (opened from the help band above the footer and from
+ * page buttons). Same on every page; dates and destination are prefilled from what the page knows.
  */
 export function HelpWidget({ ctx, pageState = {} }: Props) {
-  const { status, open, close, send } = useHelp();
+  const { status, close, send } = useHelp();
   const dialogRef = useRef<HTMLDivElement>(null);
 
   let helpIn = pageState.in || pageState.checkin || ctx.in || '';
@@ -85,50 +85,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
 
   return (
     <>
-      {/* «Ваши пожелания» sits right above «Свяжитесь со мной» on every page */}
+      {/* «Ваши пожелания»: its button is placed in the page footer */}
       <FeedbackWidget bottom={ctx.bottom || '20px'} />
-      <button
-        type="button"
-        className="help-fab"
-        dir="ltr"
-        lang="ru"
-        data-feedback-ignore
-        onClick={open}
-        aria-haspopup="dialog"
-        style={{
-          position: 'fixed',
-          right: '20px',
-          bottom: ctx.bottom || '20px',
-          zIndex: '40',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          minHeight: '48px',
-          padding: '0 18px 0 10px',
-          border: 'none',
-          borderRadius: '30px',
-          background: '#1F5F4A',
-          color: '#fff',
-          font: "700 16px Manrope,'Segoe UI',Arial,sans-serif",
-          cursor: 'pointer',
-          boxShadow: '0 8px 24px rgba(18,34,27,.35)',
-        }}
-      >
-        <span
-          style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,.16)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <HeadsetIcon size={18} color="#fff" strokeWidth={2} />
-        </span>
-        Свяжитесь со мной
-      </button>
 
       {status !== 'closed' && (
         <div

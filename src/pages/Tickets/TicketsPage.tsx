@@ -34,6 +34,24 @@ const dayLabel = (s: string) => {
 };
 const dots = (s: string) => s.split('-').reverse().join('.');
 
+/** calendar sign in the date fields */
+const CalIcon = () => (
+  <svg
+    className="tk-cal-ic"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#1F5F4A"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" />
+  </svg>
+);
+
 function Plane({ size = 18, back = false }: { size?: number; back?: boolean }) {
   return (
     <svg
@@ -259,7 +277,7 @@ export default function TicketsPage() {
       flights: 'yes',
       adults: Math.min(q.n, 4),
     });
-    navigate('/results');
+    navigate('/results', { state: { scrollTo: 'resList' } });
   };
   const rows = more ? compare : compare.slice(0, 12);
 
@@ -286,35 +304,46 @@ export default function TicketsPage() {
                 search();
               }}
             >
-              <div className="tk-seg" role="radiogroup" aria-label="Тип поездки">
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={rt}
-                  className={rt ? 'on' : ''}
-                  onClick={() => setRt(true)}
-                >
-                  Туда и обратно
-                  {rt && length ? <span className="tk-seg-n">{length + ' ' + daysWord(length)}</span> : null}
-                </button>
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={!rt}
-                  className={!rt ? 'on' : ''}
-                  onClick={() => setRt(false)}
-                >
-                  В одну сторону
-                </button>
+              <div className="tk-type" role="radiogroup" aria-label="Тип поездки">
+                {[
+                  [true, 'Туда и обратно'],
+                  [false, 'В одну сторону'],
+                ].map(([v, t]) => (
+                  <button
+                    key={String(v)}
+                    type="button"
+                    role="radio"
+                    aria-checked={rt === v}
+                    className={'tk-radio' + (rt === v ? ' on' : '')}
+                    onClick={() => setRt(v as boolean)}
+                  >
+                    <span className="tk-radio-c" aria-hidden="true">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#fff"
+                        strokeWidth="3.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m5 12 5 5L20 7" />
+                      </svg>
+                    </span>
+                    {t as string}
+                    {v && rt && length ? <span className="tk-seg-n">{length + ' ' + daysWord(length)}</span> : null}
+                  </button>
+                ))}
               </div>
               <div className="tk-fields">
                 <div className="tk-dir">
                   <label className="tk-f">
-                    <span className="tk-f-l">Откуда · {COUNTRIES[from].name}</span>
+                    <span className="tk-f-l">Откуда</span>
                     <select value={from} onChange={(e) => setFrom(e.target.value as Country)}>
                       {(['IL', 'LT'] as Country[]).map((c) => (
                         <option key={c} value={c}>
-                          {COUNTRIES[c].city}
+                          {COUNTRIES[c].city} ({COUNTRIES[c].code})
                         </option>
                       ))}
                     </select>
@@ -332,15 +361,18 @@ export default function TicketsPage() {
                     ⇄
                   </button>
                   <div className="tk-f tk-f-to">
-                    <span className="tk-f-l">Куда · {COUNTRIES[to].name}</span>
-                    <span className="tk-f-v">{COUNTRIES[to].city}</span>
+                    <span className="tk-f-l">Куда</span>
+                    <span className="tk-f-v">
+                      {COUNTRIES[to].city} ({COUNTRIES[to].code})
+                    </span>
                   </div>
                 </div>
                 <button type="button" className={'tk-f tk-date' + (dep ? '' : ' empty')} onClick={() => openCal('dep')}>
-                  <span className="tk-f-l">
-                    <Plane size={15} /> Туда
+                  <span className="tk-f-l">Туда</span>
+                  <span className="tk-f-v">
+                    <CalIcon />
+                    {dep ? dayLabel(dep) : 'Выберите дату'}
                   </span>
-                  <span className="tk-f-v">{dep ? dayLabel(dep) : 'Выберите дату'}</span>
                 </button>
                 <button
                   type="button"
@@ -348,10 +380,11 @@ export default function TicketsPage() {
                   onClick={() => (rt ? openCal('ret') : setRt(true))}
                   aria-disabled={!rt}
                 >
-                  <span className="tk-f-l">
-                    <Plane size={15} back /> Обратно
+                  <span className="tk-f-l">Обратно</span>
+                  <span className="tk-f-v">
+                    <CalIcon />
+                    {!rt ? 'не нужно' : ret ? dayLabel(ret) : 'Выберите дату'}
                   </span>
-                  <span className="tk-f-v">{!rt ? 'не нужно' : ret ? dayLabel(ret) : 'Выберите дату'}</span>
                 </button>
                 <div className="tk-f tk-people">
                   <span className="tk-f-l">Пассажиры</span>

@@ -79,32 +79,53 @@
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(28, 38, 32, 0.08);
 }
-.tk-seg {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 4px;
-  gap: 4px;
-  border-radius: 12px;
-  background: #efece5;
+/* round trip / one way: two radio buttons (light green when chosen, with a check) */
+.tk-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
 }
-.tk-seg button {
+.tk-radio {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 16px;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 4px;
   border: 0;
-  border-radius: 9px;
   background: none;
-  font-size: 16px;
-  font-weight: 700;
+  font:
+    600 17px Manrope,
+    sans-serif;
   color: #3e4b44;
   cursor: pointer;
 }
-.tk-seg button.on {
-  background: #fff;
+.tk-radio.on {
   color: #1c2620;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+}
+.tk-radio-c {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #8a968f;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tk-radio-c svg {
+  opacity: 0;
+}
+.tk-radio.on .tk-radio-c {
+  border-color: #1f5f4a;
+  background: #1f5f4a;
+}
+.tk-radio.on .tk-radio-c svg {
+  opacity: 1;
+}
+.tk-radio:hover .tk-radio-c {
+  border-color: #1f5f4a;
 }
 .tk-seg-n {
   padding: 1px 8px;
@@ -115,11 +136,13 @@
 }
 .tk-fields {
   display: grid;
-  grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr) minmax(0, 1fr) auto auto;
+  /* two rows on wide screens: where from / to + passengers, then the dates + search */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   align-items: stretch;
 }
 .tk-dir {
+  grid-column: span 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 6px;
@@ -149,11 +172,17 @@
   letter-spacing: 0.03em;
 }
 .tk-f-v {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 17px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.tk-cal-ic {
+  flex: none;
 }
 .tk-f select {
   border: 0;
@@ -199,16 +228,24 @@
   font-weight: 600;
 }
 .tk-people {
-  min-width: 150px;
+  min-width: 156px;
+  order: 1;
 }
+.tk-date {
+  order: 2;
+}
+.pg-tickets .tk-go {
+  order: 3;
+}
+/* passengers: − 2 +, the same height as the other values */
 .tk-step {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 .tk-step button {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1.5px solid #1f5f4a;
   background: #fff;
@@ -224,9 +261,9 @@
   cursor: default;
 }
 .tk-step strong {
-  min-width: 18px;
+  min-width: 22px;
   text-align: center;
-  font-size: 19px;
+  font-size: 18px;
 }
 .pg-tickets .tk-go {
   min-height: 62px;
@@ -659,6 +696,13 @@
   .tk-dir {
     grid-column: 1 / -1;
   }
+  .tk-people {
+    order: 2;
+    grid-column: 1 / -1;
+  }
+  .tk-date {
+    order: 1;
+  }
   .pg-tickets .tk-go {
     grid-column: 1 / -1;
   }
@@ -676,14 +720,11 @@
   .tk-search {
     padding: 14px;
   }
-  .tk-seg {
-    align-self: stretch;
+  .tk-type {
+    column-gap: 18px;
   }
-  .tk-seg button {
-    flex: 1;
-    justify-content: center;
-    padding: 0 8px;
-    font-size: 15px;
+  .tk-radio {
+    font-size: 16px;
   }
   .tk-dir {
     grid-template-columns: minmax(0, 1fr);
@@ -745,5 +786,12 @@
   }
   .tk-cal-h h2 {
     font-size: 21px;
+  }
+}
+
+@media (max-width: 520px) {
+  /* each date on its own line: the weekday and the month stay whole */
+  .tk-fields {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

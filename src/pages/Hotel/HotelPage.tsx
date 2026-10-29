@@ -21,7 +21,7 @@ import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { nearestStays, nightFree, stayFree } from '../../data/availability';
 import { PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
-import { HeadsetIcon, VanIcon } from '../../components/icons';
+import { HeadsetIcon, IconPath, VanIcon } from '../../components/icons';
 import { transferBySanatorium } from '../../data/transferPolicy';
 import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
@@ -1664,7 +1664,7 @@ export default function HotelPage() {
                                 aria-hidden="true"
                                 style={{ marginTop: '2px' }}
                               >
-                                <path d={n.d} />
+                                <IconPath d={n.d} />
                               </svg>
                               <span>
                                 <strong style={{ color: '#1C2620' }}>{n.t}</strong> — {n.s}
@@ -1761,7 +1761,7 @@ export default function HotelPage() {
                                   strokeLinejoin="round"
                                   aria-hidden="true"
                                 >
-                                  <path d={s.d} />
+                                  <IconPath d={s.d} />
                                 </svg>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '0' }}>
@@ -1809,83 +1809,11 @@ export default function HotelPage() {
                 <HotelTabContent tab={v.tab} info={v.info} onRooms={v.toRooms} onPhoto={v.openPhoto} />
               </div>
             )}
-            <section
-              style={{
-                width: '100%',
-                background: '#EEF5F1',
-                border: '1px solid #C8DED3',
-                borderRadius: 'var(--r)',
-                padding: '18px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '24px',
-                flexWrap: 'wrap',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 320px' }}>
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  style={{ flex: 'none' }}
-                >
-                  <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
-                </svg>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>
-                    Поможем выбрать программу
-                  </strong>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                    Объясним условия, ответим на вопросы — на русском языке
-                  </span>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  flex: '1 1 260px',
-                  paddingLeft: '24px',
-                  borderLeft: '1px solid #C8DED3',
-                }}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F5F4A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  style={{ flex: 'none' }}
-                >
-                  <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-                </svg>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '18px', textDecoration: 'none' }}>
-                    +370&nbsp;600 00000
-                  </a>
-                  <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                    Ежедневно с 9:00 до 20:00 · <Link to="/rules">Условия оплаты и отмены</Link>
-                  </span>
-                </div>
-              </div>
-              <Link className="btn btn-secondary" to="/done" style={{ minHeight: '50px', fontSize: '16px' }}>
-                Задать вопрос
-              </Link>
-            </section>
           </div>
         </div>
-        <SiteFooter />
+        <SiteFooter
+          help={{ title: 'Поможем выбрать программу', sub: 'Объясним условия, ответим на вопросы — на русском языке' }}
+        />
       </div>{' '}
       {/* "Когда дешевле?" — two-month range calendar with this sanatorium's prices; applying re-renders the page */}{' '}
       {v.calOpen ? (

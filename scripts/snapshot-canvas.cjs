@@ -105,9 +105,9 @@ const BOARDS = [
     title: 'Шаг 2 · Дорога: перелёт и трансфер — ничего не выбрано за гостя (Эгле: трансфер санатория уже оплачен)',
     route: '/transfer',
     links: [
-      ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#flyChoice .choice', 'Да, добавить', 'Transfer-fly.dc.html'],
       ['#trNeed .choice', 'Да, нужен', 'Transfer-yes.dc.html'],
-      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
     ],
   },
   { file: 'Guests.dc.html', title: 'Шаг 3 · Данные гостей', route: '/guests' },
@@ -299,13 +299,13 @@ const BOARDS = [
     route: '/transfer',
     state: true,
     setup: async (p) => {
-      await p.click('text=Билеты у меня уже есть');
+      await p.click('#flyChoice .choice >> nth=1');
       await p.click('#trNeed .choice >> nth=0');
       await p.click('#trHow .tr-how-opt >> nth=0');
       await p.click('#trFrom .rowpick >> nth=0');
       await p.waitForTimeout(300);
     },
-    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+    links: [['.fly-help', '', 'Help.dc.html']],
   },
   {
     file: 'Transfer-other.dc.html',
@@ -320,17 +320,36 @@ const BOARDS = [
       });
       await p.reload({ waitUntil: 'networkidle' });
     },
-    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+    links: [['.fly-help', '', 'Help.dc.html']],
   },
   {
     file: 'Transfer-package.dc.html',
     title: 'Шаг 2 · Дорога — перелёт добавлен (Эгле, даты с рейсом)',
     route: '/transfer',
     state: true,
-    setup: async (p) => p.click('.fly-alt-row >> nth=0'),
+    setup: async (p) => {
+      await p.click('#flyChoice .choice >> nth=0');
+      await p.click('.fly-alt-row >> nth=0');
+      await p.waitForTimeout(1300);
+    },
     links: [
-      ['[role=radiogroup] .ios-row', 'Билеты у меня уже есть', 'Transfer.dc.html'],
-      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['#flyChoice .choice', 'Нет', 'Transfer.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
+    ],
+  },
+  {
+    file: 'Transfer-fly.dc.html',
+    title: 'Шаг 2 · «Да, добавить наш перелёт»: в ваши даты рейса нет — ближайшие даты с рейсом',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.click('#flyChoice .choice >> nth=0');
+      await p.waitForTimeout(1300);
+    },
+    links: [
+      ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#flyChoice .choice', 'Нет', 'Transfer.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
     ],
   },
 ];
@@ -351,14 +370,44 @@ const linkFor = (href) => {
   return f + (hash ? '#' + hash : '');
 };
 
+/** the blocks that come in one after another when a board opens (same choice as PageTransition on the site) */
+const MARK_REVEAL = `(() => {
+  const root = document.querySelector('#root .page');
+  if (!root) return;
+  const vh = innerHeight, out = [];
+  const walk = (el, depth) => {
+    for (const c of Array.from(el.children)) {
+      const cs = getComputedStyle(c);
+      if (cs.position === 'fixed' || cs.display === 'none' || cs.display === 'contents') continue;
+      const r = c.getBoundingClientRect();
+      if (r.height < 4 || r.top > vh * 1.1) continue;
+      const parts = Array.from(c.children).filter((k) => k.getBoundingClientRect().height > 4 && getComputedStyle(k).position !== 'fixed');
+      if (depth < 4 && parts.length > 1 && r.height > vh * 0.4) walk(c, depth + 1);
+      else out.push(c);
+    }
+  };
+  walk(root, 0);
+  out.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top || a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+  out.forEach((el, i) => {
+    el.classList.add('dc-rv');
+    if (el.querySelector('.step-bar, .next-tip, [style*="position: fixed"]')) el.classList.add('dc-rvf');
+    el.style.animationDelay = (0.5 + Math.min(i, 12) * 0.07).toFixed(2) + 's';
+  });
+})()`;
+
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 const post = (html) =>
   html
     // «Ваши пожелания» opens the form board in Play
     .replace(
-      /<button type="button" class="fb-btn"([^>]*)>([\s\S]*?)<\/button>/,
-      '<a class="fb-btn" href="Feedback.dc.html"$1 style="text-decoration:none">$2</a>',
+      /<button type="button" class="(fb-btn[^"]*)"([^>]*)>([\s\S]*?)<\/button>/,
+      '<a class="$1" href="Feedback.dc.html"$2 style="text-decoration:none">$3</a>',
+    )
+    // «Свяжитесь со мной» in the help band opens the form board
+    .replace(
+      /<button type="button" class="([^"]*\bhs-btn\b[^"]*)"([^>]*)>([\s\S]*?)<\/button>/g,
+      '<a class="$1" href="Help.dc.html"$2 style="text-decoration:none">$3</a>',
     )
     .replace(/(src|href)="\/img\/([0-9a-f]{32})\.[a-z]+"/g, '$1="/_blob/$2"')
     .replace(/url\(&quot;\/img\/([0-9a-f]{32})\.[a-z]+&quot;\)/g, 'url(&quot;/_blob/$1&quot;)')
@@ -386,9 +435,20 @@ ${css}
 /* canvas only: «i» opens its balloon on hover (the site opens it on a tap with a script) */
 .info-host:has(.info-tip:hover) .info-pop{display:block}
 .info-host:has(.info-tip:hover) .info-tip{background:#1f5f4a;border-color:#1f5f4a;color:#fff}
+/* canvas only: opening a board shows the short «loading», then the page comes in from the top, as on the site */
+.dc-ld{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f4f1ea;pointer-events:none;animation:dcLdOut .26s ease-in .48s forwards}
+.dc-ld i{width:42px;height:42px;border-radius:50%;border:3px solid #c8ded3;border-top-color:#1f5f4a;animation:dcSpin .75s linear infinite}
+.dc-ld span{font:600 15px Manrope,sans-serif;color:#5e6862}
+@keyframes dcLdOut{to{opacity:0;visibility:hidden}}
+@keyframes dcSpin{to{transform:rotate(360deg)}}
+@keyframes dcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.dc-rv{animation:dcIn .55s cubic-bezier(.22,.8,.24,1) both}
+.dc-rv.dc-rvf{animation-name:dcFade}
+@keyframes dcFade{from{opacity:0}}
 </style>
 </helmet>
 <!-- Снимок страницы ${esc(route)} с shalom.bookingrobot.eu — макет совпадает с сайтом -->
+<div class="dc-ld" aria-hidden="true"><i></i><span>Загружаем…</span></div>
 ${body}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":${h}}}'>
@@ -416,6 +476,7 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     }
     if (bd.search) await searchBand(p, bd.search);
     if (bd.links) await linkButtons(p, bd.links);
+    await p.evaluate(MARK_REVEAL);
     const { html, h } = await p.evaluate(() => {
       // «Далее» of a step: the bottom bar stays hidden on a board, the button becomes a link to the next board
       document.querySelectorAll('.step-bar').forEach((x) => x.classList.remove('on'));
@@ -474,6 +535,7 @@ async function grab(b, route, setup, fn, arg) {
   await p.goto(BASE + route, { waitUntil: 'networkidle' });
   if (setup) await setup(p);
   await p.waitForTimeout(200);
+  await p.evaluate(MARK_REVEAL);
   await p.addScriptTag({ content: IA.HELPERS });
   const r = await p.evaluate(fn, arg);
   await ctx.close();
@@ -800,17 +862,19 @@ async function buildInteractive(b, sizes) {
         }),
       );
     }
+    // Results: every sanatorium's rooms open (as in the base below); a room photo opens its gallery
+    const openAll = async (p) => {
+      await p.click('text=Сбросить всё');
+      for (const bt of await p.$$('article[id^="h-"] button[aria-expanded="false"]')) await bt.click();
+      await p.waitForTimeout(1600);
+    };
+    const rg = isMain ? { roomPics: [], rgHtml: '' } : await roomGallery(b, route, openAll);
+    raws.roomgal = rgRaw(rg.rgHtml);
     // the page itself, with fields wired to the logic (Results: all sanatoriums, filters applied by the logic)
     const base = await grab(
       b,
       route,
-      isMain
-        ? null
-        : async (p) => {
-            await p.click('text=Сбросить всё');
-            for (const bt of await p.$$('article[id^="h-"] button[aria-expanded="false"]')) await bt.click();
-            await p.waitForTimeout(1600);
-          },
+      isMain ? null : openAll,
       (isMain) => {
         const d = window.__dc;
         ['#datein', '#dateout'].forEach((s, i) => {
@@ -937,8 +1001,9 @@ async function buildInteractive(b, sizes) {
             a.before(d.raw('hv-start-' + i));
             a.after(d.raw('hv-end'));
           });
-          const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
-          ask.after(d.raw('cmp'));
+          document.querySelector('.help-strip-band').before(d.raw('cmp'));
+          document.querySelectorAll('.rc-photo').forEach((x, i) => d.on(x, 'click', 'rgOpen' + i));
+          page.appendChild(d.raw('roomgal'));
           page.appendChild(d.raw('wizard'));
           page.appendChild(d.raw('price'));
         }
@@ -963,34 +1028,29 @@ async function buildInteractive(b, sizes) {
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    const logic = filterCfg ? IA.filtersLogic(filterCfg) : isMain ? IA.mainLogic(cityLabels) : IA.LOGIC;
+    let logic = filterCfg ? IA.filtersLogic(filterCfg) : isMain ? IA.mainLogic(cityLabels) : IA.LOGIC;
+    if (!isMain && rg.roomPics.length)
+      logic =
+        logic.replace('class Component extends DCLogic', 'class ResBase extends DCLogic') +
+        `
+class Component extends ResBase {
+  constructor(props) {
+    super(props);
+    Object.assign(this.state, { rg: -1, rgI: 0 });
+  }
+  renderVals() {
+    const v = super.renderVals(), st = this.state;${rgLogic(rg.roomPics)}
+    return v;
+  }
+}`;
     fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }
 }
 
-/* ---------- Hotel board: the photo gallery opens in Play ---------- */
-/** Sanatorium boards: gallery lightbox, guests pop-over and the working tabs. */
-async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') {
-  if (!sizes[file]) return;
-  const lb = await grab(
-    b,
-    route,
-    (p) => p.click('button[aria-label="Все фото"]'),
-    () => {
-      const d = window.__dc;
-      const over = Array.from(document.querySelectorAll('div')).find(
-        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 1,
-      );
-      over.querySelectorAll('button').forEach((x) => {
-        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть')
-          d.on(x, 'click', 'lbClose');
-      });
-      return over.outerHTML;
-    },
-  );
-  // a room photo opens the room's mini gallery: its markup once, and every room's photos
-  const rooms = await grab(b, route, null, async () => {
+/* ---------- a room photo opens the room's mini gallery (Hotel and Results boards) ---------- */
+async function roomGallery(b, route, setup) {
+  const rooms = await grab(b, route, setup, async () => {
     const out = [];
     const btns = Array.from(document.querySelectorAll('.rc-photo'));
     for (const bt of btns) {
@@ -1020,7 +1080,10 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     ? await grab(
         b,
         route,
-        (p) => p.click('.rc-photo >> nth=0'),
+        async (p) => {
+          if (setup) await setup(p);
+          await p.click('.rc-photo >> nth=0');
+        },
         () => {
           const d = window.__dc;
           const o = document.querySelector('.rg-overlay');
@@ -1046,6 +1109,53 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     title: r.title,
     photos: r.photos.map((x) => ({ src: blob(x.src), alt: x.alt })),
   }));
+  return { roomPics, rgHtml };
+}
+
+/** the gallery pop-up, shown while a room's photos are open */
+const rgRaw = (rgHtml) =>
+  rgHtml
+    ? '<sc-if value="{{rgOn}}" hint-placeholder-val="{{false}}">' +
+      IA.finish(post(rgHtml), {
+        rgthumbs:
+          '<sc-for list="{{rgThumbs}}" as="t" hint-placeholder-count="4"><button type="button" class="{{t.cls}}" onClick="{{t.pick}}"><img src="{{t.src}}" alt=""></button></sc-for>',
+      }) +
+      '</sc-if>'
+    : '';
+
+/** board logic: open / browse / close a room's photos (inside renderVals, with v and st) */
+const rgLogic = (roomPics) => `
+    const ROOMS = ${JSON.stringify(roomPics)};
+    const r = ROOMS[st.rg], pics = r ? r.photos : [], k = pics.length ? ((st.rgI % pics.length) + pics.length) % pics.length : 0;
+    ROOMS.forEach((_, i) => (v['rgOpen' + i] = () => this.setState({ rg: i, rgI: 0 })));
+    Object.assign(v, {
+      rgOn: !!r, rgTitle: r ? r.title : '', rgSrc: pics[k] ? pics[k].src : '', rgAlt: pics[k] ? pics[k].alt : '',
+      rgLine: r ? (k + 1) + ' из ' + pics.length + ' · ' + (pics[k] ? pics[k].alt : '') : '',
+      rgThumbs: pics.map((p, j) => ({ src: p.src, cls: 'rg-thumb' + (j === k ? ' on' : ''), pick: () => this.setState({ rgI: j }) })),
+      rgPrev: () => this.setState({ rgI: k - 1 }), rgNext: () => this.setState({ rgI: k + 1 }), rgClose: () => this.setState({ rg: -1 }),
+    });`;
+
+/* ---------- Hotel board: the photo gallery opens in Play ---------- */
+/** Sanatorium boards: gallery lightbox, guests pop-over and the working tabs. */
+async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') {
+  if (!sizes[file]) return;
+  const lb = await grab(
+    b,
+    route,
+    (p) => p.click('button[aria-label="Все фото"]'),
+    () => {
+      const d = window.__dc;
+      const over = Array.from(document.querySelectorAll('div')).find(
+        (x) => getComputedStyle(x).position === 'fixed' && x.querySelectorAll('img').length > 1,
+      );
+      over.querySelectorAll('button').forEach((x) => {
+        if (/Закрыть|✕|←|Назад/.test(x.textContent) || x.getAttribute('aria-label') === 'Закрыть')
+          d.on(x, 'click', 'lbClose');
+      });
+      return over.outerHTML;
+    },
+  );
+  const { roomPics, rgHtml } = await roomGallery(b, route, null);
   // guests chip in the "Ваши даты" bar opens the same +/− pop-over as the search
   const gpop = await grab(
     b,
@@ -1128,14 +1238,7 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
     gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
     calmodal: wrapIf('calOpen', cal),
-    roomgal: rgHtml
-      ? '<sc-if value="{{rgOn}}" hint-placeholder-val="{{false}}">' +
-        IA.finish(post(rgHtml), {
-          rgthumbs:
-            '<sc-for list="{{rgThumbs}}" as="t" hint-placeholder-count="4"><button type="button" class="{{t.cls}}" onClick="{{t.pick}}"><img src="{{t.src}}" alt=""></button></sc-for>',
-        }) +
-        '</sc-if>'
-      : '',
+    roomgal: rgRaw(rgHtml),
     'rooms-start': '<sc-if value="{{tabOn_rooms}}" hint-placeholder-val="{{true}}">',
     'rooms-end': '</sc-if>' + TABS.map((k) => ifs(k, IA.finish(post(tabHtml[k]), {}))).join(''),
   });
@@ -1158,15 +1261,8 @@ class Component extends CalBase {
     Object.assign(v, {
       lbOn: st.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }),
     });
-    // a room's mini gallery (the room photos come from the site)
-    const ROOMS = ${JSON.stringify(roomPics)};
-    const r = ROOMS[st.rg], pics = r ? r.photos : [], k = pics.length ? ((st.rgI % pics.length) + pics.length) % pics.length : 0;
-    ROOMS.forEach((_, i) => (v['rgOpen' + i] = () => this.setState({ rg: i, rgI: 0 })));
+    // a room's mini gallery (the room photos come from the site)${rgLogic(roomPics)}
     Object.assign(v, {
-      rgOn: !!r, rgTitle: r ? r.title : '', rgSrc: pics[k] ? pics[k].src : '', rgAlt: pics[k] ? pics[k].alt : '',
-      rgLine: r ? (k + 1) + ' из ' + pics.length + ' · ' + (pics[k] ? pics[k].alt : '') : '',
-      rgThumbs: pics.map((p, j) => ({ src: p.src, cls: 'rg-thumb' + (j === k ? ' on' : ''), pick: () => this.setState({ rgI: j }) })),
-      rgPrev: () => this.setState({ rgI: k - 1 }), rgNext: () => this.setState({ rgI: k + 1 }), rgClose: () => this.setState({ rg: -1 }),
       gLabel: ad + ' ' + (ad === 1 ? 'взрослый' : 'взрослых') + (ch ? ', ' + ch + ' ' + (ch === 1 ? 'ребёнок' : 'ребёнка') : ''),
       hbRange: (same ? a.getUTCDate() + '–' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]
         : a.getUTCDate() + ' ' + MONTHS[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]) + ' ' + b.getUTCFullYear(),

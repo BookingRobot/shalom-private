@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { HelpProvider } from './context/HelpContext';
 import { BookingProvider } from './context/BookingContext';
 import { LanguageProvider } from './i18n/LanguageContext';
+import { PageTransition } from './components/layout/PageTransition';
 
 const MainPage = lazy(() => import('./pages/Main/MainPage'));
 const ResultsPage = lazy(() => import('./pages/Results/ResultsPage'));
@@ -40,6 +41,7 @@ export default function App() {
       <BookingProvider>
         <HelpProvider initial={helpInitiallyOpen ? 'form' : 'closed'}>
           <ScrollManager />
+          <PageTransition />
           <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<MainPage />} />

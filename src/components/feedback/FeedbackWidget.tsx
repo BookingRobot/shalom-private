@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { captureScreenshot } from '../../lib/feedback/screenshot';
 import {
   FeedbackRefused,
@@ -16,7 +17,7 @@ import { IMAGE_TYPES, MAX_PICTURES, MAX_TOTAL, prepareImage } from '../../lib/fe
 import './FeedbackWidget.css';
 
 /**
- * «Ваши пожелания» — a red button above «Свяжитесь со мной» (like On Time's
+ * «Ваши пожелания» — a red button in the page footer (like On Time's
  * "Pastaba šiam langui"): point at a spot on the page, a screenshot is taken with the
  * spot framed, write what to change — the note becomes a GitHub issue that waits for review.
  */
@@ -163,6 +164,9 @@ function Icon({ d, size = 20 }: { d: string; size?: number }) {
 
 export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
   const [stage, setStage] = useState<Stage>('idle');
+  // the button sits in the page footer (SiteFooter / FooterSlot); floating only where a page has none
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => setSlot(document.getElementById('ftSlot')), []);
   const [type, setType] = useState<FeedbackType>('change');
   const [severity, setSeverity] = useState<FeedbackSeverity>('annoying');
   const [title, setTitle] = useState('');
@@ -461,14 +465,25 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
 
   return (
     <div data-feedback-ignore>
-      {stage === 'idle' ? (
-        <button type="button" className="fb-btn" style={{ bottom: `calc(${bottom} + 60px)` }} onClick={start}>
-          <span className="fb-btn-ico">
-            <Icon d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM8 9h8M8 13h5" size={18} />
-          </span>
-          Ваши пожелания
-        </button>
-      ) : null}
+      {stage === 'idle'
+        ? (() => {
+            const btn = (
+              <button
+                type="button"
+                className={'fb-btn' + (slot ? ' in-ft' : '')}
+                style={slot ? undefined : { bottom }}
+                onClick={start}
+                data-feedback-ignore
+              >
+                <span className="fb-btn-ico">
+                  <Icon d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM8 9h8M8 13h5" size={18} />
+                </span>
+                Ваши пожелания
+              </button>
+            );
+            return slot ? createPortal(btn, slot) : btn;
+          })()
+        : null}
 
       {stage === 'marking' ? (
         <>

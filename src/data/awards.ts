@@ -21,14 +21,10 @@ export const awardsOf = {
     { t: 'Много бассейнов и бань в здании', d: ICON_PATHS.aqua },
     { t: 'Центр города, у бювета', d: AWARD_ICONS.pin },
   ],
-  'egle-standart': [{ t: 'До процедур [N] м по улице', d: ICON_PATHS.proc }],
   'grand-spa-druskininkai': [
     { t: 'Новый корпус', d: AWARD_ICONS.renov },
     { t: 'Много бассейнов и бань рядом', d: ICON_PATHS.aqua },
   ],
-  belorus: [
-    { t: 'Номера после ремонта', d: AWARD_ICONS.renov },
-    { t: 'Подходит семьям', d: AWARD_ICONS.family },
-  ],
+  belorus: [{ t: 'Номера после ремонта', d: AWARD_ICONS.renov }],
   draugyste: [{ t: 'Минеральный бассейн', d: AWARD_ICONS.water }],
 };

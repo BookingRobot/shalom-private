@@ -1,4 +1,5 @@
 import { NextTip } from './NextTip';
+import { IconPath } from './icons';
 import { Fragment, useState } from 'react';
 import { RoomGallery } from './RoomGallery';
 import type { RoomPhoto } from '../data/roomPhotos';
@@ -164,7 +165,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path d={it.d} />
+                  <IconPath d={it.d} />
                 </svg>
                 {it.t}
               </li>
@@ -433,7 +434,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                           aria-hidden="true"
                           style={{ flex: 'none' }}
                         >
-                          <path d={v.d} />
+                          <IconPath d={v.d} />
                         </svg>
                         <span
                           style={{
@@ -483,7 +484,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                           strokeLinejoin="round"
                           aria-hidden="true"
                         >
-                          <path d={p.d} />
+                          <IconPath d={p.d} />
                         </svg>
                         {p.t}
                       </div>
@@ -524,7 +525,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                           strokeLinejoin="round"
                           aria-hidden="true"
                         >
-                          <path d={a.d} />
+                          <IconPath d={a.d} />
                         </svg>
                         {a.t}
                       </div>

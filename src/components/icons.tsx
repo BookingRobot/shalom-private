@@ -1,4 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useId, type CSSProperties, type ReactNode } from 'react';
+import { ICON_PATHS } from '../data/iconPaths';
+
+const DOCTOR_D = ICON_PATHS.doctor;
 
 /** Small stroke icons used across pages (24×24 grid, currentColor by default). */
 interface IconProps {
@@ -82,3 +85,38 @@ export const VanIcon = ({ height = 22, className = '' }: { height?: number; clas
     style={{ flex: 'none', display: 'block', height, width: 'auto' }}
   />
 );
+
+/**
+ * The doctor sign: a doctor in a ring with a V collar, tie and a cross on the chest.
+ * Drawn inside any 24×24 stroke icon: it takes the icon's stroke colour (a stroke-filled
+ * square seen through a mask of the figure), so it works on light and dark chips alike.
+ */
+export function DoctorMark() {
+  const id = 'doc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+        <circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="1.5" />
+        <ellipse cx="12" cy="7.9" rx="3.1" ry="3.6" fill="#fff" stroke="none" />
+        <path
+          d="M5.6 18.04V16.4A3.4 3.4 0 0 1 9 13h6a3.4 3.4 0 0 1 3.4 3.4v1.64a8.8 8.8 0 0 1-12.8 0z"
+          fill="#fff"
+          stroke="none"
+        />
+        {/* V collar with the tie */}
+        <path d="M10.2 13 12 16.3l1.8-3.3z" fill="#000" stroke="none" />
+        <path d="M12 14.1l.55.9-.55 1.55-.55-1.55z" fill="#fff" stroke="none" />
+        {/* stethoscope over the left shoulder */}
+        <path d="M8.4 13.3c-1 1.1-1.1 2.8-.1 3.7.9.8 2.2.3 2.3-.9" fill="none" stroke="#000" strokeWidth=".9" />
+        {/* cross */}
+        <path d="M15.9 15.5v2.8M14.5 16.9h2.8" fill="none" stroke="#000" strokeWidth="1.05" strokeLinecap="butt" />
+      </mask>
+      <path d="M0 12h24" strokeWidth="24" strokeLinecap="butt" mask={`url(#${id})`} />
+    </>
+  );
+}
+
+/** One icon path from data (amenities, chips); the doctor gets its own sign. */
+export function IconPath({ d }: { d: string }) {
+  return d === DOCTOR_D ? <DoctorMark /> : <path d={d} />;
+}
