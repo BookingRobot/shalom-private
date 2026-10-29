@@ -1,0 +1,23 @@
+{
+  "id": "20261029104754-y420q",
+  "issue": 38,
+  "received": "2026-10-29T10:47:54.358Z",
+  "type": "change",
+  "severity": "annoying",
+  "title": "[Изменение] возврат на этап ранний",
+  "whatDoing": "",
+  "expected": "",
+  "actual": "",
+  "description": "Возможность сделать возврат на страницу",
+  "name": "Юлия",
+  "contact": "+972527074391",
+  "page": "https://shalom.bookingrobot.eu/guests",
+  "pageTitle": "Шаг 3 из 4 — данные гостей · Санатории Литвы",
+  "element": "blokas „Кто едет в санаторий? Имена и фамилии — как в паспорте, латинскими буквами. Они “",
+  "viewport": "1536×730",
+  "browser": "Chrome · Windows",
+  "when": "2026-10-29 12:47:53",
+  "text": "возврат на этап ранний\n\nВозможность сделать возврат на страницу",
+  "screenshot": "feedback/2026-10/20261029104754-y420q.webp",
+  "images": []
+}
