@@ -1,0 +1,23 @@
+{
+  "id": "20261029104220-wkpjw",
+  "issue": 37,
+  "received": "2026-10-29T10:42:20.544Z",
+  "type": "change",
+  "severity": "later",
+  "title": "[Изменение] Трансфер",
+  "whatDoing": "",
+  "expected": "",
+  "actual": "",
+  "description": "Надо добавить на этом этапе трансфер, как это у Эда",
+  "name": "Юлия",
+  "contact": "+972527074391",
+  "page": "https://shalom.bookingrobot.eu/rooms",
+  "pageTitle": "Шаг 1 из 4 — номер и программа · Санатории Литвы",
+  "element": "blokas „Программа «Миди» ✓ Включена в цену 3 процедуры в день · 27 за весь заезд 3 приём“",
+  "viewport": "1536×730",
+  "browser": "Chrome · Windows",
+  "when": "2026-10-29 12:42:19",
+  "text": "Трансфер\n\nНадо добавить на этом этапе трансфер, как это у Эда",
+  "screenshot": "feedback/2026-10/20261029104220-wkpjw.webp",
+  "images": []
+}
