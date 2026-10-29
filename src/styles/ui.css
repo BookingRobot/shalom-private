@@ -1211,6 +1211,112 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   object-fit: cover;
   border-radius: 12px;
 }
+/* places worth seeing: a clean list — the photo on the left, the story on the right, a thin line between */
+.page .rs-sights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.page .rs-sight {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 20px 0;
+  border-bottom: 1px solid #ece8df;
+}
+.page .rs-sight:first-child {
+  padding-top: 6px;
+}
+.page .rs-sight:last-child {
+  border-bottom: 0;
+}
+/* two photos or a wide painting: the pictures across the top, the story under them */
+.page .rs-sight.rs-sight-wide {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.page .rs-pics.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.page .rs-pic {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.page .rs-pic img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #eef2ef;
+}
+.page .rs-pic.wide img {
+  aspect-ratio: auto;
+  height: auto;
+}
+.page .rs-pic figcaption {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #6b766f;
+}
+.page .rs-pic figcaption a {
+  color: inherit;
+  text-decoration: none;
+}
+.page .rs-pic figcaption a:hover {
+  text-decoration: underline;
+}
+.page .rs-sight-t {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.page .rs-sight-t strong {
+  font-size: 19px;
+  line-height: 1.3;
+  color: #1c2620;
+}
+.page .rs-sight-meta {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f5f4a;
+  line-height: 1.4;
+}
+.page .rs-main .rs-sight-t p {
+  margin: 4px 0 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #2f3a34;
+}
+.page .rs-sight-go {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: #3e4b44;
+}
+.page .rs-sight-go svg {
+  flex: none;
+  margin-top: 1px;
+  color: #1f5f4a;
+}
+@media (max-width: 700px) {
+  .page .rs-sight {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .page .rs-pic img {
+    aspect-ratio: 3 / 2;
+  }
+}
 /* a usual day: times down the left */
 .page .rs-day {
   list-style: none;

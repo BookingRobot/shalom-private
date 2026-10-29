@@ -1,6 +1,16 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ADDRESS, AGENCY, AGENCY_LOGO, EMAIL, MAILTO, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
+import {
+  ADDRESS,
+  AGENCY,
+  AGENCY_LOGO,
+  AGENCY_LOGO_WHITE,
+  EMAIL,
+  MAILTO,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+  SITE_NAME,
+} from '../../data/contacts';
 import { HelpStripBand, type HelpStripText } from './HelpStrip';
 import './SiteFooter.css';
 
@@ -26,7 +36,8 @@ export function AgencyBlock({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   return (
     <div className={'ft-agency' + (tone === 'light' ? ' light' : '')}>
       <span className="ft-agency-logo">
-        <img src={AGENCY_LOGO} alt={AGENCY} width="148" height="33" />
+        {/* dark footer: the white logo; light footer: the colour one */}
+        <img src={tone === 'light' ? AGENCY_LOGO : AGENCY_LOGO_WHITE} alt={AGENCY} width="160" height="36" />
       </span>
       <span className="ft-agency-t">
         <span>
