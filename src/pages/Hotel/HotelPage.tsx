@@ -30,6 +30,7 @@ import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../dat
 import { api } from '../../api';
 import { GuestsPicker, guestsLabel } from '../../components/GuestsPicker';
 import { RoomCard, tipCheapest } from '../../components/RoomCard';
+import { roomPhotos } from '../../data/roomPhotos';
 import { HOTEL_TABS, HotelTabContent, type HotelTab } from '../../components/hotel/HotelTabs';
 import { pick as pickIcon } from '../../components/hotel/illustrations';
 import { hotelInfo } from '../../data/hotelInfo';
@@ -211,8 +212,12 @@ class HotelLogic extends PageLogic {
       const p0 = PROGS[0].title.split(' — ');
       const rkey = ROOM_KEY[r.n] || '';
       const busy = overlaps(rkey, checkin, checkout);
+      // the room's photos for the mini gallery (the first one is on the card)
+      const pics = roomPhotos(info.id, r.name, r.img);
       return {
         ...r,
+        photos: pics,
+        img: pics[0]?.src || r.img,
         room: r.name,
         short: r.name,
         roomLine: r.line,

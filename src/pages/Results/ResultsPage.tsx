@@ -18,6 +18,7 @@ import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { RoomCard, tipCheapest } from '../../components/RoomCard';
+import { roomPhotos } from '../../data/roomPhotos';
 import { NextTip } from '../../components/NextTip';
 import { PriceBox } from '../../components/PriceBox';
 import { ChooseWizard } from '../../components/ChooseWizard';
@@ -293,7 +294,9 @@ class ResultsLogic extends PageLogic {
           n: ri + 1,
           id: r.id,
           room: r.room,
-          img: r.img || base.img || h0.img,
+          // the room's photos for the mini gallery (the first one is on the card)
+          photos: roomPhotos(h0.id, r.room, r.img || base.img || h0.img),
+          img: roomPhotos(h0.id, r.room, r.img || base.img || h0.img)[0]?.src || r.img || base.img || h0.img,
           amen: r.amen || base.amen,
           roomText: r.roomText || base.roomText,
           addN,
