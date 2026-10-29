@@ -450,6 +450,7 @@ const CAL_RAWS = {
   'foot-end': '</sc-if>',
   calnote: IA.CALNOTE,
   cells: IA.CELLS,
+  cells2: IA.CELLS.replace('{{cells}}', '{{cells2}}'),
 };
 /** flexible dates sit after the exact calendar; on Main an option links to the results board */
 const calRawsFor = (isMain) => ({

@@ -1487,8 +1487,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   }
 }
 
-/* ── Date-picker dialog: fits a laptop screen (legend in a side column, compact cells,
-      the confirm row always visible at the bottom) ── */
+/* ── Date-picker dialog: two months side by side on a laptop, the legend in one quiet line
+      under them, the confirm row always visible at the bottom ── */
 .cal-dlg {
   max-height: calc(100vh - 32px);
   max-height: calc(100dvh - 32px);
@@ -1506,10 +1506,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   z-index: 2;
 }
 .cal-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 210px;
-  gap: 24px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .cal-body-wide {
   grid-template-columns: minmax(0, 1fr) 260px;
@@ -1557,15 +1556,35 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .cal-legend {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid #e3ded2;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 18px;
+  padding: 0 52px;
 }
 .page .cal-legend .lg {
   font-size: 14px;
-  gap: 8px;
+  gap: 7px;
+  color: #3e4b44;
+}
+.cal-legend .lg-fly .info-host {
+  align-items: center;
+}
+.cal-legend .lg-fly-t {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #3e4b44;
+}
+.cal-legend .lg-fly .info-tip {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+}
+.cal-legend .lg-fly .info-pop {
+  max-width: 460px;
+  font-size: 14px;
 }
 .cal-fly {
   font-size: 14px;
@@ -1577,11 +1596,23 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .cal-dlg .months-calendar .cell {
   min-height: 46px;
-  font-size: 18px;
+  font-size: 17px;
   gap: 3px;
 }
 .cal-dlg .months-calendar .cell small {
-  font-size: 12.5px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.cal-dlg .months-calendar .cell > span[title] {
+  top: 3px !important;
+  right: 3px !important;
+}
+.cal-dlg .months-calendar .cell > span[title] svg {
+  width: 13px;
+  height: 13px;
+}
+.cal-dlg .months-calendar [style*='repeat(7'] {
+  gap: 3px !important;
 }
 .cal-dlg .months-calendar .wd {
   padding: 2px 0;
@@ -1595,30 +1626,18 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 @media (max-width: 760px) {
   .cal-body {
-    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
-  .cal-side {
-    display: contents;
-  }
-  .cal-side-h {
-    order: -3;
-  }
-  .cal-pgrid {
-    order: -2;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .page .cal-pgrid .preset {
-    padding: 0 2px;
-    font-size: 14px;
-  }
+  /* two columns of two: what the colours mean */
   .cal-legend {
-    order: 2;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 6px 14px;
-    margin-top: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: start;
+    gap: 6px 12px;
+    padding: 0;
+  }
+  .cal-legend .lg-fly {
+    grid-column: 1 / -1;
   }
   .cal-cmp {
     width: 100%;
@@ -1681,6 +1700,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   .cal-dlg .months-calendar .cell small {
     font-size: 10px;
     text-align: center;
+    white-space: normal;
   }
   .cal-dlg .months-calendar .cell {
     padding: 3px 0;
