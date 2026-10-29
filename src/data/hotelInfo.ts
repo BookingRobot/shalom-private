@@ -4,6 +4,7 @@
  * Texts come from the sanatoriums' own sites (see sources in hotelTexts).
  */
 import { EGLE_ALL_PHOTOS } from './egleComfort';
+import { EGLE_PIC } from './roomPhotos';
 import { HOTEL_TEXTS, type HotelText } from './hotelTexts';
 import { RATINGS, REVIEWS, type Rating, type Review } from './hotelReviews';
 
@@ -64,8 +65,15 @@ const BASE: Base[] = [
     starsN: 3,
     reviewsN: 13,
     photos: [
+      EGLE_PIC.aerial,
+      EGLE_PIC.poolCure,
       { src: '/img/99a77311bc746e38e051bd1146cc0517.jpg', alt: 'Бассейн санатория Эгле' },
-      { src: '/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg', alt: 'Двухместный номер (пример)' },
+      EGLE_PIC.bathCure,
+      EGLE_PIC.doctor,
+      EGLE_PIC.buffet,
+      EGLE_PIC.park,
+      EGLE_PIC.pump,
+      EGLE_PIC.gallery,
       ...DRUSKININKAI,
     ],
   },

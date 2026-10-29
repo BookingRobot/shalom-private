@@ -1,5 +1,7 @@
 import { NextTip } from './NextTip';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
+import { RoomGallery } from './RoomGallery';
+import type { RoomPhoto } from '../data/roomPhotos';
 import { Link } from 'react-router-dom';
 import { PriceBox } from './PriceBox';
 
@@ -47,6 +49,9 @@ export function tipCheapest<T extends { avail?: boolean; price: string | number 
 }
 
 export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
+  // all photos of the room (the card shows the first); a tap opens the mini gallery
+  const photos: RoomPhoto[] = o.photos && o.photos.length ? o.photos : [{ src: o.img, alt: o.room || o.short }];
+  const [gal, setGal] = useState(false);
   return (
     <article
       className="card"
@@ -104,20 +109,29 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               </span>
             </>
           ) : null}{' '}
-          <span
-            style={{
-              position: 'absolute',
-              left: '10px',
-              bottom: '10px',
-              background: 'rgba(28,38,32,.8)',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: '700',
-              padding: '5px 9px',
-              borderRadius: 'var(--r)',
-            }}
-          >
-            Фото номера
+          <button
+            type="button"
+            className="rc-photo"
+            onClick={() => setGal(true)}
+            aria-label={
+              'Смотреть фото номера: ' + (o.short || o.room) + (photos.length > 1 ? ', ' + photos.length + ' фото' : '')
+            }
+          />
+          <span className="rc-count" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <circle cx="12" cy="13" r="3.5" />
+            </svg>
+            {photos.length > 1 ? photos.length + ' фото' : 'Фото номера'}
           </span>
         </div>
         <div
@@ -572,6 +586,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           </div>
         </>
       ) : null}
+      {gal ? <RoomGallery title={o.short || o.room} photos={photos} onClose={() => setGal(false)} /> : null}
     </article>
   );
 }

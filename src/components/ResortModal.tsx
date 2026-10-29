@@ -1,11 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { RESORT_STORIES } from '../data/resorts';
+import { RESORT_STORIES, type ResortIcon } from '../data/resorts';
+
+const ICON: Record<ResortIcon, string> = {
+  water: 'M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11zM9.5 15a2.5 2.5 0 0 0 2.5 2.5',
+  mud: 'M4 15c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 4-1.5M4 19c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 4-1.5M8 10a4 4 0 0 1 8 0',
+  pine: 'M12 3 6 11h3l-4 6h14l-4-6h3zM12 17v4',
+  sea: 'M2 9c2 0 2-1.5 4-1.5S8 9 10 9s2-1.5 4-1.5S16 9 18 9s2-1.5 4-1.5M2 14c2 0 2-1.5 4-1.5S8 14 10 14s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5M2 19c2 0 2-1.5 4-1.5S8 19 10 19s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5',
+  river: 'M4 4c4 0 6 3 6 6s2 6 6 6h4M4 9c2 0 3 1.5 3 3s1 4 4 4M14 4h6',
+  quiet: 'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',
+  spa: 'M12 21c-4-2-7-5-7-9 3 0 5 1.5 7 4 2-2.5 4-4 7-4 0 4-3 7-7 9zM12 16c0-4 0-7 0-12',
+};
 
 /**
- * "Выберите курорт": a big pop-up with a short story for first-time guests — photos,
- * the resort's film, what to see, which sanatoriums we have there — and one button
- * that puts the resort into the search form above. Other resorts are one tap away.
+ * "Выберите курорт": a big pop-up that scrolls inside — a story for first-time guests of 60+:
+ * why people come, the nature around (sea, lakes, rivers, forests), what to see, a usual day,
+ * good to know, the film, the sanatoriums. «Закрыть» is always at hand (top and bottom);
+ * «Хочу в …» puts the resort into the search form above. Other resorts are one tap away.
  */
 export function ResortModal({
   id,
@@ -19,6 +30,11 @@ export function ResortModal({
   onChoose: (id: string) => void;
 }) {
   const r = RESORT_STORIES.find((x) => x.id === id);
+  const scroller = useRef<HTMLDivElement>(null);
+  // another resort: start reading it from the top
+  useEffect(() => {
+    scroller.current?.scrollTo({ top: 0 });
+  }, [id]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', k);
@@ -28,110 +44,182 @@ export function ResortModal({
   return (
     <div className="rs-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div role="dialog" aria-modal="true" aria-labelledby="rsTitle" className="rs">
-        <div className="rs-hero" style={{ backgroundImage: `url(${r.hero})` }}>
-          <button type="button" className="btn btn-secondary rs-close" onClick={onClose}>
-            ✕ Закрыть
-          </button>
-          <div className="rs-hero-text">
-            <h2 id="rsTitle">{r.name}</h2>
-            <span>{r.tagline}</span>
+        {/* always at hand, whatever is scrolled */}
+        <button type="button" className="rs-close" onClick={onClose} aria-label="Закрыть">
+          ✕<span> Закрыть</span>
+        </button>
+        <div className="rs-scroll" ref={scroller}>
+          <div className="rs-hero" style={{ backgroundImage: `url(${r.hero})` }}>
+            <div className="rs-hero-text">
+              <h2 id="rsTitle">{r.name}</h2>
+              <span>{r.tagline}</span>
+            </div>
           </div>
-        </div>
-        <div className="rs-tabs" role="tablist" aria-label="Курорты">
-          {RESORT_STORIES.map((x) => (
-            <button
-              type="button"
-              role="tab"
-              key={x.id}
-              aria-selected={x.id === r.id}
-              className={x.id === r.id ? 'on' : ''}
-              onClick={() => onSwitch(x.id)}
-            >
-              {x.name}
-            </button>
-          ))}
-        </div>
-        <div className="rs-body">
-          <div className="rs-main">
-            {r.story.map((p, i) => (
-              <p key={i}>{p}</p>
+          <div className="rs-tabs" role="tablist" aria-label="Курорты">
+            {RESORT_STORIES.map((x) => (
+              <button
+                type="button"
+                role="tab"
+                key={x.id}
+                aria-selected={x.id === r.id}
+                className={x.id === r.id ? 'on' : ''}
+                onClick={() => onSwitch(x.id)}
+              >
+                {x.name}
+              </button>
             ))}
-            <h3>Что посмотреть</h3>
-            <ul className="rs-sights">
-              {r.sights.map((s) => (
-                <li key={s.t}>
-                  <strong>{s.t}</strong>
-                  <span>{s.d}</span>
-                </li>
-              ))}
-            </ul>
-            {r.gallery.length ? (
-              <div className="rs-gallery">
-                {r.gallery.map((g) => (
-                  <img key={g.src} src={g.src} alt={g.alt} />
-                ))}
-              </div>
-            ) : null}
           </div>
-          <aside className="rs-side">
-            {r.video ? (
-              <iframe
-                className="rs-video"
-                src={r.video}
-                title={'Видео о курорте ' + r.name}
-                allow="encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="rs-video rs-video-empty" role="img" aria-label="Видео о курорте">
-                <svg
-                  width="44"
-                  height="44"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M10 8l6 4-6 4z" fill="#fff" />
-                </svg>
-                <span>Видео о курорте от туристического центра · [ДОБАВИТЬ ССЫЛКУ]</span>
-              </div>
-            )}
-            <dl className="rs-facts">
-              {r.facts.map(([k, v]) => (
-                <div key={k}>
-                  <dt>{k}</dt>
-                  <dd>{v}</dd>
-                </div>
+          <div className="rs-body">
+            <div className="rs-main">
+              {r.story.map((p, i) => (
+                <p key={i} className={i === 0 ? 'rs-lead' : ''}>
+                  {p}
+                </p>
               ))}
-            </dl>
-            {r.sanatoriums.length ? (
-              <div className="rs-sans">
-                <h3>Санатории</h3>
-                <div className="rs-san-list">
-                  {r.sanatoriums.map((s) =>
-                    s.id ? (
-                      <Link key={s.name} className="ps-chip" to={'/results?h=' + s.id}>
-                        {s.name}
-                      </Link>
-                    ) : (
-                      <span key={s.name} className="ps-chip rs-chip-off">
-                        {s.name}
-                      </span>
-                    ),
-                  )}
+              <h3>Почему сюда едут</h3>
+              <ul className="rs-why">
+                {r.why.map((w) => (
+                  <li key={w.t}>
+                    <span className="rs-ico" aria-hidden="true">
+                      <svg
+                        width="26"
+                        height="26"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d={ICON[w.icon]} />
+                      </svg>
+                    </span>
+                    <span>
+                      <strong>{w.t}</strong>
+                      <span>{w.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {r.gallery.length ? (
+                <div className="rs-gallery">
+                  {r.gallery.map((g) => (
+                    <img key={g.src} src={g.src} alt={g.alt} />
+                  ))}
                 </div>
-              </div>
-            ) : null}
-          </aside>
+              ) : null}
+              <h3>Природа вокруг</h3>
+              <ul className="rs-list">
+                {r.nature.map((n) => (
+                  <li key={n.t}>
+                    <strong>{n.t}</strong>
+                    <span>{n.d}</span>
+                  </li>
+                ))}
+              </ul>
+              <h3>Что посмотреть</h3>
+              <ul className="rs-sights">
+                {r.sights.map((s) => (
+                  <li key={s.t}>
+                    <strong>{s.t}</strong>
+                    <span>{s.d}</span>
+                  </li>
+                ))}
+              </ul>
+              <h3>Как проходит день на курорте</h3>
+              <ol className="rs-day">
+                {r.day.map((d) => (
+                  <li key={d.time + d.t}>
+                    <time>{d.time}</time>
+                    <span>
+                      <strong>{d.t}</strong>
+                      {d.d ? <span>{d.d}</span> : null}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <h3>Полезно знать</h3>
+              <ul className="rs-tips">
+                {r.tips.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
+            <aside className="rs-side">
+              {r.video ? (
+                /* a picture of the film with a link to YouTube (no player on the page) */
+                <a
+                  className="rs-yt"
+                  href={'https://www.youtube.com/watch?v=' + r.video.id}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={'Смотреть видео на YouTube: ' + r.video.title}
+                >
+                  <span className="rs-yt-pic">
+                    {/* the resort's own photo under the YouTube frame: shows if the frame does not load */}
+                    <img className="rs-yt-bg" src={r.hero} alt="" />
+                    <img
+                      className="rs-yt-thumb"
+                      src={'https://i.ytimg.com/vi/' + r.video.id + '/hqdefault.jpg'}
+                      alt=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                    />
+                    <span className="rs-yt-play" aria-hidden="true">
+                      <svg width="68" height="48" viewBox="0 0 68 48">
+                        <path
+                          d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.4 34 .4 34 .4s-21.2 0-26.5 1.3a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.6 34 47.6 34 47.6s21.2 0 26.5-1.3a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z"
+                          fill="#f00"
+                        />
+                        <path d="M45 24 27 14v20z" fill="#fff" />
+                      </svg>
+                    </span>
+                  </span>
+                  <span className="rs-yt-cap">
+                    <strong>{r.video.title}</strong>
+                    <span>Смотреть на YouTube · на русском · {r.video.by} ↗</span>
+                  </span>
+                </a>
+              ) : null}
+              <dl className="rs-facts">
+                {r.facts.map(([k, v]) => (
+                  <div key={k}>
+                    <dt>{k}</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              {r.sanatoriums.length ? (
+                <div className="rs-sans">
+                  <h3>Санатории</h3>
+                  <div className="rs-san-list">
+                    {r.sanatoriums.map((s) =>
+                      s.id ? (
+                        <Link key={s.name} className="ps-chip" to={'/results?h=' + s.id}>
+                          {s.name}
+                        </Link>
+                      ) : (
+                        <span key={s.name} className="ps-chip rs-chip-off">
+                          {s.name}
+                        </span>
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </aside>
+          </div>
         </div>
         <div className="rs-foot">
           <button type="button" className="btn btn-primary rs-go" onClick={() => onChoose(r.id)}>
-            Хочу в {r.name} — подобрать санаторий
+            Хочу в {r.nameTo}
+            <span className="rs-go-more"> — подобрать санаторий</span>
           </button>
-          <span>Курорт подставим в поиск — останется выбрать даты.</span>
+          <span className="rs-foot-note">Курорт подставим в поиск — останется выбрать даты.</span>
+          <button type="button" className="btn btn-secondary rs-close-b" onClick={onClose}>
+            Закрыть
+          </button>
         </div>
       </div>
     </div>

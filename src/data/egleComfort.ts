@@ -1,3 +1,4 @@
+import { EGLE_PIC } from './roomPhotos';
 import { amenity } from './iconPaths';
 /** Sanatorium page: Эгле Комфорт (Друскининкай) — photos, rooms, programmes, specialisations. [ПРИМЕР ДАННЫХ — из BookingRobot API] */
 
@@ -175,18 +176,29 @@ export const EGLE_ABOUT = [
   },
 ];
 
+/** Eglė's own photos (sanatorija.lt) first, then Druskininkai around */
 export const EGLE_PHOTOS = [
-  { src: '/img/1efd1efc34d4137ff98a8658a068afc5.jpg', alt: 'Парк и корпус санатория' },
-  { src: '/img/99a77311bc746e38e051bd1146cc0517.jpg', alt: 'Бассейн' },
-  { src: '/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg', alt: 'Двухместный номер' },
-  { src: '/img/b7bf541f72a32e5e2b9be1fa1ffd7676.jpg', alt: 'Номер с видом в сад' },
+  EGLE_PIC.aerial,
+  EGLE_PIC.poolFall,
+  EGLE_PIC.robe,
+  EGLE_PIC.bathCure,
+  EGLE_PIC.park,
+  EGLE_PIC.pump,
   { src: '/img/d4cc2009f5e9b68736ab9f9a044668e5.jpg', alt: 'Озеро в сосновом лесу' },
   { src: '/img/ec03ab120412f998fd082eb7bc49afb6.jpg', alt: 'Тропа в лесу' },
-  { src: '/img/8b637dda5588aaa2a835e012e1b36612.jpg', alt: 'Сосновый бор' },
 ];
 
 export const EGLE_ALL_PHOTOS = EGLE_PHOTOS.concat([
-  { src: '/img/26b9aff2d91280c2b14c33946e17c65c.jpg', alt: 'Двухместный номер' },
+  EGLE_PIC.poolCure,
+  EGLE_PIC.aquagym,
+  EGLE_PIC.doctor,
+  EGLE_PIC.buffet,
+  EGLE_PIC.gallery,
+  EGLE_PIC.library,
+  EGLE_PIC.twin,
+  EGLE_PIC.double,
+  EGLE_PIC.suiteLiving,
+  { src: '/img/1efd1efc34d4137ff98a8658a068afc5.jpg', alt: 'Корпус в парке' },
   { src: '/img/4af10be0f78f80567a55b4bd959f92cf.jpg', alt: 'Сосны у санатория' },
   { src: '/img/94582b10c29a7431c8ced47b9345bb6d.jpg', alt: 'Лес у санатория' },
 ]);

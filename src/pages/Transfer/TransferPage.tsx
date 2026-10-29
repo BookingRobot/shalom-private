@@ -14,6 +14,7 @@ import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { FlightChoice } from '../../components/FlightChoice';
 import { freeTransferPlaces, sanatoriumTransferName, transferBySanatorium } from '../../data/transferPolicy';
 import { legOf, transferLegs } from '../../lib/transferCost';
+import { FLIGHT_BACK, FLIGHT_THERE, flightLine } from '../../data/flights';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './TransferPage.css';
 
@@ -95,7 +96,15 @@ class TransferLogic extends PageLogic {
     const seat = legOf(booking, city, { ...tNow, mode: 'group' });
     const seatPP = Math.round(seat.price / TRANSFER_GUESTS);
     const carLeg = (vid: string) => legOf(booking, city, { ...tNow, mode: 'individual', vehicle: vid });
+    // our flight is in the order: its number and time are known — the fields are filled by us
+    const ourFlight = !!booking.flightPackage;
+    const flVal = (typed: string | undefined, line: string) => typed ?? (ourFlight ? line : '');
     return {
+      ourFlight,
+      flightIn: flVal(this.state.flIn, flightLine(FLIGHT_THERE, toD(booking.checkin), true)),
+      flightBack: flVal(this.state.flBack, flightLine(FLIGHT_BACK, toD(booking.checkout), false)),
+      setFlightIn: (e: { target: { value: string } }) => this.setState({ flIn: e.target.value }),
+      setFlightBack: (e: { target: { value: string } }) => this.setState({ flBack: e.target.value }),
       need,
       noNeed: !need,
       yesCls: need ? 'on' : '',
@@ -725,10 +734,15 @@ export default function TransferPage() {
                                   </div>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label className="lbl" htmlFor="flight" style={{ fontSize: '15px' }}>
-                                      Уже есть билеты? Рейс и время прибытия
+                                      {v.ourFlight
+                                        ? 'Ваш рейс и время прибытия'
+                                        : 'Уже есть билеты? Рейс и время прибытия'}
                                       <span style={{ fontWeight: '400', color: '#5E6862' }}>
                                         {' '}
-                                        · необязательно, можно сообщить позже
+                                        ·{' '}
+                                        {v.ourFlight
+                                          ? 'заполнили по вашему перелёту'
+                                          : 'необязательно, можно сообщить позже'}
                                       </span>
                                     </label>
                                     <input
@@ -736,6 +750,8 @@ export default function TransferPage() {
                                       className="input"
                                       type="text"
                                       placeholder="Например: LO 771, 14:35"
+                                      value={v.flightIn}
+                                      onChange={v.setFlightIn}
                                       style={{ minHeight: '44px', fontSize: '16px' }}
                                     />
                                   </div>
@@ -1193,10 +1209,15 @@ export default function TransferPage() {
                                       </div>
                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="lbl" htmlFor="backflight" style={{ fontSize: '15px' }}>
-                                          Уже есть билеты? Рейс и время отправления
+                                          {v.ourFlight
+                                            ? 'Ваш рейс и время отправления'
+                                            : 'Уже есть билеты? Рейс и время отправления'}
                                           <span style={{ fontWeight: '400', color: '#5E6862' }}>
                                             {' '}
-                                            · необязательно, можно сообщить позже
+                                            ·{' '}
+                                            {v.ourFlight
+                                              ? 'заполнили по вашему перелёту'
+                                              : 'необязательно, можно сообщить позже'}
                                           </span>
                                         </label>
                                         <input
@@ -1204,6 +1225,8 @@ export default function TransferPage() {
                                           className="input"
                                           type="text"
                                           placeholder="Например: LO 772, 16:10"
+                                          value={v.flightBack}
+                                          onChange={v.setFlightBack}
                                           style={{ minHeight: '44px', fontSize: '16px' }}
                                         />
                                       </div>
@@ -1217,10 +1240,15 @@ export default function TransferPage() {
                                     style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '420px' }}
                                   >
                                     <label className="lbl" htmlFor="backflight2" style={{ fontSize: '15px' }}>
-                                      Уже есть билеты? Рейс и время отправления
+                                      {v.ourFlight
+                                        ? 'Ваш рейс и время отправления'
+                                        : 'Уже есть билеты? Рейс и время отправления'}
                                       <span style={{ fontWeight: '400', color: '#5E6862' }}>
                                         {' '}
-                                        · необязательно, можно сообщить позже
+                                        ·{' '}
+                                        {v.ourFlight
+                                          ? 'заполнили по вашему перелёту'
+                                          : 'необязательно, можно сообщить позже'}
                                       </span>
                                     </label>
                                     <input
@@ -1228,6 +1256,8 @@ export default function TransferPage() {
                                       className="input"
                                       type="text"
                                       placeholder="Например: LO 772, 16:10"
+                                      value={v.flightBack}
+                                      onChange={v.setFlightBack}
                                       style={{ minHeight: '44px', fontSize: '16px' }}
                                     />
                                     <span style={{ fontSize: '15px', color: '#5E6862' }}>

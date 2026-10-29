@@ -569,7 +569,7 @@ async function buildInteractive(b, sizes) {
           (i) => {
             const d = window.__dc;
             const o = document.querySelector('.rs-overlay');
-            d.on(o.querySelector('.rs-close'), 'click', 'closeRes');
+            o.querySelectorAll('.rs-close, .rs-close-b').forEach((x) => d.on(x, 'click', 'closeRes'));
             o.querySelectorAll('.rs-tabs button').forEach((t, j) => {
               d.on(t, 'click', 'openRes' + j);
               t.removeAttribute('aria-selected');
@@ -931,6 +931,63 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
       return over.outerHTML;
     },
   );
+  // a room photo opens the room's mini gallery: its markup once, and every room's photos
+  const rooms = await grab(b, route, null, async () => {
+    const out = [];
+    const btns = Array.from(document.querySelectorAll('.rc-photo'));
+    for (const bt of btns) {
+      bt.click();
+      await new Promise((r) => setTimeout(r, 150));
+      const g = document.querySelector('.rg');
+      const thumbs = Array.from(g.querySelectorAll('.rg-thumb img'));
+      const main = g.querySelector('.rg-img');
+      out.push({
+        title: g.querySelector('.rg-title strong').textContent,
+        photos: thumbs.length
+          ? thumbs.map((t, k) => ({
+              src: t.getAttribute('src'),
+              alt: g
+                .querySelectorAll('.rg-thumb')
+                [k].getAttribute('aria-label')
+                .replace(/^Фото \d+: /, ''),
+            }))
+          : [{ src: main.getAttribute('src'), alt: main.getAttribute('alt') }],
+      });
+      g.querySelector('.rg-close').click();
+      await new Promise((r) => setTimeout(r, 80));
+    }
+    return out;
+  });
+  const rgHtml = rooms.length
+    ? await grab(
+        b,
+        route,
+        (p) => p.click('.rc-photo >> nth=0'),
+        () => {
+          const d = window.__dc;
+          const o = document.querySelector('.rg-overlay');
+          d.text(o.querySelector('.rg-title strong'), 'rgTitle');
+          d.text(o.querySelector('.rg-title span'), 'rgLine');
+          const img = o.querySelector('.rg-img');
+          d.attr(img, 'src', 'rgSrc');
+          d.attr(img, 'alt', 'rgAlt');
+          d.on(o.querySelector('.rg-close'), 'click', 'rgClose');
+          d.on(o.querySelector('.rg-prev'), 'click', 'rgPrev');
+          d.on(o.querySelector('.rg-next'), 'click', 'rgNext');
+          const th = o.querySelector('.rg-thumbs');
+          if (th) {
+            th.innerHTML = '';
+            th.appendChild(d.raw('rgthumbs'));
+          }
+          return o.outerHTML;
+        },
+      )
+    : '';
+  const blob = (u) => String(u || '').replace(/^\/img\/([0-9a-f]{32})\.[a-z]+$/, '/_blob/$1');
+  const roomPics = rooms.map((r) => ({
+    title: r.title,
+    photos: r.photos.map((x) => ({ src: blob(x.src), alt: x.alt })),
+  }));
   // guests chip in the "Ваши даты" bar opens the same +/− pop-over as the search
   const gpop = await grab(
     b,
@@ -976,6 +1033,7 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     const gal = document.querySelector('button[aria-label="Все фото"]').parentElement;
     gal.querySelectorAll(':scope > button').forEach((x) => d.on(x, 'click', 'lbOpen'));
     document.querySelectorAll('.ht-reviews-link').forEach((x) => d.on(x, 'click', 'tab_reviews'));
+    document.querySelectorAll('.rc-photo').forEach((x, i) => d.on(x, 'click', 'rgOpen' + i));
     const g = document.querySelector('#guests');
     if (g) {
       d.on(g, 'click', 'openGuests');
@@ -1003,6 +1061,7 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     rooms.before(d.raw('rooms-start'));
     rooms.after(d.raw('rooms-end'));
     document.querySelector('#root .page').appendChild(d.raw('lightbox'));
+    document.querySelector('#root .page').appendChild(d.raw('roomgal'));
     document.querySelector('#root .page').appendChild(d.raw('calmodal'));
     return document.getElementById('root').innerHTML;
   });
@@ -1011,6 +1070,14 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
     gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
     calmodal: wrapIf('calOpen', cal),
+    roomgal: rgHtml
+      ? '<sc-if value="{{rgOn}}" hint-placeholder-val="{{false}}">' +
+        IA.finish(post(rgHtml), {
+          rgthumbs:
+            '<sc-for list="{{rgThumbs}}" as="t" hint-placeholder-count="4"><button type="button" class="{{t.cls}}" onClick="{{t.pick}}"><img src="{{t.src}}" alt=""></button></sc-for>',
+        }) +
+        '</sc-if>'
+      : '',
     'rooms-start': '<sc-if value="{{tabOn_rooms}}" hint-placeholder-val="{{true}}">',
     'rooms-end': '</sc-if>' + TABS.map((k) => ifs(k, IA.finish(post(tabHtml[k]), {}))).join(''),
   });
@@ -1021,7 +1088,7 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
 class Component extends CalBase {
   constructor(props) {
     super(props);
-    Object.assign(this.state, { lb: false, tab: 'rooms' });
+    Object.assign(this.state, { lb: false, tab: 'rooms', rg: -1, rgI: 0 });
   }
   renderVals() {
     const v = super.renderVals();
@@ -1032,6 +1099,16 @@ class Component extends CalBase {
     const same = a.getUTCMonth() === b.getUTCMonth();
     Object.assign(v, {
       lbOn: st.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }),
+    });
+    // a room's mini gallery (the room photos come from the site)
+    const ROOMS = ${JSON.stringify(roomPics)};
+    const r = ROOMS[st.rg], pics = r ? r.photos : [], k = pics.length ? ((st.rgI % pics.length) + pics.length) % pics.length : 0;
+    ROOMS.forEach((_, i) => (v['rgOpen' + i] = () => this.setState({ rg: i, rgI: 0 })));
+    Object.assign(v, {
+      rgOn: !!r, rgTitle: r ? r.title : '', rgSrc: pics[k] ? pics[k].src : '', rgAlt: pics[k] ? pics[k].alt : '',
+      rgLine: r ? (k + 1) + ' из ' + pics.length + ' · ' + (pics[k] ? pics[k].alt : '') : '',
+      rgThumbs: pics.map((p, j) => ({ src: p.src, cls: 'rg-thumb' + (j === k ? ' on' : ''), pick: () => this.setState({ rgI: j }) })),
+      rgPrev: () => this.setState({ rgI: k - 1 }), rgNext: () => this.setState({ rgI: k + 1 }), rgClose: () => this.setState({ rg: -1 }),
       gLabel: ad + ' ' + (ad === 1 ? 'взрослый' : 'взрослых') + (ch ? ', ' + ch + ' ' + (ch === 1 ? 'ребёнок' : 'ребёнка') : ''),
       hbRange: (same ? a.getUTCDate() + '–' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]
         : a.getUTCDate() + ' ' + MONTHS[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]) + ' ' + b.getUTCFullYear(),

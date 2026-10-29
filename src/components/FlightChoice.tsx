@@ -1,15 +1,14 @@
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
 import { TODAY } from '../data/demo';
-import { isFlightDay } from '../data/flights';
+import { FLIGHT_BACK, FLIGHT_THERE, isFlightDay } from '../data/flights';
 import { WEEKDAYS_SHORT, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../lib/dates';
 import { fmt } from '../lib/format';
 import { FLIGHT_PP, PACKAGE_TRANSFER_PP, persons } from '../lib/pricing';
 import { transferBySanatorium } from '../data/transferPolicy';
 
-/** Partner flights Tel Aviv ⇄ Vilnius. [ПРИМЕР ДАННЫХ — ИЗ СИСТЕМЫ БРОНИРОВАНИЯ РЕЙСОВ] */
-const LEG_THERE = { no: 'IZ 2549', from: 'Тель-Авив', to: 'Вильнюс', dep: '13:05', arr: '17:20' };
-const LEG_BACK = { no: 'IZ 2550', from: 'Вильнюс', to: 'Тель-Авив', dep: '18:40', arr: '22:40' };
+const LEG_THERE = FLIGHT_THERE;
+const LEG_BACK = FLIGHT_BACK;
 const PLANE = 'M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z';
 
 const dayLabel = (d: Date) => WEEKDAYS_SHORT[d.getUTCDay()].toLowerCase() + ', ' + shortDate(d);
