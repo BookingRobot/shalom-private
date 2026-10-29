@@ -223,7 +223,7 @@
 .pg-main .hero-left {
   display: flex;
   align-items: center;
-  gap: 18px 84px;
+  gap: 18px 52px;
   flex-wrap: wrap;
 }
 .pg-main .hero-left > a span,
@@ -409,7 +409,10 @@ body .pg-main .card.resort:hover {
 
 @media (max-width: 1240px) {
   .pg-main .hero-left {
-    gap: 14px 44px;
+    gap: 14px 28px;
+  }
+  .pg-main .hero-left > a span {
+    font-size: 23px !important;
   }
 }
 @media (max-width: 1080px) {
@@ -440,11 +443,8 @@ body .pg-main .card.resort:hover {
     font-size: 22px !important;
   }
   .pg-main .hero .site-header nav {
-    gap: 4px 18px !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
+    gap: 6px 18px !important;
     max-width: 100%;
-    scrollbar-width: none;
   }
   .pg-main .hero .site-header .navlink {
     font-size: 16px;

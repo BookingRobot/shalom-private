@@ -80,15 +80,16 @@ export function Brand({
   );
 }
 
-export type NavKey = 'resorts' | 'pay' | 'rules' | 'contacts';
+export type NavKey = 'resorts' | 'flights' | 'pay' | 'rules' | 'contacts';
 const NAV: { key: NavKey; label: string; to: string }[] = [
   { key: 'resorts', label: 'Курорты', to: '/results' },
+  { key: 'flights', label: 'Прямые перелёты', to: '/tickets' },
   { key: 'pay', label: 'Как оплатить', to: '/rules#pay' },
   { key: 'rules', label: 'Условия', to: '/rules' },
   { key: 'contacts', label: 'Контакты', to: '/rules#contact' },
 ];
 
-/** Main navigation: resorts, payment, terms, contacts. */
+/** Main navigation: resorts, direct flights, payment, terms, contacts. */
 export function MainNav({
   gap = 36,
   size = 17,

@@ -252,9 +252,9 @@ export default function MainPage() {
           <HeaderBar tone="dark" minHeight={80} maxWidth={1340}>
             <div className="hero-left">
               <Brand tone="dark" logo={36} size={26} gap={14} round={5} />
-              <MainNav tone="dark" gap={34} size={17} />
+              <MainNav tone="dark" gap={26} size={17} />
             </div>
-            <HeaderAside gap={36} wrap={false}>
+            <HeaderAside gap={24} wrap={false}>
               <PhoneLink tone="dark" size={19} icon={22} gap={10} />
               <div className="lang">
                 <select aria-label="Язык">
