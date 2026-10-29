@@ -569,7 +569,7 @@ async function buildInteractive(b, sizes) {
           (i) => {
             const d = window.__dc;
             const o = document.querySelector('.rs-overlay');
-            d.on(o.querySelector('.rs-close'), 'click', 'closeRes');
+            o.querySelectorAll('.rs-close, .rs-close-b').forEach((x) => d.on(x, 'click', 'closeRes'));
             o.querySelectorAll('.rs-tabs button').forEach((t, j) => {
               d.on(t, 'click', 'openRes' + j);
               t.removeAttribute('aria-selected');
