@@ -191,7 +191,11 @@ const BOARDS = [
     title: 'Результаты · свободные даты номера',
     route: '/results',
     state: true,
-    setup: async (p) => p.click('text=Выбрать другие даты'),
+    setup: async (p) => {
+      await p.click('#h-egle-comfort button[aria-expanded]');
+      await p.waitForTimeout(1500);
+      await p.click('text=Выбрать другие даты');
+    },
     links: [
       ['button', 'Закрыть', 'Results-B.dc.html'],
       ['button', 'Отмена', 'Results-B.dc.html'],
@@ -208,6 +212,8 @@ const BOARDS = [
       await p.click('button[aria-label="Меньше: взрослые"]');
       await p.click('.gp-done');
       await p.click('.ftog-line input');
+      await p.click('#h-egle-comfort button[aria-expanded]');
+      await p.waitForTimeout(1500);
     },
   },
   {
@@ -736,7 +742,13 @@ async function buildInteractive(b, sizes) {
     const base = await grab(
       b,
       route,
-      isMain ? null : (p) => p.click('text=Сбросить всё'),
+      isMain
+        ? null
+        : async (p) => {
+            await p.click('text=Сбросить всё');
+            for (const bt of await p.$$('article[id^="h-"] button[aria-expanded="false"]')) await bt.click();
+            await p.waitForTimeout(1600);
+          },
       (isMain) => {
         const d = window.__dc;
         ['#datein', '#dateout'].forEach((s, i) => {
@@ -834,6 +846,25 @@ async function buildInteractive(b, sizes) {
           d.text(h2, 'foundLabel');
           h2.parentElement.before(d.raw('actrow'));
           document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
+            // «Номера и программы» opens and folds this sanatorium's rooms in Play
+            const box = a.querySelector('.rooms-reveal');
+            const btn = a.querySelector('button[aria-expanded]');
+            if (box) {
+              box.className = 'rooms-reveal';
+              box.before(d.raw('ro-start-' + i));
+              box.after(d.raw('ro-end'));
+            }
+            if (btn) {
+              btn.removeAttribute('aria-expanded');
+              d.on(btn, 'click', 'roT' + i);
+              d.attr(btn, 'class', 'roCls' + i);
+              const t = Array.from(btn.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim());
+              if (t) t.textContent = '\u27E6roLbl' + i + '\u27E7';
+              const svg = btn.querySelector('svg');
+              if (svg) d.attr(svg, 'style', 'roChev' + i);
+              // the next step after the search: the bubble over the first sanatorium's button
+              if (i === 0) btn.before(d.raw('rmtip'));
+            }
             a.before(d.raw('hv-start-' + i));
             a.after(d.raw('hv-end'));
           });
@@ -852,6 +883,11 @@ async function buildInteractive(b, sizes) {
         (_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'),
       );
       raws['hv-end'] = '</sc-if>';
+      filterCfg.order.forEach(
+        (_, i) => (raws['ro-start-' + i] = '<sc-if value="{{ro' + i + '}}" hint-placeholder-val="{{false}}">'),
+      );
+      raws['ro-end'] = '</sc-if>';
+      raws.rmtip = IA.RMTIP;
     }
     const body = IA.finish(post(base), raws);
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);

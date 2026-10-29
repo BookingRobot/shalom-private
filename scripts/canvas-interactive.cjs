@@ -116,6 +116,10 @@ const GUIDE = {
   'gr-end': '</sc-if>',
 };
 
+/** results: the next step after the search, over «Номера и программы» of the first sanatorium */
+const RMTIP =
+  '<sc-if value="{{rmTipOn}}" hint-placeholder-val="{{true}}"><div class="rm-tip" role="status"><span>Следующий шаг: <strong>посмотрите номера</strong></span><button type="button" class="rm-tip-x" aria-label="Скрыть подсказку" onClick="{{rmTipClose}}">✕</button></div></sc-if>';
+
 const ROOMLINE = `<sc-if value="{{roomOn}}" hint-placeholder-val="{{false}}"><strong style="font-size:16px;color:#1C2620">{{roomLine}}</strong></sc-if>`;
 
 /** marker → template, then data-dc-* → handlers, ⟦x⟧ → {{x}} */
@@ -234,8 +238,20 @@ class Component extends DCLogic {
     const cmp = st.cmp, cmpN = cmp.filter(Boolean).length;
     const cmpT = (i) => () => { const c = cmp.slice(); c[i] = !c[i]; this.setState({ cmp: c }); };
     const __f = this.__filters ? this.__filters(st) : {};
+    // results: every sanatorium starts folded; «Номера и программы» opens its rooms; until the
+    // guest opens some, a bubble over the first one says it is the next step
+    const ro = st.ro || {}, roAny = Object.keys(ro).some((k) => ro[k]), rmTip = !roAny && !st.rmTipX;
+    const __ro = { rmTipOn: rmTip, rmTipClose: () => this.setState({ rmTipX: true }) };
+    for (let i = 0; i < 16; i++) {
+      __ro['ro' + i] = !!ro[i];
+      __ro['roT' + i] = () => this.setState({ ro: { ...ro, [i]: !ro[i] }, rmTipX: true });
+      __ro['roLbl' + i] = ro[i] ? 'Скрыть варианты' : 'Номера и программы';
+      __ro['roCls' + i] = 'btn ' + (ro[i] ? 'btn-secondary' : 'btn-primary') + (i === 0 && rmTip ? ' rm-nudged' : '');
+      __ro['roChev' + i] = ro[i] ? 'transform:rotate(180deg)' : 'transform:none';
+    }
     return {
       ...__f,
+      ...__ro,
       // resort pop-ups (home page): story, tabs to other resorts, "Хочу в …" fills the search field
       ...Object.fromEntries(
         ['Друскининкай', 'Бирштонас', 'Паланга', 'Аникщяй'].flatMap((name, i) => [
@@ -453,6 +469,7 @@ module.exports = {
   GLABEL,
   GOTIP,
   GUIDE,
+  RMTIP,
   ROOMLINE,
   LOGIC,
   filtersLogic,

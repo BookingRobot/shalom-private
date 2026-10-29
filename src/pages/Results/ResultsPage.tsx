@@ -42,7 +42,9 @@ class ResultsLogic extends PageLogic {
       checkin: b.checkin,
       nights: daysBetween(toD(b.checkin), toD(b.checkout)),
       sort: 'pop',
-      open: { 'egle-comfort': true },
+      // all sanatoriums start folded: a bubble at the first one says to open the rooms
+      open: {},
+      closing: {},
       det: {},
       sec: {},
       f: { daily: true, doctor: true },
@@ -304,7 +306,20 @@ class ResultsLogic extends PageLogic {
     };
     const cmp: string[] = st.cmp || [];
     const cmpLimit = this.cmpLimit || 3;
-    const hotels = list.map((h0) => {
+    const closing = st.closing || {};
+    const anyOpen = Object.keys(open).some((k) => open[k]);
+    const still = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    // folding the rooms away takes a moment (CSS .rooms-reveal.closing), then they leave the page
+    const fold = (id: string) => {
+      if (still) return this.setState({ open: { ...open, [id]: false } });
+      this.setState({ closing: { ...closing, [id]: true } });
+      window.setTimeout(() => {
+        const s2 = this.state;
+        if ((s2.closing || {})[id])
+          this.setState({ open: { ...s2.open, [id]: false }, closing: { ...s2.closing, [id]: false } });
+      }, 820);
+    };
+    const hotels = list.map((h0, idx) => {
       const sf = stayFactor(h0, checkin);
       const h = {
         ...h0,
@@ -318,8 +333,11 @@ class ResultsLogic extends PageLogic {
           rest: fmt(Math.round(toNum(o.price) * sf) - Math.ceil(Math.round(toNum(o.price) * sf) * ADV_RATE)),
         })),
       };
-      const isOpen = !!open[h.id];
+      const shown = !!open[h.id];
+      const isOpen = shown && !closing[h.id];
       const aw = awardsOf[h.id] || [];
+      // the next step after the search: open the rooms of the first (promoted) sanatorium
+      const tipOn = idx === 0 && !anyOpen && !st.rmTipX;
       return {
         ...h,
         openCal: () =>
@@ -354,7 +372,9 @@ class ResultsLogic extends PageLogic {
                         ? ICON_PATHS.bed2
                         : 'm5 12 5 5L20 7',
         })),
-        open: isOpen,
+        open: shown,
+        closing: shown && !isOpen,
+        tipOn,
         border: isOpen ? '#1F5F4A' : '#E3DED2',
         btnLabel: isOpen ? 'Скрыть варианты' : 'Номера и программы',
         chips: [
@@ -373,8 +393,12 @@ class ResultsLogic extends PageLogic {
               : null,
         ].filter(Boolean),
         chev: isOpen ? 'rotate(180deg)' : 'none',
-        btnCls: isOpen ? 'btn-secondary' : 'btn-primary',
-        toggle: () => this.setState({ open: { ...open, [h.id]: !isOpen } }),
+        btnCls: (isOpen ? 'btn-secondary' : 'btn-primary') + (tipOn ? ' rm-nudged' : ''),
+        toggle: () =>
+          isOpen
+            ? fold(h.id)
+            : // the guest found the rooms: the bubble does not come back
+              this.setState({ open: { ...open, [h.id]: true }, closing: { ...closing, [h.id]: false }, rmTipX: true }),
         cmpOn: cmp.includes(h.id),
         cmpOff: !cmp.includes(h.id) && cmp.length >= cmpLimit,
         cmpToggle: () =>
@@ -860,6 +884,7 @@ class ResultsLogic extends PageLogic {
         notify: () => this.props.help.open(),
       })),
       soldCount: '2 санатория',
+      rmTipClose: () => this.setState({ rmTipX: true }),
       wzOpen: !!st.wz,
       wzOpenFn: () => this.setState({ wz: true }),
       wzClose: () => this.setState({ wz: false }),
@@ -1728,6 +1753,7 @@ export default function ResultsPage() {
                       ) : null}
                     </div>
                     <div
+                      className="hc-buy"
                       style={{
                         flex: '0 0 220px',
                         padding: '16px 18px',
@@ -1740,11 +1766,26 @@ export default function ResultsPage() {
                       }}
                     >
                       <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} hotelId={h.id} />
+                      {h.tipOn ? (
+                        <div className="rm-tip" role="status">
+                          <span>
+                            Следующий шаг: <strong>посмотрите номера</strong>
+                          </span>
+                          <button
+                            type="button"
+                            className="rm-tip-x"
+                            aria-label="Скрыть подсказку"
+                            onClick={v.rmTipClose}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : null}
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}
                         onClick={() => {
-                          if (!h.open) revealRooms(h.id);
+                          if (!h.open || h.closing) revealRooms(h.id);
                           h.toggle();
                         }}
                         aria-expanded={h.open}
@@ -1800,7 +1841,7 @@ export default function ResultsPage() {
                     </div>
                   </div>
                   {h.open ? (
-                    <div className="rooms-reveal">
+                    <div className={'rooms-reveal' + (h.closing ? ' closing' : '')}>
                       <div className="rooms-reveal-in">
                         <div
                           className="rooms-indent"
