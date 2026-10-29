@@ -10,17 +10,11 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: #fff;
 }
 .ft-agency-logo img {
   display: block;
-  width: 148px;
+  width: 160px;
   height: auto;
-}
-.ft-agency.light .ft-agency-logo {
-  padding: 0;
 }
 .ft-agency-t {
   display: flex;

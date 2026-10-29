@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { RESORT_STORIES, type FunKind, type ResortIcon } from '../data/resorts';
+import { RESORT_STORIES, type FunKind, type ResortIcon, type Sight, type SightPhoto } from '../data/resorts';
 
 const Ico = ({ d, size }: { d: string; size: number }) => (
   <svg
@@ -38,6 +38,50 @@ const FUN: Record<FunKind, { t: string; d: string }> = {
   },
 };
 const RAIN = 'M3 12a9 9 0 0 1 18 0zM12 12v6.5a2 2 0 0 0 4 0';
+const PIN =
+  'M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21zM12 12.3a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z';
+
+const commons = (file: string) =>
+  'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(file.replace(/ /g, '_'));
+
+/** a photo with its credit: who made it and the licence, linked to the file on Wikimedia Commons */
+function SightPic({ p }: { p: SightPhoto }) {
+  return (
+    <figure className={'rs-pic' + (p.wide ? ' wide' : '')}>
+      <img src={p.src} alt={p.alt} loading="lazy" style={p.pos ? { objectPosition: p.pos } : undefined} />
+      <figcaption>
+        <a href={commons(p.file)} target="_blank" rel="noopener noreferrer">
+          {p.cap ? p.cap : 'Фото: ' + p.by} · {p.lic} · Wikimedia Commons
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
+
+/** a place worth seeing: the photo on the left (on top on a phone), what it is, when and who, how to get there */
+function SightRow({ s }: { s: Sight }) {
+  const wide = s.photos.length > 1 || s.photos.some((p) => p.wide);
+  return (
+    <li className={'rs-sight' + (wide ? ' rs-sight-wide' : '')}>
+      <div className={'rs-pics' + (s.photos.length > 1 ? ' two' : '')}>
+        {s.photos.map((p) => (
+          <SightPic key={p.src} p={p} />
+        ))}
+      </div>
+      <div className="rs-sight-t">
+        <strong>{s.t}</strong>
+        {s.meta ? <span className="rs-sight-meta">{s.meta}</span> : null}
+        <p>{s.d}</p>
+        {s.go ? (
+          <span className="rs-sight-go">
+            <Ico d={PIN} size={18} />
+            {s.go}
+          </span>
+        ) : null}
+      </div>
+    </li>
+  );
+}
 
 const ICON: Record<ResortIcon, string> = {
   water: 'M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11zM9.5 15a2.5 2.5 0 0 0 2.5 2.5',
@@ -150,7 +194,18 @@ export function ResortModal({
                   </li>
                 ))}
               </ol>
-              <h3>Чем заняться вне санатория</h3>
+              {r.sights.length ? (
+                <>
+                  <h3>Что стоит увидеть</h3>
+                  <p className="rs-sub">Музеи, храмы, парки и окрестности — всё в спокойном темпе.</p>
+                  <ul className="rs-sights">
+                    {r.sights.map((s) => (
+                      <SightRow key={s.t} s={s} />
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+              <h3>{r.sights.length ? 'Ещё чем заняться' : 'Чем заняться вне санатория'}</h3>
               <div className="rs-fun">
                 {r.fun.map((g) => (
                   <section key={g.kind} className="rs-fun-g" aria-label={FUN[g.kind].t}>

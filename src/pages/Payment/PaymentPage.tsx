@@ -542,6 +542,23 @@ export default function PaymentPage() {
                   </span>
                 </div>
               </div>
+              {/* the newsletter: optional, not ticked for the guest */}
+              <label
+                id="payNews"
+                className="chk"
+                style={{
+                  padding: '14px 16px',
+                  border: '2px solid #CFC9BB',
+                  borderRadius: 'var(--r)',
+                  marginTop: '4px',
+                }}
+              >
+                <input type="checkbox" />
+                <span>
+                  Подписаться на новости о санаториях Литвы — новые программы, скидки и даты с прямым рейсом. Не чаще
+                  раза в месяц, отписаться можно в любой момент.
+                </span>
+              </label>
               <label
                 id="payAgree"
                 className="chk"

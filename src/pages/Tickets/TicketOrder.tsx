@@ -104,6 +104,7 @@ export function TicketOrder({
   const [v, setV] = useState<Saved>(() => load(n));
   const [bad, setBad] = useState<Record<string, string>>({});
   const [agree, setAgree] = useState(false);
+  const [news, setNews] = useState(false);
   const [agreeBad, setAgreeBad] = useState(false);
   const [paying, setPaying] = useState(false);
   const top = useRef<HTMLDivElement>(null);
@@ -351,6 +352,14 @@ export function TicketOrder({
                 Данные карты вводятся в защищённой форме платёжной системы — мы их не видим и не храним. [ПРИМЕР]
               </span>
             </div>
+            {/* the newsletter: optional, not ticked for the guest */}
+            <label className="tk-agree tk-news">
+              <input type="checkbox" checked={news} onChange={(e) => setNews(e.target.checked)} />
+              <span>
+                Подписаться на новости о санаториях Литвы — новые программы, скидки и даты с прямым рейсом. Не чаще раза
+                в месяц, отписаться можно в любой момент.
+              </span>
+            </label>
             <label className={'tk-agree' + (agreeBad && !agree ? ' bad' : '')}>
               <input
                 type="checkbox"
