@@ -1,7 +1,9 @@
+import { ICON_PATHS } from './iconPaths';
+
 /** Popular sanatoriums on the home page. [ПРИМЕР ДАННЫХ — из BookingRobot API] */
 
-export const DOCTOR_ICON =
-  'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2M12 15v4M10 17h4';
+/** the doctor sign (drawn by IconPath) */
+export const DOCTOR_ICON = ICON_PATHS.doctor;
 
 export const POOL_ICON =
   'M3 16c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0M7 14V6a2 2 0 0 1 4 0M13 14V6a2 2 0 0 1 4 0M7 10h6';

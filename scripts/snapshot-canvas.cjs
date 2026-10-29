@@ -105,9 +105,9 @@ const BOARDS = [
     title: 'Шаг 2 · Дорога: перелёт и трансфер — ничего не выбрано за гостя (Эгле: трансфер санатория уже оплачен)',
     route: '/transfer',
     links: [
-      ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#flyChoice .choice', 'Да, добавить', 'Transfer-fly.dc.html'],
       ['#trNeed .choice', 'Да, нужен', 'Transfer-yes.dc.html'],
-      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
     ],
   },
   { file: 'Guests.dc.html', title: 'Шаг 3 · Данные гостей', route: '/guests' },
@@ -299,13 +299,13 @@ const BOARDS = [
     route: '/transfer',
     state: true,
     setup: async (p) => {
-      await p.click('text=Билеты у меня уже есть');
+      await p.click('#flyChoice .choice >> nth=1');
       await p.click('#trNeed .choice >> nth=0');
       await p.click('#trHow .tr-how-opt >> nth=0');
       await p.click('#trFrom .rowpick >> nth=0');
       await p.waitForTimeout(300);
     },
-    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+    links: [['.fly-help', '', 'Help.dc.html']],
   },
   {
     file: 'Transfer-other.dc.html',
@@ -320,17 +320,36 @@ const BOARDS = [
       });
       await p.reload({ waitUntil: 'networkidle' });
     },
-    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+    links: [['.fly-help', '', 'Help.dc.html']],
   },
   {
     file: 'Transfer-package.dc.html',
     title: 'Шаг 2 · Дорога — перелёт добавлен (Эгле, даты с рейсом)',
     route: '/transfer',
     state: true,
-    setup: async (p) => p.click('.fly-alt-row >> nth=0'),
+    setup: async (p) => {
+      await p.click('#flyChoice .choice >> nth=0');
+      await p.click('.fly-alt-row >> nth=0');
+      await p.waitForTimeout(1300);
+    },
     links: [
-      ['[role=radiogroup] .ios-row', 'Билеты у меня уже есть', 'Transfer.dc.html'],
-      ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
+      ['#flyChoice .choice', 'Нет', 'Transfer.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
+    ],
+  },
+  {
+    file: 'Transfer-fly.dc.html',
+    title: 'Шаг 2 · «Да, добавить наш перелёт»: в ваши даты рейса нет — ближайшие даты с рейсом',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.click('#flyChoice .choice >> nth=0');
+      await p.waitForTimeout(1300);
+    },
+    links: [
+      ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#flyChoice .choice', 'Нет', 'Transfer.dc.html'],
+      ['.fly-help', '', 'Help.dc.html'],
     ],
   },
 ];
@@ -357,8 +376,13 @@ const post = (html) =>
   html
     // «Ваши пожелания» opens the form board in Play
     .replace(
-      /<button type="button" class="fb-btn"([^>]*)>([\s\S]*?)<\/button>/,
-      '<a class="fb-btn" href="Feedback.dc.html"$1 style="text-decoration:none">$2</a>',
+      /<button type="button" class="(fb-btn[^"]*)"([^>]*)>([\s\S]*?)<\/button>/,
+      '<a class="$1" href="Feedback.dc.html"$2 style="text-decoration:none">$3</a>',
+    )
+    // «Свяжитесь со мной» in the help band opens the form board
+    .replace(
+      /<button type="button" class="([^"]*\bhs-btn\b[^"]*)"([^>]*)>([\s\S]*?)<\/button>/g,
+      '<a class="$1" href="Help.dc.html"$2 style="text-decoration:none">$3</a>',
     )
     .replace(/(src|href)="\/img\/([0-9a-f]{32})\.[a-z]+"/g, '$1="/_blob/$2"')
     .replace(/url\(&quot;\/img\/([0-9a-f]{32})\.[a-z]+&quot;\)/g, 'url(&quot;/_blob/$1&quot;)')
@@ -937,8 +961,7 @@ async function buildInteractive(b, sizes) {
             a.before(d.raw('hv-start-' + i));
             a.after(d.raw('hv-end'));
           });
-          const ask = Array.from(document.querySelectorAll('section')).find((x) => /Задать вопрос/.test(x.textContent));
-          ask.after(d.raw('cmp'));
+          document.querySelector('.help-strip-band').before(d.raw('cmp'));
           page.appendChild(d.raw('wizard'));
           page.appendChild(d.raw('price'));
         }

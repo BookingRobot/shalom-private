@@ -443,3 +443,149 @@
   display: block;
   margin: 0 0 10px;
 }
+
+/* ── Flight question: «Да, добавить наш перелёт» / «Нет, билеты есть»; «Да» opens slowly ── */
+.pg-transfer .fly-yes-t {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.pg-transfer .fly-yes-warn {
+  font-size: 15px;
+  color: #8a5a00;
+}
+.pg-transfer .fly-pp {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #e6f2ea;
+  color: #1f5f4a;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.pg-transfer .fly-help {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -4px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font:
+    600 15px Manrope,
+    sans-serif;
+  color: #5e6862;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.pg-transfer .fly-help:hover {
+  color: #1f5f4a;
+}
+.pg-transfer .fly-help.on {
+  color: #1f5f4a;
+  text-decoration: none;
+  text-align: left;
+}
+.pg-transfer .fly-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 2px;
+}
+.pg-transfer .fly-sum {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #e6f2ea;
+  border: 1px solid #c8ded3;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-transfer .fly-sum strong {
+  font-size: 20px;
+  color: #1c2620;
+}
+.pg-transfer .fly-sum strong span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3e4b44;
+}
+/* the same slow drawer as the rooms under a sanatorium on the results page */
+.pg-transfer .fly-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: flyGrow 1.2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.pg-transfer .fly-reveal-in {
+  min-height: 0;
+  animation: flyClip 1.2s linear;
+}
+.pg-transfer .fly-reveal .fly-panel > * {
+  animation: flyItem 0.9s ease-out both;
+}
+.pg-transfer .fly-reveal .fly-panel > :nth-child(2) {
+  animation-delay: 0.14s;
+}
+.pg-transfer .fly-reveal .fly-panel > :nth-child(n + 3) {
+  animation-delay: 0.28s;
+}
+.pg-transfer .fly-reveal.closing {
+  animation: flyShrink 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.pg-transfer .fly-reveal.closing .fly-reveal-in {
+  overflow: hidden;
+  animation: none;
+}
+.pg-transfer .fly-reveal.closing .fly-panel > * {
+  animation: flyItemOut 0.45s ease-in both;
+}
+@keyframes flyGrow {
+  from {
+    grid-template-rows: 0fr;
+  }
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+@keyframes flyShrink {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes flyClip {
+  from,
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes flyItem {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes flyItemOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-transfer .fly-reveal,
+  .pg-transfer .fly-reveal-in,
+  .pg-transfer .fly-reveal .fly-panel > * {
+    animation: none;
+  }
+}

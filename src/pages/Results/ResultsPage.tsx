@@ -9,13 +9,13 @@ import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } 
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
 import { isSoldOutEverywhere, nearestStays } from '../../data/availability';
-import { HeadsetIcon, VanIcon } from '../../components/icons';
+import { HeadsetIcon, IconPath, VanIcon } from '../../components/icons';
 import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { awardsOf } from '../../data/awards';
-import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
+import { CAR_ICON, FILTER_GROUPS } from '../../data/filters';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { RoomCard, tipCheapest } from '../../components/RoomCard';
@@ -396,11 +396,8 @@ class ResultsLogic extends PageLogic {
               }
             : null,
           h.tags.includes('meals3') ? { t: 'Питание 3 раза', d: ICON_PATHS.meals } : null,
-          h.tags.includes('samebld')
-            ? { t: 'Всё в одном здании', d: BUILDING_ICON }
-            : h.tags.includes('transfer')
-              ? { t: 'Трансфер из аэропорта', d: CAR_ICON }
-              : null,
+          // the airport transfer only where it is already in the price (Eglė)
+          h.tags.includes('transfer') ? { t: 'Трансфер из аэропорта включён', d: CAR_ICON } : null,
         ].filter(Boolean),
         chev: isOpen ? 'rotate(180deg)' : 'none',
         btnCls: (isOpen ? 'btn-secondary' : 'btn-primary') + (tipOn ? ' next-pulse' : ''),
@@ -1181,7 +1178,7 @@ export default function ResultsPage() {
                             aria-hidden="true"
                             style={{ flex: 'none', opacity: '.85' }}
                           >
-                            <path d={f.d} />
+                            <IconPath d={f.d} />
                           </svg>
                         )}
                         <span>{f.t}</span>
@@ -1370,7 +1367,7 @@ export default function ResultsPage() {
                                     aria-hidden="true"
                                     style={{ flex: 'none', opacity: '.85' }}
                                   >
-                                    <path d={f.d} />
+                                    <IconPath d={f.d} />
                                   </svg>
                                 )}
                                 {f.t}
@@ -1406,7 +1403,7 @@ export default function ResultsPage() {
                                       aria-hidden="true"
                                       style={{ flex: 'none', opacity: '.85' }}
                                     >
-                                      <path d={f.d} />
+                                      <IconPath d={f.d} />
                                     </svg>
                                   )}
                                   {f.t}
@@ -1441,7 +1438,7 @@ export default function ResultsPage() {
                                       aria-hidden="true"
                                       style={{ flex: 'none', opacity: '.85' }}
                                     >
-                                      <path d={f.d} />
+                                      <IconPath d={f.d} />
                                     </svg>
                                   )}
                                   {f.t}
@@ -1747,7 +1744,7 @@ export default function ResultsPage() {
                                   aria-hidden="true"
                                   style={{ flex: 'none' }}
                                 >
-                                  <path d={c.d} />
+                                  <IconPath d={c.d} />
                                 </svg>
                               )}
                               {c.t}
@@ -1783,7 +1780,7 @@ export default function ResultsPage() {
                                       strokeLinejoin="round"
                                       aria-hidden="true"
                                     >
-                                      <path d={w.d} />
+                                      <IconPath d={w.d} />
                                     </svg>
                                   )}
                                   {w.t}
@@ -2088,7 +2085,7 @@ export default function ResultsPage() {
                                 strokeLinejoin="round"
                                 aria-hidden="true"
                               >
-                                <path d={c.d} />
+                                <IconPath d={c.d} />
                               </svg>
                             )}
                             {c.t}
@@ -2139,82 +2136,10 @@ export default function ResultsPage() {
               </Fragment>
             ))}
           </section>
-          {/* Help band */}
-          <section
-            style={{
-              background: '#EEF5F1',
-              border: '1px solid #C8DED3',
-              borderRadius: 'var(--r)',
-              padding: '18px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '24px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 320px' }}>
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
-              </svg>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>Поможем выбрать</strong>
-                <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                  Подскажем, какой санаторий подойдёт именно вам
-                </span>
-              </div>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                flex: '1 1 260px',
-                paddingLeft: '24px',
-                borderLeft: '1px solid #C8DED3',
-              }}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1F5F4A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                style={{ flex: 'none' }}
-              >
-                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z" />
-              </svg>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <a href="tel:+37060000000" style={{ fontWeight: '800', fontSize: '18px', textDecoration: 'none' }}>
-                  +370&nbsp;600 00000
-                </a>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                  Ежедневно с 9:00 до 20:00 по литовскому времени
-                </span>
-              </div>
-            </div>
-            <Link className="btn btn-secondary" to="/done" style={{ minHeight: '50px', fontSize: '16px' }}>
-              Задать вопрос
-            </Link>
-          </section>
           <ChooseWizard open={!!v.wzOpen} onClose={v.wzClose} onShow={v.wzShow} />
           <Compare hotels={v.cmpHotels || []} ids={v.cmpIds || []} onRemove={v.cmpRemove} onClear={v.cmpClear} />
         </div>
-        <SiteFooter />
+        <SiteFooter help={{ title: 'Поможем выбрать', sub: 'Подскажем, какой санаторий подойдёт именно вам' }} />
       </div>{' '}
       {/* Price calendar pop-up: "Когда дешевле?" */}{' '}
       {v.calOpen ? (

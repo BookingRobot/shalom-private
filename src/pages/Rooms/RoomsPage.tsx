@@ -1,4 +1,5 @@
 import { Fragment, useRef, useState } from 'react';
+import { IconPath } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { ShareOffer } from '../../components/ShareOffer';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
@@ -264,7 +265,7 @@ export default function RoomsPage() {
                             strokeLinejoin="round"
                             aria-hidden="true"
                           >
-                            <path d={f.d} />
+                            <IconPath d={f.d} />
                           </svg>
                           <strong>{f.big}</strong> {f.label}
                           {f.sub ? <span className="pc-sub"> · {f.sub}</span> : null}
@@ -338,7 +339,7 @@ export default function RoomsPage() {
                                 strokeLinejoin="round"
                                 aria-hidden="true"
                               >
-                                <path d={it.d} />
+                                <IconPath d={it.d} />
                               </svg>
                               {it.t}
                             </div>

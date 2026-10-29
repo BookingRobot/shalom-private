@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { IconPath } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { ChooseWizard } from '../../components/ChooseWizard';
@@ -18,6 +19,8 @@ import { api } from '../../api';
 import { RESORTS } from '../../data/search';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
+import { HelpStripBand } from '../../components/layout/HelpStrip';
+import { FooterSlot } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './MainPage.css';
 
@@ -364,7 +367,7 @@ export default function MainPage() {
                         strokeLinejoin="round"
                         aria-hidden="true"
                       >
-                        <path d={h.f1d} />
+                        <IconPath d={h.f1d} />
                       </svg>
                       {h.f1}
                     </div>
@@ -380,7 +383,7 @@ export default function MainPage() {
                         strokeLinejoin="round"
                         aria-hidden="true"
                       >
-                        <path d={h.f2d} />
+                        <IconPath d={h.f2d} />
                       </svg>
                       {h.f2}
                     </div>
@@ -493,7 +496,8 @@ export default function MainPage() {
             </div>
           </div>
         </section>
-        <footer style={{ background: '#1C2620', color: '#D9E2DC', marginTop: 'auto' }}>
+        <HelpStripBand maxWidth={1340} />
+        <footer style={{ background: '#1C2620', color: '#D9E2DC' }}>
           <div
             style={{
               maxWidth: '1340px',
@@ -525,7 +529,7 @@ export default function MainPage() {
               Санатории Литвы
             </div>
             <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap' }}>
-              <Link to="/done" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
+              <Link to="/rules#contact" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
                 Контакты
               </Link>
               <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
@@ -538,6 +542,7 @@ export default function MainPage() {
             <div style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: '#fff' }}>
               +370&nbsp;600 00000<span style={{ fontWeight: '600', color: '#D9E2DC' }}>RU ▾</span>
             </div>
+            <FooterSlot />
           </div>
         </footer>
       </div>{' '}

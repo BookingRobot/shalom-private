@@ -15,7 +15,7 @@ import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { FlightChoice } from '../../components/FlightChoice';
 import { freeTransferPlaces, sanatoriumTransferName, transferBySanatorium } from '../../data/transferPolicy';
 import { legOf, transferLegs } from '../../lib/transferCost';
-import { FLIGHT_BACK, FLIGHT_THERE, flightLine } from '../../data/flights';
+import { FLIGHT_BACK, FLIGHT_THERE, flightLine, isFlightDay } from '../../data/flights';
 import { usePageTitle } from '../../lib/usePageTitle';
 import type { Booking } from '../../data/booking';
 import './TransferPage.css';
@@ -1213,10 +1213,18 @@ export default function TransferPage() {
               }
               missing={() => {
                 const b = logic.props.booking.booking;
+                const flyDays = isFlightDay(toD(b.checkin)) && isFlightDay(toD(b.checkout));
                 const fly: Missing[] =
-                  b.flightPackage || b.flights === 'no' || b.flights === 'help'
+                  b.flights === 'no' || b.flights === 'help' || (b.flightPackage && flyDays)
                     ? []
-                    : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
+                    : b.flights === 'yes' || b.flightPackage
+                      ? [
+                          {
+                            label: 'даты с нашим рейсом',
+                            target: document.getElementById('flyAlt') ? '#flyAlt' : '#flyChoice',
+                          },
+                        ]
+                      : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
                 return [...fly, ...logic.gaps()];
               }}
             />

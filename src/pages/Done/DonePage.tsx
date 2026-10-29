@@ -8,6 +8,8 @@ import { fmt } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
+import { HelpStripBand } from '../../components/layout/HelpStrip';
+import { FooterSlot } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './DonePage.css';
 
@@ -614,7 +616,8 @@ export default function DonePage() {
             </aside>
           </div>
         </div>
-        <footer style={{ background: '#fff', borderTop: '1px solid #E3DED2', marginTop: 'auto' }}>
+        <HelpStripBand />
+        <footer style={{ background: '#fff', borderTop: '1px solid #E3DED2' }}>
           <div
             style={{
               maxWidth: '1180px',
@@ -645,13 +648,14 @@ export default function DonePage() {
               Санатории Литвы
             </div>
             <div style={{ display: 'flex', gap: '24px' }}>
-              <Link to="/done" style={{ textDecoration: 'none', color: '#3E4B44' }}>
+              <Link to="/rules#contact" style={{ textDecoration: 'none', color: '#3E4B44' }}>
                 Контакты
               </Link>
               <Link to="/rules" style={{ textDecoration: 'none', color: '#3E4B44' }}>
                 Оплата и отмена
               </Link>
             </div>
+            <FooterSlot />
           </div>
         </footer>
       </div>{' '}
