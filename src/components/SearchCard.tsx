@@ -6,6 +6,9 @@ import { GuestsPicker } from './GuestsPicker';
 import { PlaceSearch } from './PlaceSearch';
 import './SearchCard.css';
 
+/** after «Найти санаторий» the results page glides down to the list (PageTransition) */
+const TO_LIST = { scrollTo: 'resList' };
+
 type Step = 'place' | 'dates' | 'go';
 
 const calIcon = (
@@ -149,7 +152,7 @@ export function SearchCard({
       onSubmit={(e) => {
         e.preventDefault();
         if (guide && step !== 'go') return find(e);
-        navigate(guide ? goTo : '/results');
+        navigate(guide ? goTo : '/results', { state: guide && goTo !== '/results' ? null : TO_LIST });
       }}
     >
       <div className="search-grid">
@@ -202,6 +205,7 @@ export function SearchCard({
           <Link
             className={'btn btn-primary search-go' + (nudge || tipOn('go') ? ' nudged' : '')}
             to={guide ? goTo : '/results'}
+            state={guide && goTo !== '/results' ? null : TO_LIST}
             onClick={find}
           >
             Найти санаторий

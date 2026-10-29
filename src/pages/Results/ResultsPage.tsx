@@ -1582,6 +1582,7 @@ export default function ResultsPage() {
             </>
           ) : null}
           <div
+            id="resList"
             style={{
               display: 'flex',
               alignItems: 'center',
