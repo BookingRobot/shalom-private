@@ -101,10 +101,11 @@ const BOARDS = [
   },
   {
     file: 'Transfer.dc.html',
-    title: 'Шаг 2 · Дорога: перелёт и трансфер (Эгле — из Вильнюса и Каунаса бесплатно)',
+    title: 'Шаг 2 · Дорога: перелёт и трансфер — ничего не выбрано за гостя (Эгле: трансфер санатория уже оплачен)',
     route: '/transfer',
     links: [
       ['.fly-alt-row', '', 'Transfer-package.dc.html'],
+      ['#trNeed .choice', 'Да, нужен', 'Transfer-yes.dc.html'],
       ['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html'],
     ],
   },
@@ -254,6 +255,19 @@ const BOARDS = [
     ],
   },
   {
+    file: 'Transfer-yes.dc.html',
+    title: 'Шаг 2 · «Да, нужен трансфер» и Вильнюс: где встретить, как ехать и обратно — гость выбирает сам',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.click('text=Билеты у меня уже есть');
+      await p.click('#trNeed .choice >> nth=0');
+      await p.click('#trFrom .rowpick >> nth=0');
+      await p.waitForTimeout(300);
+    },
+    links: [['[role=radiogroup] .ios-row', 'Не знаю, как лучше добраться', 'Help.dc.html']],
+  },
+  {
     file: 'Transfer-other.dc.html',
     title: 'Шаг 2 · Дорога — другой санаторий: трансфер продаём мы',
     route: '/transfer',
@@ -329,6 +343,9 @@ const docFor = (title, route, body, h, logic) => `<!doctype html>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 ${css}
+/* canvas only: «i» opens its balloon on hover (the site opens it on a tap with a script) */
+.info-host:has(.info-tip:hover) .info-pop{display:block}
+.info-host:has(.info-tip:hover) .info-tip{background:#1f5f4a;border-color:#1f5f4a;color:#fff}
 </style>
 </helmet>
 <!-- Снимок страницы ${esc(route)} с shalom.bookingrobot.eu — макет совпадает с сайтом -->

@@ -12,14 +12,27 @@ export interface Booking {
   roomId: string;
   /** treatment programme id: "midi" | "maxi" | "premium" */
   programId: string;
+  /**
+   * «Дорога» → трансфер. Nothing is chosen for the guest: null / '' = not answered yet
+   * (the step asks every question with empty choices). `mode` is what the order counts.
+   */
   transfer: {
-    mode: 'group' | 'individual' | 'none';
-    /** also back to the airport / station on check-out day */
-    back: boolean;
-    /** pick-up place id (see data/transfer PICKUP_PLACES) */
+    mode: 'group' | 'individual' | 'none' | null;
+    /** «Нужен ли трансфер?» */
+    need: boolean | null;
+    /** together with other guests or a car of your own */
+    how: 'group' | 'individual' | null;
+    /** also back on check-out day */
+    back: boolean | null;
+    /** pick-up city id (see data/transfer PICKUP_PLACES) */
     place: string;
-    /** drop-off place on the way back */
+    /** where exactly in that city: airport, station, hotel */
+    spot: string;
+    /** back to the same place (true) or another one (false) */
+    backSame: boolean | null;
+    /** drop-off city id on the way back */
     backPlace: string;
+    backSpot: string;
     /** vehicle for an individual transfer */
     vehicle: string;
   };
@@ -46,7 +59,18 @@ export const DEFAULT_BOOKING: Booking = {
   hotelId: 'egle-comfort',
   roomId: 'double',
   programId: 'midi',
-  transfer: { mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius', vehicle: 'car' },
+  transfer: {
+    mode: null,
+    need: null,
+    how: null,
+    back: null,
+    place: '',
+    spot: '',
+    backSame: null,
+    backPlace: '',
+    backSpot: '',
+    vehicle: '',
+  },
   flights: null,
   flightPackage: false,
   chosenPlace: '',

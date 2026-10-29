@@ -18,7 +18,6 @@ export function FlightToggle({ dark = false, plain = false }: { dark?: boolean; 
         ? { flightPackage: false }
         : {
             flightPackage: true,
-            transfer: { ...booking.transfer, mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius' },
           },
     );
   const plane = (

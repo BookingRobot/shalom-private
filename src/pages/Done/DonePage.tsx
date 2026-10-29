@@ -388,7 +388,7 @@ export default function DonePage() {
             >
               <div className="card" style={{ overflow: 'hidden' }}>
                 <img
-                  src="/img/1efd1efc34d4137ff98a8658a068afc5.jpg"
+                  src="/img/d82431114d102eee0f48639f84940aad.jpg"
                   alt=""
                   style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }}
                 />{' '}

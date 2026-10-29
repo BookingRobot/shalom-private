@@ -253,3 +253,187 @@
   font-weight: 800;
   vertical-align: 2px;
 }
+
+/* ── Transfer questions: every answer is the guest's own (empty choices at first) ── */
+.pg-transfer .tr-q {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.pg-transfer .tr-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-margin-top: 90px;
+}
+.pg-transfer .tr-block + .tr-block {
+  padding-top: 22px;
+  border-top: 1px solid #eeeae1;
+}
+.pg-transfer .tr-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #faf8f3;
+  border: 1px solid #ece7dc;
+}
+.pg-transfer .tr-reco,
+.pg-transfer .tr-best {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.pg-transfer .tr-reco {
+  background: #fff1d6;
+  color: #8a5a00;
+}
+.pg-transfer .tr-best {
+  background: #1f5f4a;
+  color: #fff;
+}
+/* «Уже оплачено»: a stamp, slightly tilted, so it does not read as a button or a choice */
+.pg-transfer .paid-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 7px;
+  border: 2px solid #1f7a4f;
+  border-radius: 6px;
+  color: #1f7a4f;
+  background: rgba(230, 242, 234, 0.7);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+}
+.pg-transfer .tr-how {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pg-transfer .tr-how-opt {
+  display: grid;
+  grid-template-columns: auto 120px 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+.pg-transfer .tr-how-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 64px;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.pg-transfer .tr-how-pic img {
+  width: 120px;
+  height: auto;
+  display: block;
+}
+.pg-transfer .tr-how-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pg-transfer .info-line > strong {
+  font-size: 18px;
+  color: #1c2620;
+}
+.pg-transfer .tr-how-txt .info-line > strong {
+  font-size: 19px;
+}
+.pg-transfer .tr-warn .info-line {
+  font-size: 15.5px;
+}
+.pg-transfer .tr-how-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+.pg-transfer .tr-how-price > span {
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-transfer .tr-warn {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff1d6;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #1c2620;
+}
+.pg-transfer .tr-cars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fafbf9;
+  border: 1px solid #e6efe9;
+}
+.pg-transfer .tr-car-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 130px;
+  height: 64px;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.pg-transfer .tr-car-pic img {
+  width: 130px;
+  height: auto;
+  display: block;
+}
+/* a select still waiting for an answer reads as a placeholder */
+.pg-transfer select.input-empty {
+  color: #6b756f;
+}
+.pg-transfer #trNeed,
+.pg-transfer #trBack,
+.pg-transfer #trFrom,
+.pg-transfer #trHow,
+.pg-transfer #trCars,
+.pg-transfer #trBackWhere {
+  scroll-margin-top: 90px;
+}
+@media (max-width: 600px) {
+  .pg-transfer .tr-how-opt {
+    grid-template-columns: auto 1fr;
+    gap: 6px 14px;
+  }
+  .pg-transfer .tr-how-price {
+    grid-column: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    text-align: left;
+  }
+  .pg-transfer .tr-how-pic {
+    display: none;
+  }
+  .pg-transfer .tr-car-pic {
+    width: 84px;
+    height: 48px;
+  }
+  .pg-transfer .tr-car-pic img {
+    width: 84px;
+  }
+}
