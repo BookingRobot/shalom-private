@@ -1,3 +1,4 @@
+import { VanIcon } from '../../components/icons';
 import { Fragment } from 'react';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
@@ -907,20 +908,7 @@ export default function TransferPage() {
                                 Только вы, без ожидания и попутчиков · от {v.indFrom} за машину
                               </span>
                             </span>
-                            <svg
-                              width="26"
-                              height="26"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#1F5F4A"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                              style={{ flex: 'none' }}
-                            >
-                              <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-                            </svg>
+                            <VanIcon height={26} />
                           </label>
                           {v.cmp ? (
                             <>

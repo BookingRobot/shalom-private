@@ -8,7 +8,7 @@ import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } 
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
 import { isSoldOutEverywhere, nearestStays } from '../../data/availability';
-import { HeadsetIcon } from '../../components/icons';
+import { HeadsetIcon, VanIcon } from '../../components/icons';
 import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
@@ -1148,20 +1148,24 @@ export default function ResultsPage() {
                     <Fragment key={_i0}>
                       <label className={`tile ${f.cls ?? ''}`}>
                         <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                        <svg
-                          width="22"
-                          height="22"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', opacity: '.85' }}
-                        >
-                          <path d={f.d} />
-                        </svg>
+                        {f.d === CAR_ICON ? (
+                          <VanIcon height={22} />
+                        ) : (
+                          <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            style={{ flex: 'none', opacity: '.85' }}
+                          >
+                            <path d={f.d} />
+                          </svg>
+                        )}
                         <span>{f.t}</span>
                       </label>
                     </Fragment>
@@ -1333,20 +1337,24 @@ export default function ResultsPage() {
                             <Fragment key={_i0}>
                               <label className="fchk">
                                 <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                <svg
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#1F5F4A"
-                                  strokeWidth="1.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                  style={{ flex: 'none', opacity: '.85' }}
-                                >
-                                  <path d={f.d} />
-                                </svg>
+                                {f.d === CAR_ICON ? (
+                                  <VanIcon height={20} />
+                                ) : (
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#1F5F4A"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                    style={{ flex: 'none', opacity: '.85' }}
+                                  >
+                                    <path d={f.d} />
+                                  </svg>
+                                )}
                                 {f.t}
                                 <span className="n">{f.n}</span>
                               </label>
@@ -1365,20 +1373,24 @@ export default function ResultsPage() {
                               <Fragment key={_i0}>
                                 <label className="fchk">
                                   <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                    style={{ flex: 'none', opacity: '.85' }}
-                                  >
-                                    <path d={f.d} />
-                                  </svg>
+                                  {f.d === CAR_ICON ? (
+                                    <VanIcon height={20} />
+                                  ) : (
+                                    <svg
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                      style={{ flex: 'none', opacity: '.85' }}
+                                    >
+                                      <path d={f.d} />
+                                    </svg>
+                                  )}
                                   {f.t}
                                   <span className="n">{f.n}</span>
                                 </label>
@@ -1396,20 +1408,24 @@ export default function ResultsPage() {
                               <Fragment key={_i0}>
                                 <label className="fchk">
                                   <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                    style={{ flex: 'none', opacity: '.85' }}
-                                  >
-                                    <path d={f.d} />
-                                  </svg>
+                                  {f.d === CAR_ICON ? (
+                                    <VanIcon height={20} />
+                                  ) : (
+                                    <svg
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                      style={{ flex: 'none', opacity: '.85' }}
+                                    >
+                                      <path d={f.d} />
+                                    </svg>
+                                  )}
                                   {f.t}
                                   <span className="n">{f.n}</span>
                                 </label>
@@ -1698,20 +1714,24 @@ export default function ResultsPage() {
                         {(h.chips || []).map((c: any, _i1: number) => (
                           <Fragment key={_i1}>
                             <span className="fact" style={{ fontSize: '15px', color: '#1C2620' }}>
-                              <svg
-                                width="22"
-                                height="22"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#1F5F4A"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                                style={{ flex: 'none' }}
-                              >
-                                <path d={c.d} />
-                              </svg>
+                              {c.d === CAR_ICON ? (
+                                <VanIcon height={18} />
+                              ) : (
+                                <svg
+                                  width="22"
+                                  height="22"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="#1F5F4A"
+                                  strokeWidth="1.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                  style={{ flex: 'none' }}
+                                >
+                                  <path d={c.d} />
+                                </svg>
+                              )}
                               {c.t}
                             </span>
                           </Fragment>
@@ -1731,19 +1751,23 @@ export default function ResultsPage() {
                             {(h.awards || []).map((w: any, _i1: number) => (
                               <Fragment key={_i1}>
                                 <span className="badge">
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                  >
-                                    <path d={w.d} />
-                                  </svg>
+                                  {w.d === CAR_ICON ? (
+                                    <VanIcon height={16} />
+                                  ) : (
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                    >
+                                      <path d={w.d} />
+                                    </svg>
+                                  )}
                                   {w.t}
                                 </span>
                               </Fragment>
@@ -2042,19 +2066,23 @@ export default function ResultsPage() {
                       {(u.chips || []).map((c: any, _i1: number) => (
                         <Fragment key={_i1}>
                           <span className="fact" style={{ color: '#5E6862' }}>
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#8A968F"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d={c.d} />
-                            </svg>
+                            {c.d === CAR_ICON ? (
+                              <VanIcon height={18} />
+                            ) : (
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#8A968F"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d={c.d} />
+                              </svg>
+                            )}
                             {c.t}
                           </span>
                         </Fragment>

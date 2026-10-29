@@ -64,7 +64,6 @@ const BASE: Base[] = [
     starsN: 3,
     reviewsN: 13,
     photos: [
-      { src: '/img/c99246b157929f79cff6d7e3a80fe603.jpg', alt: 'Корпус Эгле Стандарт' },
       { src: '/img/99a77311bc746e38e051bd1146cc0517.jpg', alt: 'Бассейн санатория Эгле' },
       { src: '/img/33f9767ee953a7f2d2c8ec5ee6a77798.jpg', alt: 'Двухместный номер (пример)' },
       ...DRUSKININKAI,

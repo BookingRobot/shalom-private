@@ -1,3 +1,4 @@
+import { VanIcon } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
@@ -538,19 +539,7 @@ export default function DonePage() {
                     Гости: Mikhail Levin, Irina Levina
                   </div>
                   <div className="fact">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-                    </svg>
+                    <VanIcon height={20} />
                     {o.transferLine}
                   </div>
                 </div>

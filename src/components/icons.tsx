@@ -65,3 +65,20 @@ export const LogoMark = ({ size = 38, round = 0 }: { size?: number; round?: numb
     <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
   </svg>
 );
+
+/**
+ * The Mercedes minibus of our transfers, drawn small: used everywhere instead of a line
+ * icon of a car (transparent around, the van's body stays white).
+ */
+export const VAN_IMG = '/img/1e848da921b34b866eb461ecca33fca7.png';
+export const VanIcon = ({ height = 22, className = '' }: { height?: number; className?: string }) => (
+  <img
+    src={VAN_IMG}
+    alt=""
+    aria-hidden="true"
+    className={'van-ico' + (className ? ' ' + className : '')}
+    width={Math.round((height * 168) / 79)}
+    height={height}
+    style={{ flex: 'none', display: 'block', height, width: 'auto' }}
+  />
+);

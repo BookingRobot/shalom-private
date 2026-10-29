@@ -20,7 +20,7 @@ import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { nearestStays, nightFree, stayFree } from '../../data/availability';
 import { PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
-import { HeadsetIcon } from '../../components/icons';
+import { HeadsetIcon, VanIcon } from '../../components/icons';
 import { transferBySanatorium } from '../../data/transferPolicy';
 import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
@@ -1146,20 +1146,7 @@ export default function HotelPage() {
                 </div>
                 <button type="button" className="accrow" onClick={v.toggleTr}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      style={{ flex: 'none' }}
-                    >
-                      <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-                    </svg>
+                    <VanIcon height={22} />
                     {v.trTitle}
                   </span>
                   <svg
@@ -1227,19 +1214,7 @@ export default function HotelPage() {
                           В пути <strong>около 2 часов</strong>
                         </span>
                         <span className="ico">
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1F5F4A"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6M7 17a1.5 1.5 0 1 0 0 .01M17 17a1.5 1.5 0 1 0 0 .01" />
-                          </svg>
+                          <VanIcon height={20} />
                           Также из Каунаса, Варшавы, Мариямполе
                         </span>
                       </div>

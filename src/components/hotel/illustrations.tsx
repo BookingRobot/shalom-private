@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { WIZ_ICONS } from '../wizardIcons';
+import { VanIcon } from '../icons';
 
 /**
  * Line illustrations for the sanatorium tabs: a doctor portrait when the sanatorium
@@ -181,13 +182,8 @@ export const PICTO: Record<string, ReactNode> = {
       <circle cx="12" cy="19.5" r="1" />
     </Ico>
   ),
-  car: (
-    <Ico>
-      <path d="M5 17h14M3 11l1.5-5h15L21 11M3 11v6h18v-6" />
-      <circle cx="7" cy="17" r="1.5" />
-      <circle cx="17" cy="17" r="1.5" />
-    </Ico>
-  ),
+  // transfers: the small Mercedes minibus, not a line car
+  car: <VanIcon height={24} />,
   book: (
     <Ico>
       <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
