@@ -194,10 +194,12 @@
 /* ── Hero: lake photo, header, heading, search card ── */
 .pg-main .hero {
   position: relative;
+  /* the search card's pop-ups (places, guests) open over the sections below: no clipping here,
+     and the hero stays above them */
+  z-index: 3;
   display: flex;
   flex-direction: column;
   background: #2c4a3c;
-  overflow: hidden;
 }
 .pg-main .hero-bg {
   position: absolute;
