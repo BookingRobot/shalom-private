@@ -1112,26 +1112,93 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 15.5px;
   color: #3e4b44;
 }
-.page .rs-sights {
+.page .rs-main .rs-sub {
+  margin-top: -6px;
+  color: #3e4b44;
+  font-size: 17px;
+}
+/* three weeks: a quiet timeline — a numbered circle, the line between, no boxes */
+.page .rs-weeks {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  gap: 8px 16px;
 }
-.page .rs-sights li {
+.page .rs-weeks li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 16px;
+  padding-bottom: 20px;
+  line-height: 1.5;
+}
+.page .rs-weeks li:last-child {
+  padding-bottom: 0;
+}
+.page .rs-weeks li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 46px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 2px;
+  background: #cfe3d6;
+}
+.page .rs-wk {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 800;
+}
+.page .rs-weeks li > span:last-child {
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
-  background: #f4f1ea;
-  border-radius: 10px;
-  font-size: 16px;
-  line-height: 1.35;
+  gap: 4px;
+  padding-top: 8px;
 }
-.page .rs-sights span {
-  color: #3e4b44;
-  font-size: 15px;
+.page .rs-weeks strong {
+  font-size: 19px;
+  color: #1c2620;
+}
+.page .rs-weeks li > span:last-child > span {
+  font-size: 17px;
+  color: #2f3a34;
+}
+/* what to do: groups in two columns on a laptop, one on a phone */
+.page .rs-fun {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 18px 36px;
+}
+.page .rs-fun-g h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 2px;
+  font-size: 19px;
+  color: #1c2620;
+}
+.page .rs-ico.rs-ico-s {
+  width: 38px;
+  height: 38px;
+}
+.page .rs-rain {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f1f6f3;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.page .rs-rain > span:last-child {
+  padding-top: 6px;
 }
 .page .rs-gallery {
   display: grid;
