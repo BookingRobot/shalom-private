@@ -86,7 +86,17 @@ const BASE: Base[] = [
     address: 'V. Kudirkos g. 45',
     starsN: 4,
     reviewsN: 20,
-    photos: [{ src: '/img/a77ef961b37e1edf9b38716a5c54a79f.jpg', alt: 'Санаторий Гранд Спа Лиетува' }, ...DRUSKININKAI],
+    // the sanatorium's own photos (grandspa.lt): the complex from above, the «Lietuva» building, the water park
+    photos: [
+      {
+        src: '/img/4257cc3ec678cab57b304e0ddfa95002.jpg',
+        alt: 'Гранд Спа Лиетува с высоты: парк, ротонда и купол аквапарка',
+      },
+      { src: '/img/088d4dea4dcf2d1b8d361f6b691f859c.jpg', alt: 'Корпус «Лиетува» и парк с шахматами' },
+      { src: '/img/30f261570df10d5af0ec1ad7c6af36f5.jpg', alt: 'Аквапарк под куполом' },
+      { src: '/img/652e18efcb7ff2fb9e186a7d38be4edd.jpg', alt: 'Бассейн аквапарка' },
+      ...DRUSKININKAI,
+    ],
   },
   {
     id: 'grand-spa-druskininkai',
@@ -108,7 +118,15 @@ const BASE: Base[] = [
     address: 'Druskininkai',
     starsN: 3,
     reviewsN: 17,
-    photos: [{ src: '/img/405a6bd8cba041318eac2ff89e9e9806.jpg', alt: 'Бассейн санатория' }, ...DRUSKININKAI],
+    // the sanatorium's own photos (belorus.lt)
+    photos: [
+      { src: '/img/7d7576cf2b949466e6e7fdd81b5d43ad.jpg', alt: 'Бассейн с панорамными окнами в сосновый лес' },
+      { src: '/img/ef252eab618b4a2fbe25e6d6fbbdc26c.jpg', alt: 'Бассейн и гидромассаж' },
+      { src: '/img/c5b0fe0286e02bcf75eb209a7623f444.jpg', alt: 'Отдых в бассейне' },
+      { src: '/img/fa34d6d4ecc45cf7fff93233ffbf430b.jpg', alt: 'Паровая баня из мозаики' },
+      { src: '/img/de402f47934ad6b8e042936d4c704140.jpg', alt: 'Номер с большим окном' },
+      ...DRUSKININKAI,
+    ],
   },
   {
     id: 'draugyste',
