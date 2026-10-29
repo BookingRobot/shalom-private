@@ -1,11 +1,11 @@
 import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { api } from '../../api';
 import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
+import { StepNext } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
 import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
@@ -1288,26 +1288,21 @@ export default function TransferPage() {
                 ) : null}
               </>
             )}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: '16px',
-                flexWrap: 'wrap',
-                paddingTop: '8px',
+            <StepNext
+              back={{ to: '/rooms', label: '← Назад к номеру' }}
+              next={{ to: '/guests', label: 'Далее: данные гостей →' }}
+              info={
+                <>
+                  Итого: <strong>{v.total}</strong>
+                </>
+              }
+              missing={() => {
+                const b = logic.props.booking.booking;
+                return b.flightPackage || b.flights === 'no' || b.flights === 'help'
+                  ? []
+                  : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
               }}
-            >
-              <Link className="btn btn-secondary" to="/rooms">
-                ← Назад к номеру
-              </Link>
-              <Link
-                className="btn btn-primary"
-                to="/guests"
-                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
-              >
-                Далее: данные гостей →
-              </Link>
-            </div>
+            />
           </div>
           {/* Summary */}
           <OrderSummary

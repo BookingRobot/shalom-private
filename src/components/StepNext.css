@@ -1,0 +1,177 @@
+/* «Далее» of a checkout step: a row at the end of the page + the same button in a bottom bar */
+.step-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+.step-row-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page .btn.step-next-big {
+  min-height: 64px;
+  font-size: 20px;
+  padding: 0 40px;
+}
+.step-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 38;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid #dfe8e2;
+  box-shadow: 0 -8px 24px rgba(28, 38, 32, 0.08);
+  transform: translateY(110%);
+  visibility: hidden;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.8, 0.24, 1),
+    visibility 0s linear 0.3s;
+}
+.step-bar.on {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.8, 0.24, 1),
+    visibility 0s;
+}
+.step-bar-in {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 24px calc(10px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.step-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+}
+.step-bar-info {
+  min-width: 0;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.step-bar-info strong {
+  color: #1c2620;
+  font-size: 20px;
+}
+.page .btn.step-next {
+  min-height: 52px;
+  font-size: 18px;
+  padding: 0 28px;
+}
+
+/* what is not chosen yet */
+.step-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  padding: 10px 12px 10px 14px;
+  border-radius: 12px;
+  background: #fff6e3;
+  border: 1px solid #f0ddb8;
+  color: #5a3d00;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.step-hint-t {
+  flex: 1 1 260px;
+}
+.step-hint-t strong {
+  color: #1c2620;
+}
+.step-hint-b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.step-hint-go {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #1f5f4a;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.step-hint-x {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #8a5a00;
+  font-size: 16px;
+  cursor: pointer;
+}
+/* the spot to fill in lights up for a moment */
+.step-flash {
+  animation: stepFlash 2.4s ease-out;
+  border-radius: 12px;
+}
+@keyframes stepFlash {
+  0%,
+  30% {
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 6px #e3a93b;
+  }
+  100% {
+    box-shadow:
+      0 0 0 3px transparent,
+      0 0 0 6px transparent;
+  }
+}
+/* the floating buttons step up while the bar is shown */
+body.has-stepbar .fb-btn,
+body.has-stepbar .help-fab {
+  translate: 0 calc(-1 * var(--stepbar-h, 76px));
+}
+.fb-btn,
+.help-fab {
+  transition: translate 0.3s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+@media (max-width: 600px) {
+  .step-bar-in {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .step-bar-info {
+    font-size: 14px;
+  }
+  .step-bar-info strong {
+    font-size: 17px;
+  }
+  .page .btn.step-next {
+    padding: 0 18px;
+    font-size: 17px;
+  }
+  .page .btn.step-next-big {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step-bar,
+  .step-bar.on,
+  .fb-btn,
+  .help-fab {
+    transition: none;
+  }
+  .step-flash {
+    animation: none;
+    box-shadow: 0 0 0 3px #e3a93b;
+  }
+}

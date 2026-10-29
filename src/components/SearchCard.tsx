@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FlightToggle } from './FlightToggle';
 import { GuestsPicker } from './GuestsPicker';
@@ -21,6 +22,29 @@ export function SearchCard({
   className?: string;
 }) {
   const navigate = useNavigate();
+  // after new dates are chosen a light bubble points at «Найти санаторий»: what to press next
+  const [nudge, setNudge] = useState(false);
+  const go = useRef<HTMLDivElement>(null);
+  const dates = inLabel + '|' + outLabel;
+  const shown = useRef(dates);
+  useEffect(() => {
+    if (shown.current === dates) return;
+    shown.current = dates;
+    setNudge(true);
+    // on a phone the button may be under the fold or under the floating buttons: bring it up
+    requestAnimationFrame(() => {
+      const el = go.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.top < 90 || r.bottom > window.innerHeight - 150)
+        el.scrollIntoView({
+          block: 'center',
+          behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+    });
+    const t = window.setTimeout(() => setNudge(false), 12000);
+    return () => window.clearTimeout(t);
+  }, [dates]);
   return (
     <form
       className={'card search' + (className ? ' ' + className : '')}
@@ -90,9 +114,25 @@ export function SearchCard({
           </label>
           <GuestsPicker inputClass="input" />
         </div>
-        <Link className="btn btn-primary search-go" to="/results">
-          Найти санаторий
-        </Link>
+        <div className="sf-go" ref={go}>
+          {nudge ? (
+            <div className="go-tip" role="status">
+              <span>
+                Даты выбраны. Теперь нажмите <strong>«Найти санаторий»</strong>
+              </span>
+              <button type="button" className="go-tip-x" aria-label="Скрыть подсказку" onClick={() => setNudge(false)}>
+                ✕
+              </button>
+            </div>
+          ) : null}
+          <Link
+            className={'btn btn-primary search-go' + (nudge ? ' nudged' : '')}
+            to="/results"
+            onClick={() => setNudge(false)}
+          >
+            Найти санаторий
+          </Link>
+        </div>
       </div>
       <FlightToggle plain />
     </form>

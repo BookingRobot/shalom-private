@@ -339,6 +339,17 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     if (bd.search) await searchBand(p, bd.search);
     if (bd.links) await linkButtons(p, bd.links);
     const { html, h } = await p.evaluate(() => {
+      // «Далее» of a step: the bottom bar stays hidden on a board, the button becomes a link to the next board
+      document.querySelectorAll('.step-bar').forEach((x) => x.classList.remove('on'));
+      document.body.classList.remove('has-stepbar');
+      document.querySelectorAll('button[data-to]').forEach((bt) => {
+        const a = document.createElement('a');
+        a.className = bt.className;
+        a.setAttribute('href', bt.getAttribute('data-to'));
+        a.style.textDecoration = 'none';
+        a.innerHTML = bt.innerHTML;
+        bt.replaceWith(a);
+      });
       // carry live form state into attributes so the snapshot shows it
       document.querySelectorAll('input').forEach((i) => {
         if (i.type === 'checkbox' || i.type === 'radio') {
@@ -482,7 +493,12 @@ async function buildInteractive(b, sizes) {
       ),
       {},
     );
-    const raws = { glabel: IA.GLABEL, gpop: wrapIf('gOpen', gpop), calmodal: wrapIf('calOpen', cal) };
+    const raws = {
+      glabel: IA.GLABEL,
+      gotip: IA.GOTIP,
+      gpop: wrapIf('gOpen', gpop),
+      calmodal: wrapIf('calOpen', cal),
+    };
     // the same search card on both boards: «Курорт или санаторий» opens its list
     {
       const list = post(
@@ -711,6 +727,8 @@ async function buildInteractive(b, sizes) {
         d.on(g, 'click', 'openGuests');
         g.parentElement.appendChild(d.raw('gpop'));
         const page = document.querySelector('#root .page');
+        const goBox = document.querySelector('.search .sf-go');
+        if (goBox) goBox.prepend(d.raw('gotip'));
         const city = document.querySelector('#city');
         d.on(city, 'click', 'openSearch');
         city.after(d.raw('slist'));
@@ -812,6 +830,22 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
     (p) => p.click('#guests'),
     () => window.__dc.markGuests(document.querySelector('.gp-pop')),
   );
+  // «Изменить даты · когда дешевле?» opens the same calendar as on windows 1–2
+  const cal = IA.finish(
+    post(
+      await grab(
+        b,
+        route,
+        (p) => p.click('text=Изменить даты · когда дешевле?'),
+        () => {
+          const dlg = document.querySelector('[role="dialog"]');
+          dlg.querySelector('.cal-price')?.remove();
+          return window.__dc.markCal(dlg);
+        },
+      ),
+    ),
+    calRawsFor(false),
+  );
   // content of the other tabs
   const TABS = ['treat', 'food', 'about', 'reviews'];
   const tabHtml = {};
@@ -846,36 +880,55 @@ async function buildHotel(b, sizes, file = 'Hotel-B.dc.html', route = '/hotel') 
       d.attr(x, 'class', 'tabCls_' + keys[i]);
       x.removeAttribute('aria-current');
     });
+    // «Ваши даты» follow the calendar
+    const calBtn = Array.from(document.querySelectorAll('button')).find((x) => /Изменить даты/.test(x.textContent));
+    if (calBtn) {
+      d.on(calBtn, 'click', 'openCal');
+      const bar = calBtn.parentElement;
+      const range = bar.querySelector('strong');
+      if (range) d.text(range, 'hbRange');
+      const nights = bar.querySelector('.hb-nights');
+      if (nights) d.text(nights, 'hbNights');
+    }
     const nav = document.querySelector('.ht-tabs');
     const rooms = nav.nextElementSibling.firstElementChild;
     rooms.before(d.raw('rooms-start'));
     rooms.after(d.raw('rooms-end'));
     document.querySelector('#root .page').appendChild(d.raw('lightbox'));
+    document.querySelector('#root .page').appendChild(d.raw('calmodal'));
     return document.getElementById('root').innerHTML;
   });
   const ifs = (k, html) => `<sc-if value="{{tabOn_${k}}}" hint-placeholder-val="{{false}}">${html}</sc-if>`;
   const body = IA.finish(post(base), {
     lightbox: '<sc-if value="{{lbOn}}" hint-placeholder-val="{{false}}">' + IA.finish(post(lb), {}) + '</sc-if>',
     gpop: '<sc-if value="{{gOpen}}" hint-placeholder-val="{{false}}">' + IA.finish(post(gpop), {}) + '</sc-if>',
+    calmodal: wrapIf('calOpen', cal),
     'rooms-start': '<sc-if value="{{tabOn_rooms}}" hint-placeholder-val="{{true}}">',
     'rooms-end': '</sc-if>' + TABS.map((k) => ifs(k, IA.finish(post(tabHtml[k]), {}))).join(''),
   });
-  const logic = `class Component extends DCLogic {
+  // the board's own state (photos, tabs, guests) on top of the shared calendar logic
+  const logic =
+    IA.LOGIC.replace('class Component extends DCLogic', 'class CalBase extends DCLogic') +
+    `
+class Component extends CalBase {
   constructor(props) {
     super(props);
-    this.state = { lb: false, gOpen: false, ad: 2, ch: 0, tab: 'rooms' };
+    Object.assign(this.state, { lb: false, tab: 'rooms' });
   }
   renderVals() {
+    const v = super.renderVals();
     const st = this.state, ad = st.ad, ch = st.ch;
-    const v = {
+    const MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+    const a = new Date(st.inD + 'T00:00:00Z'), b = new Date(st.outD + 'T00:00:00Z');
+    const n = Math.round((b - a) / 86400000);
+    const same = a.getUTCMonth() === b.getUTCMonth();
+    Object.assign(v, {
       lbOn: st.lb, lbOpen: () => this.setState({ lb: true }), lbClose: () => this.setState({ lb: false }),
-      gOpen: st.gOpen, openGuests: () => this.setState({ gOpen: !st.gOpen }), closeGuests: () => this.setState({ gOpen: false }),
       gLabel: ad + ' ' + (ad === 1 ? 'взрослый' : 'взрослых') + (ch ? ', ' + ch + ' ' + (ch === 1 ? 'ребёнок' : 'ребёнка') : ''),
-      gAd: String(ad), gCh: String(ch),
-      adMinus: () => ad > 1 && this.setState({ ad: ad - 1 }), adPlus: () => ad < 4 && this.setState({ ad: ad + 1 }),
-      chMinus: () => ch > 0 && this.setState({ ch: ch - 1 }), chPlus: () => ch < 3 && this.setState({ ch: ch + 1 }),
-      adMinusOff: ad <= 1, adPlusOff: ad >= 4, chMinusOff: ch <= 0, chPlusOff: ch >= 3,
-    };
+      hbRange: (same ? a.getUTCDate() + '–' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]
+        : a.getUTCDate() + ' ' + MONTHS[a.getUTCMonth()] + ' – ' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()]) + ' ' + b.getUTCFullYear(),
+      hbNights: n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'ночь' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'ночи' : 'ночей'),
+    });
     ['rooms', 'treat', 'food', 'about', 'reviews'].forEach((k) => {
       v['tab_' + k] = () => this.setState({ tab: k });
       v['tabOn_' + k] = st.tab === k;

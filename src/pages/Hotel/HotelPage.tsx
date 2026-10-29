@@ -2,6 +2,7 @@ import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
+import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, WEEKDAYS_FULL, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../../lib/dates';
 import { fmt, toNum } from '../../lib/format';
@@ -378,10 +379,18 @@ class HotelLogic extends PageLogic {
       calNote: st.note || '',
       calNoteClose: () => this.setState({ note: null }),
       calNoteAsk: () => this.props.help.open(),
+      flexMode: !!st.flex && !st.calRoom,
+      setFlex: (flex: boolean) => this.setState({ flex, note: null }),
+      // a recommended option from «Не знаю точных дат» is the choice: the page shows those dates
+      flexPick: (a: string, b: string) => this.setState({ in: a, out: b, cal: false, flex: false, note: null }),
+      selIn: sIn ? shortDate(sIn) : '—',
+      selOut: sOut ? shortDate(sOut) : '—',
+      selNights: selN ? selN + ' ' + nightsWord(selN) : '—',
       openCal: () =>
         this.setState({
           note: null,
           cal: true,
+          flex: false,
           calRoom: null,
           calRoomName: null,
           sel: { in: iso(checkin), out: iso(checkout) },
@@ -1817,10 +1826,12 @@ export default function HotelPage() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <h2 id="calTitle" style={{ fontSize: '24px' }}>
-                    Когда дешевле? Выберите даты
+                    Выберите даты поездки
                   </h2>
                   <span style={{ fontSize: '15px', color: '#3E4B44' }}>
-                    {v.calHint} · Цены — за человека в сутки, программа «Миди»
+                    {v.flexMode
+                      ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами'
+                      : v.calHint + ' · цены — за человека в сутки'}
                   </span>
                   {v.calRoomOn ? (
                     <>
@@ -1864,7 +1875,9 @@ export default function HotelPage() {
                   Закрыть
                 </button>
               </div>
-              <div className="cal-body">
+              {v.calRoomOn ? null : <DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />}
+              {v.flexMode ? <FlexDates onPick={v.flexPick} /> : null}
+              <div className="cal-body" style={v.flexMode ? { display: 'none' } : undefined}>
                 <MonthsCalendar
                   months={v.months || []}
                   onPrev={v.calPrev}
@@ -1978,66 +1991,53 @@ export default function HotelPage() {
               </div>
               <div
                 style={{
-                  display: 'flex',
+                  display: v.flexMode ? 'none' : 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '12px',
+                  gap: '12px 16px',
                   borderTop: '1px solid #E3DED2',
                   paddingTop: '12px',
                 }}
               >
                 {v.calNote ? <CalNotice text={v.calNote} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
-                <div className="cal-cmp">
-                  <div
-                    style={{
-                      background: '#F4F1EA',
-                      borderRadius: 'var(--r)',
-                      padding: '10px 12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '2px',
-                    }}
-                  >
-                    <span
-                      className="lbl"
-                      style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '.04em' }}
-                    >
-                      Сейчас
-                    </span>
-                    <strong style={{ fontSize: '16px' }}>
-                      {v.curRange} · {v.nightsLabel}
-                    </strong>
-                    <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                      «Миди», 2 взрослых — <strong style={{ color: '#1C2620' }}>{v.curTotal}&nbsp;€</strong>
-                    </span>
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="lbl">Заезд</span>
+                    <strong style={{ fontSize: '18px' }}>{v.selIn}</strong>
                   </div>
-                  <div
-                    style={{
-                      background: v.diffBg,
-                      borderRadius: 'var(--r)',
-                      padding: '10px 12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '2px',
-                    }}
+                  <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F5F4A"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
-                    <span
-                      className="lbl"
-                      style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '.04em' }}
-                    >
-                      Новые даты
-                    </span>
-                    <strong style={{ fontSize: '16px' }}>{v.newRange}</strong>
-                    <span style={{ fontSize: '14px', color: '#3E4B44' }}>
-                      «Миди», 2 взрослых — <strong style={{ color: '#1C2620' }}>{v.newTotal}</strong>{' '}
-                      <strong style={{ color: v.diffColor }}>{v.diffText}</strong>
-                    </span>
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="lbl">Выезд</span>
+                    <strong style={{ fontSize: '18px' }}>{v.selOut}</strong>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="lbl">Итого</span>
+                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.selNights}</strong>
+                  </div>
+                  <div className="cal-price" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="lbl">«Миди», {v.guestsWho}</span>
+                    <strong style={{ fontSize: '18px' }}>
+                      {v.newTotal}{' '}
+                      <small style={{ fontSize: '14px', fontWeight: 700, color: v.diffColor }}>{v.diffText}</small>
+                    </strong>
                   </div>
                 </div>
-                <div className="cal-btns">
+                <div style={{ display: 'flex', gap: '12px' }}>
                   <button type="button" className="btn btn-secondary" onClick={v.closeCal}>
-                    Оставить {v.curRange}
+                    Отмена
                   </button>
                   <button
                     type="button"
@@ -2046,7 +2046,7 @@ export default function HotelPage() {
                     disabled={!!v.applyOff}
                     style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
                   >
-                    Применить новые даты
+                    Подтвердить даты
                   </button>
                 </div>
               </div>

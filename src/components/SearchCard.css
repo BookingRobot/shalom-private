@@ -65,6 +65,102 @@
   border-radius: 8px;
 }
 
+/* what to press next: a light bubble above «Найти санаторий» */
+.page .search .sf-go {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.page .search .go-tip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 14px);
+  z-index: 6;
+  width: max-content;
+  max-width: min(320px, 86vw);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 8px 11px 14px;
+  border-radius: 12px;
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.35;
+  box-shadow:
+    0 2px 6px rgba(18, 34, 27, 0.18),
+    0 12px 28px rgba(18, 34, 27, 0.28);
+  animation:
+    goTipIn 0.35s cubic-bezier(0.22, 0.8, 0.24, 1) both,
+    goTipBob 1.6s ease-in-out 0.4s 4;
+}
+.page .search .go-tip strong {
+  white-space: nowrap;
+}
+/* the little arrow points down at the button */
+.page .search .go-tip::after {
+  content: '';
+  position: absolute;
+  right: 56px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: #1f5f4a;
+  border-radius: 0 0 3px 0;
+  transform: rotate(45deg);
+}
+.page .search .go-tip-x {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -3px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+.page .search .search-go.nudged {
+  animation: goPulse 1.6s ease-out 0.3s 4;
+}
+@keyframes goTipIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes goTipBob {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes goPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(31, 95, 74, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(31, 95, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 95, 74, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page .search .go-tip,
+  .page .search .search-go.nudged {
+    animation: none;
+  }
+}
+
 @media (max-width: 1080px) {
   .page .search-grid {
     grid-template-columns: 1fr 1fr;
@@ -76,6 +172,16 @@
 @media (max-width: 760px) {
   .page .card.search {
     padding: 16px;
+  }
+  .page .search .go-tip {
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+  }
+  .page .search .go-tip::after {
+    right: auto;
+    left: calc(50% - 7px);
   }
   .page .search-grid {
     grid-template-columns: 1fr;

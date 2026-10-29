@@ -945,6 +945,25 @@ class ResultsLogic extends PageLogic {
   }
 }
 
+/**
+ * The rooms of a sanatorium slide out (CSS .rooms-reveal); the page follows them a little so
+ * the guest sees them open: the start of the rooms comes up to about a third of the screen.
+ */
+function revealRooms(id: string) {
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const box = document.querySelector('#h-' + id + ' .rooms-reveal');
+      if (!box) return;
+      const top = box.getBoundingClientRect().top;
+      const want = window.innerHeight * 0.38;
+      const by = top > want ? Math.min(top - want, window.innerHeight * 0.5) : 0;
+      // even when the rooms are already in view, move a little so the opening is noticed
+      window.scrollBy({ top: by || 60, behavior: still ? 'auto' : 'smooth' });
+    }),
+  );
+}
+
 export default function ResultsPage() {
   usePageTitle('Санатории Друскининкая');
   const [v, logic] = usePageLogic(ResultsLogic);
@@ -1716,7 +1735,10 @@ export default function ResultsPage() {
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}
-                        onClick={h.toggle}
+                        onClick={() => {
+                          if (!h.open) revealRooms(h.id);
+                          h.toggle();
+                        }}
                         aria-expanded={h.open}
                         style={{
                           minHeight: '48px',
@@ -1770,93 +1792,95 @@ export default function ResultsPage() {
                     </div>
                   </div>
                   {h.open ? (
-                    <>
-                      <div
-                        className="rooms-indent"
-                        style={{
-                          position: 'relative',
-                          padding: '14px 14px 18px 96px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '10px',
-                          background: '#F4F7F5',
-                          borderTop: '1px solid #E3DED2',
-                        }}
-                      >
-                        {/* rooms of this sanatorium: indented with a guide line so the next sanatorium is not mistaken for a room */}
-                        <span
-                          aria-hidden="true"
-                          className="rooms-guide"
-                          style={{
-                            position: 'absolute',
-                            left: '44px',
-                            top: '0',
-                            bottom: '18px',
-                            width: '3px',
-                            background: '#C8DED3',
-                          }}
-                        />
+                    <div className="rooms-reveal">
+                      <div className="rooms-reveal-in">
                         <div
+                          className="rooms-indent"
                           style={{
+                            position: 'relative',
+                            padding: '14px 14px 18px 96px',
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            fontSize: '15px',
-                            fontWeight: '700',
-                            color: '#1F5F4A',
-                            textTransform: 'uppercase',
-                            letterSpacing: '.04em',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            background: '#F4F7F5',
+                            borderTop: '1px solid #E3DED2',
                           }}
                         >
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                          {/* rooms of this sanatorium: indented with a guide line so the next sanatorium is not mistaken for a room */}
+                          <span
                             aria-hidden="true"
+                            className="rooms-guide"
+                            style={{
+                              position: 'absolute',
+                              left: '44px',
+                              top: '0',
+                              bottom: '18px',
+                              width: '3px',
+                              background: '#C8DED3',
+                            }}
+                          />
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              fontSize: '15px',
+                              fontWeight: '700',
+                              color: '#1F5F4A',
+                              textTransform: 'uppercase',
+                              letterSpacing: '.04em',
+                            }}
                           >
-                            <path d="M5 4v9a4 4 0 0 0 4 4h10M15 13l4 4-4 4" />
-                          </svg>
-                          Номера · {h.name}
-                        </div>
-                        {(h.offers || []).map((o: any, _i1: number) => (
-                          <Fragment key={_i1}>
-                            <RoomCard o={o} nightsLabel={v.nightsLabel} />
-                          </Fragment>
-                        ))}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            fontSize: '15px',
-                            color: '#3E4B44',
-                            padding: '2px 2px',
-                          }}
-                        >
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#1F5F4A"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M5 4v9a4 4 0 0 0 4 4h10M15 13l4 4-4 4" />
+                            </svg>
+                            Номера · {h.name}
+                          </div>
+                          {(h.offers || []).map((o: any, _i1: number) => (
+                            <Fragment key={_i1}>
+                              <RoomCard o={o} nightsLabel={v.nightsLabel} />
+                            </Fragment>
+                          ))}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              fontSize: '15px',
+                              color: '#3E4B44',
+                              padding: '2px 2px',
+                            }}
                           >
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 16v-4M12 8h.01" />
-                          </svg>
-                          Процедуры подбирает врач после консультации. Специализации, время заезда и трансфер —
-                          <Link to={'/hotel?h=' + h.id}>на странице санатория</Link>.
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#1F5F4A"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 16v-4M12 8h.01" />
+                            </svg>
+                            Процедуры подбирает врач после консультации. Специализации, время заезда и трансфер —
+                            <Link to={'/hotel?h=' + h.id}>на странице санатория</Link>.
+                          </div>
                         </div>
                       </div>
-                    </>
+                    </div>
                   ) : null}
                 </article>
               </Fragment>

@@ -89,6 +89,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
       <FeedbackWidget bottom={ctx.bottom || '20px'} />
       <button
         type="button"
+        className="help-fab"
         dir="ltr"
         lang="ru"
         data-feedback-ignore
