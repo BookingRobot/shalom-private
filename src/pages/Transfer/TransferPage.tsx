@@ -1,17 +1,18 @@
 import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { api } from '../../api';
 import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
+import { StepNext } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
 import { WEEKDAYS_SHORT, daysBetween, nightsWord, shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { FlightChoice } from '../../components/FlightChoice';
-import { sanatoriumTransferName, transferBySanatorium } from '../../data/transferPolicy';
+import { freeTransferPlaces, sanatoriumTransferName, transferBySanatorium } from '../../data/transferPolicy';
+import { legOf, transferLegs } from '../../lib/transferCost';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './TransferPage.css';
 
@@ -53,7 +54,7 @@ class TransferLogic extends PageLogic {
   }
   _rv() {
     const booking = this.props.booking.booking;
-    const { places: PICKUP_PLACES, prices: TRANSFER_PRICES, vehicles: VEHICLES } = api.getTransferOptions();
+    const { places: PICKUP_PLACES, vehicles: VEHICLES } = api.getTransferOptions();
     const TRANSFER_GUESTS = this.props.booking.booking.adults + this.props.booking.booking.children;
     const need = this.state.need ?? true;
     const city = this.state.city ?? 'vilnius';
@@ -68,23 +69,31 @@ class TransferLogic extends PageLogic {
     const vehicle = this.state.vehicle ?? 'car';
 
     const indiv = !!this.state.indiv;
-    // Group transfer (default, per person) vs individual car (per vehicle)
-    const legPrice = (cityId) => {
-      const P = TRANSFER_PRICES[cityId] || TRANSFER_PRICES.vilnius;
-      return indiv ? P[vehicle] : P.seat * TRANSFER_GUESTS;
+    // the same rule as the order summary: free (sanatorium) / in the flight package / our tariff
+    const tNow = {
+      mode: (!need ? 'none' : indiv ? 'individual' : 'group') as 'none' | 'individual' | 'group',
+      back,
+      place: city,
+      backPlace: backSame ? city : backCity,
+      vehicle,
     };
-    const leg1 = need ? legPrice(city) : 0;
-    const leg2 = need && back ? legPrice(backSame ? city : backCity) : 0;
-    const legs = (need ? 1 : 0) + (need && back ? 1 : 0);
-    const transferTotal = leg1 + leg2;
+    const tr = transferLegs(booking, tNow);
+    const legs = tr.legs.length;
+    const transferTotal = tr.total;
     const vName = (VEHICLES.find((v) => v.id === vehicle) || VEHICLES[0]).name.toLowerCase();
     const transferSum = need
-      ? fmt(transferTotal) +
-        '\u00a0€ · ' +
+      ? (transferTotal ? fmt(transferTotal) + '\u00a0€' : 'бесплатно') +
+        ' · ' +
         (indiv ? 'индивидуальный, ' + vName : 'групповой') +
         (legs === 2 ? ', туда и обратно' : ', в одну сторону')
       : '0\u00a0€';
-    const curP = TRANSFER_PRICES[city] || TRANSFER_PRICES.vilnius;
+    const bySanH = transferBySanatorium(booking.hotelId);
+    const freeCities = freeTransferPlaces(booking.hotelId);
+    const inPkg = !!booking.flightPackage && !bySanH;
+    // a group seat from the chosen city: free / in the package / extra / tariff
+    const seat = legOf(booking, city, { ...tNow, mode: 'group' });
+    const seatPP = Math.round(seat.price / TRANSFER_GUESTS);
+    const carLeg = (vid: string) => legOf(booking, city, { ...tNow, mode: 'individual', vehicle: vid });
     return {
       need,
       noNeed: !need,
@@ -96,12 +105,16 @@ class TransferLogic extends PageLogic {
       confirmNo: () => this.setState({ askNo: false, need: false }),
       keepTransfer: () => this.setState({ askNo: false, need: true }),
       cityName: cur.name,
-      cities: PICKUP_PLACES.map((c) => ({
-        ...c,
-        on: c.id === city,
-        cls: c.id === city ? 'on' : '',
-        pick: () => this.setState({ city: c.id }),
-      })),
+      cities: PICKUP_PLACES.map((c) => {
+        const g = legOf(booking, c.id, { ...tNow, mode: 'group' });
+        return {
+          ...c,
+          on: c.id === city,
+          cls: c.id === city ? 'on' : '',
+          badge: g.kind === 'free' ? 'бесплатно' : g.kind === 'package' ? 'в пакете' : '',
+          pick: () => this.setState({ city: c.id }),
+        };
+      }),
       places: cur.places.map((t) => ({ t })),
       place,
       fromHotel: /^От отеля/.test(place),
@@ -114,13 +127,26 @@ class TransferLogic extends PageLogic {
       grpBorder: indiv ? '#E3DED2' : '#1F5F4A',
       grpBg: indiv ? '#fff' : '#EEF5F1',
       indBorder: this.state.cmp ? '#1F5F4A' : '#CFC9BB',
-      seatPrice: fmt(curP.seat) + '\u00a0€',
-      seatTotal: fmt(curP.seat * TRANSFER_GUESTS) + '\u00a0€',
+      seatPrice:
+        seat.kind === 'free'
+          ? 'Бесплатно'
+          : seat.kind === 'package'
+            ? 'В пакете'
+            : (inPkg ? '+' : '') + fmt(seatPP) + '\u00a0€',
+      seatNote:
+        seat.kind === 'free'
+          ? 'организует ' + sanatoriumTransferName(booking.hotelId)
+          : seat.kind === 'package'
+            ? 'входит в пакет с перелётом'
+            : inPkg
+              ? 'доплата с человека, в одну сторону'
+              : 'с человека, в одну сторону',
+      seatTotal: fmt(seat.price) + '\u00a0€',
       guestsLabel: TRANSFER_GUESTS + ' гостей',
-      indFrom: fmt(curP.car) + '\u00a0€',
+      indFrom: (inPkg ? '+' : '') + fmt(carLeg('car').price) + '\u00a0€',
       vehicles: VEHICLES.map((v) => ({
         ...v,
-        price: curP[v.id],
+        price: (inPkg ? '+' : '') + fmt(carLeg(v.id).price),
         cls: indiv && v.id === vehicle ? 'on' : '',
         pick: () => this.setState({ vehicle: v.id, indiv: true }),
       })),
@@ -159,21 +185,43 @@ class TransferLogic extends PageLogic {
         daysBetween(toD(booking.checkin), toD(booking.checkout)) +
         ' ' +
         nightsWord(daysBetween(toD(booking.checkin), toD(booking.checkout))),
-      bySan: transferBySanatorium(booking.hotelId),
+      bySan: bySanH,
       sanName: sanatoriumTransferName(booking.hotelId),
       flightOurs: !!booking.flightPackage,
-      transferLead: transferBySanatorium(booking.hotelId)
-        ? 'Организует сам ' + sanatoriumTransferName(booking.hotelId) + ' — трансфер уже включён.'
-        : booking.flightPackage
-          ? 'Входит в перелёт: встретим у самолёта в Вильнюсе.'
-          : booking.flights === 'help'
-            ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
-            : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
+      inPkg,
+      // what is already covered, said before the choice
+      freeNote: bySanH
+        ? sanatoriumTransferName(booking.hotelId).replace(/^с/, 'С') +
+          ' бесплатно встречает гостей в ' +
+          freeCities.map((id) => (id === 'vilnius' ? 'Вильнюсе' : id === 'kaunas' ? 'Каунасе' : id)).join(' и ') +
+          ' — в аэропорту, на вокзале или у отеля. Из других мест — по нашему тарифу.'
+        : inPkg
+          ? 'Групповой трансфер из аэропорта Вильнюса уже в пакете с перелётом. Другой город или отдельная машина — с доплатой.'
+          : '',
+      yesSub: bySanH
+        ? 'Из Вильнюса и Каунаса — бесплатно, из других мест — по тарифу'
+        : inPkg
+          ? 'Групповой из аэропорта Вильнюса — уже в пакете с перелётом'
+          : 'Заберём из аэропорта, с вокзала или от отеля · групповой от 30\u00a0€ с человека',
+      withNote: bySanH
+        ? 'Из Вильнюса и Каунаса санаторий привезёт вас бесплатно.'
+        : inPkg
+          ? 'Групповой трансфер из аэропорта Вильнюса уже оплачен в пакете с перелётом.'
+          : 'Групповой трансфер — всего 30\u00a0€ с человека, индивидуальный — от 130\u00a0€ за машину.',
+      noSub: inPkg ? 'Цена пакета с перелётом не изменится' : 'На машине или общественным транспортом',
+      transferLead:
+        booking.flights === 'help' && !booking.flightPackage
+          ? 'Нужен ли трансфер? Консультант уточнит время, когда подберёт рейс.'
+          : bySanH
+            ? 'Выберите, откуда вас забрать — и нужна ли дорога обратно.'
+            : booking.flightPackage
+              ? 'Встретим у самолёта в Вильнюсе — или выберите другое место.'
+              : 'Нужен ли вам трансфер? Встретим с табличкой, поможем с багажом, довезём до стойки регистрации.',
       total:
         fmt(
           orderSummary(this.props.booking.booking).stay +
             orderSummary(this.props.booking.booking).flight +
-            (booking.flightPackage || transferBySanatorium(booking.hotelId) ? 0 : transferTotal),
+            transferTotal,
         ) + '\u00a0€',
     };
   }
@@ -223,49 +271,25 @@ export default function TransferPage() {
                 <span>{v.transferLead}</span>
               </div>
             </div>
-            {v.bySan ? (
-              <section
-                className="card"
-                style={{
-                  padding: '22px 24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  background: '#EEF5F1',
-                  borderColor: '#C8DED3',
-                }}
-              >
-                <p style={{ margin: '0', fontSize: '18px', color: '#1C2620' }}>
-                  <strong>Трансфер аэропорт Вильнюса ⇄ санаторий организует сам {v.sanName}.</strong> Он уже включён в
-                  стоимость — отдельно заказывать и платить не нужно.
-                </p>
-                <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
-                  {v.flightOurs
-                    ? 'Время вашего рейса передадим санаторию сами — водитель встретит у выхода из зала прилёта.'
-                    : 'Номер рейса и время прилёта передадим санаторию, как только вы их сообщите — на следующем шаге или консультанту.'}
-                </p>
-              </section>
-            ) : order.flightPackage ? (
-              <section
-                className="card"
-                style={{
-                  padding: '24px 26px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  background: '#EEF5F1',
-                  borderColor: '#C8DED3',
-                }}
-              >
-                <p style={{ margin: '0', fontSize: '18px', color: '#1C2620' }}>
-                  <strong>Групповой трансфер аэропорт Вильнюса ⇄ санаторий уже в цене перелёта:</strong> встретим с
-                  табличкой у выхода, поможем с багажом и довезём до стойки регистрации.
-                </p>
-                <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
-                  Нужен отдельный автомобиль? Скажите консультанту — посчитаем доплату.
-                </p>
-              </section>
-            ) : (
+            {v.freeNote ? (
+              <div className="tr-free ios-in" role="note">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m5 12 5 5L20 7" />
+                </svg>
+                <span>{v.freeNote}</span>
+              </div>
+            ) : null}
+            {
               <>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
                   <button
@@ -293,9 +317,7 @@ export default function TransferPage() {
                           Рекомендуем
                         </span>
                       </span>
-                      <span style={{ color: '#3E4B44', fontSize: '16px' }}>
-                        Заберём из аэропорта, с вокзала или от отеля · групповой от 30&nbsp;€ с человека
-                      </span>
+                      <span style={{ color: '#3E4B44', fontSize: '16px' }}>{v.yesSub}</span>
                     </span>
                   </button>
                   <button
@@ -315,7 +337,7 @@ export default function TransferPage() {
                     </span>
                     <span style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontSize: '16px', fontWeight: '600', color: '#3E4B44' }}>Нет, доберусь сам</span>
-                      <span style={{ color: '#5E6862', fontSize: '15px' }}>На машине или общественным транспортом</span>
+                      <span style={{ color: '#5E6862', fontSize: '15px' }}>{v.noSub}</span>
                     </span>
                   </button>
                 </div>
@@ -381,8 +403,7 @@ export default function TransferPage() {
                           }}
                         >
                           <strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до
-                          стойки санатория. Групповой трансфер — всего 30&nbsp;€ с человека, индивидуальный — от
-                          130&nbsp;€ за машину.
+                          стойки санатория. {v.withNote}
                         </div>
                         <div
                           style={{
@@ -646,7 +667,10 @@ export default function TransferPage() {
                               <span className={`radio ${c.cls ?? ''}`}>
                                 <i />
                               </span>
-                              <span className="rowpick-name">{c.from}</span>
+                              <span className="rowpick-name">
+                                {c.from}
+                                {c.badge ? <span className="rowpick-badge">{c.badge}</span> : null}
+                              </span>
                               <span className="rowpick-info">{c.info}</span>
                             </button>
                             {c.on ? (
@@ -839,7 +863,7 @@ export default function TransferPage() {
                             >
                               <strong style={{ fontSize: '24px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
                               <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                                с человека, в одну сторону
+                                {v.seatNote}
                               </span>
                               <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
                                 за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
@@ -933,7 +957,7 @@ export default function TransferPage() {
                                   <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                     <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{v.seatPrice}</strong>
                                     <span style={{ fontSize: '14px', color: '#3E4B44', whiteSpace: 'nowrap' }}>
-                                      с человека
+                                      {v.seatNote}
                                     </span>
                                   </span>
                                 </button>
@@ -1287,27 +1311,22 @@ export default function TransferPage() {
                   </>
                 ) : null}
               </>
-            )}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: '16px',
-                flexWrap: 'wrap',
-                paddingTop: '8px',
+            }
+            <StepNext
+              back={{ to: '/rooms', label: '← Назад к номеру' }}
+              next={{ to: '/guests', label: 'Далее: данные гостей →' }}
+              info={
+                <>
+                  Итого: <strong>{v.total}</strong>
+                </>
+              }
+              missing={() => {
+                const b = logic.props.booking.booking;
+                return b.flightPackage || b.flights === 'no' || b.flights === 'help'
+                  ? []
+                  : [{ label: 'как вы доберётесь до Литвы', target: '#flyChoice' }];
               }}
-            >
-              <Link className="btn btn-secondary" to="/rooms">
-                ← Назад к номеру
-              </Link>
-              <Link
-                className="btn btn-primary"
-                to="/guests"
-                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
-              >
-                Далее: данные гостей →
-              </Link>
-            </div>
+            />
           </div>
           {/* Summary */}
           <OrderSummary

@@ -4,6 +4,7 @@ import { TODAY } from '../data/demo';
 import { MONTHS, daysBetween, nightsWord, plural, shortDate, toD } from './dates';
 import { fmt } from './format';
 import { transferBySanatorium } from '../data/transferPolicy';
+import { transferLegs } from './transferCost';
 import { flightPackage, partyLabel, paymentPlan, perPersonOf, placeLabel, placePrice, stayTotal } from './pricing';
 
 const eur = (n: number) => fmt(n) + ' €';
@@ -22,19 +23,9 @@ export function guestsLabel(b: Pick<Booking, 'adults' | 'children'>) {
   return b.children ? `${adults}, ${b.children} ${plural(b.children, ['ребёнок', 'ребёнка', 'детей'])}` : adults;
 }
 
-/** Transfer price: group = per seat, individual = per car; one or two legs. */
+/** Transfer price for the guest (see lib/transferCost: free / in the package / our tariff). */
 export function transferPrice(b: Booking) {
-  const t = b.transfer;
-  if (b.flightPackage) return 0; // the group transfer is part of the flight package
-  if (transferBySanatorium(b.hotelId)) return 0; // the sanatorium meets its guests itself
-  if (t.mode === 'none') return 0;
-  const { prices } = api.getTransferOptions();
-  const P = prices as Record<string, Record<string, number>>;
-  const leg = (place: string) => {
-    const p = P[place] || P.vilnius;
-    return t.mode === 'individual' ? (p[t.vehicle] ?? p.car) : p.seat * (b.adults + b.children);
-  };
-  return leg(t.place) + (t.back ? leg(t.backPlace) : 0);
+  return transferLegs(b).total;
 }
 
 const place = (id: string) => api.getTransferOptions().places.find((p) => p.id === id);
@@ -50,7 +41,8 @@ export function orderSummary(b: Booking) {
   const g = { adults: b.adults, children: b.children };
   const stay = stayTotal(base2, g);
   const place = placePrice(base2, g);
-  const transfer = transferPrice(b);
+  const tr = transferLegs(b);
+  const transfer = tr.total;
   const bySan = transferBySanatorium(b.hotelId);
   const flight = b.flightPackage ? flightPackage(g, !bySan) : 0;
   const total = stay + transfer + flight;
@@ -83,42 +75,44 @@ export function orderSummary(b: Booking) {
     flight,
     flightLabel: eur(flight),
     flightPackage: b.flightPackage,
-    /** the sanatorium meets guests itself: no transfer to sell */
-    sanTransfer: bySan,
+    /** the sanatorium meets the guests itself, free of charge */
+    sanTransfer: tr.allFree,
     flightName: bySan ? 'Перелёт Тель-Авив ⇄ Вильнюс' : 'Перелёт Тель-Авив ⇄ Вильнюс и трансфер',
     transfer,
     transferLabel: eur(transfer),
-    transferKind: bySan
-      ? 'Трансфер организует санаторий'
-      : b.flightPackage
-        ? 'Групповой трансфер — в пакете с перелётом'
-        : b.transfer.mode === 'none'
-          ? 'Трансфер не нужен'
-          : `Трансфер ${b.transfer.mode === 'group' ? 'групповой' : 'индивидуальный'}, ${b.transfer.back ? 'туда и обратно' : 'в одну сторону'}`,
+    transferKind:
+      b.transfer.mode === 'none'
+        ? 'Трансфер не нужен'
+        : tr.allFree
+          ? 'Трансфер от санатория — бесплатно'
+          : tr.allPackage
+            ? 'Групповой трансфер — в пакете с перелётом'
+            : `Трансфер ${b.transfer.mode === 'group' ? 'групповой' : 'индивидуальный'}, ${b.transfer.back ? 'туда и обратно' : 'в одну сторону'}` +
+              (b.flightPackage && !bySan ? ' (доплата к пакету)' : ''),
     /** short route for the guest details step */
-    transferRoute: bySan
-      ? 'организует санаторий'
-      : b.transfer.mode === 'none'
+    transferRoute:
+      b.transfer.mode === 'none'
         ? 'не нужен'
         : (b.transfer.place === 'vilnius' ? 'из аэропорта Вильнюса' : placeFrom(b.transfer.place).toLowerCase()) +
-          (b.transfer.back ? ', туда и обратно' : ', в одну сторону'),
+          (b.transfer.back ? ', туда и обратно' : ', в одну сторону') +
+          (tr.allFree ? ' — бесплатно, организует санаторий' : ''),
     /** line on the confirmation page */
-    transferLine: bySan
-      ? 'Трансфер аэропорт Вильнюса ⇄\u00a0санаторий организует санаторий'
-      : b.transfer.mode === 'none'
+    transferLine:
+      b.transfer.mode === 'none'
         ? 'Без трансфера'
         : `${b.transfer.mode === 'group' ? 'Групповой' : 'Индивидуальный'} трансфер: ` +
           (b.transfer.place === 'vilnius' ? 'аэропорт Вильнюса' : placeName(b.transfer.place)) +
           (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
-          'санаторий',
+          'санаторий' +
+          (tr.allFree ? ' — организует санаторий, бесплатно' : ''),
     /** route for the payment step */
-    transferPlaces: bySan
-      ? 'организует санаторий'
-      : b.transfer.mode === 'none'
+    transferPlaces:
+      b.transfer.mode === 'none'
         ? 'не нужен'
         : (b.transfer.place === 'vilnius' ? 'Вильнюс, аэропорт' : placeName(b.transfer.place)) +
           (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
-          'санаторий',
+          'санаторий' +
+          (tr.allFree ? ' · бесплатно' : ''),
     total,
     totalLabel: eur(total),
     /** deposit that fixes the price (35 € per person, +100 € per person with flights) */

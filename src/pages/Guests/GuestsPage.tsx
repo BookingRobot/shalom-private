@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MONTHS_N } from '../../lib/dates';
 import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
+import { StepNext, type Missing } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
@@ -469,26 +469,27 @@ export default function GuestsPage() {
                 />
               </div>
             </section>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: '16px',
-                flexWrap: 'wrap',
-                paddingTop: '8px',
+            <StepNext
+              verb="не заполнили"
+              back={{ to: '/transfer', label: '← Назад: дорога' }}
+              next={{ to: '/payment', label: 'Далее: оплата →' }}
+              info={
+                <>
+                  Итого: <strong>{order.totalLabel}</strong>
+                </>
+              }
+              missing={() => {
+                const empty = (id: string) => !document.querySelector<HTMLInputElement>('#' + id)?.value.trim();
+                const dob = (logic.state.dob || {}) as Record<string, unknown>;
+                const m: Missing[] = [];
+                if (empty('g1fn') || empty('g1ln')) m.push({ label: 'имя и фамилию 1-го гостя', target: '#g1fn' });
+                if (!dob.g1) m.push({ label: 'дату рождения 1-го гостя', target: '#g1dob' });
+                if (empty('g1ph')) m.push({ label: 'телефон для связи', target: '#g1ph' });
+                if (empty('g2fn') || empty('g2ln')) m.push({ label: 'имя и фамилию 2-го гостя', target: '#g2fn' });
+                if (!dob.g2) m.push({ label: 'дату рождения 2-го гостя', target: '#g2dob' });
+                return m;
               }}
-            >
-              <Link className="btn btn-secondary" to="/transfer">
-                ← Назад: дорога
-              </Link>
-              <Link
-                className="btn btn-primary"
-                to="/payment"
-                style={{ minHeight: '64px', fontSize: '20px', padding: '0 40px' }}
-              >
-                Далее: оплата →
-              </Link>
-            </div>
+            />
           </form>
           <OrderSummary
             details={[

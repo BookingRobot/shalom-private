@@ -98,6 +98,8 @@ const FLEX = (isMain) => `<div class="flex-dates">
 
 const GLABEL = `<span style="display:block;white-space:nowrap">{{gAdL}}</span><sc-if value="{{gHasCh}}" hint-placeholder-val="{{false}}"><span style="display:block;white-space:nowrap;font-size:13px;font-weight:600;color:#5E6862">+ {{gChL}}</span></sc-if>`;
 
+const GOTIP = `<sc-if value="{{nudgeOn}}" hint-placeholder-val="{{false}}"><div class="go-tip" role="status"><span>Даты выбраны. Теперь нажмите <strong>«Найти санаторий»</strong></span><button type="button" class="go-tip-x" aria-label="Скрыть подсказку" onClick="{{nudgeOff}}">✕</button></div></sc-if>`;
+
 const ROOMLINE = `<sc-if value="{{roomOn}}" hint-placeholder-val="{{false}}"><strong style="font-size:16px;color:#1C2620">{{roomLine}}</strong></sc-if>`;
 
 /** marker → template, then data-dc-* → handlers, ⟦x⟧ → {{x}} */
@@ -247,7 +249,9 @@ class Component extends DCLogic {
       p7: preset(7), p10: preset(10), p14: preset(14), p21: preset(21),
       selIn: sIn ? shortD(sIn) : '—', selOut: sOut ? shortD(sOut) : '—', selNights: nights ? nights + ' ' + nW(nights) : '—',
       applyOff: !nights,
-      applyCal: () => { if (nights) this.setState({ inD: sel.in, outD: sel.out, cal: '', room: false }); },
+      applyCal: () => { if (nights) this.setState({ inD: sel.in, outD: sel.out, cal: '', room: false, nudge: !st.room }); },
+      // after new dates: a bubble at «Найти санаторий» says what to press next
+      nudgeOn: !!st.nudge, nudgeOff: () => this.setState({ nudge: false }),
       fdMonths: months24.slice(fo, fo + 6).map((x, j) => {
         const i = fo + j, o = optsFor(x), from = o.length ? Math.min(...o.map((q) => r10(q.sum))) : 0;
         return { t: MONTHS_N[x.getUTCMonth()], y: String(x.getUTCFullYear()), from: from ? 'от ' + fmt(from) + ' €' : 'нет мест',
@@ -377,4 +381,4 @@ function filtersLogic(cfg) {
   );
 }
 
-module.exports = { HELPERS, CALNOTE, CELLS, FLEX, GLABEL, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };
+module.exports = { HELPERS, CALNOTE, CELLS, FLEX, GLABEL, GOTIP, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };

@@ -202,7 +202,7 @@ export function FlightChoice() {
           </div>
         </div>
       ) : null}
-      <div className="ios-sec">
+      <div className="ios-sec" id="flyChoice">
         <span className="ios-cap">Как вы доберётесь</span>
         <div className="ios-list" role="radiogroup" aria-labelledby="flyTitle">
           {option(

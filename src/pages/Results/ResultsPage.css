@@ -391,3 +391,61 @@
   border-color: #1f5f4a;
   color: #fff;
 }
+
+/* the rooms of a sanatorium slide out like a drawer, the cards come in one after another */
+.pg-results .rooms-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: roomsGrow 0.6s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.pg-results .rooms-reveal-in {
+  min-height: 0;
+  /* clipped only while it grows: tips and pop-ups inside are free afterwards */
+  animation: roomsClip 0.6s linear;
+}
+.pg-results .rooms-reveal .rooms-indent > :not(.rooms-guide) {
+  animation: roomsItem 0.45s ease-out both;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(3) {
+  animation-delay: 0.07s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(4) {
+  animation-delay: 0.14s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(5) {
+  animation-delay: 0.21s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(n + 6) {
+  animation-delay: 0.28s;
+}
+@keyframes roomsGrow {
+  from {
+    grid-template-rows: 0fr;
+  }
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+@keyframes roomsClip {
+  from,
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes roomsItem {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-results .rooms-reveal,
+  .pg-results .rooms-reveal-in,
+  .pg-results .rooms-reveal .rooms-indent > * {
+    animation: none;
+  }
+}

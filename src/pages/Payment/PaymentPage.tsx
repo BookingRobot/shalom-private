@@ -4,6 +4,7 @@ import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { orderPriceRows, OrderSummary } from '../../components/OrderSummary';
+import { StepNext } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
 import { shortDate } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
@@ -493,6 +494,7 @@ export default function PaymentPage() {
                 </div>
               </div>
               <label
+                id="payAgree"
                 className="chk"
                 style={{
                   padding: '14px 16px',
@@ -509,42 +511,40 @@ export default function PaymentPage() {
                 </span>{' '}
               </label>
             </section>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '16px',
-                flexWrap: 'wrap',
-                paddingTop: '8px',
+            <StepNext
+              verb="не отметили"
+              back={{ to: '/guests', label: '← Назад к гостям' }}
+              next={{
+                to: '/done',
+                label: v.payLabel,
+                icon: (
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="4" y="11" width="16" height="10" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                ),
               }}
-            >
-              <Link className="btn btn-secondary" to="/guests">
-                ← Назад к гостям
-              </Link>
-              <Link
-                className="btn btn-primary"
-                to="/done"
-                style={{ minHeight: '68px', fontSize: '20px', padding: '0 44px' }}
-              >
-                {' '}
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <rect x="4" y="11" width="16" height="10" rx="2" />
-                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                </svg>{' '}
-                {v.payLabel}{' '}
-              </Link>
-            </div>
+              info={
+                <>
+                  Сейчас к оплате: <strong>{v.amount}</strong>
+                </>
+              }
+              missing={() =>
+                document.querySelector<HTMLInputElement>('#payAgree input')?.checked
+                  ? []
+                  : [{ label: 'согласие с условиями бронирования', target: '#payAgree' }]
+              }
+            />
           </form>
           <OrderSummary
             details={[
