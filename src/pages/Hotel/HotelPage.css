@@ -231,3 +231,172 @@
   border-radius: var(--r);
   display: inline-block;
 }
+
+/* ── No places on the chosen dates: nearest dates with places + «Свяжитесь со мной» ── */
+.page .ht-na {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid #ecd9a8;
+  border-radius: var(--r-lg, 14px);
+  box-shadow: var(--sh-xs, 0 1px 3px rgba(28, 38, 32, 0.08));
+  animation: htNaIn 0.35s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.page .ht-na-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.page .ht-na-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #fff6e3;
+  color: #8a5a00;
+}
+.page .ht-na h2 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+}
+.page .ht-na-head p {
+  margin: 6px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #3e4b44;
+}
+.page .ht-na-dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.page .ht-na-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid #c8ded3;
+  border-radius: 12px;
+  background: #f4f9f6;
+  color: #1c2620;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.15s;
+}
+.page .ht-na-date strong {
+  font-size: 19px;
+}
+.page .ht-na-date span {
+  font-size: 15px;
+  color: #3e4b44;
+}
+.page .ht-na-date em {
+  margin-top: 6px;
+  font-style: normal;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f5f4a;
+}
+.page .ht-na-date:hover,
+.page .ht-na-date:focus-visible {
+  border-color: #1f5f4a;
+  background: #e6f2ea;
+  outline: none;
+}
+.page .ht-na-date:active {
+  transform: scale(0.99);
+}
+.page .ht-na-cal {
+  align-self: flex-start;
+  font-size: 16px;
+}
+.page .ht-na-help {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #eef5f1;
+}
+.page .ht-na-help > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 320px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #3e4b44;
+}
+.page .ht-na-help strong {
+  font-size: 18px;
+  color: #1c2620;
+}
+.page .ht-na-call,
+.page .ht-cta-btns .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 26px;
+  font-size: 18px;
+}
+.page .ht-cta-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.page .ht-cta-btns .btn-secondary {
+  min-height: 54px;
+  font-size: 17px;
+}
+@keyframes htNaIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page .ht-na {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  .page .ht-na {
+    padding: 16px;
+  }
+  .page .ht-na h2 {
+    font-size: 22px;
+  }
+  .page .ht-na-call,
+  .page .ht-cta-btns .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+.page .ht-na-cal {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: #1f5f4a;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

@@ -184,7 +184,7 @@ export const SANATORIUMS = [
     name: 'Санаторий Эгле Стандарт',
     sub: 'Друскининкай · 13 отзывов',
     starsN: 3,
-    img: '/img/c99246b157929f79cff6d7e3a80fe603.jpg',
+    img: '/img/99a77311bc746e38e051bd1146cc0517.jpg',
     photos: 9,
     price: 1710,
     pop: 3,

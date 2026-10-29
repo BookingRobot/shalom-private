@@ -87,6 +87,13 @@ const BOARDS = [
   { file: 'Hotel-grand.dc.html', title: 'Санаторий · Гранд Спа Лиетува', route: '/hotel?h=grand-spa-lietuva' },
   { file: 'Hotel-belorus.dc.html', title: 'Санаторий · Беларусь', route: '/hotel?h=belorus' },
   {
+    // no places on the guest's dates: the nearest dates with places and «Свяжитесь со мной»
+    file: 'Hotel-upa.dc.html',
+    title: 'Санаторий · на ваши даты мест нет (Упа): ближайшие даты и «Свяжитесь со мной»',
+    route: '/hotel?h=upa',
+    links: [['.ht-na-call', '', 'Help.dc.html']],
+  },
+  {
     file: 'Rooms.dc.html',
     title: 'Шаг 1 · Номер и программа',
     route: '/rooms',
@@ -184,7 +191,11 @@ const BOARDS = [
     title: 'Результаты · свободные даты номера',
     route: '/results',
     state: true,
-    setup: async (p) => p.click('text=Выбрать другие даты'),
+    setup: async (p) => {
+      await p.click('#h-egle-comfort button[aria-expanded]');
+      await p.waitForTimeout(1500);
+      await p.click('text=Выбрать другие даты');
+    },
     links: [
       ['button', 'Закрыть', 'Results-B.dc.html'],
       ['button', 'Отмена', 'Results-B.dc.html'],
@@ -201,6 +212,8 @@ const BOARDS = [
       await p.click('button[aria-label="Меньше: взрослые"]');
       await p.click('.gp-done');
       await p.click('.ftog-line input');
+      await p.click('#h-egle-comfort button[aria-expanded]');
+      await p.waitForTimeout(1500);
     },
   },
   {
@@ -273,7 +286,11 @@ const linkFor = (href) => {
   const [p, hash] = href.split('#');
   const route = p.split('?')[0] || '/';
   const h = (p.split('?')[1] || '').match(/(?:^|&)h=([a-z-]+)/);
-  const HOTEL_FILE = { 'grand-spa-lietuva': 'Hotel-grand.dc.html', belorus: 'Hotel-belorus.dc.html' };
+  const HOTEL_FILE = {
+    'grand-spa-lietuva': 'Hotel-grand.dc.html',
+    belorus: 'Hotel-belorus.dc.html',
+    upa: 'Hotel-upa.dc.html',
+  };
   if (route === '/hotel' && h && HOTEL_FILE[h[1]]) return HOTEL_FILE[h[1]];
   const f = ROUTE_FILE[route];
   if (!f) return href;
@@ -336,6 +353,10 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     await p.goto(BASE + bd.route, { waitUntil: 'networkidle' });
     if (bd.setup) await bd.setup(p);
     await p.waitForTimeout(250);
+    if (await p.$('.step-row')) {
+      await p.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await p.waitForTimeout(450);
+    }
     if (bd.search) await searchBand(p, bd.search);
     if (bd.links) await linkButtons(p, bd.links);
     const { html, h } = await p.evaluate(() => {
@@ -496,19 +517,29 @@ async function buildInteractive(b, sizes) {
     const raws = {
       glabel: IA.GLABEL,
       gotip: IA.GOTIP,
+      // home: the resort and the dates start empty, a bubble shows what to fill next
+      ...(isMain ? { ...IA.GUIDE } : {}),
       gpop: wrapIf('gOpen', gpop),
       calmodal: wrapIf('calOpen', cal),
     };
     // the same search card on both boards: «Курорт или санаторий» opens its list
+    // (home: a pick fills the field and the bubble moves on; results: a pick opens the results)
+    let cityLabels = [];
     {
       const list = post(
         await grab(
           b,
           route,
           (p) => p.click('#city'),
-          () => {
+          (isMain) => {
             const ul = document.querySelector('.ps-list');
-            ul.querySelectorAll('li').forEach((li) => {
+            ul.querySelectorAll('li').forEach((li, i) => {
+              if (isMain) {
+                li.removeAttribute('aria-selected');
+                li.className = 'ps-opt';
+                li.style.cursor = 'pointer';
+                return window.__dc.on(li, 'click', 'pickCity' + i);
+              }
               const a = document.createElement('a');
               a.href = '/results';
               a.style.cssText = 'display:flex;flex-direction:column;text-decoration:none;color:inherit';
@@ -518,9 +549,11 @@ async function buildInteractive(b, sizes) {
             });
             return ul.outerHTML;
           },
+          isMain,
         ),
       );
-      raws.slist = wrapIf('sOpen', list);
+      cityLabels = [...list.matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+      raws.slist = wrapIf('sOpen', IA.finish(list, {}));
     }
     if (isMain) {
       // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
@@ -713,14 +746,46 @@ async function buildInteractive(b, sizes) {
     const base = await grab(
       b,
       route,
-      isMain ? null : (p) => p.click('text=Сбросить всё'),
+      isMain
+        ? null
+        : async (p) => {
+            await p.click('text=Сбросить всё');
+            for (const bt of await p.$$('article[id^="h-"] button[aria-expanded="false"]')) await bt.click();
+            await p.waitForTimeout(1600);
+          },
       (isMain) => {
         const d = window.__dc;
         ['#datein', '#dateout'].forEach((s, i) => {
           const el = document.querySelector(s);
-          d.text(el, i ? 'outLabel' : 'inLabel');
+          if (isMain) {
+            // empty until chosen: «Выберите дату»
+            el.innerHTML = '';
+            el.appendChild(d.raw(i ? 'outtext' : 'intext'));
+            d.attr(el.closest('.sf'), 'class', 'sfDatesCls');
+          } else d.text(el, i ? 'outLabel' : 'inLabel');
           d.on(el, 'click', 'openCal');
         });
+        if (isMain) {
+          document.querySelectorAll('.search .go-tip').forEach((t) => t.remove());
+          const dest = document.querySelector('.search .sf-dest');
+          dest.querySelector('.sf-at').prepend(d.raw('tipplace'));
+          d.attr(dest, 'class', 'sfPlaceCls');
+          document.querySelector('#datein').parentElement.prepend(d.raw('tipdates'));
+          // «Найти санаторий»: a link to the results once all is chosen, before that it opens what is missing
+          const go = document.querySelector('.search .search-go');
+          d.attr(go, 'class', 'goCls');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = go.textContent;
+          d.attr(btn, 'class', 'goCls');
+          d.on(btn, 'click', 'findGap');
+          const mid = d.raw('gr-mid');
+          const end = d.raw('gr-end');
+          go.before(d.raw('gr-start'));
+          go.after(mid);
+          mid.after(btn);
+          btn.after(end);
+        }
         const g = document.querySelector('#guests');
         g.innerHTML = '';
         g.appendChild(d.raw('glabel'));
@@ -753,6 +818,17 @@ async function buildInteractive(b, sizes) {
             .forEach((x) => d.on(x, 'click', 'wzOpen'));
           btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
           btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
+          // «нет мест на ваши даты»: «Свяжитесь со мной» opens the form board
+          btns
+            .filter((x) => /Свяжитесь со мной/.test(x.textContent) && x.closest('article'))
+            .forEach((x) => {
+              const a = document.createElement('a');
+              a.className = x.className;
+              a.href = 'Help.dc.html';
+              a.innerHTML = x.innerHTML;
+              a.setAttribute('style', (x.getAttribute('style') || '') + ';text-decoration:none');
+              x.replaceWith(a);
+            });
           // "Фильтры" (next to the wizard button) opens / closes the panel in place (see filtersLogic)
           const fb = document.querySelector('.f-btn');
           d.on(fb, 'click', 'fToggle');
@@ -774,6 +850,32 @@ async function buildInteractive(b, sizes) {
           d.text(h2, 'foundLabel');
           h2.parentElement.before(d.raw('actrow'));
           document.querySelectorAll('article[id^="h-"]').forEach((a, i) => {
+            // «Номера и программы» opens and folds this sanatorium's rooms in Play
+            const box = a.querySelector('.rooms-reveal');
+            const btn = a.querySelector('button[aria-expanded]');
+            if (box) {
+              box.className = 'rooms-reveal';
+              // the cheapest free room gets the bubble of the sanatorium opened last (see LOGIC rt*)
+              box.querySelectorAll('.next-tip').forEach((t) => t.remove());
+              const cheap = box.querySelector('[data-cheapest]');
+              if (cheap) {
+                cheap.before(d.raw('rtip-' + i));
+                d.attr(cheap, 'class', 'rtCls' + i);
+              }
+              box.before(d.raw('ro-start-' + i));
+              box.after(d.raw('ro-end'));
+            }
+            if (btn) {
+              btn.removeAttribute('aria-expanded');
+              d.on(btn, 'click', 'roT' + i);
+              d.attr(btn, 'class', 'roCls' + i);
+              const t = Array.from(btn.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim());
+              if (t) t.textContent = '\u27E6roLbl' + i + '\u27E7';
+              const svg = btn.querySelector('svg');
+              if (svg) d.attr(svg, 'style', 'roChev' + i);
+              // the next step after the search: the bubble over the first sanatorium's button
+              if (i === 0) btn.before(d.raw('rmtip'));
+            }
             a.before(d.raw('hv-start-' + i));
             a.after(d.raw('hv-end'));
           });
@@ -792,12 +894,18 @@ async function buildInteractive(b, sizes) {
         (_, i) => (raws['hv-start-' + i] = '<sc-if value="{{hv' + i + '}}" hint-placeholder-val="{{true}}">'),
       );
       raws['hv-end'] = '</sc-if>';
+      filterCfg.order.forEach(
+        (_, i) => (raws['ro-start-' + i] = '<sc-if value="{{ro' + i + '}}" hint-placeholder-val="{{false}}">'),
+      );
+      raws['ro-end'] = '</sc-if>';
+      raws.rmtip = IA.RMTIP;
+      filterCfg.order.forEach((_, i) => (raws['rtip-' + i] = IA.RTIP(i)));
     }
     const body = IA.finish(post(base), raws);
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    const logic = filterCfg ? IA.filtersLogic(filterCfg) : IA.LOGIC;
+    const logic = filterCfg ? IA.filtersLogic(filterCfg) : isMain ? IA.mainLogic(cityLabels) : IA.LOGIC;
     fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }

@@ -92,13 +92,39 @@ const FLEX = (isMain) => `<div class="flex-dates">
 <div class="fd-row"><span class="fd-lbl">Месяц</span><div class="fd-car"><button type="button" class="navbtn" aria-label="Раньше" disabled="{{fdPrevOff}}" onClick="{{fdPrev}}">‹</button><div class="fd-tiles" role="group" aria-label="Месяц" style="--per:6"><sc-for list="{{fdMonths}}" as="m" hint-placeholder-count="6"><button type="button" class="{{m.cls}}" onClick="{{m.pick}}"><strong>{{m.t}}</strong><span>{{m.y}}</span><small>{{m.from}}</small></button></sc-for></div><button type="button" class="navbtn" aria-label="Позже" disabled="{{fdNextOff}}" onClick="{{fdNext}}">›</button></div></div>
 <div class="fd-row"><span class="fd-lbl">Сколько ночей</span><div class="fd-opts" role="group" aria-label="Сколько ночей"><sc-for list="{{fdNights}}" as="n" hint-placeholder-count="4"><button type="button" class="{{n.cls}}" onClick="{{n.pick}}">{{n.t}}</button></sc-for></div></div>
 <div class="fd-list"><span class="fd-title">{{fdTitle}}</span><sc-if value="{{fdEmpty}}" hint-placeholder-val="{{false}}"><span class="fd-empty">В этом месяце свободных дат нет — выберите другой.</span></sc-if>
-<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5">${isMain ? `<a class="fd-opt" href="Results-B.dc.html" style="text-decoration:none"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></a>` : `<button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></button>`}</sc-for>
+<sc-for list="{{fdOpts}}" as="o" hint-placeholder-count="5">${isMain ? `<sc-if value="{{o.link}}" hint-placeholder-val="{{false}}"><a class="fd-opt" href="Results-B.dc.html" style="text-decoration:none"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></a></sc-if><sc-if value="{{o.stay}}" hint-placeholder-val="{{true}}"><button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></button></sc-if>` : `<button type="button" class="fd-opt" onClick="{{o.pick}}"><span class="fd-when">{{o.when}}<span class="fd-fly">✈ рейс туда · ✈ обратно</span></span><span class="fd-sum">≈ {{o.sum}} € на человека<sc-if value="{{o.best}}" hint-placeholder-val="{{false}}"><span class="fd-best">дешевле всего</span></sc-if></span><span class="fd-go" aria-hidden="true">→</span></button>`}</sc-for>
 <span class="fd-note">Средняя цена по курорту за проживание и лечение. Выберите вариант — сразу покажем санатории на эти даты.</span></div>
 </div>`;
 
 const GLABEL = `<span style="display:block;white-space:nowrap">{{gAdL}}</span><sc-if value="{{gHasCh}}" hint-placeholder-val="{{false}}"><span style="display:block;white-space:nowrap;font-size:13px;font-weight:600;color:#5E6862">+ {{gChL}}</span></sc-if>`;
 
 const GOTIP = `<sc-if value="{{nudgeOn}}" hint-placeholder-val="{{false}}"><div class="go-tip" role="status"><span>Даты выбраны. Теперь нажмите <strong>«Найти санаторий»</strong></span><button type="button" class="go-tip-x" aria-label="Скрыть подсказку" onClick="{{nudgeOff}}">✕</button></div></sc-if>`;
+
+/** home page: the green bubble over the field to fill next (same rules as the site's SearchCard guide) */
+const tipTpl = (on, at, text) =>
+  `<sc-if value="{{${on}}}" hint-placeholder-val="{{${at === 'place'}}}"><div class="go-tip go-tip-${at}" role="status"><span>${text}</span><button type="button" class="go-tip-x" aria-label="Скрыть подсказку" onClick="{{tipClose}}">✕</button></div></sc-if>`;
+const GUIDE = {
+  tipplace: tipTpl('tipPlaceOn', 'place', '{{tipPlaceLead}}<strong>курорт или санаторий</strong>'),
+  tipdates: tipTpl('tipDatesOn', 'dates', 'Теперь выберите <strong>даты поездки</strong>'),
+  gotip: tipTpl('tipGoOn', 'go', 'Всё выбрано. Нажмите <strong>«Найти санаторий»</strong>'),
+  intext:
+    '<sc-if value="{{datesOn}}" hint-placeholder-val="{{false}}">{{inLabel}}</sc-if><sc-if value="{{datesOff}}" hint-placeholder-val="{{true}}"><span class="datebtn-ph">Выберите дату</span></sc-if>',
+  outtext:
+    '<sc-if value="{{datesOn}}" hint-placeholder-val="{{false}}">{{outLabel}}</sc-if><sc-if value="{{datesOff}}" hint-placeholder-val="{{true}}"><span class="datebtn-ph">Выберите дату</span></sc-if>',
+  'gr-start': '<sc-if value="{{goReady}}" hint-placeholder-val="{{false}}">',
+  'gr-mid': '</sc-if><sc-if value="{{goNotReady}}" hint-placeholder-val="{{true}}">',
+  'gr-end': '</sc-if>',
+};
+
+/** results: the next step after the search, over «Номера и программы» of the first sanatorium */
+const nextTip = (on, text, close, extra = '') =>
+  `<sc-if value="{{${on}}}" hint-placeholder-val="{{false}}"><div class="next-tip next-tip-center${extra}" role="status"><span class="next-tip-t">${text}</span><button type="button" class="next-tip-x" aria-label="Скрыть подсказку" onClick="{{${close}}}">✕</button></div></sc-if>`;
+const RMTIP = nextTip('rmTipOn', 'Следующий шаг: <strong>посмотрите номера</strong>', 'rmTipClose', ' rm-tip').replace(
+  'hint-placeholder-val="{{false}}"',
+  'hint-placeholder-val="{{true}}"',
+);
+/** results: once a sanatorium's rooms are open, the bubble is on its cheapest free room */
+const RTIP = (i) => nextTip('rtOn' + i, 'Следующий шаг: <strong>выберите номер</strong>', 'rtClose');
 
 const ROOMLINE = `<sc-if value="{{roomOn}}" hint-placeholder-val="{{false}}"><strong style="font-size:16px;color:#1C2620">{{roomLine}}</strong></sc-if>`;
 
@@ -218,8 +244,22 @@ class Component extends DCLogic {
     const cmp = st.cmp, cmpN = cmp.filter(Boolean).length;
     const cmpT = (i) => () => { const c = cmp.slice(); c[i] = !c[i]; this.setState({ cmp: c }); };
     const __f = this.__filters ? this.__filters(st) : {};
+    // results: every sanatorium starts folded; «Номера и программы» opens its rooms; until the
+    // guest opens some, a bubble over the first one says it is the next step
+    const ro = st.ro || {}, roAny = Object.keys(ro).some((k) => ro[k]), rmTip = !roAny && !st.rmTipX;
+    const __ro = { rmTipOn: rmTip, rmTipClose: () => this.setState({ rmTipX: true }), rtClose: () => this.setState({ rtX: true }) };
+    for (let i = 0; i < 16; i++) {
+      __ro['ro' + i] = !!ro[i];
+      __ro['roT' + i] = () => this.setState({ ro: { ...ro, [i]: !ro[i] }, rmTipX: true, lastRo: ro[i] ? st.lastRo : i });
+      __ro['rtOn' + i] = !!ro[i] && st.lastRo === i && !st.rtX;
+      __ro['rtCls' + i] = 'btn btn-primary' + (__ro['rtOn' + i] ? ' next-pulse' : '');
+      __ro['roLbl' + i] = ro[i] ? 'Скрыть варианты' : 'Номера и программы';
+      __ro['roCls' + i] = 'btn ' + (ro[i] ? 'btn-secondary' : 'btn-primary') + (i === 0 && rmTip ? ' next-pulse' : '');
+      __ro['roChev' + i] = ro[i] ? 'transform:rotate(180deg)' : 'transform:none';
+    }
     return {
       ...__f,
+      ...__ro,
       // resort pop-ups (home page): story, tabs to other resorts, "Хочу в …" fills the search field
       ...Object.fromEntries(
         ['Друскининкай', 'Бирштонас', 'Паланга', 'Аникщяй'].flatMap((name, i) => [
@@ -381,4 +421,68 @@ function filtersLogic(cfg) {
   );
 }
 
-module.exports = { HELPERS, CALNOTE, CELLS, FLEX, GLABEL, GOTIP, ROOMLINE, LOGIC, filtersLogic, finish, calRaws };
+/**
+ * Home board in Play: the resort and the dates start empty, the bubble hops over the resort,
+ * then the dates (or the other way round), then «Найти санаторий» — as on the site.
+ * `labels`: the names in the «Курорт или санаторий» list, in order.
+ */
+const mainLogic = (labels) =>
+  LOGIC.replace('class Component extends DCLogic', 'class MainBase extends DCLogic') +
+  `
+class Component extends MainBase {
+  constructor(props) {
+    super(props);
+    Object.assign(this.state, { city: '', dates: false, tipX: '' });
+  }
+  openDates() {
+    const st = this.state, d = new Date(st.inD + 'T00:00:00Z');
+    this.setState({ cal: 'exact', room: false, note: '', sOpen: false, gOpen: false,
+      sel: st.dates ? { in: st.inD, out: st.outD } : { in: null, out: null }, m: d.getUTCMonth(), y: d.getUTCFullYear() });
+  }
+  renderVals() {
+    const v = super.renderVals(), st = this.state;
+    const LABELS = ${JSON.stringify(labels)};
+    const step = !st.city ? 'place' : !st.dates ? 'dates' : 'go';
+    const on = (x) => step === x && st.tipX !== x;
+    return {
+      ...v,
+      cityLabel: st.city || '',
+      datesOn: !!st.dates, datesOff: !st.dates,
+      tipPlaceOn: on('place'), tipDatesOn: on('dates'), tipGoOn: on('go'),
+      tipPlaceLead: st.dates ? 'Теперь выберите ' : 'Выберите ',
+      tipClose: () => this.setState({ tipX: step }),
+      sfPlaceCls: 'sf sf-dest' + (on('place') ? ' sf-next' : ''),
+      sfDatesCls: 'sf' + (on('dates') ? ' sf-next' : ''),
+      goReady: step === 'go', goNotReady: step !== 'go',
+      goCls: 'btn btn-primary search-go' + (on('go') ? ' nudged' : ''),
+      // «Найти» with something missing: open what is missing
+      findGap: () => (step === 'place' ? this.setState({ sOpen: true, gOpen: false, tipX: '' }) : this.openDates()),
+      openCal: () => this.openDates(),
+      applyCal: () => {
+        const s = st.sel;
+        if (s && s.in && s.out) this.setState({ inD: s.in, outD: s.out, cal: '', room: false, dates: true });
+      },
+      fdOpts: v.fdOpts.map((o) => ({ ...o, link: !!st.city, stay: !st.city, pick: () => { o.pick(); this.setState({ dates: true }); } })),
+      ...Object.fromEntries(LABELS.map((l, i) => ['pickCity' + i, () => this.setState({ city: l, sOpen: false })])),
+    };
+  }
+}
+`;
+
+module.exports = {
+  HELPERS,
+  CALNOTE,
+  CELLS,
+  FLEX,
+  GLABEL,
+  GOTIP,
+  GUIDE,
+  RMTIP,
+  RTIP,
+  ROOMLINE,
+  LOGIC,
+  filtersLogic,
+  mainLogic,
+  finish,
+  calRaws,
+};

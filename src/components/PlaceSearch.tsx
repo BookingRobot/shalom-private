@@ -32,25 +32,49 @@ const matches = (q: string) => {
  * ("Беларусь", "Эгле Комфорт", "Гранд Спа Лиетува"), so the first search field takes
  * either a resort or a sanatorium, in any spelling. Picking a sanatorium opens its rooms.
  */
-/** Pick a resort (stay on the form) or a sanatorium (open its rooms in the results). */
-function usePick(onResort?: (label: string) => void) {
+/** What the field shows for the guest's choice: the sanatorium's name or the resort's. */
+export function placeLabel(chosenPlace: string, dest: string) {
+  if (chosenPlace.startsWith('san:')) {
+    const s = SANATORIUM_NAMES.find((x) => x.id === chosenPlace.slice(4));
+    if (s) return s.name;
+  }
+  return RESORTS.find(([id]) => id === dest)?.[1] || 'Друскининкай';
+}
+
+/**
+ * Pick a resort (stay on the form) or a sanatorium. Elsewhere a sanatorium opens its rooms in
+ * the results right away; on the home page (`stay`) it stays in the field like a resort, and
+ * the guest goes on with the dates and «Найти санаторий».
+ */
+function usePick(onPicked?: (label: string) => void, stay = false) {
   const { update } = useBooking();
   const navigate = useNavigate();
   return (it: Item) => {
     if (it.kind === 'resort') {
-      update({ dest: it.id });
-      onResort?.(it.label);
+      update({ dest: it.id, chosenPlace: 'resort:' + it.id });
+      onPicked?.(it.label);
       return;
     }
-    update({ dest: 'druskininkai', ...(it.sold ? {} : { hotelId: it.id }) });
-    navigate('/results?h=' + it.id);
+    update({ dest: 'druskininkai', chosenPlace: 'san:' + it.id, ...(it.sold ? {} : { hotelId: it.id }) });
+    if (stay) onPicked?.(it.label);
+    else navigate('/results?h=' + it.id);
   };
 }
 
-export function PlaceSearch() {
+/**
+ * `guide` (home page): the field stays empty until the guest picks a resort or a sanatorium
+ * themselves, and a sanatorium does not leave the page.
+ */
+export function PlaceSearch({ guide = false }: { guide?: boolean }) {
   const { booking } = useBooking();
-  const resortLabel = RESORTS.find(([id]) => id === booking.dest)?.[1] || 'Друскининкай';
+  const label = placeLabel(booking.chosenPlace, booking.dest);
+  const resortLabel = guide
+    ? booking.chosenPlace
+      ? label
+      : ''
+    : RESORTS.find(([id]) => id === booking.dest)?.[1] || 'Друскининкай';
   const [q, setQ] = useState(resortLabel);
+  const input = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const wrap = useRef<HTMLDivElement>(null);
@@ -74,10 +98,12 @@ export function PlaceSearch() {
     return () => document.removeEventListener('mousedown', down);
   }, [open, resortLabel]);
 
-  const choose = usePick(setQ);
+  const choose = usePick(setQ, guide);
   const pick = (it: Item) => {
     setOpen(false);
     choose(it);
+    // the next step is on the page: put the phone keyboard away
+    if (guide) input.current?.blur();
   };
 
   return (
@@ -98,6 +124,7 @@ export function PlaceSearch() {
         <circle cx="12" cy="10" r="2.5" />
       </svg>
       <input
+        ref={input}
         id="city"
         className="input"
         role="combobox"
@@ -106,7 +133,7 @@ export function PlaceSearch() {
         aria-autocomplete="list"
         aria-activedescendant={open && list[active] ? listId + '-' + active : undefined}
         autoComplete="off"
-        placeholder="Курорт или санаторий"
+        placeholder={guide ? 'Введите или выберите' : 'Курорт или санаторий'}
         value={q}
         onFocus={(e) => {
           setOpen(true);

@@ -27,6 +27,13 @@ export interface Booking {
   flights: 'yes' | 'no' | 'help' | null;
   /** package: flight Tel Aviv ⇄ Vilnius + group transfer, chosen in the search */
   flightPackage: boolean;
+  /**
+   * What the guest has really chosen in the search card: '' (nothing yet), 'resort:<id>' or
+   * 'san:<hotel id>'. The home page keeps the field empty until then and shows what to do next.
+   */
+  chosenPlace: string;
+  /** the guest has picked the dates themselves (until then the home page shows empty date fields) */
+  chosenDates: boolean;
 }
 
 /** Defaults = the example order used throughout the prototype. [ПРИМЕР ДАННЫХ] */
@@ -42,4 +49,6 @@ export const DEFAULT_BOOKING: Booking = {
   transfer: { mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius', vehicle: 'car' },
   flights: null,
   flightPackage: false,
+  chosenPlace: '',
+  chosenDates: false,
 };

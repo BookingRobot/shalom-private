@@ -7,7 +7,8 @@ import { MonthsCalendar, type CalendarCell } from '../../components/calendar/Mon
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
-import { isSoldOutEverywhere } from '../../data/availability';
+import { isSoldOutEverywhere, nearestStays } from '../../data/availability';
+import { HeadsetIcon, VanIcon } from '../../components/icons';
 import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
@@ -16,7 +17,8 @@ import { awardsOf } from '../../data/awards';
 import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
-import { RoomCard } from '../../components/RoomCard';
+import { RoomCard, tipCheapest } from '../../components/RoomCard';
+import { NextTip } from '../../components/NextTip';
 import { PriceBox } from '../../components/PriceBox';
 import { ChooseWizard } from '../../components/ChooseWizard';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
@@ -41,7 +43,9 @@ class ResultsLogic extends PageLogic {
       checkin: b.checkin,
       nights: daysBetween(toD(b.checkin), toD(b.checkout)),
       sort: 'pop',
-      open: { 'egle-comfort': true },
+      // all sanatoriums start folded: a bubble at the first one says to open the rooms
+      open: {},
+      closing: {},
       det: {},
       sec: {},
       f: { daily: true, doctor: true },
@@ -52,7 +56,10 @@ class ResultsLogic extends PageLogic {
     };
     // came from the name search on the home page: open that sanatorium's rooms
     const hq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('h') : null;
-    if (hq) this.state.open = { [hq]: true };
+    if (hq) {
+      this.state.open = { [hq]: true };
+      this.state.lastOpen = hq;
+    }
   }
   syncBooking(st) {
     return st.checkin ? { checkin: st.checkin, checkout: iso(addD(toD(st.checkin), st.nights || 9)) } : null;
@@ -303,7 +310,20 @@ class ResultsLogic extends PageLogic {
     };
     const cmp: string[] = st.cmp || [];
     const cmpLimit = this.cmpLimit || 3;
-    const hotels = list.map((h0) => {
+    const closing = st.closing || {};
+    const anyOpen = Object.keys(open).some((k) => open[k]);
+    const still = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    // folding the rooms away takes a moment (CSS .rooms-reveal.closing), then they leave the page
+    const fold = (id: string) => {
+      if (still) return this.setState({ open: { ...open, [id]: false } });
+      this.setState({ closing: { ...closing, [id]: true } });
+      window.setTimeout(() => {
+        const s2 = this.state;
+        if ((s2.closing || {})[id])
+          this.setState({ open: { ...s2.open, [id]: false }, closing: { ...s2.closing, [id]: false } });
+      }, 820);
+    };
+    const hotels = list.map((h0, idx) => {
       const sf = stayFactor(h0, checkin);
       const h = {
         ...h0,
@@ -317,8 +337,13 @@ class ResultsLogic extends PageLogic {
           rest: fmt(Math.round(toNum(o.price) * sf) - Math.ceil(Math.round(toNum(o.price) * sf) * ADV_RATE)),
         })),
       };
-      const isOpen = !!open[h.id];
+      const shown = !!open[h.id];
+      const isOpen = shown && !closing[h.id];
       const aw = awardsOf[h.id] || [];
+      // the next step after the search: open the rooms of the first (promoted) sanatorium;
+      // once rooms are open: choose the cheapest free room of the sanatorium opened last
+      const tipOn = idx === 0 && !anyOpen && !st.rmTipX;
+      const roomTip = isOpen && st.lastOpen === h.id && !st.roomTipX;
       return {
         ...h,
         openCal: () =>
@@ -353,7 +378,9 @@ class ResultsLogic extends PageLogic {
                         ? ICON_PATHS.bed2
                         : 'm5 12 5 5L20 7',
         })),
-        open: isOpen,
+        open: shown,
+        closing: shown && !isOpen,
+        tipOn,
         border: isOpen ? '#1F5F4A' : '#E3DED2',
         btnLabel: isOpen ? 'Скрыть варианты' : 'Номера и программы',
         chips: [
@@ -372,8 +399,17 @@ class ResultsLogic extends PageLogic {
               : null,
         ].filter(Boolean),
         chev: isOpen ? 'rotate(180deg)' : 'none',
-        btnCls: isOpen ? 'btn-secondary' : 'btn-primary',
-        toggle: () => this.setState({ open: { ...open, [h.id]: !isOpen } }),
+        btnCls: (isOpen ? 'btn-secondary' : 'btn-primary') + (tipOn ? ' next-pulse' : ''),
+        toggle: () =>
+          isOpen
+            ? fold(h.id)
+            : // the guest found the rooms: the bubble does not come back
+              this.setState({
+                open: { ...open, [h.id]: true },
+                closing: { ...closing, [h.id]: false },
+                rmTipX: true,
+                lastOpen: h.id,
+              }),
         cmpOn: cmp.includes(h.id),
         cmpOff: !cmp.includes(h.id) && cmp.length >= cmpLimit,
         cmpToggle: () =>
@@ -386,127 +422,132 @@ class ResultsLogic extends PageLogic {
         toggleTime: secT(h.id, 'time'),
         trOpen: !!sec[h.id + 'tr'],
         toggleTr: secT(h.id, 'tr'),
-        offers: roomsOf(h0, h, sf).map((r) => {
-          const o = r;
-          const key = h.id + '-' + o.n;
-          const dOpen = !!det[key];
-          const area = (o.amen.find((a) => /м²/.test(a.t)) || {}).t;
-          const beds = o.amen.find((a) => /кроват/i.test(a.t));
-          const extra = o.amen.find((a) => /Балкон|Кондиционер|Ванна/.test(a.t));
-          const amenTop = [
-            { d: ICON_PATHS.bed2, t: o.room + (area ? ' · ' + area : '') },
-            beds
-              ? {
-                  d: beds.d,
-                  t: beds.t.replace('2 односпальные кровати', '2 отдельные кровати') + (extra ? ' · ' + extra.t : ''),
-                }
-              : null,
-          ].filter(Boolean);
-          const parts = String(o.title).split(' — ');
-          const short = parts[0];
-          const progT = o.prog.map((p) => p.t).join(' ');
-          const sub =
-            'с программой ' +
-            short.replace('Программа ', '') +
-            (parts[1] ? ' · ' + parts[1] : '') +
-            (/питани/i.test(progT) ? ' · питание 3 раза' : '');
-          // programmes for this room, cheapest first; selection drives the details below
-          const ps = st.ps || {};
-          const selI = ps[key] ?? 0;
-          const progs = r.progs;
-          const sp = progs[selI] || progs[0];
-          const progRows = progs.map((p, pi) => {
-            const on = pi === selI,
-              pp = p.title.split(' — ');
-            return {
-              name: pp[0],
-              sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
-              price:
-                eur(
-                  quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
-                    .perPerson,
-                ) + ' / чел.',
-              diff:
-                pi === 0
-                  ? 'самая доступная'
-                  : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
-              diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
-              border: on ? '#1F5F4A' : '#CFC9BB',
-              bg: on ? '#EEF5F1' : '#fff',
-              dot: on ? '#1F5F4A' : 'transparent',
-              pick: () => this.setState({ ps: { ...ps, [key]: pi } }),
-            };
-          });
-          const spVal = valueOf(sp, o.room, area);
-          const spLines = String(sp.details)
-            .split('\n')
-            .map((l) => l.trim())
-            .filter(Boolean)
-            .map((l) => ({
-              t: l.replace(/^— ?/, '• '),
-              fw: /:$/.test(l) || /^\d+\./.test(l) ? 700 : 400,
-              pl: /^—/.test(l) ? '14px' : '0',
-              mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
-            }));
-          const rkey = h.id + ':' + r.id,
-            checkout = addD(checkin, NIGHTS);
-          const busy = overlaps(rkey, checkin, checkout);
-          const p0 = progs[0].title.split(' — ');
-          return {
-            ...o,
-            short: o.room,
-            sub,
-            value: spVal,
-            detLines: spLines,
-            prog: sp.prog,
-            amenTop,
-            progRows,
-            ...(busy ? BUSY_LOOK : FREE_LOOK),
-            busy,
-            avail: !busy,
-            busyRange: range(checkin),
-            nextFree: freeFrom(rkey),
-            pill: busy
-              ? 'Нет мест на ваши даты'
-              : r.addN
-                ? 'Номер +' + eur(placePrice(r.addN, GQ)) + ' с человека'
-                : 'Включён в цену программы',
-            roomLine: (o.amen || [])
-              .slice(0, 3)
-              .map((a) => a.t)
-              .join(' · '),
-            progLine:
+        offers: tipCheapest(
+          roomsOf(h0, h, sf).map((r) => {
+            const o = r;
+            const key = h.id + '-' + o.n;
+            const dOpen = !!det[key];
+            const area = (o.amen.find((a) => /м²/.test(a.t)) || {}).t;
+            const beds = o.amen.find((a) => /кроват/i.test(a.t));
+            const extra = o.amen.find((a) => /Балкон|Кондиционер|Ванна/.test(a.t));
+            const amenTop = [
+              { d: ICON_PATHS.bed2, t: o.room + (area ? ' · ' + area : '') },
+              beds
+                ? {
+                    d: beds.d,
+                    t: beds.t.replace('2 односпальные кровати', '2 отдельные кровати') + (extra ? ' · ' + extra.t : ''),
+                  }
+                : null,
+            ].filter(Boolean);
+            const parts = String(o.title).split(' — ');
+            const short = parts[0];
+            const progT = o.prog.map((p) => p.t).join(' ');
+            const sub =
               'с программой ' +
-              p0[0].replace('Программа ', '') +
-              (p0[1] ? ' · ' + p0[1] : '') +
-              ' · ' +
-              (progs[0].meals || 'питание 3 раза'),
-            choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
-            // same calendar as the search band, with this room's busy nights closed
-            openRoomCal: () =>
-              this.setState({
-                sOpen: true,
-                sRoom: { key: rkey, name: r.room, hotel: h.name },
-                sNote: null,
-                ss: { in: null, out: null },
-                sm: checkin.getUTCMonth(),
-                sy: checkin.getUTCFullYear(),
-              }),
-            selName: sp.title.split(' — ')[0],
-            selPrice: eur(
-              quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id)).total,
-            ),
-            addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
-            detBtn: 'Программы и что входит (' + progs.length + ')',
-            detChev: dOpen ? 'rotate(180deg)' : 'none',
-            noImg: !o.img,
-            ppn: ppn(o.price),
-            oldPpn: o.old ? ppn(o.old) : '',
-            detOpen: dOpen,
-            detLabel: dOpen ? 'Всё понятно, можно убрать' : 'Подробнее. Что сюда входит?',
-            toggleDet: () => this.setState({ det: { ...det, [key]: !dOpen } }),
-          };
-        }),
+              short.replace('Программа ', '') +
+              (parts[1] ? ' · ' + parts[1] : '') +
+              (/питани/i.test(progT) ? ' · питание 3 раза' : '');
+            // programmes for this room, cheapest first; selection drives the details below
+            const ps = st.ps || {};
+            const selI = ps[key] ?? 0;
+            const progs = r.progs;
+            const sp = progs[selI] || progs[0];
+            const progRows = progs.map((p, pi) => {
+              const on = pi === selI,
+                pp = p.title.split(' — ');
+              return {
+                name: pp[0],
+                sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
+                price:
+                  eur(
+                    quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
+                      .perPerson,
+                  ) + ' / чел.',
+                diff:
+                  pi === 0
+                    ? 'самая доступная'
+                    : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
+                diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
+                border: on ? '#1F5F4A' : '#CFC9BB',
+                bg: on ? '#EEF5F1' : '#fff',
+                dot: on ? '#1F5F4A' : 'transparent',
+                pick: () => this.setState({ ps: { ...ps, [key]: pi } }),
+              };
+            });
+            const spVal = valueOf(sp, o.room, area);
+            const spLines = String(sp.details)
+              .split('\n')
+              .map((l) => l.trim())
+              .filter(Boolean)
+              .map((l) => ({
+                t: l.replace(/^— ?/, '• '),
+                fw: /:$/.test(l) || /^\d+\./.test(l) ? 700 : 400,
+                pl: /^—/.test(l) ? '14px' : '0',
+                mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
+              }));
+            const rkey = h.id + ':' + r.id,
+              checkout = addD(checkin, NIGHTS);
+            const busy = overlaps(rkey, checkin, checkout);
+            const p0 = progs[0].title.split(' — ');
+            return {
+              ...o,
+              short: o.room,
+              sub,
+              value: spVal,
+              detLines: spLines,
+              prog: sp.prog,
+              amenTop,
+              progRows,
+              ...(busy ? BUSY_LOOK : FREE_LOOK),
+              busy,
+              avail: !busy,
+              busyRange: range(checkin),
+              nextFree: freeFrom(rkey),
+              pill: busy
+                ? 'Нет мест на ваши даты'
+                : r.addN
+                  ? 'Номер +' + eur(placePrice(r.addN, GQ)) + ' с человека'
+                  : 'Включён в цену программы',
+              roomLine: (o.amen || [])
+                .slice(0, 3)
+                .map((a) => a.t)
+                .join(' · '),
+              progLine:
+                'с программой ' +
+                p0[0].replace('Программа ', '') +
+                (p0[1] ? ' · ' + p0[1] : '') +
+                ' · ' +
+                (progs[0].meals || 'питание 3 раза'),
+              choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
+              // same calendar as the search band, with this room's busy nights closed
+              openRoomCal: () =>
+                this.setState({
+                  sOpen: true,
+                  sRoom: { key: rkey, name: r.room, hotel: h.name },
+                  sNote: null,
+                  ss: { in: null, out: null },
+                  sm: checkin.getUTCMonth(),
+                  sy: checkin.getUTCFullYear(),
+                }),
+              selName: sp.title.split(' — ')[0],
+              selPrice: eur(
+                quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
+                  .total,
+              ),
+              addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
+              detBtn: 'Программы и что входит (' + progs.length + ')',
+              detChev: dOpen ? 'rotate(180deg)' : 'none',
+              noImg: !o.img,
+              ppn: ppn(o.price),
+              oldPpn: o.old ? ppn(o.old) : '',
+              detOpen: dOpen,
+              detLabel: dOpen ? 'Всё понятно, можно убрать' : 'Подробнее. Что сюда входит?',
+              toggleDet: () => this.setState({ det: { ...det, [key]: !dOpen } }),
+            };
+          }),
+          roomTip,
+          () => this.setState({ roomTipX: true }),
+        ),
       };
     });
     // calendar modal values
@@ -634,7 +675,9 @@ class ResultsLogic extends PageLogic {
         this.setState({ cal: { ...st.cal, month: m % 12, year: m > 11 ? y + 1 : y } });
       },
       calApply: () => {
-        if (!cal.applyOff) this.setState({ checkin: st.cal.picked || iso(checkin), cal: null });
+        if (cal.applyOff) return;
+        this.setState({ checkin: st.cal.picked || iso(checkin), cal: null });
+        this.props.booking.update({ chosenDates: true });
       },
       calNoteClose: () => this.setState({ cal: { ...st.cal, note: null } }),
       calNoteAsk: () => this.props.help.open(),
@@ -788,6 +831,7 @@ class ResultsLogic extends PageLogic {
       // a recommended option is the choice: apply the dates and show the list
       sFlexPick: (a, b) => {
         this.setState({ checkin: a, nights: daysBetween(toD(a), toD(b)), sOpen: false, sFlex: false, sRoom: null });
+        this.props.booking.update({ chosenDates: true });
       },
       sCalTitle: sRoom ? 'Свободные даты номера' : 'Выберите даты поездки',
       sRoomLine: sRoom ? sRoom.name + ' · ' + sRoom.hotel + ' — занятые дни закрыты' : '',
@@ -813,8 +857,9 @@ class ResultsLogic extends PageLogic {
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
       sApplyOff: !sN || sSelBad,
       sApplyCal: () => {
-        if (sN && sIn && !sSelBad)
-          this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null, sNote: null });
+        if (!(sN && sIn && !sSelBad)) return;
+        this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null, sNote: null });
+        this.props.booking.update({ chosenDates: true });
       },
       sP7: sPreset(7),
       sP10: sPreset(10),
@@ -832,7 +877,6 @@ class ResultsLogic extends PageLogic {
           stars: '★★★',
           sub: 'Друскининкай · у парка Вийя',
           img: '/img/79c9318ba02a718e29de4346c9642a33.jpg',
-          next: 'с 23 ноября',
         },
         {
           id: 'spa-vilnius',
@@ -840,10 +884,14 @@ class ResultsLogic extends PageLogic {
           stars: '★★★★',
           sub: 'Друскининкай · у реки Неман',
           img: '/img/30b3b315653c1dbc711827ceb6c48ebe.jpg',
-          next: 'с 1 декабря',
         },
       ].map((u) => ({
         ...u,
+        // the nearest stay of the same length with places (data/availability)
+        next: (() => {
+          const a = nearestStays(u.id, iso(checkin), NIGHTS, { count: 1 })[0];
+          return a ? range(toD(a.checkin)) : 'уточнит консультант';
+        })(),
         chips: [
           { t: 'Врач включён', d: ICON_PATHS.doctor },
           { t: 'Бассейн и сауны', d: ICON_PATHS.pool },
@@ -852,11 +900,13 @@ class ResultsLogic extends PageLogic {
         notify: () => this.props.help.open(),
       })),
       soldCount: '2 санатория',
+      rmTipClose: () => this.setState({ rmTipX: true }),
       wzOpen: !!st.wz,
       wzOpenFn: () => this.setState({ wz: true }),
       wzClose: () => this.setState({ wz: false }),
       wzShow: ({ filters, hotelId }) => {
         this.setState({
+          lastOpen: hotelId,
           f: { ...filters },
           pf: { ...filters },
           pr: {},
@@ -1115,20 +1165,24 @@ export default function ResultsPage() {
                     <Fragment key={_i0}>
                       <label className={`tile ${f.cls ?? ''}`}>
                         <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                        <svg
-                          width="22"
-                          height="22"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none', opacity: '.85' }}
-                        >
-                          <path d={f.d} />
-                        </svg>
+                        {f.d === CAR_ICON ? (
+                          <VanIcon height={22} />
+                        ) : (
+                          <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#1F5F4A"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            style={{ flex: 'none', opacity: '.85' }}
+                          >
+                            <path d={f.d} />
+                          </svg>
+                        )}
                         <span>{f.t}</span>
                       </label>
                     </Fragment>
@@ -1300,20 +1354,24 @@ export default function ResultsPage() {
                             <Fragment key={_i0}>
                               <label className="fchk">
                                 <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                <svg
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#1F5F4A"
-                                  strokeWidth="1.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                  style={{ flex: 'none', opacity: '.85' }}
-                                >
-                                  <path d={f.d} />
-                                </svg>
+                                {f.d === CAR_ICON ? (
+                                  <VanIcon height={20} />
+                                ) : (
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#1F5F4A"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                    style={{ flex: 'none', opacity: '.85' }}
+                                  >
+                                    <path d={f.d} />
+                                  </svg>
+                                )}
                                 {f.t}
                                 <span className="n">{f.n}</span>
                               </label>
@@ -1332,20 +1390,24 @@ export default function ResultsPage() {
                               <Fragment key={_i0}>
                                 <label className="fchk">
                                   <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                    style={{ flex: 'none', opacity: '.85' }}
-                                  >
-                                    <path d={f.d} />
-                                  </svg>
+                                  {f.d === CAR_ICON ? (
+                                    <VanIcon height={20} />
+                                  ) : (
+                                    <svg
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                      style={{ flex: 'none', opacity: '.85' }}
+                                    >
+                                      <path d={f.d} />
+                                    </svg>
+                                  )}
                                   {f.t}
                                   <span className="n">{f.n}</span>
                                 </label>
@@ -1363,20 +1425,24 @@ export default function ResultsPage() {
                               <Fragment key={_i0}>
                                 <label className="fchk">
                                   <input type="checkbox" checked={!!f.on} onChange={f.toggle} />
-                                  <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                    style={{ flex: 'none', opacity: '.85' }}
-                                  >
-                                    <path d={f.d} />
-                                  </svg>
+                                  {f.d === CAR_ICON ? (
+                                    <VanIcon height={20} />
+                                  ) : (
+                                    <svg
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                      style={{ flex: 'none', opacity: '.85' }}
+                                    >
+                                      <path d={f.d} />
+                                    </svg>
+                                  )}
                                   {f.t}
                                   <span className="n">{f.n}</span>
                                 </label>
@@ -1665,20 +1731,24 @@ export default function ResultsPage() {
                         {(h.chips || []).map((c: any, _i1: number) => (
                           <Fragment key={_i1}>
                             <span className="fact" style={{ fontSize: '15px', color: '#1C2620' }}>
-                              <svg
-                                width="22"
-                                height="22"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#1F5F4A"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                                style={{ flex: 'none' }}
-                              >
-                                <path d={c.d} />
-                              </svg>
+                              {c.d === CAR_ICON ? (
+                                <VanIcon height={18} />
+                              ) : (
+                                <svg
+                                  width="22"
+                                  height="22"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="#1F5F4A"
+                                  strokeWidth="1.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                  style={{ flex: 'none' }}
+                                >
+                                  <path d={c.d} />
+                                </svg>
+                              )}
                               {c.t}
                             </span>
                           </Fragment>
@@ -1698,19 +1768,23 @@ export default function ResultsPage() {
                             {(h.awards || []).map((w: any, _i1: number) => (
                               <Fragment key={_i1}>
                                 <span className="badge">
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#1F5F4A"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                  >
-                                    <path d={w.d} />
-                                  </svg>
+                                  {w.d === CAR_ICON ? (
+                                    <VanIcon height={16} />
+                                  ) : (
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#1F5F4A"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      aria-hidden="true"
+                                    >
+                                      <path d={w.d} />
+                                    </svg>
+                                  )}
                                   {w.t}
                                 </span>
                               </Fragment>
@@ -1720,6 +1794,7 @@ export default function ResultsPage() {
                       ) : null}
                     </div>
                     <div
+                      className="hc-buy"
                       style={{
                         flex: '0 0 220px',
                         padding: '16px 18px',
@@ -1732,11 +1807,16 @@ export default function ResultsPage() {
                       }}
                     >
                       <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} hotelId={h.id} />
+                      {h.tipOn ? (
+                        <NextTip onClose={v.rmTipClose} className="rm-tip">
+                          Следующий шаг: <strong>посмотрите номера</strong>
+                        </NextTip>
+                      ) : null}
                       <button
                         type="button"
                         className={`btn ${h.btnCls ?? ''}`}
                         onClick={() => {
-                          if (!h.open) revealRooms(h.id);
+                          if (!h.open || h.closing) revealRooms(h.id);
                           h.toggle();
                         }}
                         aria-expanded={h.open}
@@ -1792,7 +1872,7 @@ export default function ResultsPage() {
                     </div>
                   </div>
                   {h.open ? (
-                    <div className="rooms-reveal">
+                    <div className={'rooms-reveal' + (h.closing ? ' closing' : '')}>
                       <div className="rooms-reveal-in">
                         <div
                           className="rooms-indent"
@@ -1993,19 +2073,23 @@ export default function ResultsPage() {
                       {(u.chips || []).map((c: any, _i1: number) => (
                         <Fragment key={_i1}>
                           <span className="fact" style={{ color: '#5E6862' }}>
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#8A968F"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d={c.d} />
-                            </svg>
+                            {c.d === CAR_ICON ? (
+                              <VanIcon height={18} />
+                            ) : (
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#8A968F"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d={c.d} />
+                              </svg>
+                            )}
                             {c.t}
                           </span>
                         </Fragment>
@@ -2042,11 +2126,12 @@ export default function ResultsPage() {
                     </Link>
                     <button
                       type="button"
-                      className="linkbtn"
+                      className="btn btn-primary"
                       onClick={u.notify}
-                      style={{ fontSize: '15px', justifyContent: 'center' }}
+                      style={{ minHeight: '46px', fontSize: '15px', padding: '0 14px', gap: '8px' }}
                     >
-                      Сообщить, если появятся места
+                      <HeadsetIcon size={20} />
+                      Свяжитесь со мной
                     </button>
                   </div>
                 </article>

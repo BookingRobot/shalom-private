@@ -396,27 +396,57 @@
 .pg-results .rooms-reveal {
   display: grid;
   grid-template-rows: 1fr;
-  animation: roomsGrow 0.6s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+  /* the same soft curve as before, twice as slow: slides out and settles, the iPhone way */
+  animation: roomsGrow 1.2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
 }
 .pg-results .rooms-reveal-in {
   min-height: 0;
   /* clipped only while it grows: tips and pop-ups inside are free afterwards */
-  animation: roomsClip 0.6s linear;
+  animation: roomsClip 1.2s linear;
 }
 .pg-results .rooms-reveal .rooms-indent > :not(.rooms-guide) {
-  animation: roomsItem 0.45s ease-out both;
+  animation: roomsItem 0.9s ease-out both;
 }
 .pg-results .rooms-reveal .rooms-indent > :nth-child(3) {
-  animation-delay: 0.07s;
-}
-.pg-results .rooms-reveal .rooms-indent > :nth-child(4) {
   animation-delay: 0.14s;
 }
+.pg-results .rooms-reveal .rooms-indent > :nth-child(4) {
+  animation-delay: 0.28s;
+}
 .pg-results .rooms-reveal .rooms-indent > :nth-child(5) {
-  animation-delay: 0.21s;
+  animation-delay: 0.42s;
 }
 .pg-results .rooms-reveal .rooms-indent > :nth-child(n + 6) {
-  animation-delay: 0.28s;
+  animation-delay: 0.56s;
+}
+/* «Скрыть варианты»: the rooms fold back up under the card */
+.pg-results .rooms-reveal.closing {
+  animation: roomsShrink 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.pg-results .rooms-reveal.closing .rooms-reveal-in {
+  overflow: hidden;
+  animation: none;
+}
+.pg-results .rooms-reveal.closing .rooms-indent > * {
+  animation: roomsItemOut 0.45s ease-in both;
+}
+@keyframes roomsShrink {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes roomsItemOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+/* the bubble over «Номера и программы» (NextTip) sits in the narrow price column */
+.pg-results .rm-tip + .btn {
+  margin-top: 0 !important;
 }
 @keyframes roomsGrow {
   from {
@@ -447,5 +477,15 @@
   .pg-results .rooms-reveal-in,
   .pg-results .rooms-reveal .rooms-indent > * {
     animation: none;
+  }
+}
+/* phone: price, the next-step bubble and the buttons take the whole width of the card */
+@media (max-width: 640px) {
+  .pg-results .hc-buy {
+    flex: 1 1 100% !important;
+    border-left: 0 !important;
+    border-top: 1px solid #e3ded2;
+    margin: 0 14px !important;
+    padding: 14px 0 16px !important;
   }
 }

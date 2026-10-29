@@ -175,3 +175,27 @@ body.has-stepbar .help-fab {
     box-shadow: 0 0 0 3px #e3a93b;
   }
 }
+/* «Далее» carries the bubble «what to do now» above it (NextTip float) */
+.step-next-at {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+/* phone: the bubble in the bottom bar spans the bar (the button may sit anywhere in it) */
+@media (max-width: 760px) {
+  .step-bar .step-next-at,
+  .rooms-bar .step-next-at {
+    position: static;
+  }
+  .step-bar .next-tip-float,
+  .rooms-bar .next-tip-float {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+  }
+  .step-row .next-tip-float {
+    right: auto;
+    left: 0;
+  }
+}

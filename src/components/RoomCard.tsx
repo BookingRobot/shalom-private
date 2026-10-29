@@ -1,3 +1,4 @@
+import { NextTip } from './NextTip';
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { PriceBox } from './PriceBox';
@@ -24,6 +25,27 @@ const ROOM_INCL = [
  * price for the stay or "busy on your dates", programmes for this room.
  * `o` is the view-model built by the page (see roomsOf / offers in page logic).
  */
+/**
+ * Marks the cheapest free room of a list (`cheapest`) and, when `on`, gives it the
+ * «Следующий шаг: выберите номер» bubble (`tip`).
+ */
+export function tipCheapest<T extends { avail?: boolean; price: string | number }>(
+  offers: T[],
+  on: boolean,
+  close: () => void,
+): (T & { cheapest: boolean; tip: boolean; tipClose: () => void })[] {
+  let best = -1,
+    min = Infinity;
+  offers.forEach((o, i) => {
+    const p = Number(String(o.price).replace(/\s/g, ''));
+    if (o.avail && p < min) {
+      min = p;
+      best = i;
+    }
+  });
+  return offers.map((o, i) => ({ ...o, cheapest: i === best, tip: on && i === best, tipClose: close }));
+}
+
 export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
   return (
     <article
@@ -149,11 +171,17 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           {o.avail ? (
             <>
               <PriceBox forTwo={o.price} nightsLabel={nightsLabel} />
+              {o.tip ? (
+                <NextTip onClose={o.tipClose}>
+                  Следующий шаг: <strong>выберите номер</strong>
+                </NextTip>
+              ) : null}
               <Link
-                className="btn btn-primary"
+                className={'btn btn-primary' + (o.tip ? ' next-pulse' : '')}
                 to="/rooms"
                 onClick={o.choose}
-                style={{ minHeight: '48px', fontSize: '16px', marginTop: '12px' }}
+                data-cheapest={o.cheapest ? '1' : undefined}
+                style={{ minHeight: '48px', fontSize: '16px', marginTop: o.tip ? '0' : '12px' }}
               >
                 Выбрать номер
               </Link>

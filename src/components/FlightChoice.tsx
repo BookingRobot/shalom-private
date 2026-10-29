@@ -78,7 +78,7 @@ export function FlightChoice() {
 
   const pickWith = (dates?: { checkin: string; checkout: string }) =>
     update({
-      ...(dates || {}),
+      ...(dates ? { ...dates, chosenDates: true } : {}),
       flightPackage: true,
       flights: 'yes',
       transfer: { ...booking.transfer, mode: 'group', back: true, place: 'vilnius', backPlace: 'vilnius' },
