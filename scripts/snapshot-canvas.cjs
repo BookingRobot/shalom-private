@@ -148,9 +148,75 @@ const BOARDS = [
     },
     links: [
       ['.tk-date', '', 'Tickets-cal.dc.html'],
+      ['.tk-buy', '', 'Tickets-pax.dc.html'],
       ['.tk-res button', 'Свяжитесь со мной', 'Help.dc.html'],
       ['.tk-res button', 'Подобрать санаторий', 'Results-B.dc.html'],
     ],
+  },
+  {
+    file: 'Tickets-pax.dc.html',
+    title: 'Прямые перелёты · покупка онлайн, шаг 2: имена как в паспорте и куда прислать билеты',
+    route: '/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=pax',
+    state: true,
+    links: [
+      ['.tk-next', '', 'Tickets-pay.dc.html'],
+      ['.tk-back', '', 'Tickets-res.dc.html'],
+    ],
+  },
+  {
+    file: 'Tickets-pay.dc.html',
+    title: 'Прямые перелёты · шаг 3: оплата картой всей суммы',
+    route: '/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=pay',
+    state: true,
+    setup: async (p) => {
+      await p.evaluate(() =>
+        sessionStorage.setItem(
+          'br-shalom:tickets',
+          JSON.stringify({
+            pax: [
+              { first: 'Ivan', last: 'Ivanov', birth: '1958-03-14' },
+              { first: 'Maria', last: 'Ivanova', birth: '1960-07-02' },
+            ],
+            code: '+972',
+            phone: '50 123 4567',
+            email: 'ivan@gmail.com',
+            no: 'TK-261101-482',
+          }),
+        ),
+      );
+      await p.reload({ waitUntil: 'networkidle' });
+      await p.waitForTimeout(700);
+    },
+    links: [
+      ['.tk-pay', '', 'Tickets-done.dc.html'],
+      ['.tk-back', '', 'Tickets-pax.dc.html'],
+    ],
+  },
+  {
+    file: 'Tickets-done.dc.html',
+    title: 'Прямые перелёты · спасибо, билеты оплачены — пришлём на почту и в WhatsApp',
+    route: '/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=done',
+    state: true,
+    setup: async (p) => {
+      await p.evaluate(() =>
+        sessionStorage.setItem(
+          'br-shalom:tickets',
+          JSON.stringify({
+            pax: [
+              { first: 'Ivan', last: 'Ivanov', birth: '1958-03-14' },
+              { first: 'Maria', last: 'Ivanova', birth: '1960-07-02' },
+            ],
+            code: '+972',
+            phone: '50 123 4567',
+            email: 'ivan@gmail.com',
+            no: 'TK-261101-482',
+          }),
+        ),
+      );
+      await p.reload({ waitUntil: 'networkidle' });
+      await p.waitForTimeout(700);
+    },
+    links: [['.tk-stay-btn', '', 'Results-B.dc.html']],
   },
   { file: 'Help.dc.html', title: 'Справка · Форма «Свяжитесь со мной» (на всех страницах)', route: '/?help=1' },
   // States people comment on: pop-ups and variants

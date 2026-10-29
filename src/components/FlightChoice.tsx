@@ -167,7 +167,6 @@ export function FlightChoice() {
           aria-checked={withOn}
           className={'choice fly-yes ' + (withOn ? 'on' : '')}
           onClick={() => pickWith()}
-          style={{ flex: '2 1 360px' }}
         >
           <span className={'radio ' + (withOn ? 'on' : '')}>
             <i />
@@ -194,7 +193,6 @@ export function FlightChoice() {
           aria-checked={ownOn}
           className={'choice ' + (ownOn ? 'on' : '')}
           onClick={pickOwn}
-          style={{ flex: '1 1 220px' }}
         >
           <span className={'radio ' + (ownOn ? 'on' : '')}>
             <i />

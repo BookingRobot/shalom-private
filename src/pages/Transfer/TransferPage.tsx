@@ -437,7 +437,6 @@ export default function TransferPage() {
                 aria-checked={v.need}
                 className={`choice ${v.yesCls}`}
                 onClick={v.sayYes}
-                style={{ flex: '2 1 360px' }}
               >
                 <span className={`radio ${v.yesCls}`}>
                   <i />
@@ -454,7 +453,6 @@ export default function TransferPage() {
                 aria-checked={v.noNeed}
                 className={`choice tr-no ${v.noCls}`}
                 onClick={v.sayNo}
-                style={{ flex: '1 1 220px' }}
               >
                 <span className={`radio ${v.noCls}`}>
                   <i />
@@ -1044,7 +1042,6 @@ export default function TransferPage() {
                           aria-checked={v.backOn}
                           className={`choice ${v.backYesCls}`}
                           onClick={v.pickBackYes}
-                          style={{ flex: '2 1 320px' }}
                         >
                           <span className={`radio ${v.backYesCls}`}>
                             <i />
@@ -1061,7 +1058,6 @@ export default function TransferPage() {
                           aria-checked={v.backNoCls === 'on'}
                           className={`choice tr-no ${v.backNoCls}`}
                           onClick={v.pickBackNo}
-                          style={{ flex: '1 1 220px' }}
                         >
                           <span className={`radio ${v.backNoCls}`}>
                             <i />
@@ -1081,7 +1077,6 @@ export default function TransferPage() {
                               aria-checked={v.backSame}
                               className={`choice ${v.sameCls}`}
                               onClick={v.pickSame}
-                              style={{ flex: '2 1 300px' }}
                             >
                               <span className={`radio ${v.sameCls}`}>
                                 <i />
@@ -1097,7 +1092,6 @@ export default function TransferPage() {
                               aria-checked={v.backOther}
                               className={`choice ${v.otherCls}`}
                               onClick={v.pickOther}
-                              style={{ flex: '1 1 220px' }}
                             >
                               <span className={`radio ${v.otherCls}`}>
                                 <i />

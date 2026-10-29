@@ -43,8 +43,8 @@ export const FLIGHT_FACTS = {
   ],
 };
 
-/** the first and the last day of the schedule we sell */
-export const FIRST_DAY = addD(TODAY, 1);
+/** the first and the last day of the schedule we show (today's flight too: it is sold by phone) */
+export const FIRST_DAY = TODAY;
 export const LAST_DAY = addD(TODAY, 365);
 
 export const hasFlight = (d: Date) => d >= FIRST_DAY && d <= LAST_DAY && isFlightDay(d);
@@ -82,6 +82,17 @@ export function legOn(dateIso: string, from: Country): FlightLeg | null {
     pp: legPrice(d, from),
   };
 }
+
+/** demo «now» for the 24-hour rule: today, 10:00 [ПРИМЕР ДАННЫХ — в системе текущее время] */
+export const NOW = new Date(TODAY.getTime() + 10 * 3600 * 1000);
+/** online the tickets are sold until 24 hours before the departure; later only by phone */
+export const ONLINE_UNTIL_H = 24;
+
+export function departsAt(leg: FlightLeg) {
+  const [h, m] = leg.dep.split(':').map(Number);
+  return new Date(toD(leg.date).getTime() + (h * 60 + m) * 60000);
+}
+export const canBuyOnline = (leg: FlightLeg) => departsAt(leg).getTime() - NOW.getTime() >= ONLINE_UNTIL_H * 3600000;
 
 export interface Offer {
   there: FlightLeg;
