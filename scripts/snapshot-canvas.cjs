@@ -256,12 +256,13 @@ const BOARDS = [
   },
   {
     file: 'Transfer-yes.dc.html',
-    title: 'Шаг 2 · «Да, нужен трансфер» и Вильнюс: где встретить, как ехать и обратно — гость выбирает сам',
+    title: 'Шаг 2 · «Да» → «Групповой» → Вильнюс: дальше где встретить и обратно — гость выбирает сам',
     route: '/transfer',
     state: true,
     setup: async (p) => {
       await p.click('text=Билеты у меня уже есть');
       await p.click('#trNeed .choice >> nth=0');
+      await p.click('#trHow .tr-how-opt >> nth=0');
       await p.click('#trFrom .rowpick >> nth=0');
       await p.waitForTimeout(300);
     },

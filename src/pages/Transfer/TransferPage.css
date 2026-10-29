@@ -437,3 +437,9 @@
     width: 84px;
   }
 }
+
+/* the city's details show once the row is opened */
+.pg-transfer .rowpick-info-in {
+  display: block;
+  margin: 0 0 10px;
+}
