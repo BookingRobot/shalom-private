@@ -1048,23 +1048,55 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-direction: column;
   gap: 16px;
 }
-.page .rs-video {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 0;
-  border-radius: var(--r);
-}
-.page .rs-video-empty {
-  background: #2b3a33;
-  color: #d9e2dc;
+.page .rs-yt {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+.page .rs-yt-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--r);
+  background: #2b3a33;
+}
+.page .rs-yt-bg,
+.page .rs-yt-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.page .rs-yt-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+  transition: transform 0.15s;
+}
+.page .rs-yt:hover .rs-yt-play,
+.page .rs-yt:focus-visible .rs-yt-play {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+.page .rs-yt-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.page .rs-yt-cap strong {
+  color: #1c2620;
+}
+.page .rs-yt-cap span {
+  color: #1f5f4a;
+  font-weight: 700;
   font-size: 14px;
-  padding: 12px;
 }
 .page .rs-facts {
   margin: 0;

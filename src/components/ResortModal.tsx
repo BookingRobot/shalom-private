@@ -75,30 +75,41 @@ export function ResortModal({
           </div>
           <aside className="rs-side">
             {r.video ? (
-              <iframe
-                className="rs-video"
-                src={r.video}
-                title={'Видео о курорте ' + r.name}
-                allow="encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div className="rs-video rs-video-empty" role="img" aria-label="Видео о курорте">
-                <svg
-                  width="44"
-                  height="44"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M10 8l6 4-6 4z" fill="#fff" />
-                </svg>
-                <span>Видео о курорте от туристического центра · [ДОБАВИТЬ ССЫЛКУ]</span>
-              </div>
-            )}
+              /* a picture of the film with a link to YouTube (no player on the page) */
+              <a
+                className="rs-yt"
+                href={'https://www.youtube.com/watch?v=' + r.video.id}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={'Смотреть видео на YouTube: ' + r.video.title}
+              >
+                <span className="rs-yt-pic">
+                  {/* the resort's own photo under the YouTube frame: shows if the frame does not load */}
+                  <img className="rs-yt-bg" src={r.hero} alt="" />
+                  <img
+                    className="rs-yt-thumb"
+                    src={'https://i.ytimg.com/vi/' + r.video.id + '/hqdefault.jpg'}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <span className="rs-yt-play" aria-hidden="true">
+                    <svg width="68" height="48" viewBox="0 0 68 48">
+                      <path
+                        d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.4 34 .4 34 .4s-21.2 0-26.5 1.3a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.6 34 47.6 34 47.6s21.2 0 26.5-1.3a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z"
+                        fill="#f00"
+                      />
+                      <path d="M45 24 27 14v20z" fill="#fff" />
+                    </svg>
+                  </span>
+                </span>
+                <span className="rs-yt-cap">
+                  <strong>{r.video.title}</strong>
+                  <span>Смотреть на YouTube · на русском · {r.video.by} ↗</span>
+                </span>
+              </a>
+            ) : null}
             <dl className="rs-facts">
               {r.facts.map(([k, v]) => (
                 <div key={k}>

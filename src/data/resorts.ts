@@ -1,8 +1,16 @@
 /**
  * Resort stories for the "Выберите курорт" pop-up: a short read for first-time guests.
- * Photos are the site's own; `video` is the resort's official tourism-centre film
- * (YouTube embed URL) — [ДОБАВИТЬ ССЫЛКИ НА ВИДЕО ТИЦ].
+ * Photos are the site's own; `video` is a Russian-language film on YouTube about the resort and
+ * its sanatoriums (shown as a picture with a link, not an embedded player).
  */
+export interface ResortVideo {
+  /** YouTube video id */
+  id: string;
+  /** what the film is about, in plain words */
+  title: string;
+  /** who made it */
+  by: string;
+}
 export interface Resort {
   id: string;
   name: string;
@@ -14,7 +22,7 @@ export interface Resort {
   facts: [string, string][];
   /** sanatoriums we sell here: name + id for the results page (empty id = no page yet) */
   sanatoriums: { name: string; id: string }[];
-  video: string;
+  video: ResortVideo | null;
 }
 
 export const RESORT_STORIES: Resort[] = [
@@ -52,7 +60,11 @@ export const RESORT_STORIES: Resort[] = [
       { name: 'Эгле Стандарт', id: 'egle-standart' },
       { name: 'Гранд Спа Друскининкай', id: 'grand-spa-druskininkai' },
     ],
-    video: '',
+    video: {
+      id: 'O74iW1AYXFE',
+      title: 'Санатории Друскининкая: лечебные отделения и минеральные бассейны',
+      by: 'sanatoriums.com',
+    },
   },
   {
     id: 'birstonas',
@@ -75,7 +87,11 @@ export const RESORT_STORIES: Resort[] = [
       ['Лечат', 'суставы и спина, сердце, нервы, пищеварение'],
     ],
     sanatoriums: [{ name: 'Эгле Комфорт Бирштонас', id: '' }],
-    video: '',
+    video: {
+      id: '38r6rIOlotM',
+      title: 'Санаторий «Эгле Комфорт» в Бирштонасе: номера, лечение, территория',
+      by: 'sanatoriums.com',
+    },
   },
   {
     id: 'palanga',
@@ -98,7 +114,11 @@ export const RESORT_STORIES: Resort[] = [
       ['Лечат', 'дыхание, нервы, суставы; морской климат'],
     ],
     sanatoriums: [{ name: 'Градиали', id: '' }],
-    video: '',
+    video: {
+      id: 'loQSxFTr8mY',
+      title: 'Паланга — морской курорт: климат, морская вода, лечебная грязь',
+      by: 'sanatoriums.com',
+    },
   },
   {
     id: 'anyksciai',
@@ -121,6 +141,6 @@ export const RESORT_STORIES: Resort[] = [
       ['Подходит', 'для отдыха и восстановления'],
     ],
     sanatoriums: [],
-    video: '',
+    video: null,
   },
 ];
