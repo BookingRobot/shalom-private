@@ -46,3 +46,10 @@
 .months-calendar .navbtn:hover {
   border-color: #1f5f4a;
 }
+.months-calendar .mc-months {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 18px 28px;
+}

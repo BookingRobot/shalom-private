@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
+import { CalLegend } from '../../components/calendar/CalLegend';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
 import {
   MONTHS,
@@ -380,17 +381,17 @@ class HotelLogic extends PageLogic {
       }
       return cells;
     };
-    const months = [{ title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) }];
+    // two months side by side: a stay across months is seen at once
+    const m1 = (m0 + 1) % 12,
+      y1 = m0 === 11 ? y0 + 1 : y0;
+    const months = [
+      { title: MONTHS_N[m0] + ' ' + y0, cells: monthCells(y0, m0) },
+      { title: MONTHS_N[m1] + ' ' + y1, cells: monthCells(y1, m1) },
+    ];
     const selN = sIn && sOut ? daysBetween(sIn, sOut) : 0;
     const curTotal = totalFor(checkin, nights, 2138),
       newTotal = selN ? totalFor(sIn, selN, 2138) : 0,
       diff = curTotal - newTotal;
-    const preset = (n) => () => {
-      const a = sIn || checkin;
-      const bad = blockedNights(a, addD(a, n), blocked);
-      if (bad.length) return this.setState({ note: blockedNote(bad) });
-      this.setState({ sel: { in: iso(a), out: iso(addD(a, n)) }, note: null });
-    };
     const selBlocked = !!(sIn && sOut && blockedNights(sIn, sOut, blocked).length);
     const calVals = {
       calOpen: !!st.cal,
@@ -458,10 +459,6 @@ class HotelLogic extends PageLogic {
         this.setState({ in: iso(sIn), out: iso(sOut), cal: false, note: null });
         this.props.booking.update({ chosenDates: true });
       },
-      p7: preset(7),
-      p10: preset(10),
-      p14: preset(14),
-      p21: preset(21),
     };
     return {
       ...calVals,
@@ -1914,7 +1911,7 @@ export default function HotelPage() {
               style={{
                 background: '#fff',
                 borderRadius: 'var(--r)',
-                width: 'min(1040px,100%)',
+                width: 'min(1120px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
@@ -1983,110 +1980,7 @@ export default function HotelPage() {
                   onNext={v.calNext}
                   planeTitle="Рейс из Израиля"
                 />
-                <aside className="cal-side">
-                  <span className="cal-side-h">Быстрый выбор</span>
-                  <div className="cal-pgrid">
-                    <button type="button" className="preset" onClick={v.p7}>
-                      7 ночей
-                    </button>
-                    <button type="button" className="preset" onClick={v.p10}>
-                      10 ночей
-                    </button>
-                    <button type="button" className="preset" onClick={v.p14}>
-                      14 ночей
-                    </button>
-                    <button type="button" className="preset" onClick={v.p21}>
-                      21 ночь
-                    </button>
-                  </div>
-                  <div className="cal-legend">
-                    <span className="lg">
-                      <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
-                      дешевле
-                    </span>
-                    <span className="lg">
-                      <i style={{ background: '#FFF6E3', border: '1px solid #F0DDB8' }} />
-                      как сейчас
-                    </span>
-                    <span className="lg">
-                      <i style={{ background: '#FCEDE9', border: '1px solid #F0CFC6' }} />
-                      дороже
-                    </span>
-                    <span className="lg">
-                      <i style={{ background: '#E8E6E1' }} />
-                      прошедшие дни
-                    </span>
-                    <span className="lg">
-                      <i
-                        style={{
-                          background: 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)',
-                          border: '1px solid #CFC9BB',
-                        }}
-                      />
-                      нет свободных мест
-                    </span>
-                    <details className="cal-fly">
-                      <summary
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          listStyle: 'none',
-                        }}
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#1F5F4A"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
-                        </svg>
-                        <span>
-                          <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
-                        </span>
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            border: '1.5px solid #1F5F4A',
-                            color: '#1F5F4A',
-                            fontSize: '12px',
-                            fontWeight: '800',
-                          }}
-                        >
-                          i
-                        </span>
-                      </summary>
-                      <div
-                        style={{
-                          marginTop: '8px',
-
-                          background: '#F4F1EA',
-                          borderRadius: 'var(--r)',
-                          padding: '10px 12px',
-                          fontSize: '14px',
-                          lineHeight: '1.45',
-                          color: '#1C2620',
-                        }}
-                      >
-                        Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
-                        осени — также Wizz Air). В отмеченные дни удобнее всего заезжать и уезжать: трансфер встретит
-                        прямо в аэропорту. Расписание рейсов уточняйте у авиакомпании [ПОДТВЕРДИТЬ ДНИ].
-                      </div>
-                    </details>
-                  </div>
-                </aside>
+                <CalLegend />
               </div>
               <div
                 style={{

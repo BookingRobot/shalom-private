@@ -48,13 +48,15 @@ window.__dc = {
     const mc = dialog.querySelector('.months-calendar');
     const nav = mc.querySelectorAll(':scope > .navbtn');
     d.on(nav[0], 'click', 'calPrev'); d.on(nav[1], 'click', 'calNext');
-    const month = mc.querySelector(':scope > div > div');
-    d.text(month.children[0], 'calMonth');
-    const grid = month.children[1];
-    grid.querySelectorAll('.cell').forEach((c) => c.remove());
-    grid.appendChild(d.raw('cells'));
+    // two months side by side: each title and grid becomes a template
+    mc.querySelectorAll(':scope > div > div').forEach((month, k) => {
+      d.text(month.children[0], k ? 'calMonth2' : 'calMonth');
+      const grid = month.children[1];
+      grid.querySelectorAll('.cell').forEach((c) => c.remove());
+      grid.appendChild(d.raw(k ? 'cells2' : 'cells'));
+    });
     const body = dialog.querySelector('.cal-body');
-    (body || presets[0].parentElement).before(d.raw('exact-start'));
+    (body || mc).before(d.raw('exact-start'));
     (body || mc).after(d.raw('exact-end'));
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
@@ -195,6 +197,9 @@ class Component extends DCLogic {
       if (blocked(date)) return this.setState({ note: noteFor([date], true) });
       this.setState({ sel: { in: k, out: null }, note: '' });
     };
+    // the calendar shows two months side by side: m0 and the next one
+    const m1 = (m0 + 1) % 12, y1 = m0 === 11 ? y0 + 1 : y0;
+    const cellsFor = (y0, m0) => {
     const first = new Date(Date.UTC(y0, m0, 1)), lead = (first.getUTCDay() + 6) % 7;
     const days = new Date(Date.UTC(y0, m0 + 1, 0)).getUTCDate();
     const cells = [];
@@ -213,6 +218,9 @@ class Component extends DCLogic {
         bg, border, color, subColor, off: past, cursor: past || ((full || busy) && !canOut) ? 'not-allowed' : 'pointer',
         aria: d + ' ' + MONTHS[m0], pick: pick(date) });
     }
+    return cells;
+    };
+    const cells = cellsFor(y0, m0), cells2 = cellsFor(y1, m1);
     const nights = sIn && sOut ? Math.round((sOut - sIn) / DAY) : 0;
     const preset = (n) => () => {
       const a = sIn || inD, bad = badNights(a, addD(a, n));
@@ -285,7 +293,7 @@ class Component extends DCLogic {
       closeCal: () => this.setState({ cal: '', room: false, note: '' }),
       calPrev: () => { const m = m0 - 1; this.setState({ m: (m + 12) % 12, y: m < 0 ? y0 - 1 : y0 }); },
       calNext: () => { const m = m0 + 1; this.setState({ m: m % 12, y: m > 11 ? y0 + 1 : y0 }); },
-      calMonth: MONTHS_N[m0] + ' ' + y0, cells,
+      calMonth: MONTHS_N[m0] + ' ' + y0, cells, calMonth2: MONTHS_N[m1] + ' ' + y1, cells2,
       p7: preset(7), p10: preset(10), p14: preset(14), p21: preset(21),
       selIn: sIn ? shortD(sIn) : '—', selOut: sOut ? shortD(sOut) : '—', selNights: nights ? nights + ' ' + nW(nights) : '—',
       applyOff: !nights,

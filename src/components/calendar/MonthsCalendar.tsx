@@ -39,7 +39,7 @@ interface Props {
   gap?: number;
 }
 
-/** Vertical list of month grids with ‹ › buttons — used for picking stay dates. */
+/** Month grids with ‹ › buttons — two side by side on a laptop, one under another on a phone. */
 export function MonthsCalendar({
   months,
   onPrev,
@@ -67,7 +67,8 @@ export function MonthsCalendar({
           <path d="m15 6-6 6 6 6" />
         </svg>
       </button>
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      {/* two months side by side — a stay across months is seen at once (stacked on a phone) */}
+      <div className="mc-months">
         {months.map((m, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '600', textAlign: 'center' }}>
