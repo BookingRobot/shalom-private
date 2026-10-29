@@ -589,3 +589,25 @@
     animation: none;
   }
 }
+
+/* «Да / Нет» answers: each title with its «i» stays on one line; the «Да» answer takes the
+   rest of the row, «Нет» only what it needs; when both do not fit, «Нет» goes below */
+.pg-transfer .tr-q > .choice {
+  width: auto;
+  flex: 1 0 auto;
+}
+.pg-transfer .tr-q > .choice:first-child {
+  flex: 999 1 0;
+  min-width: min(100%, 440px);
+}
+.pg-transfer .tr-q > .choice .info-pop {
+  /* the opened balloon does not widen the answer */
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+@media (min-width: 640px) {
+  .pg-transfer .tr-q > .choice .info-line > strong {
+    white-space: nowrap;
+  }
+}

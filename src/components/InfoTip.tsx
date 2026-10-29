@@ -30,7 +30,12 @@ export function InfoTitle({
           tabIndex={0}
           aria-label="Подробнее"
           aria-expanded={open}
-          onMouseDown={(e) => (was.current = document.activeElement === e.currentTarget)}
+          onMouseDown={(e) => {
+            was.current = document.activeElement === e.currentTarget;
+            // no focus (and no balloon) on press: the balloon opens on the click itself, so the
+            // answer around it does not move under the finger and does not get chosen by mistake
+            e.preventDefault();
+          }}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
