@@ -65,7 +65,7 @@ const BOARDS = [
     file: 'Results-B.dc.html',
     title: '2 · Результаты (Друскининкай)',
     route: '/results',
-    search: { city: false },
+    search: { city: true },
     links: [
       ['button', 'Помогите выбрать санаторий', 'Results-wizard.dc.html'],
       ['button', 'Выбрать другие даты', 'Results-roomdates.dc.html'],
@@ -200,7 +200,7 @@ const BOARDS = [
       await p.click('#guests');
       await p.click('button[aria-label="Меньше: взрослые"]');
       await p.click('.gp-done');
-      await p.click('.ftog-box');
+      await p.click('.ftog-line input');
     },
   },
   {
@@ -483,7 +483,8 @@ async function buildInteractive(b, sizes) {
       {},
     );
     const raws = { glabel: IA.GLABEL, gpop: wrapIf('gOpen', gpop), calmodal: wrapIf('calOpen', cal) };
-    if (isMain) {
+    // the same search card on both boards: «Курорт или санаторий» opens its list
+    {
       const list = post(
         await grab(
           b,
@@ -504,6 +505,8 @@ async function buildInteractive(b, sizes) {
         ),
       );
       raws.slist = wrapIf('sOpen', list);
+    }
+    if (isMain) {
       // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
       raws.wizard = await wizardRaws(b, true);
       // resort story pop-ups
@@ -708,14 +711,14 @@ async function buildInteractive(b, sizes) {
         d.on(g, 'click', 'openGuests');
         g.parentElement.appendChild(d.raw('gpop'));
         const page = document.querySelector('#root .page');
+        const city = document.querySelector('#city');
+        d.on(city, 'click', 'openSearch');
+        city.after(d.raw('slist'));
+        d.attr(city, 'value', 'cityLabel');
         if (isMain) {
-          const city = document.querySelector('#city');
-          d.on(city, 'click', 'openSearch');
-          city.after(d.raw('slist'));
           document.querySelectorAll('.wz-link, .choose-btn').forEach((x) => d.on(x, 'click', 'wzOpen'));
           document.querySelectorAll('[data-resort]').forEach((x, i) => d.on(x, 'click', 'openRes' + i));
           page.appendChild(d.raw('resorts'));
-          d.attr(document.querySelector('#city'), 'value', 'cityLabel');
           page.appendChild(d.raw('wizard'));
           document.querySelectorAll('.ps-chip').forEach((c) => {
             const a = document.createElement('a');

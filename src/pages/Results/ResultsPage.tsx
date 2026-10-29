@@ -1,7 +1,6 @@
 import { Fragment, useEffect } from 'react';
 import { transferBySanatorium } from '../../data/transferPolicy';
 import { Link } from 'react-router-dom';
-import { GuestsPicker } from '../../components/GuestsPicker';
 import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -22,7 +21,7 @@ import { PriceBox } from '../../components/PriceBox';
 import { ChooseWizard } from '../../components/ChooseWizard';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { Compare, useCompareLimit } from '../../components/Compare';
-import { FlightToggle } from '../../components/FlightToggle';
+import { SearchCard } from '../../components/SearchCard';
 import { guestsLabel } from '../../lib/orderSummary';
 import { eur, placePrice, quote } from '../../lib/pricing';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
@@ -967,159 +966,10 @@ export default function ResultsPage() {
           <MainNav active="resorts" />
           <PhoneLink />
         </HeaderBar>
-        {/* Search band: same picker as on the home page */}
+        {/* Search band: the same card as on the home page */}
         <section style={{ background: '#1F5F4A' }}>
           <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '16px 24px 18px' }}>
-            <form
-              className="card"
-              onSubmit={(e) => {
-                e.preventDefault();
-                logic.props.navigate('/results');
-              }}
-              style={{
-                padding: '16px 18px 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                boxShadow: '0 6px 18px rgba(0,0,0,.15)',
-              }}
-            >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit,minmax(min(170px,100%),1fr))',
-                  gap: '12px',
-                  alignItems: 'end',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <label className="lbl" htmlFor="city">
-                    Курорт
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
-                      <circle cx="12" cy="10" r="2.5" />
-                    </svg>
-                    <select id="city" className="input sinput">
-                      <option>Друскининкай</option>
-                      <option>Бирштонас</option>
-                      <option>Паланга</option>
-                      <option>Аникщяй</option>
-                    </select>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      aria-hidden="true"
-                      style={{ position: 'absolute', right: '12px', top: '16px', pointerEvents: 'none' }}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <label className="lbl" htmlFor="datein">
-                    Заезд
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                    </svg>
-                    <button type="button" id="datein" className="input sinput datebtn" onClick={v.sOpenCal}>
-                      {v.sInLabel}
-                    </button>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <label className="lbl" htmlFor="dateout">
-                    Выезд
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                    </svg>
-                    <button type="button" id="dateout" className="input sinput datebtn" onClick={v.sOpenCal}>
-                      {v.sOutLabel}
-                    </button>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <label className="lbl" htmlFor="guests">
-                    Гости
-                  </label>
-                  <GuestsPicker inputClass="input sinput" />
-                </div>
-                <Link className="btn btn-primary" to="/results" style={{ minHeight: '50px' }}>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="m21 21-4.3-4.3" />
-                  </svg>
-                  Изменить поиск
-                </Link>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px 16px',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <FlightToggle />
-                <span style={{ fontSize: '14px', color: '#5E6862' }}>
-                  {v.nightsLabel} · Цены — на человека за весь заезд, итог для всех гостей указан ниже.
-                </span>
-              </div>
-            </form>
+            <SearchCard inLabel={v.sInLabel} outLabel={v.sOutLabel} onOpenCal={v.sOpenCal} />
           </div>
         </section>
         <div

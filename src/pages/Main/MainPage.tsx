@@ -1,11 +1,9 @@
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GuestsPicker } from '../../components/GuestsPicker';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
-import { FlightToggle } from '../../components/FlightToggle';
 import { ChooseWizard } from '../../components/ChooseWizard';
 import { ResortModal } from '../../components/ResortModal';
-import { PlaceSearch } from '../../components/PlaceSearch';
+import { SearchCard } from '../../components/SearchCard';
 import { ChooseCard } from '../../components/ChooseCard';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
@@ -284,80 +282,7 @@ export default function MainPage() {
               и&nbsp;отдых в&nbsp;Литве
             </h1>
             <p className="hero-sub">Выберите санаторий, сравните программы и забронируйте на русском языке.</p>
-            <form
-              className="card search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                logic.props.navigate('/results');
-              }}
-            >
-              <div className="search-grid">
-                <div className="sf sf-dest">
-                  <label className="lbl" htmlFor="city">
-                    Курорт или санаторий
-                  </label>
-                  <PlaceSearch />
-                </div>
-                <div className="sf">
-                  <label className="lbl" htmlFor="datein">
-                    Заезд
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                    </svg>
-                    <button type="button" id="datein" className="input datebtn" onClick={v.openCal}>
-                      {v.inLabel}
-                    </button>
-                  </div>
-                </div>
-                <div className="sf">
-                  <label className="lbl" htmlFor="dateout">
-                    Выезд
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <svg
-                      className="fieldico"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1F5F4A"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
-                    </svg>
-                    <button type="button" id="dateout" className="input datebtn" onClick={v.openCal}>
-                      {v.outLabel}
-                    </button>
-                  </div>
-                </div>
-                <div className="sf">
-                  <label className="lbl" htmlFor="guests">
-                    Гости
-                  </label>
-                  <GuestsPicker inputClass="input" />
-                </div>
-                <Link className="btn btn-primary search-go" to="/results">
-                  Найти санаторий
-                </Link>
-              </div>
-              <FlightToggle plain />
-            </form>
+            <SearchCard className="hero-search" inLabel={v.inLabel} outLabel={v.outLabel} onOpenCal={v.openCal} />
           </div>
         </section>
         {/* Resorts */}
