@@ -1,0 +1,94 @@
+/* «i» next to a title and the balloon it opens (in the flow, so lists never clip it) */
+.info-host {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+}
+.info-tip {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #9cb8aa;
+  background: #fff;
+  color: #1f5f4a;
+  font:
+    700 italic 14px/1 Georgia,
+    'Times New Roman',
+    serif;
+  cursor: pointer;
+  user-select: none;
+  /* a bigger target for a finger, the same small circle on the screen */
+  box-shadow: 0 0 0 8px transparent;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+.info-tip:hover {
+  border-color: #1f5f4a;
+}
+.info-tip:focus-visible {
+  outline: 3px solid #9cc9b5;
+  outline-offset: 2px;
+}
+.info-host.open .info-tip,
+.info-host:has(.info-tip:focus) .info-tip {
+  background: #1f5f4a;
+  border-color: #1f5f4a;
+  color: #fff;
+}
+.info-pop {
+  display: none;
+  position: relative;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #eef5f1;
+  border: 1px solid #c8ded3;
+  color: #1c2620;
+  font-size: 15.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 6px 18px rgba(20, 40, 30, 0.08);
+}
+.info-pop::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  background: #eef5f1;
+  border-left: 1px solid #c8ded3;
+  border-top: 1px solid #c8ded3;
+  transform: rotate(45deg);
+}
+.info-host.open .info-pop,
+.info-host:has(.info-tip:focus) .info-pop {
+  display: block;
+  animation: infoIn 0.22s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+@keyframes infoIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .info-host.open .info-pop,
+  .info-host:has(.info-tip:focus) .info-pop {
+    animation: none;
+  }
+}

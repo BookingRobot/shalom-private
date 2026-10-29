@@ -41,7 +41,7 @@ export function OrderSummary({
   // the sanatorium of this order (the prototype's example order is Eglė Comfort)
   const { booking } = useBooking();
   const h = SANATORIUMS.find((x) => x.id === booking.hotelId);
-  const img = h && booking.hotelId !== 'egle-comfort' ? h.img : '/img/1efd1efc34d4137ff98a8658a068afc5.jpg';
+  const img = h && booking.hotelId !== 'egle-comfort' ? h.img : '/img/d82431114d102eee0f48639f84940aad.jpg';
   const name = h ? h.name : 'Санаторий Эгле Комфорт';
   const place = (h ? h.sub.split(' · ')[0] : 'Друскининкай') + ' · ' + '★'.repeat(h ? h.starsN : 4);
   return (

@@ -343,6 +343,9 @@ const docFor = (title, route, body, h, logic) => `<!doctype html>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
 ${css}
+/* canvas only: «i» opens its balloon on hover (the site opens it on a tap with a script) */
+.info-host:has(.info-tip:hover) .info-pop{display:block}
+.info-host:has(.info-tip:hover) .info-tip{background:#1f5f4a;border-color:#1f5f4a;color:#fff}
 </style>
 </helmet>
 <!-- Снимок страницы ${esc(route)} с shalom.bookingrobot.eu — макет совпадает с сайтом -->

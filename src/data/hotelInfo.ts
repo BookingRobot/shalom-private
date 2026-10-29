@@ -137,7 +137,13 @@ const BASE: Base[] = [
     address: 'Druskininkai',
     starsN: 3,
     reviewsN: 4,
-    photos: [{ src: '/img/a3e6585f5dd9cb9a1b6daa1d5c50ff22.jpg', alt: 'Санаторий в лесу' }, ...DRUSKININKAI],
+    // the sanatorium's own photos (draugyste.lt): the «Violeta» building in the evening, the pool hall
+    photos: [
+      { src: '/img/8c9ffb66b65bd2f85fa22df1c989c3b7.jpg', alt: 'Корпус «Виолета» вечером' },
+      { src: '/img/5f3e80c631fc97a5f9b194173c9d9590.jpg', alt: 'Бассейн под стеклянным куполом' },
+      { src: '/img/a3e6585f5dd9cb9a1b6daa1d5c50ff22.jpg', alt: 'Санаторий в лесу' },
+      ...DRUSKININKAI,
+    ],
   },
   {
     id: 'upa',
@@ -181,7 +187,11 @@ const BASE: Base[] = [
     address: 'Birštonas',
     starsN: 4,
     reviewsN: 35,
-    photos: [{ src: '/img/226796cc08c3c360c4ac718f6a4c433f.jpg', alt: 'Санаторий в Бирштонасе' }, ...BIRSTONAS],
+    photos: [
+      { src: '/img/5f53f4a87e8d933d8e5bedf76624ab4a.jpg', alt: 'Санаторий «Эгле» в Бирштонасе среди высоких сосен' },
+      { src: '/img/226796cc08c3c360c4ac718f6a4c433f.jpg', alt: 'Санаторий в Бирштонасе' },
+      ...BIRSTONAS,
+    ],
   },
 ];
 

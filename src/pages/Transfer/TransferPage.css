@@ -345,9 +345,15 @@
   gap: 2px;
   min-width: 0;
 }
-.pg-transfer .tr-how-txt > span:last-child {
-  font-size: 15px;
-  color: #3e4b44;
+.pg-transfer .info-line > strong {
+  font-size: 18px;
+  color: #1c2620;
+}
+.pg-transfer .tr-how-txt .info-line > strong {
+  font-size: 19px;
+}
+.pg-transfer .tr-warn .info-line {
+  font-size: 15.5px;
 }
 .pg-transfer .tr-how-price {
   display: flex;

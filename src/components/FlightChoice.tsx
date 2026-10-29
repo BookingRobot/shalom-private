@@ -1,3 +1,4 @@
+import { InfoTitle } from './InfoTip';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
 import { TODAY } from '../data/demo';
@@ -140,8 +141,15 @@ export function FlightChoice() {
     >
       <span className={'ios-radio ' + (sel === key ? 'on' : '')} aria-hidden="true" />
       <span className="ios-main">
-        <strong>{title}</strong>
-        <span className="ios-sub">{sub}</span>
+        {off ? (
+          <>
+            <strong>{title}</strong>
+            <span className="ios-sub">{sub}</span>
+          </>
+        ) : (
+          // the explanation waits under «i» — less text on the page
+          <InfoTitle title={title} info={sub} />
+        )}
       </span>
       {end ? <span className="ios-end ok">{end}</span> : null}
     </button>

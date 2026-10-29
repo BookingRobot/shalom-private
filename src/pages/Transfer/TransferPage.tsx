@@ -7,6 +7,7 @@ import { fmt } from '../../lib/format';
 import { api } from '../../api';
 import { AdvanceNote, OrderSummary, orderPriceRows } from '../../components/OrderSummary';
 import { StepNext, type Missing } from '../../components/StepNext';
+import { InfoTitle } from '../../components/InfoTip';
 import { orderSummary } from '../../lib/orderSummary';
 import { WEEKDAYS_SHORT, shortDate, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
@@ -165,7 +166,6 @@ class TransferLogic extends PageLogic {
     const ourFlight = pkg;
     const flVal = (typed: string | undefined, line: string) => typed ?? (ourFlight ? line : '');
     const cityFree = (id: string) => bySanH && freeCities.includes(id);
-    const freeCityNames = freeCities.map((id) => (id === 'vilnius' ? 'Вильнюса' : id === 'kaunas' ? 'Каунаса' : id));
     const pick = (patch: Record<string, any>) => () => this.setState({ ...patch, askNo: false });
     return {
       ourFlight,
@@ -185,14 +185,15 @@ class TransferLogic extends PageLogic {
       keepTransfer: () => this.setState({ askNo: false, need: true }),
       paidBy,
       yesTitle: bySanH ? 'Да, нужен трансфер санатория' : 'Да, нужен трансфер',
-      yesSub: bySanH
+      // what is already paid and from where — under «i» of «Да»
+      yesInfo: bySanH
         ? sanName.replace(/^с/, 'С') +
-          ' встречает гостей из ' +
-          freeCityNames.join(' и ') +
-          ' — это уже входит в оплату'
+          ' сам встречает гостей в ' +
+          freeCities.map((id) => (id === 'vilnius' ? 'Вильнюсе' : id === 'kaunas' ? 'Каунасе' : id)).join(' и ') +
+          ' — в аэропорту, на вокзале или у отеля. Это уже входит в оплату. Из других мест или отдельной машиной — по нашему тарифу.'
         : inPkg
-          ? 'Групповой из аэропорта Вильнюса — уже в пакете с перелётом'
-          : 'Заберём из аэропорта, с вокзала или от отеля · групповой от 30 € с человека',
+          ? 'Групповой трансфер из аэропорта Вильнюса уже в пакете с перелётом. Другой город или отдельная машина — с доплатой.'
+          : 'Встретим с табличкой в аэропорту, на вокзале или у отеля, поможем с багажом и довезём до стойки регистрации. Групповой — от 30\u00a0€ с человека, отдельная машина — от 130\u00a0€.',
       noSub: bySanH
         ? 'Цена не изменится — трансфер санатория просто не понадобится'
         : inPkg
@@ -213,9 +214,10 @@ class TransferLogic extends PageLogic {
               : 'Встретим с табличкой, поможем с багажом, довезём до стойки регистрации. Отметьте, нужен ли трансфер.',
       // 2. from where — nothing chosen unless our flight tells us
       inDay: shortDate(toD(booking.checkin)),
-      fromNote: pkg
-        ? 'Ваш рейс прилетает в аэропорт Вильнюса — его мы и отметили. Можно выбрать другое место.'
-        : 'Выберите город, где вас встретить. Большинство гостей прилетают в Вильнюс — до санатория около 2 часов.',
+      // with our flight say what we marked; otherwise the hint waits under «i»
+      fromNote: pkg ? 'Ваш рейс прилетает в аэропорт Вильнюса — его мы и отметили. Можно выбрать другое место.' : '',
+      fromInfo:
+        'Большинство гостей прилетают в Вильнюс — до санатория около 2 часов. Из Каунаса столько же, из Варшавы около 5 часов.',
       cities: PICKUP_PLACES.map((c) => {
         const g = legOf(booking, c.id, { ...tNow, mode: 'group' });
         return {
@@ -301,15 +303,6 @@ class TransferLogic extends PageLogic {
       moreOpen: !!this.state.more,
       moreLabel: this.state.more ? 'Свернуть' : 'Подробнее о встрече и поездке',
       toggleMore: () => this.setState({ more: !this.state.more }),
-      // what is already covered, said before the choice
-      freeNote: bySanH
-        ? sanName.replace(/^с/, 'С') +
-          ' сам встречает гостей в ' +
-          freeCities.map((id) => (id === 'vilnius' ? 'Вильнюсе' : id === 'kaunas' ? 'Каунасе' : id)).join(' и ') +
-          ' — в аэропорту, на вокзале или у отеля. Это уже входит в оплату. Из других мест — по нашему тарифу.'
-        : inPkg
-          ? 'Групповой трансфер из аэропорта Вильнюса уже в пакете с перелётом. Другой город или отдельная машина — с доплатой.'
-          : '',
       total:
         fmt(
           orderSummary(this.props.booking.booking).stay + orderSummary(this.props.booking.booking).flight + tr.total,
@@ -364,7 +357,7 @@ function BackFlight({ v, id }: { v: any; id: string }) {
         {v.ourFlight ? 'Ваш рейс и время отправления' : 'Уже есть билеты? Рейс и время отправления'}
         <span style={{ fontWeight: '400', color: '#5E6862' }}>
           {' '}
-          · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно, можно сообщить позже'}
+          · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно'}
         </span>
       </label>
       <input
@@ -424,24 +417,6 @@ export default function TransferPage() {
                 <span>{v.transferLead}</span>
               </div>
             </div>
-            {v.freeNote ? (
-              <div className="tr-free ios-in" role="note">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m5 12 5 5L20 7" />
-                </svg>
-                <span>{v.freeNote}</span>
-              </div>
-            ) : null}
             {/* 1. Нужен ли трансфер — nothing is chosen for the guest */}
             <div id="trNeed" className="tr-q" role="radiogroup" aria-label="Нужен ли трансфер">
               <button
@@ -455,13 +430,11 @@ export default function TransferPage() {
                 <span className={`radio ${v.yesCls}`}>
                   <i />
                 </span>
-                <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <strong style={{ fontSize: '18px' }}>{v.yesTitle}</strong>
-                    {v.paidBy ? <PaidStamp>{v.paidBy}</PaidStamp> : <span className="tr-reco">Рекомендуем</span>}
-                  </span>
-                  <span style={{ color: '#3E4B44', fontSize: '16px' }}>{v.yesSub}</span>
-                </span>
+                <InfoTitle
+                  title={v.yesTitle}
+                  info={v.yesInfo}
+                  extra={v.paidBy ? <PaidStamp>{v.paidBy}</PaidStamp> : <span className="tr-reco">Рекомендуем</span>}
+                />
               </button>
               <button
                 type="button"
@@ -474,10 +447,7 @@ export default function TransferPage() {
                 <span className={`radio ${v.noCls}`}>
                   <i />
                 </span>
-                <span style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '17px', fontWeight: '700', color: '#1C2620' }}>Нет, доберусь сам</span>
-                  <span style={{ color: '#5E6862', fontSize: '15px' }}>{v.noSub}</span>
-                </span>
+                <InfoTitle title="Нет, доберусь сам" info={v.noSub} />
               </button>
             </div>
             {/* Confirmation pop-up when the guest declines the transfer */}
@@ -794,8 +764,13 @@ export default function TransferPage() {
                 {/* 2. Откуда забрать — empty until chosen (our flight: Vilnius airport) */}
                 <div id="trFrom" className="tr-block">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>
-                    <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>{v.fromNote}</p>
+                    <InfoTitle
+                      title={<h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>}
+                      info={v.fromInfo}
+                    />
+                    {v.fromNote ? (
+                      <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>{v.fromNote}</p>
+                    ) : null}
                   </div>
                   <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
                     {v.cities.map((c: any) => (
@@ -855,10 +830,7 @@ export default function TransferPage() {
                                   {v.ourFlight ? 'Ваш рейс и время прибытия' : 'Уже есть билеты? Рейс и время прибытия'}
                                   <span style={{ fontWeight: '400', color: '#5E6862' }}>
                                     {' '}
-                                    ·{' '}
-                                    {v.ourFlight
-                                      ? 'заполнили по вашему перелёту'
-                                      : 'необязательно, можно сообщить позже'}
+                                    · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно'}
                                   </span>
                                 </label>
                                 <input
@@ -931,11 +903,11 @@ export default function TransferPage() {
                           <img src="/img/165765111b3ce679a969db85fe7d023f.png" alt="" />
                         </span>
                         <span className="tr-how-txt">
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                            <strong style={{ fontSize: '19px' }}>Групповой трансфер</strong>
-                            <span className="tr-best">Самый выгодный</span>
-                          </span>
-                          <span>Микроавтобус вместе с другими гостями санаториев · встреча с табличкой</span>
+                          <InfoTitle
+                            title="Групповой трансфер"
+                            extra={<span className="tr-best">Самый выгодный</span>}
+                            info="Микроавтобус Mercedes Sprinter или Vito вместе с другими гостями санаториев. Встретим с табличкой и поможем с багажом."
+                          />
                         </span>
                         <span className="tr-how-price">
                           {v.seatPaid ? (
@@ -965,8 +937,10 @@ export default function TransferPage() {
                           <VanIcon height={40} />
                         </span>
                         <span className="tr-how-txt">
-                          <strong style={{ fontSize: '19px' }}>Отдельная машина — только вы</strong>
-                          <span>Без ожидания и попутчиков, едем сразу</span>
+                          <InfoTitle
+                            title="Отдельная машина — только вы"
+                            info="Без ожидания других рейсов и попутчиков: водитель встречает вас и едет сразу в санаторий. Машину выберете ниже."
+                          />
                         </span>
                         <span className="tr-how-price">
                           <strong style={{ fontSize: '22px' }}>от {v.indFrom}</strong>
@@ -991,11 +965,10 @@ export default function TransferPage() {
                           <circle cx="12" cy="12" r="10" />
                           <path d="M12 8v5M12 16h.01" />
                         </svg>
-                        <span>
-                          <strong>Это не индивидуальная поездка.</strong> Вы едете вместе с другими гостями: возможно
-                          ожидание других рейсов до 1 часа, по дороге — остановки у других санаториев (дорога длиннее на
-                          30–40 минут). Точное время встречи сообщим за день до приезда.
-                        </span>
+                        <InfoTitle
+                          title={<span>Возможно ожидание других рейсов до 1 часа</span>}
+                          info="Вы едете вместе с другими гостями: по дороге — остановки у других санаториев, дорога длиннее на 30–40 минут. Точное время встречи сообщим за день до приезда."
+                        />
                       </div>
                     ) : null}
                     {v.isInd ? (
@@ -1039,12 +1012,18 @@ export default function TransferPage() {
                 {/* 4. Обратно — its own question, nothing chosen */}
                 <div className="tr-block">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <h2 style={{ fontSize: '23px' }}>
-                      Обратно {v.outDay}, {v.outWeekday}: нужен трансфер?
-                    </h2>
-                    <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
-                      Заберём из санатория {v.hotelShort} и отвезём к самолёту, поезду или в отель.
-                    </p>
+                    <InfoTitle
+                      title={
+                        <h2 style={{ fontSize: '23px' }}>
+                          Обратно {v.outDay}, {v.outWeekday}: нужен трансфер?
+                        </h2>
+                      }
+                      info={
+                        'Заберём из санатория ' +
+                        v.hotelShort +
+                        ' и отвезём к самолёту, поезду или в отель. К самолёту выезжаем за 3 часа до вылета, время подтвердим за день.'
+                      }
+                    />
                   </div>
                   <div id="trBack" className="tr-q" role="radiogroup" aria-label="Нужен ли трансфер обратно">
                     <button
@@ -1058,13 +1037,11 @@ export default function TransferPage() {
                       <span className={`radio ${v.backYesCls}`}>
                         <i />
                       </span>
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <strong style={{ fontSize: '18px' }}>Да, отвезите обратно</strong>
-                          {v.backPaid ? <PaidStamp>{v.backPaid}</PaidStamp> : null}
-                        </span>
-                        <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.backSub}</span>
-                      </span>
+                      <InfoTitle
+                        title="Да, отвезите обратно"
+                        info={v.backSub}
+                        extra={v.backPaid ? <PaidStamp>{v.backPaid}</PaidStamp> : null}
+                      />
                     </button>
                     <button
                       type="button"
@@ -1077,10 +1054,7 @@ export default function TransferPage() {
                       <span className={`radio ${v.backNoCls}`}>
                         <i />
                       </span>
-                      <span style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '17px', fontWeight: '700', color: '#1C2620' }}>Нет, обратно сам</span>
-                        <span style={{ color: '#5E6862', fontSize: '15px' }}>Обратный трансфер не нужен</span>
-                      </span>
+                      <strong>Нет, обратно сам</strong>
                     </button>
                   </div>
                   {v.backOn ? (
@@ -1116,10 +1090,10 @@ export default function TransferPage() {
                           <span className={`radio ${v.otherCls}`}>
                             <i />
                           </span>
-                          <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <strong style={{ fontSize: '18px' }}>В другое место</strong>
-                            <span style={{ color: '#3E4B44', fontSize: '15px' }}>Другой город, вокзал или отель</span>
-                          </span>
+                          <InfoTitle
+                            title="В другое место"
+                            info="Другой город, аэропорт, вокзал или отель — выберете ниже."
+                          />
                         </button>
                       </div>
                       {v.backOther ? (

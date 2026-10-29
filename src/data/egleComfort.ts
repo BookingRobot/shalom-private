@@ -188,7 +188,13 @@ export const EGLE_PHOTOS = [
   { src: '/img/ec03ab120412f998fd082eb7bc49afb6.jpg', alt: 'Тропа в лесу' },
 ];
 
-export const EGLE_ALL_PHOTOS = EGLE_PHOTOS.concat([
+/** the sanatorium's own photos (sanatorija.lt): guests at the pool, a Comfort Plus room */
+export const EGLE_COMFORT_PIC = {
+  couplePool: { src: '/img/d82431114d102eee0f48639f84940aad.jpg', alt: 'Отдых у бассейна в санатории «Эгле»' },
+  comfortPlus: { src: '/img/9154c799d123fa18ba341825325c1358.jpg', alt: 'Номер «Комфорт плюс»' },
+};
+
+export const EGLE_ALL_PHOTOS = [EGLE_COMFORT_PIC.couplePool, EGLE_COMFORT_PIC.comfortPlus].concat(EGLE_PHOTOS, [
   EGLE_PIC.poolCure,
   EGLE_PIC.aquagym,
   EGLE_PIC.doctor,
