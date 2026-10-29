@@ -218,12 +218,12 @@
 .pg-main .hero-bg {
   object-fit: cover;
   object-position: 50% 45%;
-  background: #4f86b8;
+  background: #2c4a3c;
 }
 .pg-main .hero-shade {
   background:
-    linear-gradient(90deg, rgba(8, 32, 56, 0.55) 0%, rgba(8, 32, 56, 0.28) 40%, rgba(8, 32, 56, 0) 68%),
-    linear-gradient(0deg, rgba(8, 32, 56, 0.18) 0, rgba(8, 32, 56, 0) 30%);
+    linear-gradient(90deg, rgba(14, 38, 28, 0.58) 0%, rgba(14, 38, 28, 0.3) 40%, rgba(14, 38, 28, 0) 68%),
+    linear-gradient(0deg, rgba(14, 38, 28, 0.2) 0, rgba(14, 38, 28, 0) 30%);
 }
 .pg-main .hero-left {
   display: flex;
@@ -239,13 +239,24 @@
   -webkit-appearance: none;
   min-height: 46px;
   padding: 0 38px 0 18px;
-  border: 1.5px solid #e3ded2;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
   border-radius: 10px;
-  background: #fff;
-  color: #1c2620;
+  background: transparent;
+  color: #fff;
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
+}
+/* the list itself opens light */
+.pg-main .lang option {
+  color: #1c2620;
+  background: #fff;
+}
+.pg-main .lang select:hover {
+  border-color: #fff;
+}
+.pg-main .lang {
+  color: #fff;
 }
 .pg-main .lang select:focus-visible {
   outline: 3px solid #9cc9b5;
@@ -273,7 +284,7 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 18px rgba(0, 20, 40, 0.35);
+  text-shadow: 0 2px 18px rgba(8, 26, 18, 0.4);
 }
 .pg-main .hero-sub {
   margin: 14px 0 0;
@@ -281,11 +292,11 @@
   color: #fff;
   font-size: 21px;
   line-height: 1.4;
-  text-shadow: 0 1px 12px rgba(0, 20, 40, 0.4);
+  text-shadow: 0 1px 12px rgba(8, 26, 18, 0.45);
 }
 .pg-main .hero-search {
   margin-top: 104px;
-  box-shadow: 0 18px 50px rgba(10, 30, 50, 0.18);
+  box-shadow: 0 18px 50px rgba(14, 38, 28, 0.2);
 }
 
 /* ── Sections below the hero ── */
@@ -471,7 +482,12 @@ body .pg-main .card.resort:hover {
     object-position: 62% 40%;
   }
   .pg-main .hero-shade {
-    background: linear-gradient(180deg, rgba(8, 32, 56, 0.5) 0, rgba(8, 32, 56, 0.25) 40%, rgba(8, 32, 56, 0.1) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(14, 38, 28, 0.52) 0,
+      rgba(14, 38, 28, 0.26) 40%,
+      rgba(14, 38, 28, 0.1) 100%
+    );
   }
   .pg-main .sec-head h2 {
     font-size: 28px;

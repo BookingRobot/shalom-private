@@ -20,3 +20,35 @@
     font-size: 16px !important;
   }
 }
+
+/* the green bar: white logo, menu and phone; quiet notes in a soft white */
+.site-header.on-green {
+  color: #fff;
+}
+.site-header.on-green .navlink:hover {
+  opacity: 0.8;
+}
+.site-header.on-green .navlink[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
+.site-header.on-green a:focus-visible {
+  outline: 3px solid #9cc9b5;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.site-header .hd-note {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.86);
+}
+.site-header.on-green {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+/* phone: the menu wraps in tidy rows, not with big gaps */
+@media (max-width: 760px) {
+  .site-header nav[aria-label='Основное меню'] {
+    row-gap: 6px !important;
+    column-gap: 22px !important;
+  }
+}

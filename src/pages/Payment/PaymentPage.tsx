@@ -104,13 +104,13 @@ export default function PaymentPage() {
         <HeaderBar>
           <Brand />
           <HeaderAside>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', color: '#3E4B44' }}>
+            <span className="hd-note" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <svg
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="currentColor"
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"

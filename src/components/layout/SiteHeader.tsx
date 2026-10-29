@@ -1,31 +1,37 @@
-import type { ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { AGENCY, AGENCY_LOGO, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
+import { AGENCY, AGENCY_LOGO, AGENCY_LOGO_WHITE, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
 import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
 type Tone = 'light' | 'dark';
 
+/** the site's forest green: the header bar is painted with it, so the agency's logo goes white on it */
+export const HEADER_GREEN = '#1F5F4A';
+
+/** the parts of the header read it: on the green bar the logo, menu and phone are white */
+const OnGreen = createContext(false);
+const useTone = (tone: Tone): Tone => (useContext(OnGreen) ? 'dark' : tone);
+
 /**
- * Top bar of the site. Composed from small parts so each page keeps its own layout:
+ * Top bar of the site: a solid forest-green bar with the agency's white logo and a white menu
+ * (the colour logo's blue would clash with the site's greens). Composed from small parts so each
+ * page keeps its own layout:
  *   <HeaderBar><Brand /><MainNav active="resorts" /><PhoneLink /></HeaderBar>
  */
 export function HeaderBar({
   minHeight = 64,
   maxWidth = 1180,
-  tone = 'light',
   children,
 }: {
   minHeight?: number;
   maxWidth?: number;
+  /** kept for older callers: the bar is always green now */
   tone?: Tone;
   children: ReactNode;
 }) {
   return (
-    <header
-      className="site-header"
-      style={tone === 'dark' ? { position: 'relative' } : { background: '#fff', borderBottom: '1px solid #E3DED2' }}
-    >
+    <header className="site-header on-green" style={{ background: HEADER_GREEN }}>
       <div
         style={{
           maxWidth: `${maxWidth}px`,
@@ -39,15 +45,16 @@ export function HeaderBar({
           flexWrap: 'wrap',
         }}
       >
-        {children}
+        <OnGreen.Provider value={true}>{children}</OnGreen.Provider>
       </div>
     </header>
   );
 }
 
-/** The agency's logo (Atlantis travel & tourism), links to the home page. */
+/** The agency's logo (Atlantis travel & tourism), links to the home page; white on the green bar. */
 export function Brand({
   logo = 32,
+  tone = 'light',
 }: {
   round?: number;
   logo?: number;
@@ -57,6 +64,7 @@ export function Brand({
   name?: ReactNode;
 }) {
   const h = Math.round(logo * 1.2);
+  const white = useTone(tone) === 'dark';
   return (
     <Link
       to="/"
@@ -64,7 +72,7 @@ export function Brand({
       style={{ display: 'flex', alignItems: 'center', padding: '4px 0', margin: '-4px 0' }}
     >
       <img
-        src={AGENCY_LOGO}
+        src={white ? AGENCY_LOGO_WHITE : AGENCY_LOGO}
         alt={AGENCY + ' — ' + SITE_NAME}
         height={h}
         width={Math.round((h * 738) / 165)}
@@ -88,13 +96,14 @@ export function MainNav({
   gap = 36,
   size = 17,
   active,
-  tone = 'light',
+  tone: toneProp = 'light',
 }: {
   gap?: number;
   size?: number;
   active?: NavKey;
   tone?: Tone;
 }) {
+  const tone = useTone(toneProp);
   return (
     <nav
       aria-label="Основное меню"
@@ -123,13 +132,14 @@ export function PhoneLink({
   size = 18,
   icon = 20,
   gap = 10,
-  tone = 'light',
+  tone: toneProp = 'light',
 }: {
   size?: number;
   icon?: number;
   gap?: number;
   tone?: Tone;
 }) {
+  const tone = useTone(toneProp);
   return (
     <a
       href={PHONE_TEL}

@@ -174,7 +174,7 @@ export default function GuestsPage() {
         <HeaderBar>
           <Brand />
           <HeaderAside>
-            <span style={{ fontSize: '16px', color: '#3E4B44' }}>Нужна помощь с заказом?</span>
+            <span className="hd-note">Нужна помощь с заказом?</span>
             <PhoneLink />
           </HeaderAside>
         </HeaderBar>
