@@ -29,7 +29,7 @@ import { ICON_PATHS } from '../../data/iconPaths';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
 import { GuestsPicker, guestsLabel } from '../../components/GuestsPicker';
-import { RoomCard } from '../../components/RoomCard';
+import { RoomCard, tipCheapest } from '../../components/RoomCard';
 import { HOTEL_TABS, HotelTabContent, type HotelTab } from '../../components/hotel/HotelTabs';
 import { pick as pickIcon } from '../../components/hotel/illustrations';
 import { hotelInfo } from '../../data/hotelInfo';
@@ -469,7 +469,10 @@ class HotelLogic extends PageLogic {
       freeTr: transferBySanatorium(info.id)
         ? 'Трансфер аэропорт Вильнюса ⇄ санаторий организует сам санаторий «Эгле» — он включён в стоимость, отдельно заказывать не нужно.'
         : 'Трансфер из аэропорта Вильнюса, Каунаса или Варшавы закажете на шаге «Дорога» — встретим с табличкой и довезём до стойки.',
-      offers,
+      // the next step on a sanatorium: choose the cheapest free room (the bubble is on it)
+      offers: tipCheapest(offers, !st.roomTipX && stayFree(info.id, iso(checkin), nights), () =>
+        this.setState({ roomTipX: true }),
+      ),
       noRooms: offers.length === 0,
       // no places on the chosen dates: the nearest dates with places + «Свяжитесь со мной»
       ...((): {

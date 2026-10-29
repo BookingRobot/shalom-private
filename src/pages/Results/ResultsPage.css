@@ -444,54 +444,9 @@
     transform: translateY(-10px);
   }
 }
-/* the next step after the search: a green bubble over «Номера и программы» of the first sanatorium */
-.pg-results .rm-tip {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 10px 0 4px;
-  padding: 9px 6px 9px 12px;
-  border-radius: 12px;
-  background: #1f5f4a;
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.35;
-  box-shadow:
-    0 2px 6px rgba(18, 34, 27, 0.18),
-    0 12px 28px rgba(18, 34, 27, 0.28);
-  animation:
-    goTipIn 0.35s cubic-bezier(0.22, 0.8, 0.24, 1) both,
-    goTipHop 3.2s ease-in-out 0.35s infinite;
-}
-.pg-results .rm-tip::after {
-  content: '';
-  position: absolute;
-  left: calc(50% - 7px);
-  bottom: -7px;
-  width: 14px;
-  height: 14px;
-  background: #1f5f4a;
-  border-radius: 0 0 3px 0;
-  transform: rotate(45deg);
-}
-.pg-results .rm-tip-x {
-  flex: none;
-  width: 26px;
-  height: 26px;
-  margin-top: -2px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-size: 12px;
-  cursor: pointer;
-}
+/* the bubble over «Номера и программы» (NextTip) sits in the narrow price column */
 .pg-results .rm-tip + .btn {
-  margin-top: 6px !important;
-}
-.pg-results .btn.rm-nudged {
-  animation: goPulse 1.6s ease-out 0.3s 4;
+  margin-top: 0 !important;
 }
 @keyframes roomsGrow {
   from {
@@ -520,9 +475,7 @@
 @media (prefers-reduced-motion: reduce) {
   .pg-results .rooms-reveal,
   .pg-results .rooms-reveal-in,
-  .pg-results .rooms-reveal .rooms-indent > *,
-  .pg-results .rm-tip,
-  .pg-results .btn.rm-nudged {
+  .pg-results .rooms-reveal .rooms-indent > * {
     animation: none;
   }
 }

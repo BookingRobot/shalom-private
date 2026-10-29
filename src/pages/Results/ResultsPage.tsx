@@ -17,7 +17,8 @@ import { awardsOf } from '../../data/awards';
 import { BUILDING_ICON, CAR_ICON, FILTER_GROUPS } from '../../data/filters';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
-import { RoomCard } from '../../components/RoomCard';
+import { RoomCard, tipCheapest } from '../../components/RoomCard';
+import { NextTip } from '../../components/NextTip';
 import { PriceBox } from '../../components/PriceBox';
 import { ChooseWizard } from '../../components/ChooseWizard';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
@@ -55,7 +56,10 @@ class ResultsLogic extends PageLogic {
     };
     // came from the name search on the home page: open that sanatorium's rooms
     const hq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('h') : null;
-    if (hq) this.state.open = { [hq]: true };
+    if (hq) {
+      this.state.open = { [hq]: true };
+      this.state.lastOpen = hq;
+    }
   }
   syncBooking(st) {
     return st.checkin ? { checkin: st.checkin, checkout: iso(addD(toD(st.checkin), st.nights || 9)) } : null;
@@ -336,8 +340,10 @@ class ResultsLogic extends PageLogic {
       const shown = !!open[h.id];
       const isOpen = shown && !closing[h.id];
       const aw = awardsOf[h.id] || [];
-      // the next step after the search: open the rooms of the first (promoted) sanatorium
+      // the next step after the search: open the rooms of the first (promoted) sanatorium;
+      // once rooms are open: choose the cheapest free room of the sanatorium opened last
       const tipOn = idx === 0 && !anyOpen && !st.rmTipX;
+      const roomTip = isOpen && st.lastOpen === h.id && !st.roomTipX;
       return {
         ...h,
         openCal: () =>
@@ -393,12 +399,17 @@ class ResultsLogic extends PageLogic {
               : null,
         ].filter(Boolean),
         chev: isOpen ? 'rotate(180deg)' : 'none',
-        btnCls: (isOpen ? 'btn-secondary' : 'btn-primary') + (tipOn ? ' rm-nudged' : ''),
+        btnCls: (isOpen ? 'btn-secondary' : 'btn-primary') + (tipOn ? ' next-pulse' : ''),
         toggle: () =>
           isOpen
             ? fold(h.id)
             : // the guest found the rooms: the bubble does not come back
-              this.setState({ open: { ...open, [h.id]: true }, closing: { ...closing, [h.id]: false }, rmTipX: true }),
+              this.setState({
+                open: { ...open, [h.id]: true },
+                closing: { ...closing, [h.id]: false },
+                rmTipX: true,
+                lastOpen: h.id,
+              }),
         cmpOn: cmp.includes(h.id),
         cmpOff: !cmp.includes(h.id) && cmp.length >= cmpLimit,
         cmpToggle: () =>
@@ -411,127 +422,132 @@ class ResultsLogic extends PageLogic {
         toggleTime: secT(h.id, 'time'),
         trOpen: !!sec[h.id + 'tr'],
         toggleTr: secT(h.id, 'tr'),
-        offers: roomsOf(h0, h, sf).map((r) => {
-          const o = r;
-          const key = h.id + '-' + o.n;
-          const dOpen = !!det[key];
-          const area = (o.amen.find((a) => /м²/.test(a.t)) || {}).t;
-          const beds = o.amen.find((a) => /кроват/i.test(a.t));
-          const extra = o.amen.find((a) => /Балкон|Кондиционер|Ванна/.test(a.t));
-          const amenTop = [
-            { d: ICON_PATHS.bed2, t: o.room + (area ? ' · ' + area : '') },
-            beds
-              ? {
-                  d: beds.d,
-                  t: beds.t.replace('2 односпальные кровати', '2 отдельные кровати') + (extra ? ' · ' + extra.t : ''),
-                }
-              : null,
-          ].filter(Boolean);
-          const parts = String(o.title).split(' — ');
-          const short = parts[0];
-          const progT = o.prog.map((p) => p.t).join(' ');
-          const sub =
-            'с программой ' +
-            short.replace('Программа ', '') +
-            (parts[1] ? ' · ' + parts[1] : '') +
-            (/питани/i.test(progT) ? ' · питание 3 раза' : '');
-          // programmes for this room, cheapest first; selection drives the details below
-          const ps = st.ps || {};
-          const selI = ps[key] ?? 0;
-          const progs = r.progs;
-          const sp = progs[selI] || progs[0];
-          const progRows = progs.map((p, pi) => {
-            const on = pi === selI,
-              pp = p.title.split(' — ');
-            return {
-              name: pp[0],
-              sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
-              price:
-                eur(
-                  quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
-                    .perPerson,
-                ) + ' / чел.',
-              diff:
-                pi === 0
-                  ? 'самая доступная'
-                  : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
-              diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
-              border: on ? '#1F5F4A' : '#CFC9BB',
-              bg: on ? '#EEF5F1' : '#fff',
-              dot: on ? '#1F5F4A' : 'transparent',
-              pick: () => this.setState({ ps: { ...ps, [key]: pi } }),
-            };
-          });
-          const spVal = valueOf(sp, o.room, area);
-          const spLines = String(sp.details)
-            .split('\n')
-            .map((l) => l.trim())
-            .filter(Boolean)
-            .map((l) => ({
-              t: l.replace(/^— ?/, '• '),
-              fw: /:$/.test(l) || /^\d+\./.test(l) ? 700 : 400,
-              pl: /^—/.test(l) ? '14px' : '0',
-              mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
-            }));
-          const rkey = h.id + ':' + r.id,
-            checkout = addD(checkin, NIGHTS);
-          const busy = overlaps(rkey, checkin, checkout);
-          const p0 = progs[0].title.split(' — ');
-          return {
-            ...o,
-            short: o.room,
-            sub,
-            value: spVal,
-            detLines: spLines,
-            prog: sp.prog,
-            amenTop,
-            progRows,
-            ...(busy ? BUSY_LOOK : FREE_LOOK),
-            busy,
-            avail: !busy,
-            busyRange: range(checkin),
-            nextFree: freeFrom(rkey),
-            pill: busy
-              ? 'Нет мест на ваши даты'
-              : r.addN
-                ? 'Номер +' + eur(placePrice(r.addN, GQ)) + ' с человека'
-                : 'Включён в цену программы',
-            roomLine: (o.amen || [])
-              .slice(0, 3)
-              .map((a) => a.t)
-              .join(' · '),
-            progLine:
+        offers: tipCheapest(
+          roomsOf(h0, h, sf).map((r) => {
+            const o = r;
+            const key = h.id + '-' + o.n;
+            const dOpen = !!det[key];
+            const area = (o.amen.find((a) => /м²/.test(a.t)) || {}).t;
+            const beds = o.amen.find((a) => /кроват/i.test(a.t));
+            const extra = o.amen.find((a) => /Балкон|Кондиционер|Ванна/.test(a.t));
+            const amenTop = [
+              { d: ICON_PATHS.bed2, t: o.room + (area ? ' · ' + area : '') },
+              beds
+                ? {
+                    d: beds.d,
+                    t: beds.t.replace('2 односпальные кровати', '2 отдельные кровати') + (extra ? ' · ' + extra.t : ''),
+                  }
+                : null,
+            ].filter(Boolean);
+            const parts = String(o.title).split(' — ');
+            const short = parts[0];
+            const progT = o.prog.map((p) => p.t).join(' ');
+            const sub =
               'с программой ' +
-              p0[0].replace('Программа ', '') +
-              (p0[1] ? ' · ' + p0[1] : '') +
-              ' · ' +
-              (progs[0].meals || 'питание 3 раза'),
-            choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
-            // same calendar as the search band, with this room's busy nights closed
-            openRoomCal: () =>
-              this.setState({
-                sOpen: true,
-                sRoom: { key: rkey, name: r.room, hotel: h.name },
-                sNote: null,
-                ss: { in: null, out: null },
-                sm: checkin.getUTCMonth(),
-                sy: checkin.getUTCFullYear(),
-              }),
-            selName: sp.title.split(' — ')[0],
-            selPrice: eur(
-              quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id)).total,
-            ),
-            addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
-            detBtn: 'Программы и что входит (' + progs.length + ')',
-            detChev: dOpen ? 'rotate(180deg)' : 'none',
-            noImg: !o.img,
-            ppn: ppn(o.price),
-            oldPpn: o.old ? ppn(o.old) : '',
-            detOpen: dOpen,
-            detLabel: dOpen ? 'Всё понятно, можно убрать' : 'Подробнее. Что сюда входит?',
-            toggleDet: () => this.setState({ det: { ...det, [key]: !dOpen } }),
-          };
-        }),
+              short.replace('Программа ', '') +
+              (parts[1] ? ' · ' + parts[1] : '') +
+              (/питани/i.test(progT) ? ' · питание 3 раза' : '');
+            // programmes for this room, cheapest first; selection drives the details below
+            const ps = st.ps || {};
+            const selI = ps[key] ?? 0;
+            const progs = r.progs;
+            const sp = progs[selI] || progs[0];
+            const progRows = progs.map((p, pi) => {
+              const on = pi === selI,
+                pp = p.title.split(' — ');
+              return {
+                name: pp[0],
+                sub: (pp[1] || '') + (p.meals ? ' · ' + p.meals : ''),
+                price:
+                  eur(
+                    quote(p.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
+                      .perPerson,
+                  ) + ' / чел.',
+                diff:
+                  pi === 0
+                    ? 'самая доступная'
+                    : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
+                diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
+                border: on ? '#1F5F4A' : '#CFC9BB',
+                bg: on ? '#EEF5F1' : '#fff',
+                dot: on ? '#1F5F4A' : 'transparent',
+                pick: () => this.setState({ ps: { ...ps, [key]: pi } }),
+              };
+            });
+            const spVal = valueOf(sp, o.room, area);
+            const spLines = String(sp.details)
+              .split('\n')
+              .map((l) => l.trim())
+              .filter(Boolean)
+              .map((l) => ({
+                t: l.replace(/^— ?/, '• '),
+                fw: /:$/.test(l) || /^\d+\./.test(l) ? 700 : 400,
+                pl: /^—/.test(l) ? '14px' : '0',
+                mt: /:$/.test(l) || /^День/.test(l) ? '8px' : '0',
+              }));
+            const rkey = h.id + ':' + r.id,
+              checkout = addD(checkin, NIGHTS);
+            const busy = overlaps(rkey, checkin, checkout);
+            const p0 = progs[0].title.split(' — ');
+            return {
+              ...o,
+              short: o.room,
+              sub,
+              value: spVal,
+              detLines: spLines,
+              prog: sp.prog,
+              amenTop,
+              progRows,
+              ...(busy ? BUSY_LOOK : FREE_LOOK),
+              busy,
+              avail: !busy,
+              busyRange: range(checkin),
+              nextFree: freeFrom(rkey),
+              pill: busy
+                ? 'Нет мест на ваши даты'
+                : r.addN
+                  ? 'Номер +' + eur(placePrice(r.addN, GQ)) + ' с человека'
+                  : 'Включён в цену программы',
+              roomLine: (o.amen || [])
+                .slice(0, 3)
+                .map((a) => a.t)
+                .join(' · '),
+              progLine:
+                'с программой ' +
+                p0[0].replace('Программа ', '') +
+                (p0[1] ? ' · ' + p0[1] : '') +
+                ' · ' +
+                (progs[0].meals || 'питание 3 раза'),
+              choose: () => this.props.booking.update({ hotelId: h.id, roomId: r.id }),
+              // same calendar as the search band, with this room's busy nights closed
+              openRoomCal: () =>
+                this.setState({
+                  sOpen: true,
+                  sRoom: { key: rkey, name: r.room, hotel: h.name },
+                  sNote: null,
+                  ss: { in: null, out: null },
+                  sm: checkin.getUTCMonth(),
+                  sy: checkin.getUTCFullYear(),
+                }),
+              selName: sp.title.split(' — ')[0],
+              selPrice: eur(
+                quote(sp.priceN + r.addN, GQ, this.props.booking.booking.flightPackage, transferBySanatorium(h.id))
+                  .total,
+              ),
+              addLabel: r.addN ? 'номер +' + fmt(r.addN) + '\u00a0€ к базовому' : 'с самой доступной программой',
+              detBtn: 'Программы и что входит (' + progs.length + ')',
+              detChev: dOpen ? 'rotate(180deg)' : 'none',
+              noImg: !o.img,
+              ppn: ppn(o.price),
+              oldPpn: o.old ? ppn(o.old) : '',
+              detOpen: dOpen,
+              detLabel: dOpen ? 'Всё понятно, можно убрать' : 'Подробнее. Что сюда входит?',
+              toggleDet: () => this.setState({ det: { ...det, [key]: !dOpen } }),
+            };
+          }),
+          roomTip,
+          () => this.setState({ roomTipX: true }),
+        ),
       };
     });
     // calendar modal values
@@ -890,6 +906,7 @@ class ResultsLogic extends PageLogic {
       wzClose: () => this.setState({ wz: false }),
       wzShow: ({ filters, hotelId }) => {
         this.setState({
+          lastOpen: hotelId,
           f: { ...filters },
           pf: { ...filters },
           pr: {},
@@ -1791,19 +1808,9 @@ export default function ResultsPage() {
                     >
                       <PriceBox forTwo={h.price} nightsLabel={v.nightsLabel} hotelId={h.id} />
                       {h.tipOn ? (
-                        <div className="rm-tip" role="status">
-                          <span>
-                            Следующий шаг: <strong>посмотрите номера</strong>
-                          </span>
-                          <button
-                            type="button"
-                            className="rm-tip-x"
-                            aria-label="Скрыть подсказку"
-                            onClick={v.rmTipClose}
-                          >
-                            ✕
-                          </button>
-                        </div>
+                        <NextTip onClose={v.rmTipClose} className="rm-tip">
+                          Следующий шаг: <strong>посмотрите номера</strong>
+                        </NextTip>
                       ) : null}
                       <button
                         type="button"

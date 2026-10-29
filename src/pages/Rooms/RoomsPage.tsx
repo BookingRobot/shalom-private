@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShareOffer } from '../../components/ShareOffer';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
@@ -13,6 +13,8 @@ import { daysBetween, nightsWord, toD } from '../../lib/dates';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
+import { NextTip } from '../../components/NextTip';
+import { useLiftFabs } from '../../components/StepNext';
 import './RoomsPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -111,6 +113,11 @@ class RoomsLogic extends PageLogic {
 export default function RoomsPage() {
   usePageTitle('Шаг 1 из 4 — номер и программа');
   const [v, logic] = usePageLogic(RoomsLogic);
+  // the summary bar stays at the bottom: the floating buttons step up above it
+  const bar = useRef<HTMLDivElement>(null);
+  useLiftFabs(bar, true);
+  // room and programme are chosen: the next step is «Далее»
+  const [tipX, setTipX] = useState(false);
   return (
     <div className="page pg-rooms">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -412,6 +419,8 @@ export default function RoomsPage() {
         </div>
         {/* Sticky summary */}
         <div
+          ref={bar}
+          className="rooms-bar"
           style={{
             position: 'sticky',
             bottom: '0',
@@ -422,6 +431,7 @@ export default function RoomsPage() {
           }}
         >
           <div
+            className="rooms-bar-in"
             style={{
               maxWidth: '1180px',
               margin: '0 auto',
@@ -434,10 +444,12 @@ export default function RoomsPage() {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.sumLine}</span>
+              <span className="rooms-bar-line" style={{ fontSize: '15px', color: '#3E4B44' }}>
+                {v.sumLine}
+              </span>
               <span style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                 <strong style={{ fontSize: '22px', whiteSpace: 'nowrap' }}>{v.sumTotal}</strong>
-                <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                <span className="rooms-bar-dep" style={{ fontSize: '15px', color: '#3E4B44' }}>
                   {v.sumFull ? (
                     'оплата сразу всей суммы'
                   ) : (
@@ -450,17 +462,29 @@ export default function RoomsPage() {
                 </span>
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <Link className="btn btn-secondary" to="/hotel" style={{ minHeight: '46px', fontSize: '17px' }}>
-                ← К номерам
-              </Link>
+            <div className="rooms-bar-btns" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <Link
-                className="btn btn-primary"
-                to="/transfer"
-                style={{ minHeight: '46px', fontSize: '17px', padding: '0 24px' }}
+                className="btn btn-secondary"
+                to="/hotel"
+                aria-label="К номерам"
+                style={{ minHeight: '46px', fontSize: '17px' }}
               >
-                Далее: дорога →
+                ←<span className="rooms-bar-backt"> К номерам</span>
               </Link>
+              <span className="step-next-at">
+                {tipX ? null : (
+                  <NextTip float arrow="right" onClose={() => setTipX(true)}>
+                    Номер выбран. Следующий шаг: <strong>«Далее: дорога»</strong>
+                  </NextTip>
+                )}
+                <Link
+                  className={'btn btn-primary' + (tipX ? '' : ' next-pulse')}
+                  to="/transfer"
+                  style={{ minHeight: '46px', fontSize: '17px', padding: '0 24px' }}
+                >
+                  Далее: дорога →
+                </Link>
+              </span>
             </div>
           </div>
         </div>

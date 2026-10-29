@@ -117,8 +117,14 @@ const GUIDE = {
 };
 
 /** results: the next step after the search, over «Номера и программы» of the first sanatorium */
-const RMTIP =
-  '<sc-if value="{{rmTipOn}}" hint-placeholder-val="{{true}}"><div class="rm-tip" role="status"><span>Следующий шаг: <strong>посмотрите номера</strong></span><button type="button" class="rm-tip-x" aria-label="Скрыть подсказку" onClick="{{rmTipClose}}">✕</button></div></sc-if>';
+const nextTip = (on, text, close, extra = '') =>
+  `<sc-if value="{{${on}}}" hint-placeholder-val="{{false}}"><div class="next-tip next-tip-center${extra}" role="status"><span class="next-tip-t">${text}</span><button type="button" class="next-tip-x" aria-label="Скрыть подсказку" onClick="{{${close}}}">✕</button></div></sc-if>`;
+const RMTIP = nextTip('rmTipOn', 'Следующий шаг: <strong>посмотрите номера</strong>', 'rmTipClose', ' rm-tip').replace(
+  'hint-placeholder-val="{{false}}"',
+  'hint-placeholder-val="{{true}}"',
+);
+/** results: once a sanatorium's rooms are open, the bubble is on its cheapest free room */
+const RTIP = (i) => nextTip('rtOn' + i, 'Следующий шаг: <strong>выберите номер</strong>', 'rtClose');
 
 const ROOMLINE = `<sc-if value="{{roomOn}}" hint-placeholder-val="{{false}}"><strong style="font-size:16px;color:#1C2620">{{roomLine}}</strong></sc-if>`;
 
@@ -241,12 +247,14 @@ class Component extends DCLogic {
     // results: every sanatorium starts folded; «Номера и программы» opens its rooms; until the
     // guest opens some, a bubble over the first one says it is the next step
     const ro = st.ro || {}, roAny = Object.keys(ro).some((k) => ro[k]), rmTip = !roAny && !st.rmTipX;
-    const __ro = { rmTipOn: rmTip, rmTipClose: () => this.setState({ rmTipX: true }) };
+    const __ro = { rmTipOn: rmTip, rmTipClose: () => this.setState({ rmTipX: true }), rtClose: () => this.setState({ rtX: true }) };
     for (let i = 0; i < 16; i++) {
       __ro['ro' + i] = !!ro[i];
-      __ro['roT' + i] = () => this.setState({ ro: { ...ro, [i]: !ro[i] }, rmTipX: true });
+      __ro['roT' + i] = () => this.setState({ ro: { ...ro, [i]: !ro[i] }, rmTipX: true, lastRo: ro[i] ? st.lastRo : i });
+      __ro['rtOn' + i] = !!ro[i] && st.lastRo === i && !st.rtX;
+      __ro['rtCls' + i] = 'btn btn-primary' + (__ro['rtOn' + i] ? ' next-pulse' : '');
       __ro['roLbl' + i] = ro[i] ? 'Скрыть варианты' : 'Номера и программы';
-      __ro['roCls' + i] = 'btn ' + (ro[i] ? 'btn-secondary' : 'btn-primary') + (i === 0 && rmTip ? ' rm-nudged' : '');
+      __ro['roCls' + i] = 'btn ' + (ro[i] ? 'btn-secondary' : 'btn-primary') + (i === 0 && rmTip ? ' next-pulse' : '');
       __ro['roChev' + i] = ro[i] ? 'transform:rotate(180deg)' : 'transform:none';
     }
     return {
@@ -470,6 +478,7 @@ module.exports = {
   GOTIP,
   GUIDE,
   RMTIP,
+  RTIP,
   ROOMLINE,
   LOGIC,
   filtersLogic,

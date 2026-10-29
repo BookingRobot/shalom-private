@@ -228,3 +228,22 @@
     padding-left: 0;
   }
 }
+
+/* phone: the summary bar is one short row — the total and the two buttons */
+@media (max-width: 760px) {
+  .rooms-bar .rooms-bar-line,
+  .rooms-bar .rooms-bar-dep,
+  .rooms-bar .rooms-bar-backt {
+    display: none;
+  }
+  .rooms-bar .rooms-bar-in {
+    flex-wrap: nowrap !important;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+  .rooms-bar .rooms-bar-btns {
+    flex-wrap: nowrap !important;
+  }
+  .rooms-bar .rooms-bar-btns .btn {
+    padding: 0 14px !important;
+  }
+}

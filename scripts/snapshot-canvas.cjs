@@ -353,6 +353,10 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     await p.goto(BASE + bd.route, { waitUntil: 'networkidle' });
     if (bd.setup) await bd.setup(p);
     await p.waitForTimeout(250);
+    if (await p.$('.step-row')) {
+      await p.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await p.waitForTimeout(450);
+    }
     if (bd.search) await searchBand(p, bd.search);
     if (bd.links) await linkButtons(p, bd.links);
     const { html, h } = await p.evaluate(() => {
@@ -851,6 +855,13 @@ async function buildInteractive(b, sizes) {
             const btn = a.querySelector('button[aria-expanded]');
             if (box) {
               box.className = 'rooms-reveal';
+              // the cheapest free room gets the bubble of the sanatorium opened last (see LOGIC rt*)
+              box.querySelectorAll('.next-tip').forEach((t) => t.remove());
+              const cheap = box.querySelector('[data-cheapest]');
+              if (cheap) {
+                cheap.before(d.raw('rtip-' + i));
+                d.attr(cheap, 'class', 'rtCls' + i);
+              }
               box.before(d.raw('ro-start-' + i));
               box.after(d.raw('ro-end'));
             }
@@ -888,6 +899,7 @@ async function buildInteractive(b, sizes) {
       );
       raws['ro-end'] = '</sc-if>';
       raws.rmtip = IA.RMTIP;
+      filterCfg.order.forEach((_, i) => (raws['rtip-' + i] = IA.RTIP(i)));
     }
     const body = IA.finish(post(base), raws);
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);

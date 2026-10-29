@@ -1,0 +1,126 @@
+/* «What to do now»: a green bubble with a small arrow down to the button to press */
+.next-tip {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 10px 0 12px;
+  padding: 9px 6px 9px 12px;
+  border-radius: 12px;
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  box-shadow:
+    0 2px 6px rgba(18, 34, 27, 0.18),
+    0 12px 28px rgba(18, 34, 27, 0.28);
+  /* comes in, then hops twice every few seconds until the guest acts */
+  animation:
+    nextTipIn 0.35s cubic-bezier(0.22, 0.8, 0.24, 1) both,
+    nextTipHop 3.2s ease-in-out 0.35s infinite;
+}
+.next-tip strong {
+  font-weight: 800;
+}
+.next-tip::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 7px);
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: #1f5f4a;
+  border-radius: 0 0 3px 0;
+  transform: rotate(45deg);
+}
+.next-tip-right::after {
+  left: auto;
+  right: 48px;
+}
+/* above its anchor, not in the flow */
+.next-tip-float {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 12px);
+  width: max-content;
+  max-width: min(340px, calc(100vw - 32px));
+  margin: 0;
+}
+.next-tip-t {
+  flex: 1 1 auto;
+}
+.next-tip-x {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -2px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+/* a link-like action inside the bubble («Показать ↑») */
+.next-tip-go {
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+/* the button the bubble points at pulses a few times */
+.page .btn.next-pulse {
+  animation: nextPulse 1.6s ease-out 0.3s 4;
+}
+@keyframes nextTipIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes nextTipHop {
+  0%,
+  32%,
+  100% {
+    transform: none;
+  }
+  8% {
+    transform: translateY(-9px);
+  }
+  16% {
+    transform: none;
+  }
+  24% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes nextPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(31, 95, 74, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(31, 95, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 95, 74, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .next-tip,
+  .page .btn.next-pulse {
+    animation: none;
+  }
+}
