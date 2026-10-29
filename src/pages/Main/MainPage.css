@@ -284,58 +284,8 @@
   line-height: 1.4;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
 }
-.pg-main .card.search {
+.pg-main .hero-search {
   margin-top: 18px;
-  padding: 14px 24px 13px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border: 0;
-  border-radius: 14px;
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.08),
-    0 14px 36px rgba(0, 0, 0, 0.18);
-}
-.pg-main .search-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr 1fr 236px;
-  gap: 16px;
-  align-items: end;
-}
-.pg-main .sf {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.pg-main .search .lbl {
-  font-size: 14.5px;
-  font-weight: 500;
-  color: #3e4b44;
-}
-.pg-main .search .input {
-  min-height: 51px;
-  font-size: 17px;
-  font-weight: 500;
-  border-width: 1px;
-  border-color: #cfc9bb;
-  border-radius: 8px;
-  box-shadow: none;
-}
-.pg-main .search .input:focus {
-  border-color: #1f5f4a;
-  box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.14);
-}
-.pg-main .search .fieldico {
-  top: 15px;
-}
-.pg-main .search .ftog-line {
-  min-height: 26px;
-}
-.pg-main .search-go {
-  min-height: 51px;
-  font-size: 17px;
-  border-radius: 8px;
 }
 
 /* ── Sections below the hero ── */
@@ -464,12 +414,6 @@ body .pg-main .card.resort:hover {
   .pg-main .hero-in {
     padding-top: 14px;
   }
-  .pg-main .search-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .pg-main .sf-dest {
-    grid-column: 1 / -1;
-  }
   .pg-main .resorts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -527,13 +471,6 @@ body .pg-main .card.resort:hover {
       rgba(10, 24, 18, 0.2) 45%,
       rgba(10, 24, 18, 0.1) 100%
     );
-  }
-  .pg-main .card.search {
-    padding: 16px;
-  }
-  .pg-main .search-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
   }
   .pg-main .sec-head h2 {
     font-size: 28px;

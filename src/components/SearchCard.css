@@ -1,0 +1,84 @@
+/* The search card: home page hero and the band above the results (same look on both) */
+.page .card.search {
+  padding: 14px 24px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 0;
+  border-radius: 14px;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 14px 36px rgba(0, 0, 0, 0.18);
+}
+.page .search-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr 236px;
+  gap: 16px;
+  align-items: end;
+}
+.page .search .sf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.page .search .lbl {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #3e4b44;
+}
+.page .search .input {
+  min-height: 51px;
+  padding: 0 14px 0 42px;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  border: 1px solid #cfc9bb;
+  border-radius: 8px;
+  box-shadow: none;
+  width: 100%;
+}
+.page .search .input:focus {
+  outline: none;
+  border-color: #1f5f4a;
+  box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.14);
+}
+.page .search .datebtn {
+  text-align: left;
+  cursor: pointer;
+}
+.page .search .datebtn:hover {
+  border-color: #1f5f4a;
+}
+.page .search .fieldico {
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  pointer-events: none;
+}
+.page .search .ftog-line {
+  min-height: 26px;
+}
+.page .search .search-go {
+  min-height: 51px;
+  font-size: 17px;
+  border-radius: 8px;
+}
+
+@media (max-width: 1080px) {
+  .page .search-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .page .search .sf-dest {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .page .card.search {
+    padding: 16px;
+  }
+  .page .search-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
