@@ -4,10 +4,23 @@ import { HeaderBar, Brand, MainNav, PhoneLink } from '../../components/layout/Si
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
 import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
-import { MONTHS, MONTHS_N, WEEKDAYS_FULL, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../../lib/dates';
+import {
+  MONTHS,
+  MONTHS_N,
+  WEEKDAYS_FULL,
+  WEEKDAYS_SHORT,
+  addD,
+  daysBetween,
+  iso,
+  nightsWord,
+  shortDate,
+  toD,
+} from '../../lib/dates';
 import { fmt, toNum } from '../../lib/format';
 import { TODAY } from '../../data/demo';
-import { isSoldOutEverywhere } from '../../data/availability';
+import { nearestStays, nightFree, stayFree } from '../../data/availability';
+import { PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
+import { HeadsetIcon } from '../../components/icons';
 import { transferBySanatorium } from '../../data/transferPolicy';
 import { blockedNights, blockedNote, restartNote } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
@@ -276,7 +289,7 @@ class HotelLogic extends PageLogic {
       y0 = st.year ?? checkin.getUTCFullYear();
     const curPpn = Math.round(totalFor(checkin, nights, 2138) / nights / 2);
     // a stay can't cross a "нет мест" night (resort-wide or this room): pop-up instead of selecting
-    const blocked = (d: Date) => isSoldOutEverywhere(iso(d)) || (st.calRoom ? roomDayBusy(st.calRoom, d) : false);
+    const blocked = (d: Date) => !nightFree(info.id, iso(d)) || (st.calRoom ? roomDayBusy(st.calRoom, d) : false);
     const pickDay = (date) => () => {
       const k = iso(date);
       if (sel.in && !sel.out && date > toD(sel.in)) {
@@ -313,7 +326,7 @@ class HotelLogic extends PageLogic {
       for (let d = 1; d <= days; d++) {
         const date = new Date(Date.UTC(y, m, d));
         const past = date < TODAY;
-        const full = !past && (isSoldOutEverywhere(iso(date)) || (st.calRoom ? roomDayBusy(st.calRoom, date) : false));
+        const full = !past && (!nightFree(info.id, iso(date)) || (st.calRoom ? roomDayBusy(st.calRoom, date) : false));
         /* [ПРИМЕР] нет мест ни в одном объекте */ const p = ppnDay(date),
           r = p / curPpn;
         let bg = r < 0.97 ? '#E9F4EC' : r <= 1.03 ? '#FFF6E3' : '#FCEDE9',
@@ -458,6 +471,43 @@ class HotelLogic extends PageLogic {
         : 'Трансфер из аэропорта Вильнюса, Каунаса или Варшавы закажете на шаге «Дорога» — встретим с табличкой и довезём до стойки.',
       offers,
       noRooms: offers.length === 0,
+      // no places on the chosen dates: the nearest dates with places + «Свяжитесь со мной»
+      ...((): {
+        naOn: boolean;
+        naTitle?: string;
+        naText?: string;
+        naDates: { label: string; sub: string; pick: () => void }[];
+      } => {
+        const free = stayFree(info.id, iso(checkin), nights);
+        if (free) return { naOn: false, naDates: [] };
+        const fly = this.props.booking.booking.flightPackage;
+        const wd = (d: Date) => WEEKDAYS_SHORT[d.getUTCDay()].toLowerCase();
+        return {
+          naOn: true,
+          naTitle: 'На ' + range(checkin, checkout) + ' мест нет',
+          naText:
+            'В ' +
+            info.short +
+            ' все номера на эти даты заняты. Ближайшие даты на ' +
+            nightsLabel +
+            (fly ? ' с нашим рейсом туда и обратно' : '') +
+            ', когда места есть:',
+          naDates: nearestStays(info.id, iso(checkin), nights, { flights: fly }).map((a) => {
+            const A = toD(a.checkin),
+              B = toD(a.checkout);
+            return {
+              label: range(A, B),
+              sub: wd(A) + ' → ' + wd(B) + ' · ' + nightsLabel,
+              pick: () => {
+                this.setState({ in: a.checkin, out: a.checkout });
+                this.props.booking.update({ chosenDates: true });
+                document.getElementById('rooms')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              },
+            };
+          }),
+        };
+      })(),
+      helpOpen: () => this.props.help.open(),
       info,
       isEgle,
       tab: (st.tab || 'rooms') as HotelTab,
@@ -982,25 +1032,86 @@ export default function HotelPage() {
                     Изменить даты · когда дешевле?
                   </button>
                 </div>
-                <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
-                  <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
-                  <div style={{ fontSize: '16px', color: '#3E4B44' }}>
-                    Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить внутри
-                    карточки номера.
-                  </div>
-                </div>
-                {v.noRooms ? (
-                  <div className="ht-cta">
-                    <span>
-                      Цены и свободные номера в {v.info.short} подскажет консультант — ответим в течение часа в рабочее
-                      время.
-                    </span>
-                    <a className="btn btn-primary" href="tel:+37060000000">
-                      Узнать цены
-                    </a>
-                  </div>
-                ) : null}
-                {(v.offers || []).map((o: any, _i0: number) => (
+                {v.naOn ? (
+                  /* no places on these dates: the nearest dates with places, and a person to help */
+                  <section id="rooms" className="ht-na" aria-labelledby="ht-na-t">
+                    <div className="ht-na-head">
+                      <span className="ht-na-ico" aria-hidden="true">
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18M9.5 14.5l5 4M14.5 14.5l-5 4" />
+                        </svg>
+                      </span>
+                      <div>
+                        <h2 id="ht-na-t">{v.naTitle}</h2>
+                        <p>{v.naText}</p>
+                      </div>
+                    </div>
+                    {v.naDates.length ? (
+                      <div className="ht-na-dates" role="group" aria-label="Ближайшие свободные даты">
+                        {v.naDates.map((a: any) => (
+                          <button key={a.label} type="button" className="ht-na-date" onClick={a.pick}>
+                            <strong>{a.label}</strong>
+                            <span>{a.sub}</span>
+                            <em>Выбрать эти даты →</em>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                    <button type="button" className="linkbtn ht-na-cal" onClick={v.openCal}>
+                      Посмотреть другие даты в календаре
+                    </button>
+                    <div className="ht-na-help">
+                      <div>
+                        <strong>Не хотите искать сами?</strong>
+                        <span>
+                          Оставьте телефон — консультант подберёт свободные даты и цену и перезвонит вам в течение 2
+                          часов (9:00–20:00).
+                        </span>
+                      </div>
+                      <button type="button" className="btn btn-primary ht-na-call" onClick={v.helpOpen}>
+                        <HeadsetIcon size={22} />
+                        Свяжитесь со мной
+                      </button>
+                    </div>
+                  </section>
+                ) : (
+                  <>
+                    <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
+                      <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
+                      <div style={{ fontSize: '16px', color: '#3E4B44' }}>
+                        Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить
+                        внутри карточки номера.
+                      </div>
+                    </div>
+                    {v.noRooms ? (
+                      <div className="ht-cta">
+                        <span>
+                          Цены и свободные номера в {v.info.short} на ваши даты подскажет консультант — ответим в
+                          течение 2 часов (9:00–20:00).
+                        </span>
+                        <span className="ht-cta-btns">
+                          <button type="button" className="btn btn-primary" onClick={v.helpOpen}>
+                            <HeadsetIcon size={22} />
+                            Свяжитесь со мной
+                          </button>
+                          <a className="btn btn-secondary" href={PHONE_TEL} dir="ltr">
+                            {PHONE_DISPLAY}
+                          </a>
+                        </span>
+                      </div>
+                    ) : null}
+                  </>
+                )}
+                {(v.naOn ? [] : v.offers || []).map((o: any, _i0: number) => (
                   <Fragment key={_i0}>
                     <RoomCard o={o} nightsLabel={v.nightsLabel} />
                   </Fragment>

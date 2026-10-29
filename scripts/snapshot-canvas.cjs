@@ -87,6 +87,13 @@ const BOARDS = [
   { file: 'Hotel-grand.dc.html', title: 'Санаторий · Гранд Спа Лиетува', route: '/hotel?h=grand-spa-lietuva' },
   { file: 'Hotel-belorus.dc.html', title: 'Санаторий · Беларусь', route: '/hotel?h=belorus' },
   {
+    // no places on the guest's dates: the nearest dates with places and «Свяжитесь со мной»
+    file: 'Hotel-upa.dc.html',
+    title: 'Санаторий · на ваши даты мест нет (Упа): ближайшие даты и «Свяжитесь со мной»',
+    route: '/hotel?h=upa',
+    links: [['.ht-na-call', '', 'Help.dc.html']],
+  },
+  {
     file: 'Rooms.dc.html',
     title: 'Шаг 1 · Номер и программа',
     route: '/rooms',
@@ -273,7 +280,11 @@ const linkFor = (href) => {
   const [p, hash] = href.split('#');
   const route = p.split('?')[0] || '/';
   const h = (p.split('?')[1] || '').match(/(?:^|&)h=([a-z-]+)/);
-  const HOTEL_FILE = { 'grand-spa-lietuva': 'Hotel-grand.dc.html', belorus: 'Hotel-belorus.dc.html' };
+  const HOTEL_FILE = {
+    'grand-spa-lietuva': 'Hotel-grand.dc.html',
+    belorus: 'Hotel-belorus.dc.html',
+    upa: 'Hotel-upa.dc.html',
+  };
   if (route === '/hotel' && h && HOTEL_FILE[h[1]]) return HOTEL_FILE[h[1]];
   const f = ROUTE_FILE[route];
   if (!f) return href;
@@ -791,6 +802,17 @@ async function buildInteractive(b, sizes) {
             .forEach((x) => d.on(x, 'click', 'wzOpen'));
           btns.filter((x) => /Выбрать другие даты/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'openRoomCal'));
           btns.filter((x) => /Когда дешевле\?/.test(x.textContent)).forEach((x) => d.on(x, 'click', 'priceOpen'));
+          // «нет мест на ваши даты»: «Свяжитесь со мной» opens the form board
+          btns
+            .filter((x) => /Свяжитесь со мной/.test(x.textContent) && x.closest('article'))
+            .forEach((x) => {
+              const a = document.createElement('a');
+              a.className = x.className;
+              a.href = 'Help.dc.html';
+              a.innerHTML = x.innerHTML;
+              a.setAttribute('style', (x.getAttribute('style') || '') + ';text-decoration:none');
+              x.replaceWith(a);
+            });
           // "Фильтры" (next to the wizard button) opens / closes the panel in place (see filtersLogic)
           const fb = document.querySelector('.f-btn');
           d.on(fb, 'click', 'fToggle');

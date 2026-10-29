@@ -7,7 +7,8 @@ import { MonthsCalendar, type CalendarCell } from '../../components/calendar/Mon
 import { MONTHS, MONTHS_N, addD, daysBetween, iso, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { fmt } from '../../lib/format';
-import { isSoldOutEverywhere } from '../../data/availability';
+import { isSoldOutEverywhere, nearestStays } from '../../data/availability';
+import { HeadsetIcon } from '../../components/icons';
 import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/stayCheck';
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
@@ -836,7 +837,6 @@ class ResultsLogic extends PageLogic {
           stars: '★★★',
           sub: 'Друскининкай · у парка Вийя',
           img: '/img/79c9318ba02a718e29de4346c9642a33.jpg',
-          next: 'с 23 ноября',
         },
         {
           id: 'spa-vilnius',
@@ -844,10 +844,14 @@ class ResultsLogic extends PageLogic {
           stars: '★★★★',
           sub: 'Друскининкай · у реки Неман',
           img: '/img/30b3b315653c1dbc711827ceb6c48ebe.jpg',
-          next: 'с 1 декабря',
         },
       ].map((u) => ({
         ...u,
+        // the nearest stay of the same length with places (data/availability)
+        next: (() => {
+          const a = nearestStays(u.id, iso(checkin), NIGHTS, { count: 1 })[0];
+          return a ? range(toD(a.checkin)) : 'уточнит консультант';
+        })(),
         chips: [
           { t: 'Врач включён', d: ICON_PATHS.doctor },
           { t: 'Бассейн и сауны', d: ICON_PATHS.pool },
@@ -2046,11 +2050,12 @@ export default function ResultsPage() {
                     </Link>
                     <button
                       type="button"
-                      className="linkbtn"
+                      className="btn btn-primary"
                       onClick={u.notify}
-                      style={{ fontSize: '15px', justifyContent: 'center' }}
+                      style={{ minHeight: '46px', fontSize: '15px', padding: '0 14px', gap: '8px' }}
                     >
-                      Сообщить, если появятся места
+                      <HeadsetIcon size={20} />
+                      Свяжитесь со мной
                     </button>
                   </div>
                 </article>
