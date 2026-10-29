@@ -496,19 +496,29 @@ async function buildInteractive(b, sizes) {
     const raws = {
       glabel: IA.GLABEL,
       gotip: IA.GOTIP,
+      // home: the resort and the dates start empty, a bubble shows what to fill next
+      ...(isMain ? { ...IA.GUIDE } : {}),
       gpop: wrapIf('gOpen', gpop),
       calmodal: wrapIf('calOpen', cal),
     };
     // the same search card on both boards: «Курорт или санаторий» opens its list
+    // (home: a pick fills the field and the bubble moves on; results: a pick opens the results)
+    let cityLabels = [];
     {
       const list = post(
         await grab(
           b,
           route,
           (p) => p.click('#city'),
-          () => {
+          (isMain) => {
             const ul = document.querySelector('.ps-list');
-            ul.querySelectorAll('li').forEach((li) => {
+            ul.querySelectorAll('li').forEach((li, i) => {
+              if (isMain) {
+                li.removeAttribute('aria-selected');
+                li.className = 'ps-opt';
+                li.style.cursor = 'pointer';
+                return window.__dc.on(li, 'click', 'pickCity' + i);
+              }
               const a = document.createElement('a');
               a.href = '/results';
               a.style.cssText = 'display:flex;flex-direction:column;text-decoration:none;color:inherit';
@@ -518,9 +528,11 @@ async function buildInteractive(b, sizes) {
             });
             return ul.outerHTML;
           },
+          isMain,
         ),
       );
-      raws.slist = wrapIf('sOpen', list);
+      cityLabels = [...list.matchAll(/<strong>([^<]+)<\/strong>/g)].map((m) => m[1]);
+      raws.slist = wrapIf('sOpen', IA.finish(list, {}));
     }
     if (isMain) {
       // "Не знаете, какой санаторий выбрать?" opens the 3-question wizard right here
@@ -718,9 +730,35 @@ async function buildInteractive(b, sizes) {
         const d = window.__dc;
         ['#datein', '#dateout'].forEach((s, i) => {
           const el = document.querySelector(s);
-          d.text(el, i ? 'outLabel' : 'inLabel');
+          if (isMain) {
+            // empty until chosen: «Выберите дату»
+            el.innerHTML = '';
+            el.appendChild(d.raw(i ? 'outtext' : 'intext'));
+            d.attr(el.closest('.sf'), 'class', 'sfDatesCls');
+          } else d.text(el, i ? 'outLabel' : 'inLabel');
           d.on(el, 'click', 'openCal');
         });
+        if (isMain) {
+          document.querySelectorAll('.search .go-tip').forEach((t) => t.remove());
+          const dest = document.querySelector('.search .sf-dest');
+          dest.querySelector('.sf-at').prepend(d.raw('tipplace'));
+          d.attr(dest, 'class', 'sfPlaceCls');
+          document.querySelector('#datein').parentElement.prepend(d.raw('tipdates'));
+          // «Найти санаторий»: a link to the results once all is chosen, before that it opens what is missing
+          const go = document.querySelector('.search .search-go');
+          d.attr(go, 'class', 'goCls');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = go.textContent;
+          d.attr(btn, 'class', 'goCls');
+          d.on(btn, 'click', 'findGap');
+          const mid = d.raw('gr-mid');
+          const end = d.raw('gr-end');
+          go.before(d.raw('gr-start'));
+          go.after(mid);
+          mid.after(btn);
+          btn.after(end);
+        }
         const g = document.querySelector('#guests');
         g.innerHTML = '';
         g.appendChild(d.raw('glabel'));
@@ -797,7 +835,7 @@ async function buildInteractive(b, sizes) {
     const left = body.match(/\u27E6|data-dc-|<dc-raw/g);
     if (left) console.warn(file, 'unconverted markers:', left.length);
     const h = sizes[file].h;
-    const logic = filterCfg ? IA.filtersLogic(filterCfg) : IA.LOGIC;
+    const logic = filterCfg ? IA.filtersLogic(filterCfg) : isMain ? IA.mainLogic(cityLabels) : IA.LOGIC;
     fs.writeFileSync(path.join(OUT, file), docFor(sizes[file].title, route, body, h, logic));
     console.log(file, 'interactive', body.length);
   }

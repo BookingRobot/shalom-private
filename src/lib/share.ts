@@ -39,6 +39,9 @@ export function bookingFromUrl(search: string): Partial<Booking> | null {
     children: num(q.get('c'), 0, 3),
     flightPackage: q.get('f') === '1',
   };
+  // an offer is a finished search: the home page shows its sanatorium and dates as chosen
+  if (out.hotelId) out.chosenPlace = 'san:' + out.hotelId;
+  if (out.checkin && out.checkout) out.chosenDates = true;
   Object.keys(out).forEach((k) => (out as any)[k] === undefined && delete (out as any)[k]);
   return out;
 }

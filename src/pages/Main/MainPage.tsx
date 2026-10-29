@@ -180,10 +180,12 @@ class MainLogic extends PageLogic {
       flexMode: !!st.flex,
       setFlex: (flex) => this.setState({ flex }),
       // a recommended option is the choice: set the dates and show sanatoriums right away
+      // (with the resort not chosen yet the guest stays here: the bubble points at the resort)
       flexPick: (a, b) => {
         this.setState({ in: a, out: b, flex: false, calOpen: false });
-        this.props.booking.update({ checkin: a, checkout: b });
-        this.props.navigate('/results');
+        this.props.booking.update({ checkin: a, checkout: b, chosenDates: true });
+        const place = booking.chosenPlace;
+        if (place) this.props.navigate(place.startsWith('san:') ? '/results?h=' + place.slice(4) : '/results');
       },
       hotels: POPULAR_SANATORIUMS,
       dest: booking.dest,
@@ -199,7 +201,8 @@ class MainLogic extends PageLogic {
         this.setState({
           note: null,
           calOpen: true,
-          sel: { in: iso(inD), out: iso(outD) },
+          // dates not chosen yet: an empty calendar, the guest taps the check-in day first
+          sel: booking.chosenDates ? { in: iso(inD), out: iso(outD) } : { in: null, out: null },
           month: inD.getUTCMonth(),
           year: inD.getUTCFullYear(),
         }),
@@ -225,7 +228,9 @@ class MainLogic extends PageLogic {
       selNights: nights ? nights + ' ' + nightsWord(nights) : '—',
       applyOff: !(sIn && sOut),
       applyCal: () => {
-        if (sIn && sOut) this.setState({ in: iso(sIn), out: iso(sOut), calOpen: false });
+        if (!(sIn && sOut)) return;
+        this.setState({ in: iso(sIn), out: iso(sOut), calOpen: false });
+        update({ chosenDates: true });
       },
       p7: preset(7),
       p10: preset(10),
@@ -282,7 +287,7 @@ export default function MainPage() {
               и&nbsp;отдых в&nbsp;Литве
             </h1>
             <p className="hero-sub">Выберите санаторий, сравните программы и забронируйте на русском языке.</p>
-            <SearchCard className="hero-search" inLabel={v.inLabel} outLabel={v.outLabel} onOpenCal={v.openCal} />
+            <SearchCard guide className="hero-search" inLabel={v.inLabel} outLabel={v.outLabel} onOpenCal={v.openCal} />
           </div>
         </section>
         {/* Resorts */}
@@ -788,7 +793,7 @@ export default function MainPage() {
           onClose={() => setResort('')}
           onSwitch={setResort}
           onChoose={(id) => {
-            logic.props.booking.update({ dest: id });
+            logic.props.booking.update({ dest: id, chosenPlace: 'resort:' + id });
             setResort('');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}

@@ -634,7 +634,9 @@ class ResultsLogic extends PageLogic {
         this.setState({ cal: { ...st.cal, month: m % 12, year: m > 11 ? y + 1 : y } });
       },
       calApply: () => {
-        if (!cal.applyOff) this.setState({ checkin: st.cal.picked || iso(checkin), cal: null });
+        if (cal.applyOff) return;
+        this.setState({ checkin: st.cal.picked || iso(checkin), cal: null });
+        this.props.booking.update({ chosenDates: true });
       },
       calNoteClose: () => this.setState({ cal: { ...st.cal, note: null } }),
       calNoteAsk: () => this.props.help.open(),
@@ -788,6 +790,7 @@ class ResultsLogic extends PageLogic {
       // a recommended option is the choice: apply the dates and show the list
       sFlexPick: (a, b) => {
         this.setState({ checkin: a, nights: daysBetween(toD(a), toD(b)), sOpen: false, sFlex: false, sRoom: null });
+        this.props.booking.update({ chosenDates: true });
       },
       sCalTitle: sRoom ? 'Свободные даты номера' : 'Выберите даты поездки',
       sRoomLine: sRoom ? sRoom.name + ' · ' + sRoom.hotel + ' — занятые дни закрыты' : '',
@@ -813,8 +816,9 @@ class ResultsLogic extends PageLogic {
       sSelNights: sN ? sN + ' ' + nW(sN) : '—',
       sApplyOff: !sN || sSelBad,
       sApplyCal: () => {
-        if (sN && sIn && !sSelBad)
-          this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null, sNote: null });
+        if (!(sN && sIn && !sSelBad)) return;
+        this.setState({ checkin: iso(sIn), nights: sN, sOpen: false, sRoom: null, sNote: null });
+        this.props.booking.update({ chosenDates: true });
       },
       sP7: sPreset(7),
       sP10: sPreset(10),

@@ -382,7 +382,10 @@ class HotelLogic extends PageLogic {
       flexMode: !!st.flex && !st.calRoom,
       setFlex: (flex: boolean) => this.setState({ flex, note: null }),
       // a recommended option from «Не знаю точных дат» is the choice: the page shows those dates
-      flexPick: (a: string, b: string) => this.setState({ in: a, out: b, cal: false, flex: false, note: null }),
+      flexPick: (a: string, b: string) => {
+        this.setState({ in: a, out: b, cal: false, flex: false, note: null });
+        this.props.booking.update({ chosenDates: true });
+      },
       selIn: sIn ? shortDate(sIn) : '—',
       selOut: sOut ? shortDate(sOut) : '—',
       selNights: selN ? selN + ' ' + nightsWord(selN) : '—',
@@ -433,7 +436,9 @@ class HotelLogic extends PageLogic {
       diffColor: diff > 0 ? '#1F5F4A' : diff < 0 ? '#B3261E' : '#3E4B44',
       applyOff: !(sIn && sOut) || selBlocked,
       applyCal: () => {
-        if (sIn && sOut && !selBlocked) this.setState({ in: iso(sIn), out: iso(sOut), cal: false, note: null });
+        if (!(sIn && sOut && !selBlocked)) return;
+        this.setState({ in: iso(sIn), out: iso(sOut), cal: false, note: null });
+        this.props.booking.update({ chosenDates: true });
       },
       p7: preset(7),
       p10: preset(10),
