@@ -1,4 +1,5 @@
 import { VanIcon } from '../../components/icons';
+import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../../data/contacts';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
@@ -9,7 +10,7 @@ import { TODAY } from '../../data/demo';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { HelpStripBand } from '../../components/layout/HelpStrip';
-import { FooterSlot } from '../../components/layout/SiteFooter';
+import { AgencyBlock, FooterSlot } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './DonePage.css';
 
@@ -87,7 +88,7 @@ export default function DonePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Спасибо! Заказ № 12345 принят</h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px' }}>
+                <span style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px' }}>
                   Депозит {o.advanceLabel} внесён — цена зафиксирована.
                 </span>
                 <span
@@ -192,7 +193,9 @@ export default function DonePage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">27 октября · сегодня</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Депозит получен</strong>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
+                        Депозит получен
+                      </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Оплата {o.advanceLabel} прошла успешно. Цена больше не изменится.
                       </span>
@@ -220,7 +223,7 @@ export default function DonePage() {
                       <span className="chip" style={{ background: '#FFF1D6', color: '#8A5A00' }}>
                         До 28 октября
                       </span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Подтверждение санатория
                       </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -233,7 +236,9 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">2–6 ноября</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Памятка и встреча</strong>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
+                        Памятка и встреча
+                      </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Пришлём время встречи, контакты водителя и список вещей.
                       </span>
@@ -244,7 +249,9 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">{inDay} · с 14:00</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>Заезд в санаторий</strong>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
+                        Заезд в санаторий
+                      </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
                         Всё оплачено заранее — на месте доплачивать ничего не нужно.
                       </span>
@@ -254,7 +261,7 @@ export default function DonePage() {
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">{outDay} · до 12:00</span>
-                      <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '18px' }}>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Выезд и обратный трансфер
                       </strong>
                       <span style={{ fontSize: '15px', color: '#3E4B44' }}>
@@ -330,7 +337,7 @@ export default function DonePage() {
                 </svg>
                 <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px' }}>
+                    <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '20px' }}>
                       Нужна помощь? Мы на связи
                     </strong>
                     <span style={{ fontSize: '16px', color: '#3E4B44' }}>
@@ -340,7 +347,7 @@ export default function DonePage() {
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <a className="btn btn-secondary" href="https://wa.me/37060000000">
+                    <a className="btn btn-secondary" href={WHATSAPP_URL}>
                       <svg
                         width="22"
                         height="22"
@@ -359,7 +366,7 @@ export default function DonePage() {
                     </a>
                     <a
                       className="btn btn-secondary"
-                      href="tel:+37060000000"
+                      href={PHONE_TEL}
                       style={{ flexDirection: 'column', gap: '0', lineHeight: '1.2', padding: '8px 20px' }}
                     >
                       <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -378,7 +385,7 @@ export default function DonePage() {
                         </svg>
                         Позвонить
                       </span>
-                      <span>+370&nbsp;600 00000</span>
+                      <span dir="ltr">{PHONE_DISPLAY}</span>
                     </a>
                   </div>
                 </div>
@@ -396,7 +403,7 @@ export default function DonePage() {
                 />{' '}
                 <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '22px', fontWeight: '600' }}>
+                    <div style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px', fontWeight: '600' }}>
                       Эгле Комфорт
                     </div>
                     <span style={{ color: '#8A6500', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
@@ -636,7 +643,7 @@ export default function DonePage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                fontFamily: 'Lora,Georgia,serif',
+                fontFamily: 'Montserrat,Manrope,sans-serif',
                 fontSize: '18px',
                 fontWeight: '700',
               }}
@@ -656,6 +663,9 @@ export default function DonePage() {
               </Link>
             </div>
             <FooterSlot />
+          </div>
+          <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '0 24px 18px' }}>
+            <AgencyBlock tone="light" />
           </div>
         </footer>
       </div>{' '}

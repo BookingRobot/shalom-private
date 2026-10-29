@@ -145,7 +145,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   <h2
                     id="helpTitle"
                     style={{
-                      fontFamily: 'Lora,Georgia,serif',
+                      fontFamily: 'Montserrat,Manrope,sans-serif',
                       fontSize: '24px',
                       fontWeight: '600',
                       margin: '0',
@@ -373,7 +373,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                 >
                   <CheckIcon size={34} color="#fff" strokeWidth={2.6} />
                 </span>
-                <strong style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '23px', fontWeight: '600' }}>
+                <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '23px', fontWeight: '600' }}>
                   Спасибо! Мы скоро свяжемся с вами
                 </strong>
                 <span style={{ fontSize: '17px', color: '#3E4B44' }}>

@@ -72,8 +72,15 @@ export function FlightChoice() {
   const bySan = transferBySanatorium(booking.hotelId);
   const pp = FLIGHT_PP + (bySan ? 0 : PACKAGE_TRANSFER_PP);
   // «Да» is chosen even when our flight does not fly on these dates (then: flights 'yes', no package yet)
-  const sel = booking.flightPackage || booking.flights === 'yes' ? 'with' : booking.flights === 'no' ? 'own' : '';
-  const askedHelp = booking.flights === 'help';
+  // nothing is marked until the guest answers here (a «с перелётом» tick in the search does not answer it)
+  const sel = !booking.flightAsked
+    ? ''
+    : booking.flightPackage || booking.flights === 'yes'
+      ? 'with'
+      : booking.flights === 'no'
+        ? 'own'
+        : '';
+  const askedHelp = booking.flightAsked && booking.flights === 'help';
   const pairs = both ? [] : flightPairs(inD, nights);
 
   // «Нет» after «Да»: the flights fold back up before they disappear
@@ -97,12 +104,12 @@ export function FlightChoice() {
   const pickWith = (dates?: { checkin: string; checkout: string }) =>
     update(
       dates || both
-        ? { ...(dates ? { ...dates, chosenDates: true } : {}), flightPackage: true, flights: 'yes' }
-        : { flightPackage: false, flights: 'yes' },
+        ? { ...(dates ? { ...dates, chosenDates: true } : {}), flightPackage: true, flights: 'yes', flightAsked: true }
+        : { flightPackage: false, flights: 'yes', flightAsked: true },
     );
-  const pickOwn = () => update({ flightPackage: false, flights: 'no' });
+  const pickOwn = () => update({ flightPackage: false, flights: 'no', flightAsked: true });
   const pickHelp = () => {
-    update({ flightPackage: false, flights: 'help' });
+    update({ flightPackage: false, flights: 'help', flightAsked: true });
     help.open();
   };
 

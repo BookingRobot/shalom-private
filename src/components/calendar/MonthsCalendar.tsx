@@ -71,7 +71,14 @@ export function MonthsCalendar({
       <div className="mc-months">
         {months.map((m, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '600', textAlign: 'center' }}>
+            <div
+              style={{
+                fontFamily: 'Montserrat,Manrope,sans-serif',
+                fontSize: '20px',
+                fontWeight: '600',
+                textAlign: 'center',
+              }}
+            >
               {m.title}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>

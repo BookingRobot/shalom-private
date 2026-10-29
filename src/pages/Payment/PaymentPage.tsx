@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { PHONE_TEL } from '../../data/contacts';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
@@ -8,6 +9,8 @@ import { StepNext } from '../../components/StepNext';
 import { orderSummary } from '../../lib/orderSummary';
 import { shortDate } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
+import { DEPOSIT_FLIGHT_PP, persons } from '../../lib/pricing';
+import { transferBySanatorium } from '../../data/transferPolicy';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
@@ -40,7 +43,21 @@ class PaymentLogic extends PageLogic {
       restAmt = fmt(order.rest),
       totalAmt = fmt(TOTAL);
     const TODAY_LABEL = 'сегодня, ' + shortDate(TODAY);
+    // how the rest is paid: a payment link, a bank transfer or cash in our office;
+    // at Eglė the sanatorium itself is paid on arrival
+    const HOW =
+      'пришлём ссылку для оплаты картой или реквизиты для банковского перевода, можно и наличными в нашем офисе';
+    const atSan = transferBySanatorium(booking.hotelId);
+    const flightRest = order.flight ? Math.max(0, order.flight - DEPOSIT_FLIGHT_PP * persons(booking)) : 0;
+    const sanRest = order.rest - flightRest;
+    const restLines = atSan
+      ? [
+          ...(flightRest ? ['Перелёт: остаток ' + eur(flightRest) + ' — до ' + order.dueDate + '; ' + HOW + '.'] : []),
+          'Санаторий: остаток ' + eur(sanRest) + ' оплачиваете на месте, при заезде.',
+        ]
+      : ['Остаток ' + eur(order.rest) + ' — до ' + order.dueDate + ': ' + HOW + '.'];
     return {
+      restLines,
       advAmt,
       restAmt,
       totalAmt,
@@ -139,52 +156,84 @@ export default function PaymentPage() {
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
               <h2 style={{ fontSize: '24px' }}>Сумма к оплате сейчас</h2>
-              <div className="plan-list">
-                {v.fullOnly ? null : (
-                  <button type="button" className={`choice plan plan-main ${v.advCls ?? ''}`} onClick={v.pickAdv}>
-                    <span className={`radio ${v.advCls ?? ''}`}>
-                      <i />
-                    </span>
-                    <span className="plan-body">
-                      <span className="plan-head">
-                        <strong className="plan-title">
-                          Депозит — <span className="nowrap">{v.advAmt}&nbsp;€</span>
-                        </strong>
-                        <span className="plan-badge">Цена фиксируется</span>
-                      </span>
-                      <span className="plan-text">
-                        {v.depositRule}. Остальные <strong>{v.restAmt}&nbsp;€</strong> — до {v.dueDate}; до этой даты
-                        отмена бесплатная, депозит возвращаем.
-                      </span>
-                    </span>
-                  </button>
-                )}
-                <button type="button" className={`choice plan plan-alt ${v.fullCls ?? ''}`} onClick={v.pickFull}>
-                  <span className={`radio ${v.fullCls ?? ''}`}>
-                    <i />
-                  </span>
-                  <span className="plan-body plan-inline">
-                    <strong className="plan-title">
-                      Вся сумма — <span className="nowrap">{v.totalAmt}&nbsp;€</span>
-                    </strong>
+              {/* what is paid today, and how the rest is paid; other ways fold out below */}
+              <div className="pay-now">
+                <span className="pay-now-h">
+                  <strong className="plan-title">
+                    {v.advCls ? (
+                      <>
+                        Депозит сегодня — <span className="nowrap">{v.advAmt}&nbsp;€</span>
+                      </>
+                    ) : (
+                      <>
+                        Вся сумма сегодня — <span className="nowrap">{v.totalAmt}&nbsp;€</span>
+                      </>
+                    )}
+                  </strong>
+                  {v.advCls ? <span className="plan-badge">Цена фиксируется</span> : null}
+                </span>
+                {v.advCls ? (
+                  <>
                     <span className="plan-text">
-                      {v.fullOnly
-                        ? 'До заезда меньше недели — бронь подтверждаем только после полной оплаты.'
-                        : v.fullIncludes + ' Больше ничего не платить — удобно, если оплачивают родственники.'}
+                      {v.depositRule}. До {v.dueDate} отмена бесплатная, депозит возвращаем.
                     </span>
+                    {(v.restLines || []).map((t: string) => (
+                      <span className="plan-text pay-rest" key={t}>
+                        {t}
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  <span className="plan-text">
+                    {v.fullOnly
+                      ? 'До заезда меньше недели — бронь подтверждаем только после полной оплаты.'
+                      : v.fullIncludes + ' Больше ничего не платить.'}
                   </span>
-                </button>
+                )}
               </div>
-              <div className="pay-steps" aria-label="График оплаты">
-                <div className="pay-steps-title">График оплаты</div>
-                {(v.steps || []).map((x: any) => (
-                  <div className="pay-step" key={x.when}>
-                    <span className="pay-when">{x.when}</span>
-                    <span className="pay-what">{x.what}</span>
-                    <strong className="pay-sum">{x.sum}</strong>
+              {v.fullOnly ? null : (
+                <details className="pay-more">
+                  <summary>Оплатить всю сумму сразу · график оплаты</summary>
+                  <div className="pay-more-in">
+                    <div className="plan-list">
+                      <button type="button" className={`choice plan plan-main ${v.advCls ?? ''}`} onClick={v.pickAdv}>
+                        <span className={`radio ${v.advCls ?? ''}`}>
+                          <i />
+                        </span>
+                        <span className="plan-body plan-inline">
+                          <strong className="plan-title">
+                            Депозит — <span className="nowrap">{v.advAmt}&nbsp;€</span>
+                          </strong>
+                          <span className="plan-text">Остальное — позже, до {v.dueDate}.</span>
+                        </span>
+                      </button>
+                      <button type="button" className={`choice plan plan-alt ${v.fullCls ?? ''}`} onClick={v.pickFull}>
+                        <span className={`radio ${v.fullCls ?? ''}`}>
+                          <i />
+                        </span>
+                        <span className="plan-body plan-inline">
+                          <strong className="plan-title">
+                            Вся сумма — <span className="nowrap">{v.totalAmt}&nbsp;€</span>
+                          </strong>
+                          <span className="plan-text">
+                            {v.fullIncludes} Больше ничего не платить — удобно, если оплачивают родственники.
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                    <div className="pay-steps" aria-label="График оплаты">
+                      <div className="pay-steps-title">График оплаты</div>
+                      {(v.steps || []).map((x: any) => (
+                        <div className="pay-step" key={x.when}>
+                          <span className="pay-when">{x.when}</span>
+                          <span className="pay-what">{x.what}</span>
+                          <strong className="pay-sum">{x.sum}</strong>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                </details>
+              )}
             </section>
             {/* Method */}
             <section
@@ -373,7 +422,7 @@ export default function PaymentPage() {
 
               <div style={{ fontSize: '16px', color: '#3E4B44', borderTop: '1px solid #E3DED2', paddingTop: '12px' }}>
                 Нужен банковский перевод (например, оплачивает организация)?{' '}
-                <a href="tel:+37060000000" style={{ fontWeight: '700' }}>
+                <a href={PHONE_TEL} style={{ fontWeight: '700' }}>
                   Позвоните нам
                 </a>{' '}
                 — пришлём счёт.

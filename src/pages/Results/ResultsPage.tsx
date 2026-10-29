@@ -1253,7 +1253,12 @@ export default function ResultsPage() {
                         type="button"
                         className="acc"
                         onClick={v.toggleMore}
-                        style={{ fontSize: '18px', fontFamily: 'Lora,Georgia,serif', color: '#1C2620', gap: '12px' }}
+                        style={{
+                          fontSize: '18px',
+                          fontFamily: 'Montserrat,Manrope,sans-serif',
+                          color: '#1C2620',
+                          gap: '12px',
+                        }}
                       >
                         <span>Дополнительные фильтры</span>
                         <svg
@@ -2381,7 +2386,12 @@ export default function ResultsPage() {
                   }}
                 >
                   <div
-                    style={{ fontFamily: 'Lora,Georgia,serif', fontSize: '20px', fontWeight: '600', color: '#1F5F4A' }}
+                    style={{
+                      fontFamily: 'Montserrat,Manrope,sans-serif',
+                      fontSize: '20px',
+                      fontWeight: '600',
+                      color: '#1F5F4A',
+                    }}
                   >
                     Новые даты
                   </div>

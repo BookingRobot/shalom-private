@@ -107,7 +107,15 @@ function ChooseArt() {
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <text x="189" y="25" textAnchor="middle" fontFamily="Lora,Georgia,serif" fontSize="19" fontWeight="700" fill={G}>
+      <text
+        x="189"
+        y="25"
+        textAnchor="middle"
+        fontFamily="Montserrat,Manrope,sans-serif"
+        fontSize="19"
+        fontWeight="700"
+        fill={G}
+      >
         ?
       </text>
       {/* three sanatoriums, the middle one chosen */}

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
-import { LogoMark, PhoneIcon } from '../icons';
+import { AGENCY, AGENCY_LOGO, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
+import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
 type Tone = 'light' | 'dark';
@@ -45,14 +45,9 @@ export function HeaderBar({
   );
 }
 
-/** Logo + site name, links to the home page. */
+/** The agency's logo (Atlantis travel & tourism), links to the home page. */
 export function Brand({
   logo = 32,
-  size = 21,
-  gap = 12,
-  tone = 'light',
-  name = SITE_NAME,
-  round = 0,
 }: {
   round?: number;
   logo?: number;
@@ -61,21 +56,20 @@ export function Brand({
   tone?: Tone;
   name?: ReactNode;
 }) {
+  const h = Math.round(logo * 1.2);
   return (
     <Link
       to="/"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: `${gap}px`,
-        textDecoration: 'none',
-        color: tone === 'dark' ? '#fff' : '#1C2620',
-        padding: '4px 0',
-        margin: '-4px 0',
-      }}
+      className="brand"
+      style={{ display: 'flex', alignItems: 'center', padding: '4px 0', margin: '-4px 0' }}
     >
-      <LogoMark size={logo} round={round} />
-      <span style={{ fontFamily: 'Lora,Georgia,serif', fontSize: `${size}px`, fontWeight: '700' }}>{name}</span>
+      <img
+        src={AGENCY_LOGO}
+        alt={AGENCY + ' — ' + SITE_NAME}
+        height={h}
+        width={Math.round((h * 738) / 165)}
+        style={{ display: 'block', height: h + 'px', width: 'auto' }}
+      />
     </Link>
   );
 }

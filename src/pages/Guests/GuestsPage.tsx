@@ -641,7 +641,7 @@ export default function GuestsPage() {
                       <div
                         style={{
                           textAlign: 'center',
-                          fontFamily: 'Lora,Georgia,serif',
+                          fontFamily: 'Montserrat,Manrope,sans-serif',
                           fontSize: '20px',
                           fontWeight: '600',
                         }}
@@ -700,7 +700,7 @@ export default function GuestsPage() {
                     <div
                       style={{
                         textAlign: 'center',
-                        fontFamily: 'Lora,Georgia,serif',
+                        fontFamily: 'Montserrat,Manrope,sans-serif',
                         fontSize: '20px',
                         fontWeight: '600',
                       }}
