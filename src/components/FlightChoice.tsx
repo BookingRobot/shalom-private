@@ -192,12 +192,24 @@ export function FlightChoice() {
                 onClick={() => pickWith({ checkin: iso(p.a), checkout: iso(p.b) })}
               >
                 <span className="ios-main">
-                  <strong>
-                    {dayLabel(p.a)} → {dayLabel(p.b)}
-                  </strong>
-                  <span className="ios-sub">
-                    {p.n} {nightsWord(p.n)} · рейсы {LEG_THERE.no} и {LEG_BACK.no}
-                  </span>
+                  {/* nights and flight numbers wait under «i» */}
+                  <InfoTitle
+                    title={
+                      <strong>
+                        {dayLabel(p.a)} → {dayLabel(p.b)}
+                      </strong>
+                    }
+                    info={
+                      p.n +
+                      ' ' +
+                      nightsWord(p.n) +
+                      ' · рейсы ' +
+                      LEG_THERE.no +
+                      ' и ' +
+                      LEG_BACK.no +
+                      ' (Israir, прямые)'
+                    }
+                  />
                 </span>
                 <span className="ios-end">
                   <span className="ios-link">Выбрать</span>
