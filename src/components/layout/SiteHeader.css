@@ -11,3 +11,12 @@
 .site-header .navlink:hover {
   color: #1f5f4a;
 }
+/* five menu items: keep the header on one line on smaller laptops */
+@media (max-width: 1240px) and (min-width: 761px) {
+  .site-header nav[aria-label='Основное меню'] {
+    column-gap: 20px !important;
+  }
+  .site-header .navlink {
+    font-size: 16px !important;
+  }
+}

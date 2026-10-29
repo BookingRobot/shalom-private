@@ -13,6 +13,7 @@ const GuestsPage = lazy(() => import('./pages/Guests/GuestsPage'));
 const PaymentPage = lazy(() => import('./pages/Payment/PaymentPage'));
 const DonePage = lazy(() => import('./pages/Done/DonePage'));
 const RulesPage = lazy(() => import('./pages/Rules/RulesPage'));
+const TicketsPage = lazy(() => import('./pages/Tickets/TicketsPage'));
 const ScreensPage = lazy(() => import('./pages/Screens/ScreensPage'));
 
 /** New page → scroll to top; link with #hash → scroll to that section. */
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/payment" element={<PaymentPage />} />
               <Route path="/done" element={<DonePage />} />
               <Route path="/rules" element={<RulesPage />} />
+              <Route path="/tickets" element={<TicketsPage />} />
               <Route path="/screens" element={<ScreensPage />} />
               <Route path="*" element={<MainPage />} />
             </Routes>

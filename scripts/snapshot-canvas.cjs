@@ -48,6 +48,7 @@ const ROUTE_FILE = {
   '/payment': 'Payment.dc.html',
   '/done': 'Done.dc.html',
   '/rules': 'Rules.dc.html',
+  '/tickets': 'Tickets.dc.html',
 };
 
 const css = fs
@@ -113,6 +114,44 @@ const BOARDS = [
   { file: 'Payment.dc.html', title: 'Шаг 4 · Оплата', route: '/payment' },
   { file: 'Done.dc.html', title: '🏁 Финиш · Заказ принят', route: '/done' },
   { file: 'Rules.dc.html', title: 'Справка · Условия и отмена', route: '/rules' },
+  {
+    file: 'Tickets.dc.html',
+    title: 'Меню · Прямые перелёты Тель-Авив ⇄ Вильнюс — поиск',
+    route: '/tickets',
+    links: [
+      ['.tk-date', '', 'Tickets-cal.dc.html'],
+      ['.tk-go', '', 'Tickets-res.dc.html'],
+    ],
+  },
+  {
+    file: 'Tickets-cal.dc.html',
+    title: 'Прямые перелёты · календарь: только дни с рейсом, цена с человека',
+    route: '/tickets',
+    state: true,
+    setup: async (p) => {
+      await p.click('.tk-date >> nth=0');
+      await p.waitForTimeout(300);
+    },
+    links: [
+      ['.tk-cal .cell:not([disabled])', '', 'Tickets-res.dc.html'],
+      ['.tk-cal-h .btn', '', 'Tickets.dc.html'],
+    ],
+  },
+  {
+    file: 'Tickets-res.dc.html',
+    title: 'Прямые перелёты · рейс найден: время, места, цена на всех, заказ и сравнение дат',
+    route: '/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15',
+    state: true,
+    setup: async (p) => {
+      await p.click('.tk-cmp-h');
+      await p.waitForTimeout(300);
+    },
+    links: [
+      ['.tk-date', '', 'Tickets-cal.dc.html'],
+      ['.tk-res button', 'Свяжитесь со мной', 'Help.dc.html'],
+      ['.tk-res button', 'Подобрать санаторий', 'Results-B.dc.html'],
+    ],
+  },
   { file: 'Help.dc.html', title: 'Справка · Форма «Свяжитесь со мной» (на всех страницах)', route: '/?help=1' },
   // States people comment on: pop-ups and variants
   {
