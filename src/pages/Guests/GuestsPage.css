@@ -207,3 +207,200 @@
   text-align: center;
   padding: 4px 0;
 }
+
+/* ── date of birth: year → month → day; the day saves and closes ── */
+.pg-guests .dob-back {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow: auto;
+  background: rgba(18, 34, 27, 0.55);
+  animation: dobFade 0.2s ease both;
+}
+.pg-guests .dob {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: dobIn 0.3s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.pg-guests .dob-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pg-guests .dob-head h2 {
+  margin: 0;
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 21px;
+  line-height: 1.25;
+}
+.pg-guests .dob-head h2 span {
+  font-family: Manrope, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #5e6862;
+}
+.pg-guests .dob-x {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e3ded2;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 17px;
+  cursor: pointer;
+}
+/* what is chosen: small chips, a tap goes back to that step */
+.pg-guests .dob-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #a39f96;
+  font-size: 16px;
+}
+.pg-guests .dob-crumb {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1.5px solid #e3ded2;
+  border-radius: 999px;
+  background: #fff;
+  color: #5e6862;
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+button.dob-crumb {
+  cursor: pointer;
+}
+.pg-guests .dob-crumb.on {
+  border-color: #1f5f4a;
+  background: #1f5f4a;
+  color: #fff;
+}
+.pg-guests .dob-crumb.done {
+  border-color: #b9d6c6;
+  background: #eef5f1;
+  color: #1f5f4a;
+}
+.pg-guests .dob-crumb:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.pg-guests .dob-hint {
+  margin: 0;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-guests .dob-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.pg-guests .dob-nav strong,
+.pg-guests .dob-month {
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 19px;
+  text-align: center;
+}
+.pg-guests .dob-month {
+  display: block;
+  margin-bottom: 8px;
+}
+.pg-guests .dob-arrow {
+  width: 48px;
+  height: 44px;
+  border: 1.5px solid #cfc9bb;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f5f4a;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+.pg-guests .dob-grid {
+  display: grid;
+  gap: 8px;
+}
+.pg-guests .dob-grid-y {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.pg-guests .dob-grid-m {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.pg-guests .dob-grid-d {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.pg-guests .dob .pick {
+  min-height: 50px;
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 18px;
+}
+.pg-guests .dob-grid-m .pick {
+  font-size: 17px;
+}
+.pg-guests .dob-grid-d .pick {
+  min-height: 46px;
+  font-size: 17px;
+}
+.pg-guests .dob-wd {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5e6862;
+  padding: 2px 0;
+}
+@media (max-width: 640px) {
+  .pg-guests .dob-back {
+    padding: 8px;
+  }
+  .pg-guests .dob {
+    padding: 14px 12px 16px;
+    gap: 10px;
+  }
+  .pg-guests .dob-grid-y {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .pg-guests .dob .pick {
+    min-height: 48px;
+    font-size: 17px;
+  }
+  .pg-guests .dob-grid-d {
+    gap: 4px;
+  }
+  .pg-guests .dob-grid-d .pick {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+@keyframes dobFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes dobIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-guests .dob,
+  .pg-guests .dob-back {
+    animation: none;
+  }
+}

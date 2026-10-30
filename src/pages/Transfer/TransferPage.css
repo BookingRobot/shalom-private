@@ -648,3 +648,154 @@
     align-self: stretch;
   }
 }
+
+/* «От встречи до санатория»: four pictures in a row, the same size, a thin arrow between */
+.pg-transfer .tr-film {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.pg-transfer .tr-film li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  text-align: center;
+}
+.pg-transfer .tr-film li + li::before {
+  content: '›';
+  position: absolute;
+  left: -9px;
+  top: 22px;
+  color: #7fb49a;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.pg-transfer .tr-film-pic {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 64px;
+}
+.pg-transfer .tr-film-pic img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+.pg-transfer .tr-film-l {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1c2620;
+  text-wrap: balance;
+}
+.pg-transfer .tr-film-s {
+  display: none;
+}
+@media (max-width: 600px) {
+  .pg-transfer .tr-film {
+    gap: 4px;
+  }
+  .pg-transfer .tr-film-pic {
+    width: 52px;
+    height: 48px;
+  }
+  .pg-transfer .tr-film li + li::before {
+    left: -6px;
+    top: 14px;
+    font-size: 18px;
+  }
+  /* one short word under each picture: the details are under «Подробнее» */
+  .pg-transfer .tr-film-l {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .pg-transfer .tr-film-s {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1c2620;
+  }
+  /* «Как поедете»: the van stays, smaller, next to the answer */
+  .pg-transfer .tr-how-opt {
+    grid-template-columns: auto 64px minmax(0, 1fr) !important;
+    gap: 6px 12px !important;
+  }
+  .pg-transfer .tr-how-pic {
+    display: flex !important;
+    width: 64px;
+    height: 40px;
+    border-radius: 8px;
+  }
+  .pg-transfer .tr-how-pic img {
+    width: 64px;
+  }
+  .pg-transfer .tr-how-pic svg {
+    width: 60px;
+    height: auto;
+  }
+  .pg-transfer .tr-how-price {
+    grid-column: 3 !important;
+  }
+}
+/* the transfer questions in one white card */
+.pg-transfer .tr-card {
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+/* a pick-up row: the radio and the name stay on one line, the badge follows the name */
+.pg-transfer .rowpick {
+  flex-wrap: nowrap;
+}
+.pg-transfer .rowpick-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+@media (max-width: 600px) {
+  /* more room for the words in the answers: less padding around them */
+  .pg-transfer .tr-card {
+    padding: 18px 12px;
+  }
+  .pg-transfer .tr-how-opt {
+    padding: 14px 12px !important;
+    grid-template-columns: auto 56px minmax(0, 1fr) !important;
+    gap: 6px 10px !important;
+  }
+  .pg-transfer .tr-how-pic {
+    width: 56px;
+    height: 36px;
+  }
+  .pg-transfer .tr-how-pic img {
+    width: 56px;
+  }
+  .pg-transfer .tr-how-pic svg {
+    width: 54px;
+  }
+  /* the stamps fit the card: a little smaller, no tilt overflow */
+  .pg-transfer .tr-how-opt .info-extra {
+    margin-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    max-width: 100%;
+  }
+}

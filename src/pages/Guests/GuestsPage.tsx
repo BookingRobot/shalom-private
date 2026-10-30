@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
@@ -55,6 +54,7 @@ class GuestsLogic extends PageLogic {
           y: v ? v.y : null,
           m: v ? v.m : null,
           d: v ? v.d : null,
+          // the 20 years around the chosen one, or the 1950s–60s, the usual decades of our guests
           from: v ? Math.floor(v.y / 10) * 10 - 10 : 1950,
         },
       });
@@ -115,19 +115,21 @@ class GuestsLogic extends PageLogic {
       const n = new Date(Date.UTC(pk.y, pk.m + 1, 0)).getUTCDate();
       for (let i = 0; i < lead; i++) days.push({ t: '', cls: '', off: true, border: 'transparent', pick: () => {} });
       for (let d = 1; d <= n; d++)
-        days.push({ t: String(d), cls: d === pk.d ? 'on' : '', off: false, border: '#CFC9BB', pick: () => set({ d }) });
+        days.push({
+          t: String(d),
+          cls: d === pk.d ? 'on' : '',
+          off: false,
+          border: '#CFC9BB',
+          // the third tap: the date is saved and the window closes — no «Готово» to press
+          pick: () => this.setState({ dob: { ...dob, [pk.g]: { y: pk.y, m: pk.m, d } }, pk: null }),
+        });
     }
     const complete = pk.y != null && pk.m != null && pk.d != null;
     const step = pk.step;
     return {
       ...vals,
       dobWho: pk.g === 'g1' ? 'первый гость' : 'второй гость',
-      dobHint:
-        step === 'year'
-          ? 'Сначала выберите год рождения'
-          : step === 'month'
-            ? 'Теперь выберите месяц'
-            : 'И наконец — день',
+      dobHint: step === 'year' ? 'Выберите год' : step === 'month' ? 'Теперь месяц' : 'И день — дата сохранится сама',
       stYearCls: step === 'year' ? 'on' : pk.y != null ? 'done' : '',
       stMonthCls: step === 'month' ? 'on' : pk.m != null ? 'done' : '',
       stDayCls: step === 'day' ? 'on' : pk.d != null ? 'done' : '',
@@ -506,265 +508,87 @@ export default function GuestsPage() {
         </div>
         <SiteFooter />
       </div>{' '}
-      {/* Date-of-birth picker: year → month → day, tuned for 55+ guests */}{' '}
+      {/* Date-of-birth picker: tap the year, tap the month, tap the day — it closes and keeps the date */}
       {v.dobOpen ? (
-        <>
-          <div
-            style={{
-              position: 'fixed',
-              inset: '0',
-              background: 'rgba(18,34,27,.55)',
-              zIndex: '50',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '40px 16px',
-              overflow: 'auto',
-            }}
-          >
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="dobTitle"
-              style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
-                width: 'min(760px,100%)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '20px',
-                padding: '26px 28px 24px',
-                boxShadow: '0 24px 60px rgba(0,0,0,.35)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="dobTitle" style={{ fontSize: '26px' }}>
-                    Дата рождения — {v.dobWho}
-                  </h2>
-                  <span style={{ fontSize: '17px', color: '#3E4B44' }}>{v.dobHint}</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={v.closeDob}
-                  style={{ minHeight: '48px', fontSize: '16px', padding: '0 18px' }}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                  Закрыть
-                </button>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '22px',
-                  flexWrap: 'wrap',
-                  padding: '12px 16px',
-                  background: '#F4F1EA',
-                  borderRadius: 'var(--r)',
-                }}
-              >
-                <button
-                  type="button"
-                  className={`pstep ${v.stYearCls ?? ''}`}
-                  onClick={v.goYear}
-                  style={{ background: 'none', border: 'none', padding: '0', cursor: 'pointer' }}
-                >
-                  <span className="n">1</span>Год{v.yearPicked}
-                </button>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#CFC9BB"
-                  strokeWidth="2.5"
-                  aria-hidden="true"
-                >
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
-                <button
-                  type="button"
-                  className={`pstep ${v.stMonthCls ?? ''}`}
-                  onClick={v.goMonth}
-                  disabled={!!v.monthOff}
-                  style={{ background: 'none', border: 'none', padding: '0', cursor: 'pointer' }}
-                >
-                  <span className="n">2</span>Месяц{v.monthPicked}
-                </button>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#CFC9BB"
-                  strokeWidth="2.5"
-                  aria-hidden="true"
-                >
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
-                <div className={`pstep ${v.stDayCls ?? ''}`}>
-                  <span className="n">3</span>День{v.dayPicked}
-                </div>
-              </div>
-              {v.stepYear ? (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <button type="button" className="navbtn" onClick={v.yearsPrev} aria-label="Более ранние годы">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="m15 6-6 6 6 6" />
-                      </svg>
-                    </button>
-                    <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div
-                        style={{
-                          textAlign: 'center',
-                          fontFamily: 'Montserrat,Manrope,sans-serif',
-                          fontSize: '20px',
-                          fontWeight: '600',
-                        }}
-                      >
-                        {v.yearsTitle}
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '8px' }}>
-                        {(v.years || []).map((y: any, _i0: number) => (
-                          <Fragment key={_i0}>
-                            <button type="button" className={`pick ${y.cls ?? ''}`} onClick={y.pick}>
-                              {y.t}
-                            </button>
-                          </Fragment>
-                        ))}
-                      </div>
-                    </div>
-                    <button type="button" className="navbtn" onClick={v.yearsNext} aria-label="Более поздние годы">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="m9 6 6 6-6 6" />
-                      </svg>
-                    </button>
-                  </div>
-                </>
-              ) : null}
-              {v.stepMonth ? (
-                <>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px' }}>
-                    {(v.months || []).map((m: any, _i0: number) => (
-                      <Fragment key={_i0}>
-                        <button
-                          type="button"
-                          className={`pick ${m.cls ?? ''}`}
-                          onClick={m.pick}
-                          style={{ fontSize: '18px' }}
-                        >
-                          {m.t}
-                        </button>
-                      </Fragment>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-              {v.stepDay ? (
-                <>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <div
-                      style={{
-                        textAlign: 'center',
-                        fontFamily: 'Montserrat,Manrope,sans-serif',
-                        fontSize: '20px',
-                        fontWeight: '600',
-                      }}
-                    >
-                      {v.dayTitle}
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '6px' }}>
-                      <div className="wd">Пн</div>
-                      <div className="wd">Вт</div>
-                      <div className="wd">Ср</div>
-                      <div className="wd">Чт</div>
-                      <div className="wd">Пт</div>
-                      <div className="wd">Сб</div>
-                      <div className="wd">Вс</div>
-                      {(v.days || []).map((d: any, _i0: number) => (
-                        <Fragment key={_i0}>
-                          <button
-                            type="button"
-                            className={`pick ${d.cls ?? ''}`}
-                            onClick={d.pick}
-                            disabled={!!d.off}
-                            style={{ minHeight: '48px', borderColor: d.border }}
-                          >
-                            {d.t}
-                          </button>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : null}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '16px',
-                }}
-              >
-                <span style={{ fontSize: '18px' }}>
-                  Выбрано: <strong>{v.dobSummary}</strong>
-                </span>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button type="button" className="btn btn-secondary" onClick={v.dobBack} disabled={!!v.backOff}>
-                    ← Назад
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={v.dobDone}
-                    disabled={!!v.doneOff}
-                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
-                  >
-                    Готово
-                  </button>
-                </div>
-              </div>
+        <div className="dob-back" onClick={(e) => e.target === e.currentTarget && v.closeDob()}>
+          <div role="dialog" aria-modal="true" aria-labelledby="dobTitle" className="dob">
+            <div className="dob-head">
+              <h2 id="dobTitle">
+                Дата рождения <span>· {v.dobWho}</span>
+              </h2>
+              <button type="button" className="dob-x" onClick={v.closeDob} aria-label="Закрыть">
+                ✕
+              </button>
             </div>
+            {/* what is chosen so far: a tap goes back to that step */}
+            <div className="dob-crumbs">
+              <button type="button" className={'dob-crumb ' + v.stYearCls} onClick={v.goYear}>
+                {v.yearPicked ? v.yearPicked.replace(': ', '') : 'Год'}
+              </button>
+              <span aria-hidden="true">›</span>
+              <button type="button" className={'dob-crumb ' + v.stMonthCls} onClick={v.goMonth} disabled={!!v.monthOff}>
+                {v.monthPicked ? v.monthPicked.replace(': ', '') : 'Месяц'}
+              </button>
+              <span aria-hidden="true">›</span>
+              <span className={'dob-crumb ' + v.stDayCls}>День</span>
+            </div>
+            <p className="dob-hint">{v.dobHint}</p>
+            {v.stepYear ? (
+              <div className="dob-years">
+                <div className="dob-nav">
+                  <button type="button" className="dob-arrow" onClick={v.yearsPrev} aria-label="Более ранние годы">
+                    ‹
+                  </button>
+                  <strong>{v.yearsTitle}</strong>
+                  <button type="button" className="dob-arrow" onClick={v.yearsNext} aria-label="Более поздние годы">
+                    ›
+                  </button>
+                </div>
+                <div className="dob-grid dob-grid-y">
+                  {(v.years || []).map((y: any) => (
+                    <button type="button" key={y.t} className={'pick ' + y.cls} onClick={y.pick}>
+                      {y.t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {v.stepMonth ? (
+              <div className="dob-grid dob-grid-m">
+                {(v.months || []).map((m: any) => (
+                  <button type="button" key={m.t} className={'pick ' + m.cls} onClick={m.pick}>
+                    {m.t}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {v.stepDay ? (
+              <div className="dob-days">
+                <strong className="dob-month">{v.dayTitle}</strong>
+                <div className="dob-grid dob-grid-d">
+                  {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((w) => (
+                    <span className="dob-wd" key={w}>
+                      {w}
+                    </span>
+                  ))}
+                  {(v.days || []).map((d: any, i: number) => (
+                    <button
+                      type="button"
+                      key={i}
+                      className={'pick ' + d.cls}
+                      onClick={d.pick}
+                      disabled={!!d.off}
+                      style={d.off ? { borderColor: 'transparent' } : undefined}
+                    >
+                      {d.t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
-        </>
-      ) : null}{' '}
+        </div>
+      ) : null}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>
   );

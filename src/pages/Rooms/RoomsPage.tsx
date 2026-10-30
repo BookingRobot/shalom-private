@@ -8,6 +8,7 @@ import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { ICON_PATHS } from '../../data/iconPaths';
 import { api } from '../../api';
+import { DEFAULT_BOOKING } from '../../data/booking';
 import { guestsLabel, orderSummary, stayRange } from '../../lib/orderSummary';
 import { partyLabel, placePrice, stayTotal } from '../../lib/pricing';
 import { daysBetween, nightsWord, toD } from '../../lib/dates';
@@ -130,6 +131,10 @@ class RoomsLogic extends PageLogic {
       sumParty: party.replace(/^за /, 'на '),
       sumAdv: order.advanceLabel,
       sumFull: order.fullOnly,
+      // going on to step 2: the guest answers the road questions there themselves — nothing
+      // answered earlier (another visit, another sanatorium) stays marked for them
+      toRoad: () =>
+        this.props.booking.update({ flights: null, flightAsked: false, transfer: { ...DEFAULT_BOOKING.transfer } }),
       // the people of this sanatorium (0–3)
       team: teamOf(booking.hotelId || 'egle-comfort'),
     };
@@ -506,7 +511,11 @@ export default function RoomsPage() {
                     Программа выбрана. Следующий шаг: <strong>«Далее: дорога»</strong>
                   </NextTip>
                 )}
-                <Link className={'btn btn-primary rooms-bar-next' + (tipX ? '' : ' next-pulse')} to="/transfer">
+                <Link
+                  className={'btn btn-primary rooms-bar-next' + (tipX ? '' : ' next-pulse')}
+                  to="/transfer"
+                  onClick={v.toRoad}
+                >
                   Далее: дорога →
                 </Link>
               </span>
