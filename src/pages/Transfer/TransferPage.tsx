@@ -552,10 +552,7 @@ export default function TransferPage() {
               </>
             ) : null}
             {v.need ? (
-              <div
-                className="card ios-in"
-                style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '22px' }}
-              >
+              <div className="card ios-in tr-card">
                 {/* 1. Как поедете — right after «Да», nothing chosen */}
                 <div id="trHow" className="tr-block">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -663,173 +660,45 @@ export default function TransferPage() {
                       }}
                     >
                       <div style={{ fontWeight: '800', fontSize: '17px' }}>От встречи до санатория</div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: '4px',
-                          flexWrap: 'nowrap',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/39ad8fe2bfcea92423d717bc9dac8f37.png"
-                            alt="Водитель встречает с табличкой"
-                            style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                              maxWidth: '120px',
-                            }}
-                          >
-                            Встретим с табличкой
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/838118fe86e78736560c2ece8886b813.png"
-                            alt="Водитель укладывает чемодан в багажник"
-                            style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                              maxWidth: '120px',
-                            }}
-                          >
-                            Поможем с багажом
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/565b4c9fbca5b96b414361547b3a452f.png"
-                            alt="Микроавтобус едет к санаторию"
-                            style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                              maxWidth: '120px',
-                            }}
-                          >
-                            Довезём до санатория
-                          </span>
-                        </div>
-                        <svg
-                          width="30"
-                          height="12"
-                          viewBox="0 0 46 12"
-                          fill="none"
-                          stroke="#7FB49A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                          style={{ flex: 'none' }}
-                        >
-                          <path d="M2 6h30" strokeDasharray="2 4" />
-                          <path d="M36 2l5 4-5 4" />
-                        </svg>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '6px',
-                            flex: '1 1 0',
-                            minWidth: '0',
-                          }}
-                        >
-                          <img
-                            src="/img/05b41fccbf0a437d88db58e3ce3a1a91.png"
-                            alt="Гость у стойки регистрации санатория"
-                            style={{ height: '64px', width: 'auto', maxWidth: '100%', display: 'block' }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '700',
-                              color: '#1C2620',
-                              textAlign: 'center',
-                              lineHeight: '1.2',
-                              maxWidth: '120px',
-                            }}
-                          >
-                            Проводим до стойки
-                          </span>
-                        </div>
-                      </div>
+                      {/* a mini film: four pictures in a row; on a phone smaller, with one-word captions */}
+                      <ol className="tr-film">
+                        {[
+                          [
+                            '/img/39ad8fe2bfcea92423d717bc9dac8f37.png',
+                            'Водитель встречает с табличкой',
+                            'Встретим с табличкой',
+                            'Встреча',
+                          ],
+                          [
+                            '/img/838118fe86e78736560c2ece8886b813.png',
+                            'Водитель укладывает чемодан в багажник',
+                            'Поможем с багажом',
+                            'Багаж',
+                          ],
+                          [
+                            '/img/565b4c9fbca5b96b414361547b3a452f.png',
+                            'Микроавтобус едет к санаторию',
+                            'Довезём до санатория',
+                            'Дорога',
+                          ],
+                          [
+                            '/img/05b41fccbf0a437d88db58e3ce3a1a91.png',
+                            'Гость у стойки регистрации санатория',
+                            'Проводим до стойки',
+                            'Стойка',
+                          ],
+                        ].map(([src, alt, long, short]) => (
+                          <li key={src}>
+                            <span className="tr-film-pic">
+                              <img src={src} alt={alt} />
+                            </span>
+                            <span className="tr-film-l">{long}</span>
+                            <span className="tr-film-s" aria-hidden="true">
+                              {short}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
                       <button
                         type="button"
                         className="acc"

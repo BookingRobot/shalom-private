@@ -12,7 +12,8 @@
 }
 .page .search-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr 1fr 236px;
+  /* the dates never break onto two lines: «30 сентября 2026» needs about 200px */
+  grid-template-columns: minmax(150px, 1.1fr) minmax(206px, 1fr) minmax(206px, 1fr) minmax(165px, 1fr) minmax(190px, 236px);
   gap: 16px;
   align-items: end;
 }
@@ -46,6 +47,10 @@
 .page .search .datebtn {
   text-align: left;
   cursor: pointer;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .page .search .datebtn:hover {
   border-color: #1f5f4a;
