@@ -278,9 +278,9 @@ export default function MainPage() {
             </div>
           </HeaderAside>
         </HeaderBar>
-        {/* Hero: the Baltic coast, the heading, and the search card lying over the photo's lower edge */}
+        {/* Hero: lakes and forests of Lithuania, the heading, and the search card lying over the photo's lower edge */}
         <section className="hero">
-          <img className="hero-bg" src="/img/a6cc2c3f70f2ddda6fa11d959e5344b2.jpg" alt="" />
+          <img className="hero-bg" src="/img/3ac36e1a1cd36ed63b52266ae332f936.jpg" alt="" />
           <div className="hero-shade" />
           <div className="hero-in">
             <h1>
