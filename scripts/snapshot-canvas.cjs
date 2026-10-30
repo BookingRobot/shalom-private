@@ -437,30 +437,10 @@ const linkFor = (href) => {
   return f + (hash ? '#' + hash : '');
 };
 
-/** the blocks that come in one after another when a board opens (same choice as PageTransition on the site) */
-const MARK_REVEAL = `(() => {
-  const root = document.querySelector('#root .page');
-  if (!root) return;
-  const vh = innerHeight, out = [];
-  const walk = (el, depth) => {
-    for (const c of Array.from(el.children)) {
-      const cs = getComputedStyle(c);
-      if (cs.position === 'fixed' || cs.display === 'none' || cs.display === 'contents') continue;
-      const r = c.getBoundingClientRect();
-      if (r.height < 4 || r.top > vh * 1.1) continue;
-      const parts = Array.from(c.children).filter((k) => k.getBoundingClientRect().height > 4 && getComputedStyle(k).position !== 'fixed');
-      if (depth < 4 && parts.length > 1 && r.height > vh * 0.4) walk(c, depth + 1);
-      else out.push(c);
-    }
-  };
-  walk(root, 0);
-  out.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top || a.getBoundingClientRect().left - b.getBoundingClientRect().left);
-  out.forEach((el, i) => {
-    el.classList.add('dc-rv');
-    if (el.querySelector('.step-bar, .next-tip, [style*="position: fixed"]')) el.classList.add('dc-rvf');
-    el.style.animationDelay = (0.5 + Math.min(i, 12) * 0.07).toFixed(2) + 's';
-  });
-})()`;
+/*
+ * No «loading» overlay and no blocks coming in on the boards: the canvas may show a board frozen
+ * at its first frame, and then the page stayed hidden under «Загружаем…». The site keeps both.
+ */
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -502,20 +482,9 @@ ${css}
 /* canvas only: «i» opens its balloon on hover (the site opens it on a tap with a script) */
 .info-host:has(.info-tip:hover) .info-pop{display:block}
 .info-host:has(.info-tip:hover) .info-tip{background:#1f5f4a;border-color:#1f5f4a;color:#fff}
-/* canvas only: opening a board shows the short «loading», then the page comes in from the top, as on the site */
-.dc-ld{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f4f1ea;pointer-events:none;animation:dcLdOut .26s ease-in .48s forwards}
-.dc-ld i{width:42px;height:42px;border-radius:50%;border:3px solid #c8ded3;border-top-color:#1f5f4a;animation:dcSpin .75s linear infinite}
-.dc-ld span{font:600 15px Manrope,sans-serif;color:#5e6862}
-@keyframes dcLdOut{to{opacity:0;visibility:hidden}}
-@keyframes dcSpin{to{transform:rotate(360deg)}}
-@keyframes dcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.dc-rv{animation:dcIn .55s cubic-bezier(.22,.8,.24,1) both}
-.dc-rv.dc-rvf{animation-name:dcFade}
-@keyframes dcFade{from{opacity:0}}
 </style>
 </helmet>
 <!-- Снимок страницы ${esc(route)} с shalom.bookingrobot.eu — макет совпадает с сайтом -->
-<div class="dc-ld" aria-hidden="true"><i></i><span>Загружаем…</span></div>
 ${body}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":${h}}}'>
@@ -543,7 +512,6 @@ ${logic || 'class Component extends DCLogic {\n  renderVals() {\n    return {};\
     }
     if (bd.search) await searchBand(p, bd.search);
     if (bd.links) await linkButtons(p, bd.links);
-    await p.evaluate(MARK_REVEAL);
     const { html, h } = await p.evaluate(() => {
       // «Далее» of a step: the bottom bar stays hidden on a board, the button becomes a link to the next board
       document.querySelectorAll('.step-bar').forEach((x) => x.classList.remove('on'));
@@ -603,7 +571,6 @@ async function grab(b, route, setup, fn, arg) {
   await p.goto(BASE + route, { waitUntil: 'networkidle' });
   if (setup) await setup(p);
   await p.waitForTimeout(200);
-  await p.evaluate(MARK_REVEAL);
   await p.addScriptTag({ content: IA.HELPERS });
   const r = await p.evaluate(fn, arg);
   await ctx.close();
