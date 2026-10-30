@@ -442,6 +442,30 @@ const BOARDS = [
       ['.fly-alt-row', '', 'Transfer-package.dc.html'],
       ['#flyChoice .choice', 'Нет', 'Transfer.dc.html'],
       ['.fly-help', '', 'Help.dc.html'],
+      ['.fly-cal-btn', '', 'Transfer-flycal.dc.html'],
+    ],
+  },
+  {
+    // «Выбрать даты под наш рейс»: the calendar with the flight days and the sanatorium's places
+    file: 'Transfer-flycal.dc.html',
+    title: 'Шаг 2 · «Выбрать даты под наш рейс»: календарь (✈ — дни рейса)',
+    route: '/transfer',
+    state: true,
+    setup: async (p) => {
+      await p.click('#flyChoice .choice >> nth=0');
+      await p.waitForTimeout(1300);
+      await p.click('.fly-cal-btn');
+      await p.waitForTimeout(400);
+      const free = await p.$$('.fd .cell:not([disabled])');
+      await free[2].click();
+      const free2 = await p.$$('.fd .cell:not([disabled])');
+      await free2[6].click();
+      await p.waitForTimeout(200);
+    },
+    links: [
+      ['.fd-foot .btn-primary', '', 'Transfer-package.dc.html'],
+      ['.fd-foot .btn-secondary', '', 'Transfer-fly.dc.html'],
+      ['.fd-x', '', 'Transfer-fly.dc.html'],
     ],
   },
 ];

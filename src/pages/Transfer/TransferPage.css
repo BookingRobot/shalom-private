@@ -207,22 +207,444 @@
   font-size: 16px;
   color: #3e4b44;
 }
-/* the titles with «i»: the «i» follows the last word of the title */
-.pg-transfer .tr-title .info-line,
-.pg-transfer .road-h .info-line {
+.pg-transfer .road-h-out {
+  margin-bottom: -10px;
+}
+.pg-transfer .road-num {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f5f4a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  border-radius: var(--r);
+}
+
+/* what is already covered: the sanatorium's free transfer or the flight package */
+.pg-transfer .tr-free {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #e6f2ea;
+  border: 1px solid #c8ded3;
+  color: #1c2620;
+  font-size: 17px;
+  line-height: 1.45;
+}
+.pg-transfer .tr-free svg {
+  flex: none;
+  margin-top: 2px;
+  color: #1f5f4a;
+}
+.pg-transfer .rowpick-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #e6f2ea;
+  color: #1f5f4a;
+  font-size: 13px;
+  font-weight: 800;
+  vertical-align: 2px;
+}
+
+/* ── Transfer questions: every answer is the guest's own (empty choices at first) ── */
+.pg-transfer .tr-q {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.pg-transfer .tr-block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-margin-top: 90px;
+}
+.pg-transfer .tr-block + .tr-block {
+  padding-top: 22px;
+  border-top: 1px solid #eeeae1;
+}
+.pg-transfer .tr-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #faf8f3;
+  border: 1px solid #ece7dc;
+}
+.pg-transfer .tr-reco,
+.pg-transfer .tr-best {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.pg-transfer .tr-reco {
+  background: #fff1d6;
+  color: #8a5a00;
+}
+.pg-transfer .tr-best {
+  background: #1f5f4a;
+  color: #fff;
+}
+/* «Уже оплачено»: a stamp, slightly tilted, so it does not read as a button or a choice */
+.pg-transfer .paid-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 7px;
+  border: 2px solid #1f7a4f;
+  border-radius: 6px;
+  color: #1f7a4f;
+  background: rgba(230, 242, 234, 0.7);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+}
+.pg-transfer .tr-how {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pg-transfer .tr-how-opt {
+  display: grid;
+  grid-template-columns: auto 120px 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+.pg-transfer .tr-how-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 64px;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.pg-transfer .tr-how-pic img {
+  width: 120px;
+  height: auto;
   display: block;
 }
-.pg-transfer .tr-title .info-line > h1,
-.pg-transfer .road-h .info-line > h2 {
-  display: inline;
+.pg-transfer .tr-how-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
-.pg-transfer .tr-title .info-tip,
-.pg-transfer .road-h .info-tip {
-  display: inline-grid;
-  vertical-align: 0.25em;
-  margin-left: 10px;
+.pg-transfer .info-line > strong {
+  font-size: 18px;
+  color: #1c2620;
 }
+.pg-transfer .tr-how-txt .info-line > strong {
+  font-size: 19px;
+}
+.pg-transfer .tr-warn .info-line {
+  font-size: 15.5px;
+}
+.pg-transfer .tr-how-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+.pg-transfer .tr-how-price > span {
+  font-size: 14px;
+  color: #3e4b44;
+}
+.pg-transfer .tr-warn {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff1d6;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #1c2620;
+}
+.pg-transfer .tr-cars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fafbf9;
+  border: 1px solid #e6efe9;
+}
+.pg-transfer .tr-car-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 130px;
+  height: 64px;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.pg-transfer .tr-car-pic img {
+  width: 130px;
+  height: auto;
+  display: block;
+}
+/* a select still waiting for an answer reads as a placeholder */
+.pg-transfer select.input-empty {
+  color: #6b756f;
+}
+.pg-transfer #trNeed,
+.pg-transfer #trBack,
+.pg-transfer #trFrom,
+.pg-transfer #trHow,
+.pg-transfer #trCars,
+.pg-transfer #trBackWhere {
+  scroll-margin-top: 90px;
+}
+@media (max-width: 600px) {
+  .pg-transfer .tr-how-opt {
+    grid-template-columns: auto 1fr;
+    gap: 6px 14px;
+  }
+  .pg-transfer .tr-how-price {
+    grid-column: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    text-align: left;
+  }
+  .pg-transfer .tr-how-pic {
+    display: none;
+  }
+  .pg-transfer .tr-car-pic {
+    width: 84px;
+    height: 48px;
+  }
+  .pg-transfer .tr-car-pic img {
+    width: 84px;
+  }
+}
+
+/* the city's details show once the row is opened */
+.pg-transfer .rowpick-info-in {
+  display: block;
+  margin: 0 0 10px;
+}
+
+/* ── Flight question: «Да, добавить наш перелёт» / «Нет, билеты есть»; «Да» opens slowly ── */
+.pg-transfer .fly-yes-t {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.pg-transfer .fly-yes-warn {
+  font-size: 15px;
+  color: #8a5a00;
+}
+.pg-transfer .fly-pp {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #e6f2ea;
+  color: #1f5f4a;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.pg-transfer .fly-help {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -4px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font:
+    600 15px Manrope,
+    sans-serif;
+  color: #5e6862;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.pg-transfer .fly-help:hover {
+  color: #1f5f4a;
+}
+.pg-transfer .fly-help.on {
+  color: #1f5f4a;
+  text-decoration: none;
+  text-align: left;
+}
+.pg-transfer .fly-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 2px;
+}
+.pg-transfer .fly-sum {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #e6f2ea;
+  border: 1px solid #c8ded3;
+  font-size: 16px;
+  color: #3e4b44;
+}
+.pg-transfer .fly-sum strong {
+  font-size: 20px;
+  color: #1c2620;
+}
+.pg-transfer .fly-sum strong span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3e4b44;
+}
+/* the same slow drawer as the rooms under a sanatorium on the results page */
+.pg-transfer .fly-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: flyGrow 1.2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.pg-transfer .fly-reveal-in {
+  min-height: 0;
+  animation: flyClip 1.2s linear;
+}
+.pg-transfer .fly-reveal .fly-panel > * {
+  animation: flyItem 0.9s ease-out both;
+}
+.pg-transfer .fly-reveal .fly-panel > :nth-child(2) {
+  animation-delay: 0.14s;
+}
+.pg-transfer .fly-reveal .fly-panel > :nth-child(n + 3) {
+  animation-delay: 0.28s;
+}
+.pg-transfer .fly-reveal.closing {
+  animation: flyShrink 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.pg-transfer .fly-reveal.closing .fly-reveal-in {
+  overflow: hidden;
+  animation: none;
+}
+.pg-transfer .fly-reveal.closing .fly-panel > * {
+  animation: flyItemOut 0.45s ease-in both;
+}
+@keyframes flyGrow {
+  from {
+    grid-template-rows: 0fr;
+  }
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+@keyframes flyShrink {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes flyClip {
+  from,
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes flyItem {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes flyItemOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-transfer .fly-reveal,
+  .pg-transfer .fly-reveal-in,
+  .pg-transfer .fly-reveal .fly-panel > * {
+    animation: none;
+  }
+}
+
+/* «Да / Нет» answers: each title with its «i» stays on one line; the «Да» answer takes the
+   rest of the row, «Нет» only what it needs; when both do not fit, «Нет» goes below */
+.pg-transfer .tr-q > .choice {
+  width: auto;
+  flex: 1 0 auto;
+}
+.pg-transfer .tr-q > .choice:first-child {
+  flex: 999 1 0;
+  min-width: min(100%, 440px);
+}
+.pg-transfer .tr-q > .choice .info-pop {
+  /* the opened balloon does not widen the answer */
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+@media (min-width: 640px) {
+  .pg-transfer .tr-q > .choice .info-line > strong {
+    white-space: nowrap;
+  }
+}
+
+/* the explanations under «i» next to the step titles */
 .pg-transfer .tr-title .info-pop,
 .pg-transfer .road-h .info-pop {
   max-width: 560px;
+}
+
+/* no flight on the guest's dates: pick dates under our flight in a calendar */
+.pg-transfer .fly-cal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  align-self: flex-start;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--r);
+  background: #1f5f4a;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(31, 95, 74, 0.2);
+}
+.pg-transfer .fly-cal-btn:hover {
+  background: #174b3a;
+}
+.pg-transfer .fly-cal-or {
+  font-size: 15px;
+  color: #5e6862;
+}
+@media (max-width: 640px) {
+  .pg-transfer .fly-cal-btn {
+    align-self: stretch;
+  }
 }
