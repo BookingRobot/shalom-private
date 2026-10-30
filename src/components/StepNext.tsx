@@ -9,6 +9,8 @@ export interface Missing {
   label: string;
   /** where it is on the page (CSS selector) — we scroll there and light it up */
   target: string;
+  /** what to do with it, when it differs from the step's verb: «заполнить», «отметить» */
+  todo?: string;
 }
 
 /**
@@ -98,6 +100,7 @@ export function StepNext({
   // what is still missing right now (for the bubble); null until the page has rendered
   const [gaps, setGaps] = useState<Missing[] | null>(null);
   const [tipX, setTipX] = useState(false);
+  const hadGaps = useRef(false);
   const check = useRef(missing);
   check.current = missing;
 
@@ -131,10 +134,22 @@ export function StepNext({
     };
   }, []);
 
+  // all filled in after the bubble stepped aside: it comes back once with «Всё готово … «Далее»»
+  useEffect(() => {
+    if (!gaps) return;
+    if (gaps.length) hadGaps.current = true;
+    else if (hadGaps.current) {
+      hadGaps.current = false;
+      setTipX(false);
+    }
+  }, [gaps]);
+
   const go = () => {
     const m = missing();
     setLeft(m);
     setGaps(m);
+    // «Далее» with something still missing: the hint comes back and shows what
+    setTipX(false);
     if (!m.length) navigate(next.to);
   };
 
@@ -171,13 +186,26 @@ export function StepNext({
   const show = (m: Missing | undefined) => {
     if (!m) return;
     showSpot(m.target);
+    // took the guest there: the bubble steps aside and lets them fill it in quietly
+    // (it is back at the next «Далее» if something is still missing)
     setLeft([]);
+    setTipX(true);
   };
 
   const hint = left.length ? (
     <div className="step-hint ios-in" role="alert">
       <span className="step-hint-t">
-        Вы ещё {verb}: <strong>{left.map((m) => m.label).join(', ')}</strong>. Поднимитесь выше и отметьте.
+        {left.some((m) => m.todo) ? (
+          <>
+            Осталось: <strong>{left.map((m) => (m.todo || TODO[verb] || 'выбрать') + ' ' + m.label).join(', ')}</strong>
+            .
+          </>
+        ) : (
+          <>
+            Вы ещё {verb}: <strong>{left.map((m) => m.label).join(', ')}</strong>.
+          </>
+        )}{' '}
+        Нажмите «Показать».
       </span>
       <span className="step-hint-b">
         <button type="button" className="step-hint-go" onClick={() => show(left[0])}>
@@ -197,7 +225,7 @@ export function StepNext({
       <NextTip float arrow="right" onClose={() => setTipX(true)}>
         {gaps.length ? (
           <>
-            Осталось {TODO[verb] || 'выбрать'}: <strong>{gaps[0].label}</strong>
+            Осталось {gaps[0].todo || TODO[verb] || 'выбрать'}: <strong>{gaps[0].label}</strong>
             <button type="button" className="next-tip-go" onClick={() => show(gaps[0])}>
               Показать ↑
             </button>

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { PhoneCodeSelect } from '../../components/PhoneCodeSelect';
+import { CardForm, cardMissing } from '../../components/CardForm';
+import { BirthDateField, birthLabel } from '../../components/BirthDate';
 import { PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
 import { COUNTRIES, FLIGHT_FACTS, type FlightLeg, type Offer } from '../../data/tickets';
-import { WEEKDAYS_SHORT, iso, plural, shortDate, toD } from '../../lib/dates';
+import { WEEKDAYS_SHORT, plural, shortDate, toD } from '../../lib/dates';
 import { fmt } from '../../lib/format';
-import { TODAY } from '../../data/demo';
 
 export type OrderStep = 'pax' | 'pay' | 'done';
 
@@ -106,6 +107,8 @@ export function TicketOrder({
   const [agree, setAgree] = useState(false);
   const [news, setNews] = useState(false);
   const [agreeBad, setAgreeBad] = useState(false);
+  /** what is still empty in the card form */
+  const [cardBad, setCardBad] = useState('');
   const [paying, setPaying] = useState(false);
   const top = useRef<HTMLDivElement>(null);
 
@@ -157,6 +160,14 @@ export function TicketOrder({
   };
 
   const pay = () => {
+    // [ТЕСТОВЫЙ РЕЖИМ] any card details are taken, only empty fields are asked for
+    const card = cardMissing('tk');
+    if (card.length) {
+      setCardBad(card.map((m) => m.label).join(', '));
+      document.querySelector<HTMLInputElement>(card[0].target)?.focus();
+      return;
+    }
+    setCardBad('');
     if (!agree) {
       setAgreeBad(true);
       return;
@@ -235,14 +246,11 @@ export function TicketOrder({
                   {field(
                     `p${i}birth`,
                     'Дата рождения',
-                    <input
+                    <BirthDateField
                       id={`tk-p${i}birth`}
-                      className="input"
-                      type="date"
                       value={p.birth}
-                      min="1920-01-01"
-                      max={iso(TODAY)}
-                      onChange={(e) => setPax(i, 'birth', e.target.value)}
+                      who={'пассажир ' + (i + 1)}
+                      onChange={(d) => setPax(i, 'birth', d)}
                     />,
                   )}
                 </div>
@@ -313,7 +321,7 @@ export function TicketOrder({
                     <strong>
                       {p.first.toUpperCase()} {p.last.toUpperCase()}
                     </strong>
-                    <span>{p.birth ? p.birth.split('-').reverse().join('.') : ''}</span>
+                    <span>{birthLabel(p.birth)}</span>
                   </li>
                 ))}
               </ul>
@@ -327,27 +335,12 @@ export function TicketOrder({
             <div className="tk-box tk-card">
               <h3>Оплата картой</h3>
               <span className="tk-card-sub">Visa, Mastercard, Isracard, Amex · Apple Pay, Google Pay</span>
-              <div className="tk-card-form">
-                <span className="tk-card-safe">🔒 Защищённая форма оплаты</span>
-                <div className="tk-card-grid">
-                  <span>
-                    <span className="lbl">Номер карты</span>
-                    <span className="input tk-ph">0000 0000 0000 0000</span>
-                  </span>
-                  <span>
-                    <span className="lbl">Срок</span>
-                    <span className="input tk-ph">ММ / ГГ</span>
-                  </span>
-                  <span>
-                    <span className="lbl">CVV</span>
-                    <span className="input tk-ph">•••</span>
-                  </span>
-                </div>
-                <span className="tk-card-pays">
-                  <span className="tk-apple">Apple Pay</span>
-                  <span className="tk-gpay">Google Pay</span>
+              <CardForm idPrefix="tk" />
+              {cardBad ? (
+                <span className="tk-in-err" role="alert">
+                  Заполните: {cardBad}
                 </span>
-              </div>
+              ) : null}
               <span className="tk-card-note">
                 Данные карты вводятся в защищённой форме платёжной системы — мы их не видим и не храним. [ПРИМЕР]
               </span>
