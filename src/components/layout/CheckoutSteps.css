@@ -1,10 +1,20 @@
 .checkout-steps .step {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-weight: 700;
   font-size: 16px;
   color: #5e6862;
+  cursor: default;
+}
+/* the name of a step after a tap (phone) */
+.checkout-steps .step-tip {
+  display: none;
 }
 .checkout-steps .step .num {
   width: 30px;
@@ -50,4 +60,65 @@
 }
 .checkout-steps.compact .step.on {
   color: #1f5f4a;
+}
+
+/* phone: only the numbers, in one line across the width; a tap shows the step's name */
+@media (max-width: 760px) {
+  .checkout-steps {
+    flex-wrap: nowrap !important;
+    justify-content: space-between;
+    gap: 6px !important;
+    padding: 10px 16px !important;
+  }
+  .checkout-steps .step {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .checkout-steps .step .step-l {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .checkout-steps .step .num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+  }
+  .checkout-steps .step-tip {
+    display: block;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    white-space: nowrap;
+    padding: 7px 12px;
+    border-radius: 10px;
+    background: #1f5f4a;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    animation: stepTip 0.2s ease both;
+  }
+  .checkout-steps .step:first-child .step-tip {
+    left: 0;
+    transform: none;
+  }
+  .checkout-steps .step:last-child .step-tip {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}
+@keyframes stepTip {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
 }

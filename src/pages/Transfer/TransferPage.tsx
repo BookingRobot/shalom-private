@@ -415,18 +415,18 @@ export default function TransferPage() {
         >
           {/* Main column */}
           <div style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <h1 style={{ fontSize: '32px' }}>Дорога до санатория</h1>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
-                Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации санатория.
-              </p>
+            {/* fewer words on the screen: the explanations wait under «i» next to the titles */}
+            <div className="tr-title">
+              <InfoTitle
+                title={<h1 style={{ fontSize: '32px' }}>Дорога до санатория</h1>}
+                info="Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации санатория."
+              />
             </div>
             <FlightChoice />
             <div className="road-h road-h-out">
               <span className="road-num">2</span>
               <div>
-                <h2>Трансфер до санатория</h2>
-                <span>{v.transferLead}</span>
+                <InfoTitle title={<h2>Трансфер до санатория</h2>} info={v.transferLead} />
               </div>
             </div>
             {/* 1. Нужен ли трансфер — nothing is chosen for the guest */}

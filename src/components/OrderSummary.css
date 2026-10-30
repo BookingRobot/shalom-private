@@ -1,0 +1,90 @@
+/* phone: the order box is behind the basket in the bottom bar (not at the end of the page) */
+@media (max-width: 760px) {
+  .page .order-aside {
+    display: none !important;
+  }
+}
+.bk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(16, 28, 22, 0.5);
+  animation: bkFade 0.2s ease both;
+}
+.bk {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: bkUp 0.32s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.bk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #ece8df;
+}
+.bk-head h2 {
+  margin: 0;
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 22px;
+}
+.bk-sub {
+  font-size: 15px;
+  color: #5e6862;
+}
+.bk-x {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e3ded2;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 17px;
+  cursor: pointer;
+}
+.bk-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.bk-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid #ece8df;
+}
+.page .bk-foot .btn,
+.bk-foot .btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: 18px;
+}
+@keyframes bkFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes bkUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bk,
+  .bk-overlay {
+    animation: none;
+  }
+}

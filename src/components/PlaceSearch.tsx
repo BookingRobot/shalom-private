@@ -1,7 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useBooking } from '../context/BookingContext';
 import { POPULAR_NAMES, RESORTS, SANATORIUM_NAMES } from '../data/search';
+import { RESORT_STORIES } from '../data/resorts';
+import './PlaceSearch.css';
 
 type Item = { kind: 'resort' | 'san'; id: string; label: string; sub: string; sold?: boolean };
 
@@ -61,11 +64,163 @@ function usePick(onPicked?: (label: string) => void, stay = false) {
   };
 }
 
+const PHONE = '(max-width: 760px)';
+/** a phone-sized screen (follows turning the phone and resizing) */
+function usePhone() {
+  const [m, setM] = useState(() => typeof window !== 'undefined' && window.matchMedia(PHONE).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE);
+    const f = () => setM(mq.matches);
+    f();
+    mq.addEventListener('change', f);
+    return () => mq.removeEventListener('change', f);
+  }, []);
+  return m;
+}
+
 /**
  * `guide` (home page): the field stays empty until the guest picks a resort or a sanatorium
  * themselves, and a sanatorium does not leave the page.
+ * Phone: no typing — the field opens a list of the resorts (the keyboard would cover the list).
  */
 export function PlaceSearch({ guide = false }: { guide?: boolean }) {
+  return usePhone() ? <PlacePhone guide={guide} /> : <PlaceType guide={guide} />;
+}
+
+/** phone: the resort from a list, no keyboard */
+function PlacePhone({ guide }: { guide: boolean }) {
+  const { booking } = useBooking();
+  const label = guide
+    ? booking.chosenPlace
+      ? placeLabel(booking.chosenPlace, booking.dest)
+      : ''
+    : placeLabel(booking.chosenPlace, booking.dest);
+  const [open, setOpen] = useState(false);
+  const btn = useRef<HTMLButtonElement>(null);
+  const choose = usePick(undefined, guide);
+  const sel = booking.chosenPlace.startsWith('san:')
+    ? ''
+    : booking.chosenPlace
+      ? booking.dest
+      : guide
+        ? ''
+        : booking.dest;
+  useEffect(() => {
+    if (!open) return;
+    const k = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', k);
+    const ov = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', k);
+      document.body.style.overflow = ov;
+      btn.current?.focus();
+    };
+  }, [open]);
+  return (
+    <div style={{ position: 'relative' }}>
+      <svg
+        className="fieldico"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#1F5F4A"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </svg>
+      <button
+        ref={btn}
+        type="button"
+        id="city"
+        className="input ps-btn"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+      >
+        {label ? label : <span className="ps-ph">Выберите курорт</span>}
+        <svg
+          className="ps-chev"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open
+        ? createPortal(
+            <div className="ps-sheet-back" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+              <div className="ps-sheet" role="dialog" aria-modal="true" aria-labelledby="psTitle">
+                <span className="ps-grab" aria-hidden="true" />
+                <div className="ps-sheet-head">
+                  <h2 id="psTitle">Куда поедете?</h2>
+                  <button type="button" className="ps-sheet-x" onClick={() => setOpen(false)} aria-label="Закрыть">
+                    ✕
+                  </button>
+                </div>
+                <ul className="ps-sheet-list">
+                  {RESORTS.map(([id, name]) => {
+                    const on = sel === id;
+                    const tag = RESORT_STORIES.find((r) => r.id === id)?.tagline;
+                    return (
+                      <li key={id}>
+                        <button
+                          type="button"
+                          className={on ? 'on' : ''}
+                          aria-pressed={on}
+                          onClick={() => {
+                            choose({ kind: 'resort', id, label: name, sub: 'курорт' });
+                            setOpen(false);
+                          }}
+                        >
+                          <span>
+                            <strong>{name}</strong>
+                            {tag ? <span>{tag}</span> : null}
+                          </span>
+                          {on ? (
+                            <svg
+                              width="22"
+                              height="22"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="m5 12.5 4.5 4.5L19 7.5" />
+                            </svg>
+                          ) : null}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="ps-sheet-note">Санаторий выберете на следующем шаге — по фото, ценам и отзывам.</p>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+    </div>
+  );
+}
+
+/** laptop: type a resort or a sanatorium in any spelling, or pick from the list */
+function PlaceType({ guide = false }: { guide?: boolean }) {
   const { booking } = useBooking();
   const label = placeLabel(booking.chosenPlace, booking.dest);
   const resortLabel = guide

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import './CheckoutSteps.css';
 
 export const STEP_LABELS_RU = ['Номер', 'Дорога', 'Гости', 'Оплата', 'Готово'];
@@ -19,6 +19,20 @@ export function CheckoutSteps({
 }) {
   const steps = labels.slice(0, -1);
   const finished = current > steps.length;
+  // phone: only the numbers; a tap shows the step's name for a moment
+  const [tip, setTip] = useState(-1);
+  useEffect(() => {
+    if (tip < 0) return;
+    const t = window.setTimeout(() => setTip(-1), 2600);
+    return () => window.clearTimeout(t);
+  }, [tip]);
+  const tipOf = (i: number) =>
+    tip === i ? (
+      <span className="step-tip" role="status">
+        {i < steps.length ? `Шаг ${i + 1} · ` : ''}
+        {labels[i]}
+      </span>
+    ) : null;
   return (
     <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
       <div
@@ -39,10 +53,17 @@ export function CheckoutSteps({
           const state = n < current ? 'done' : n === current ? 'on' : '';
           return (
             <Fragment key={n}>
-              <div className={'step ' + state} aria-current={state === 'on' ? 'step' : undefined}>
+              <button
+                type="button"
+                className={'step ' + state}
+                aria-current={state === 'on' ? 'step' : undefined}
+                aria-label={`Шаг ${n}: ${label}`}
+                onClick={() => setTip(tip === i ? -1 : i)}
+              >
                 <span className="num">{state === 'done' ? '✓' : n}</span>
-                {label}
-              </div>
+                <span className="step-l">{label}</span>
+                {tipOf(i)}
+              </button>
               <svg
                 width="18"
                 height="18"
@@ -57,9 +78,12 @@ export function CheckoutSteps({
             </Fragment>
           );
         })}
-        <div
+        <button
+          type="button"
           className={'step' + (finished ? ' on' : '')}
           aria-current={finished ? 'step' : undefined}
+          aria-label={labels[labels.length - 1]}
+          onClick={() => setTip(tip === steps.length ? -1 : steps.length)}
           style={{ gap: '8px' }}
         >
           <svg
@@ -75,8 +99,9 @@ export function CheckoutSteps({
           >
             <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
           </svg>
-          {labels[labels.length - 1]}
-        </div>
+          <span className="step-l">{labels[labels.length - 1]}</span>
+          {tipOf(steps.length)}
+        </button>
       </div>
     </div>
   );

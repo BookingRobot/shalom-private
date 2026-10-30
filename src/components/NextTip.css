@@ -65,6 +65,7 @@
   cursor: pointer;
 }
 /* a link-like action inside the bubble («Показать ↑») */
+.page .next-tip-go,
 .next-tip-go {
   margin-left: 6px;
   padding: 0;

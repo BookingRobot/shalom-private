@@ -1,6 +1,15 @@
-import { createContext, useContext, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import { AGENCY, AGENCY_LOGO, AGENCY_LOGO_WHITE, PHONE_DISPLAY, PHONE_TEL, SITE_NAME } from '../../data/contacts';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  AGENCY,
+  AGENCY_LOGO,
+  AGENCY_LOGO_WHITE,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+  SITE_NAME,
+  WHATSAPP_URL,
+} from '../../data/contacts';
+import { LANGS, useLang } from '../../i18n/LanguageContext';
 import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
@@ -46,8 +55,149 @@ export function HeaderBar({
         }}
       >
         <OnGreen.Provider value={true}>{children}</OnGreen.Provider>
+        <MobileMenu />
       </div>
     </header>
+  );
+}
+
+/**
+ * Phone: the header is one slim row — the logo and «Меню». The menu opens as a sheet under the bar:
+ * every page of the menu, the phone and WhatsApp, the language. Laptop: hidden.
+ */
+function MobileMenu() {
+  const [open, setOpen] = useState(false);
+  const loc = useLocation();
+  const { lang, setLang } = useLang();
+  const btn = useRef<HTMLLabelElement>(null);
+  // a new page closes the menu
+  useEffect(() => setOpen(false), [loc.pathname, loc.hash]);
+  // the sheet opens right under the green bar, wherever the page is scrolled
+  const [top, setTop] = useState(56);
+  const toggle = () => {
+    const bar = btn.current?.closest('header');
+    if (bar) setTop(Math.max(0, Math.round(bar.getBoundingClientRect().bottom)));
+    setOpen(!open);
+  };
+  useEffect(() => {
+    if (!open) return;
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        btn.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', k);
+    const ov = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', k);
+      document.body.style.overflow = ov;
+    };
+  }, [open]);
+  const here = (to: string) => {
+    const [path, hash] = to.split('#');
+    return loc.pathname === path && (hash ? loc.hash === '#' + hash : !loc.hash);
+  };
+  return (
+    <>
+      {/* a checkbox under the label keeps the menu working even without scripts (the canvas boards) */}
+      <input
+        type="checkbox"
+        id="hdToggle"
+        className="hd-toggle"
+        checked={open}
+        onChange={(e) => {
+          const bar = btn.current?.closest('header');
+          if (bar) setTop(Math.max(0, Math.round(bar.getBoundingClientRect().bottom)));
+          setOpen(e.target.checked);
+        }}
+        tabIndex={-1}
+        aria-hidden="true"
+      />
+      <label
+        ref={btn}
+        htmlFor="hdToggle"
+        className="hd-burger"
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        aria-controls="hdMenu"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <span className="hd-burger-ico" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="hd-burger-m">Меню</span>
+        <span className="hd-burger-x">Закрыть</span>
+      </label>
+      {
+        <div
+          className="hd-menu-back"
+          style={{ ['--hd-menu-top' as string]: top + 'px' }}
+          onClick={(e) => e.target === e.currentTarget && setOpen(false)}
+        >
+          <nav id="hdMenu" className="hd-menu" aria-label="Меню">
+            <ul className="hd-menu-list">
+              {NAV.map((n) => (
+                <li key={n.key}>
+                  <Link to={n.to} aria-current={here(n.to) ? 'page' : undefined} onClick={() => setOpen(false)}>
+                    {n.label}
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 6 6 6-6 6" />
+                    </svg>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="hd-menu-call">
+              <span className="hd-menu-k">Консультация на русском</span>
+              <a className="hd-menu-tel" href={PHONE_TEL} dir="ltr">
+                <PhoneIcon size={20} color="currentColor" />
+                {PHONE_DISPLAY}
+              </a>
+              <a className="hd-menu-wa" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+                Написать в WhatsApp
+              </a>
+            </div>
+            <div className="hd-menu-lang">
+              <span className="hd-menu-k">Язык сайта</span>
+              <div className="hd-seg" role="radiogroup" aria-label="Язык сайта">
+                {LANGS.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    role="radio"
+                    aria-checked={lang === l.code}
+                    className={lang === l.code ? 'on' : ''}
+                    onClick={() => setLang(l.code)}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </nav>
+        </div>
+      }
+    </>
   );
 }
 
@@ -144,6 +294,7 @@ export function PhoneLink({
     <a
       href={PHONE_TEL}
       dir="ltr"
+      className="hd-phone"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -173,7 +324,10 @@ export function HeaderAside({
   wrap?: boolean;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: `${gap}px`, ...(wrap ? { flexWrap: 'wrap' } : null) }}>
+    <div
+      className="hd-aside"
+      style={{ display: 'flex', alignItems: 'center', gap: `${gap}px`, ...(wrap ? { flexWrap: 'wrap' } : null) }}
+    >
       {children}
     </div>
   );

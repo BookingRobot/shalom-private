@@ -163,8 +163,10 @@ export function FlightChoice() {
       <div className="road-h">
         <span className="road-num">1</span>
         <div>
-          <h2 id="flyTitle">Перелёт Тель-Авив ⇄ Вильнюс</h2>
-          <span>Сначала решим с рейсом — трансфер подстроим под него.</span>
+          <InfoTitle
+            title={<h2 id="flyTitle">Перелёт Тель-Авив ⇄ Вильнюс</h2>}
+            info="Сначала решим с рейсом — трансфер подстроим под него."
+          />
         </div>
       </div>
       <div id="flyChoice" className="tr-q" role="radiogroup" aria-labelledby="flyTitle">

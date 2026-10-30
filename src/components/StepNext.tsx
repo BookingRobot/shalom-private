@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { BASKET_NEXT, openBasket } from '../lib/basket';
 import { NextTip } from './NextTip';
 import './StepNext.css';
 
@@ -137,6 +138,36 @@ export function StepNext({
     if (!m.length) navigate(next.to);
   };
 
+  // phone: the order box sits behind a basket here; its «Продолжить» is the same as «Далее»
+  const [hasBasket, setHasBasket] = useState(false);
+  const goRef = useRef(go);
+  goRef.current = go;
+  useEffect(() => {
+    setHasBasket(!!document.querySelector('.order-aside'));
+    const n = () => goRef.current();
+    window.addEventListener(BASKET_NEXT, n);
+    return () => window.removeEventListener(BASKET_NEXT, n);
+  }, []);
+  const basket = (cls: string) =>
+    hasBasket ? (
+      <button type="button" className={'step-basket ' + cls} onClick={openBasket} aria-label="Ваш заказ">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 8h14l-1.3 10.4a2 2 0 0 1-2 1.6H8.3a2 2 0 0 1-2-1.6zM9 8V6a3 3 0 0 1 6 0v2" />
+        </svg>
+        {info ? <span className="step-basket-t">{info}</span> : <span className="step-basket-t">Ваш заказ</span>}
+      </button>
+    ) : null;
+
   const show = (m: Missing | undefined) => {
     if (!m) return;
     showSpot(m.target);
@@ -195,6 +226,7 @@ export function StepNext({
     <>
       <div className="step-row" ref={row}>
         {rowSeen ? hint : null}
+        {basket('step-basket-row')}
         <div className="step-row-btns">
           {back ? (
             <Link className="btn btn-secondary" to={back.to}>
@@ -213,7 +245,8 @@ export function StepNext({
         <div className="step-bar-in">
           {!rowSeen ? hint : null}
           <div className="step-bar-row">
-            <span className="step-bar-info">{info}</span>
+            <span className={'step-bar-info' + (hasBasket ? ' has-basket' : '')}>{info}</span>
+            {basket('step-basket-bar')}
             <span className="step-next-at">
               {!rowSeen ? tip : null}
               {nextBtn('step-next')}

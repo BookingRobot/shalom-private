@@ -455,6 +455,10 @@ export default function RoomsPage() {
             <h2>Хотите посоветоваться с близкими?</h2>
             <ShareOffer />
           </section>
+          {/* a quiet way back at the end of the step (not in the bar: the bar leads forward) */}
+          <Link className="rm-back" to="/hotel">
+            ← Назад: выбор номера
+          </Link>
         </div>
         {/* the summary bar */}
         <div ref={bar} className="rooms-bar">

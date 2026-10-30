@@ -96,6 +96,7 @@
   align-items: center;
   gap: 6px;
 }
+.page .step-hint-go,
 .step-hint-go {
   min-height: 40px;
   padding: 0 14px;
@@ -107,6 +108,7 @@
   font-weight: 700;
   cursor: pointer;
 }
+.page .step-hint-x,
 .step-hint-x {
   width: 36px;
   height: 36px;
@@ -197,5 +199,65 @@ body.has-stepbar .help-fab {
   .step-row .next-tip-float {
     right: auto;
     left: 0;
+  }
+}
+
+/* the basket (phone): the order box opens from here; on a laptop the box is beside the page */
+.step-basket {
+  display: none;
+}
+@media (max-width: 760px) {
+  .step-basket {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 14px 0 12px;
+    border: 1.5px solid #cfe3d6;
+    border-radius: 12px;
+    background: #eef5f1;
+    color: #1f5f4a;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    flex: none;
+  }
+  .step-basket svg {
+    flex: none;
+  }
+  /* in the bar: the basket and the total, the words «Итого:» are not needed there */
+  .step-basket-bar .step-basket-t {
+    font-size: 0;
+  }
+  .step-basket-bar .step-basket-t strong {
+    font-size: 17px;
+    color: #1c2620;
+    white-space: nowrap;
+  }
+  .step-bar-info.has-basket {
+    display: none;
+  }
+  .step-bar-row {
+    gap: 8px !important;
+  }
+  .step-bar .step-next-at {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  .step-bar .btn.step-next {
+    flex: 1 1 auto;
+    padding: 0 12px !important;
+    font-size: 16px !important;
+    white-space: nowrap;
+  }
+  /* at the end of the page: «Ваш заказ · Итого …» over the buttons */
+  .step-basket-row {
+    align-self: stretch;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .step-basket-row .step-basket-t {
+    font-weight: 600;
+    color: #1c2620;
   }
 }
