@@ -906,7 +906,7 @@ async function buildInteractive(b, sizes) {
       const order = await grab(
         b,
         route,
-        (p) => p.click('text=Сбросить всё'),
+        null,
         () => Array.from(document.querySelectorAll('article[id^="h-"]')).map((a) => a.id.slice(2)),
       );
       filterCfg = {
@@ -922,7 +922,8 @@ async function buildInteractive(b, sizes) {
         order,
       };
       // the "Выбрано:" row with removable chips
-      raws.actrow = await grab(b, route, null, () => {
+      // the row exists only with filters on: open the page with two of them
+      raws.actrow = await grab(b, route + '?f=daily,doctor', null, () => {
         const d = window.__dc;
         const lab = Array.from(document.querySelectorAll('span')).find((x) => x.textContent.trim() === 'Выбрано:');
         const row = lab.parentElement;
@@ -948,7 +949,7 @@ async function buildInteractive(b, sizes) {
     }
     // Results: every sanatorium's rooms open (as in the base below); a room photo opens its gallery
     const openAll = async (p) => {
-      await p.click('text=Сбросить всё');
+      // no filters are on by default (the guest picks them)
       for (const bt of await p.$$('article[id^="h-"] button[aria-expanded="false"]')) await bt.click();
       await p.waitForTimeout(1600);
     };

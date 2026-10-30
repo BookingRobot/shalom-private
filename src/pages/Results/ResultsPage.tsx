@@ -51,12 +51,20 @@ class ResultsLogic extends PageLogic {
       closing: {},
       det: {},
       sec: {},
-      f: { daily: true, doctor: true },
-      pf: { daily: true, doctor: true },
+      // no filter is on until the guest picks one
+      f: {},
+      pf: {},
       more: false,
       pr: {},
       wz: typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('wizard'),
     };
+    // a link may carry the guest's filters (?f=daily,doctor): only then they are on
+    const fq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('f') : null;
+    if (fq) {
+      const on = Object.fromEntries(fq.split(',').filter(Boolean).map((k) => [k, true]));
+      this.state.f = on;
+      this.state.pf = { ...on };
+    }
     // came from the name search on the home page: open that sanatorium's rooms
     const hq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('h') : null;
     if (hq) {
