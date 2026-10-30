@@ -984,7 +984,15 @@
 }
 .pg-tickets .tk-tel select.input {
   flex: none;
-  width: 118px;
+  /* «+972 · Израиль» fits whole */
+  width: 172px;
+  padding-left: 12px;
+  padding-right: 28px;
+  font-size: 16px;
+}
+.pg-tickets .tk-tel input.input {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .tk-flow-act {
   display: flex;
@@ -1082,61 +1090,6 @@
   font-size: 15px;
   color: #3e4b44;
 }
-.tk-card-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 18px;
-  border: 2px dashed #c8ded3;
-  border-radius: 12px;
-  background: #fafbf9;
-}
-.tk-card-safe {
-  font-weight: 800;
-  font-size: 16px;
-}
-.tk-card-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 12px;
-}
-.tk-card-grid > span {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.pg-tickets .tk-ph {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-  color: #6b776f;
-  font-size: 17px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.tk-card-pays {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.tk-card-pays > span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 16px;
-}
-.tk-apple {
-  background: #1c2620;
-  color: #fff;
-}
-.tk-gpay {
-  background: #fff;
-  border: 2px solid #1c2620;
-}
 .tk-agree {
   display: flex;
   align-items: flex-start;
@@ -1227,8 +1180,7 @@
 }
 @media (max-width: 700px) {
   .tk-grid3,
-  .tk-grid2,
-  .tk-card-grid {
+  .tk-grid2 {
     grid-template-columns: minmax(0, 1fr);
   }
   .tk-box,
@@ -1281,11 +1233,6 @@
   font-weight: 700;
   font-size: 15px;
   color: #3e4b44;
-}
-.pg-tickets .tk-ph {
-  border-style: solid;
-  border-color: #e3ded2;
-  background: #fff;
 }
 .pg-tickets .linkbtn {
   background: none;

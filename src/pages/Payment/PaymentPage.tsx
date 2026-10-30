@@ -14,6 +14,7 @@ import { transferBySanatorium } from '../../data/transferPolicy';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
+import { CardForm, cardMissing } from '../../components/CardForm';
 import './PaymentPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -263,132 +264,7 @@ export default function PaymentPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    border: '2px dashed #C8DED3',
-                    background: '#FAFBF9',
-                    borderRadius: 'var(--r)',
-                    padding: '18px 20px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '12px',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        fontWeight: '800',
-                        fontSize: '17px',
-                      }}
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                        style={{ flex: 'none' }}
-                      >
-                        <rect x="4" y="11" width="16" height="10" rx="1" />
-                        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                      </svg>
-                      Защищённая форма оплаты
-                    </span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <span className="lbl">Номер карты</span>
-                      <div
-                        className="input"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          color: '#6B776F',
-                          fontSize: '18px',
-                          letterSpacing: '.06em',
-                        }}
-                      >
-                        0000 0000 0000 0000
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <span className="lbl">Срок</span>
-                      <div
-                        className="input"
-                        style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
-                      >
-                        ММ / ГГ
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <span className="lbl">CVV</span>
-                      <div
-                        className="input"
-                        style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
-                      >
-                        •••
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <span className="lbl">Номер удостоверения личности (ת.ז.) — для карт израильских банков</span>
-                    <div
-                      className="input"
-                      style={{ display: 'flex', alignItems: 'center', color: '#6B776F', fontSize: '18px' }}
-                    >
-                      000000000
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        minHeight: '48px',
-                        padding: '0 18px',
-                        borderRadius: 'var(--r)',
-                        background: '#1C2620',
-                        color: '#fff',
-                        fontWeight: '700',
-                        fontSize: '16px',
-                      }}
-                    >
-                      Apple Pay
-                    </span>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        minHeight: '48px',
-                        padding: '0 18px',
-                        borderRadius: 'var(--r)',
-                        background: '#fff',
-                        border: '2px solid #1C2620',
-                        fontWeight: '700',
-                        fontSize: '16px',
-                      }}
-                    >
-                      Google Pay
-                    </span>
-                  </div>
-                </div>
+                <CardForm withId idPrefix="pay" />
                 <div
                   style={{
                     display: 'flex',
@@ -605,11 +481,13 @@ export default function PaymentPage() {
                   Сейчас к оплате: <strong>{v.amount}</strong>
                 </>
               }
-              missing={() =>
-                document.querySelector<HTMLInputElement>('#payAgree input')?.checked
+              missing={() => [
+                // [ТЕСТОВЫЙ РЕЖИМ] any card details are taken, only empty fields are asked for
+                ...cardMissing('pay'),
+                ...(document.querySelector<HTMLInputElement>('#payAgree input')?.checked
                   ? []
-                  : [{ label: 'согласие с условиями бронирования', target: '#payAgree' }]
-              }
+                  : [{ label: 'согласие с условиями бронирования', target: '#payAgree' }]),
+              ]}
             />
           </form>
           <OrderSummary

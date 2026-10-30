@@ -8,6 +8,7 @@ import { orderSummary } from '../../lib/orderSummary';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
+import '../../components/BirthDate.css';
 import './GuestsPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -294,8 +295,8 @@ export default function GuestsPage() {
                   <label className="lbl" htmlFor="g1ph">
                     Мобильный телефон
                   </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <div style={{ position: 'relative', flex: 'none', width: '210px' }}>
+                  <div className="g-tel">
+                    <div className="g-tel-code">
                       <select
                         className="input"
                         aria-label="Страна и код"
