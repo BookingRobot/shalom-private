@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { InfoTitle } from './InfoTip';
+import { FlightDates } from './FlightDates';
 import { CheckIcon } from './icons';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
@@ -81,6 +82,8 @@ export function FlightChoice() {
         ? 'own'
         : '';
   const askedHelp = booking.flightAsked && booking.flights === 'help';
+  // «Выбрать даты под наш рейс»: the calendar with the flight days and this sanatorium's places
+  const [cal, setCal] = useState(false);
   const pairs = both ? [] : flightPairs(inD, nights);
 
   // «Нет» after «Да»: the flights fold back up before they disappear
@@ -164,7 +167,9 @@ export function FlightChoice() {
         <span className="road-num">1</span>
         <div>
           <InfoTitle
-            title={<h2 id="flyTitle">Перелёт Тель-Авив ⇄ Вильнюс</h2>}
+            tag="h2"
+            id="flyTitle"
+            title="Перелёт Тель-Авив ⇄ Вильнюс"
             info="Сначала решим с рейсом — трансфер подстроим под него."
           />
         </div>
@@ -267,7 +272,7 @@ export function FlightChoice() {
                   </span>
                   <span>
                     Наш прямой рейс Israir летает по вторникам, четвергам и воскресеньям — в ваши даты его нет.
-                    {pairs.length ? ' Выберите ближайшие даты с рейсом:' : ' Консультант подберёт другой рейс.'}
+                    Рекомендуем выбрать даты под наш рейс: без пересадок, трансфер подстроим.
                   </span>
                 </p>
                 <div className="ios-list">
@@ -314,10 +319,27 @@ export function FlightChoice() {
                     </div>
                   </div>
                 ) : null}
+                <button type="button" className="fly-cal-btn" onClick={() => setCal(true)}>
+                  {plane}
+                  {pairs.length ? 'Другие даты под наш рейс — в календаре' : 'Выбрать даты под наш рейс'}
+                </button>
+                <span className="fly-cal-or">или консультант подберёт другой рейс — можно продолжать</span>
               </div>
             )}
           </div>
         </div>
+      ) : null}
+      {cal ? (
+        <FlightDates
+          hotelId={booking.hotelId}
+          checkin={booking.checkin}
+          nights={nights}
+          onClose={() => setCal(false)}
+          onApply={(d) => {
+            setCal(false);
+            pickWith(d);
+          }}
+        />
       ) : null}
     </section>
   );

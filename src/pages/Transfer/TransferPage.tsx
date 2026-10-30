@@ -418,7 +418,9 @@ export default function TransferPage() {
             {/* fewer words on the screen: the explanations wait under «i» next to the titles */}
             <div className="tr-title">
               <InfoTitle
-                title={<h1 style={{ fontSize: '32px' }}>Дорога до санатория</h1>}
+                tag="h1"
+                style={{ fontSize: '32px' }}
+                title="Дорога до санатория"
                 info="Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации санатория."
               />
             </div>
@@ -426,7 +428,7 @@ export default function TransferPage() {
             <div className="road-h road-h-out">
               <span className="road-num">2</span>
               <div>
-                <InfoTitle title={<h2>Трансфер до санатория</h2>} info={v.transferLead} />
+                <InfoTitle tag="h2" title="Трансфер до санатория" info={v.transferLead} />
               </div>
             </div>
             {/* 1. Нужен ли трансфер — nothing is chosen for the guest */}
@@ -638,7 +640,8 @@ export default function TransferPage() {
                         <path d="M12 8v5M12 16h.01" />
                       </svg>
                       <InfoTitle
-                        title={<span>Возможно ожидание других рейсов до 1 часа</span>}
+                        tag="span"
+                        title="Возможно ожидание других рейсов до 1 часа"
                         info="Вы едете вместе с другими гостями: по дороге — остановки у других санаториев, дорога длиннее на 30–40 минут. Точное время встречи сообщим за день до приезда."
                       />
                     </div>
@@ -868,7 +871,9 @@ export default function TransferPage() {
                     <div id="trFrom" className="tr-block ios-in">
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         <InfoTitle
-                          title={<h2 style={{ fontSize: '23px' }}>Откуда вас забрать {v.inDay}?</h2>}
+                          tag="h2"
+                          style={{ fontSize: '23px' }}
+                          title={'Откуда вас забрать ' + v.inDay + '?'}
                           info={v.fromInfo}
                         />
                         {v.fromNote ? (
@@ -1023,11 +1028,9 @@ export default function TransferPage() {
                     <div className="tr-block ios-in">
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <InfoTitle
-                          title={
-                            <h2 style={{ fontSize: '23px' }}>
-                              Обратно {v.outDay}, {v.outWeekday}: нужен трансфер?
-                            </h2>
-                          }
+                          tag="h2"
+                          style={{ fontSize: '23px' }}
+                          title={'Обратно ' + v.outDay + ', ' + v.outWeekday + ': нужен трансфер?'}
                           info={
                             'Заберём из санатория ' +
                             v.hotelShort +

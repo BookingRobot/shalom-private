@@ -6,10 +6,29 @@
   min-width: 0;
 }
 .info-line {
-  display: flex;
-  align-items: center;
-  gap: 8px 10px;
-  flex-wrap: wrap;
+  display: block;
+}
+/* the title runs as text; the «i» follows its last word, a stamp or badge after it */
+.info-line > .info-t {
+  display: inline;
+}
+.info-glue {
+  white-space: nowrap;
+}
+.info-line .info-tip {
+  vertical-align: 0.12em;
+  margin-left: 8px;
+}
+.info-line > h1 .info-tip,
+.info-line > h2 .info-tip,
+.info-line > h3 .info-tip {
+  vertical-align: 0.3em;
+  margin-left: 10px;
+}
+.info-extra {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 10px;
 }
 .info-tip {
   flex: none;
