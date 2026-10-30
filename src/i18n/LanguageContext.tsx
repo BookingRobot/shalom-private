@@ -45,6 +45,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   return <LangCtx.Provider value={api}>{children}</LangCtx.Provider>;
 }
 
+/** The chosen language and its switch (the menu uses it; pages use usePageLanguage). */
+export const useLang = () => useContext(LangCtx);
+
 /**
  * Language for the current page. Pages translated only into Russian pass ['ru'] and
  * stay Russian even if the guest switched language elsewhere. Sets <html lang/dir>.

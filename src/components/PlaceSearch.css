@@ -1,0 +1,139 @@
+/* phone: the resort field is a button that opens a list (no keyboard) */
+.page .ps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+.page .ps-ph {
+  color: #6b766f;
+  font-weight: 500;
+}
+.page .ps-chev {
+  flex: none;
+  color: #1f5f4a;
+}
+@media (max-width: 760px) {
+  .page .sf-dest-x {
+    display: none;
+  }
+}
+.ps-sheet-back {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(16, 28, 22, 0.5);
+  animation: psFade 0.2s ease both;
+}
+.ps-sheet {
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: #fff;
+  color: #1c2620;
+  border-radius: 18px 18px 0 0;
+  padding: 8px 16px calc(18px + env(safe-area-inset-bottom));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  animation: psUp 0.32s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.ps-grab {
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: 0 auto 8px;
+  border-radius: 3px;
+  background: #d9d4c8;
+}
+.ps-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.ps-sheet-head h2 {
+  margin: 0;
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 22px;
+}
+.ps-sheet-x {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e3ded2;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 17px;
+  cursor: pointer;
+}
+.ps-sheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ps-sheet-list li + li {
+  border-top: 1px solid #ece8df;
+}
+.ps-sheet-list button {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 2px 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ps-sheet-list button > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ps-sheet-list strong {
+  font-size: 19px;
+}
+.ps-sheet-list button > span > span {
+  font-size: 15px;
+  color: #5e6862;
+}
+/* the chosen resort: light green with a check mark, as on iPhone */
+.ps-sheet-list button.on {
+  background: #eef5f1;
+  color: #1f5f4a;
+}
+.ps-sheet-list button.on svg {
+  flex: none;
+  color: #1f5f4a;
+}
+.ps-sheet-note {
+  margin: 10px 4px 0;
+  font-size: 15px;
+  color: #5e6862;
+}
+@keyframes psFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes psUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps-sheet,
+  .ps-sheet-back {
+    animation: none;
+  }
+}

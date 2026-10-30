@@ -472,6 +472,15 @@
   margin: 0;
 }
 
+.pg-rooms .rm-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f5f4a;
+}
 /* the summary bar at the bottom */
 .pg-rooms .rooms-bar {
   position: sticky;

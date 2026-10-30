@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useBooking } from '../context/BookingContext';
 import { SANATORIUMS } from '../data/sanatoriums';
+import { BASKET_OPEN, basketNext } from '../lib/basket';
+import './OrderSummary.css';
 
 const row = {
   display: 'grid',
@@ -44,19 +46,15 @@ export function OrderSummary({
   const img = h && booking.hotelId !== 'egle-comfort' ? h.img : '/img/d82431114d102eee0f48639f84940aad.jpg';
   const name = h ? h.name : 'Санаторий Эгле Комфорт';
   const place = (h ? h.sub.split(' · ')[0] : 'Друскининкай') + ' · ' + '★'.repeat(h ? h.starsN : 4);
-  return (
-    <aside
-      className="card"
-      aria-label="Ваш заказ"
-      style={{
-        flex: '1 1 300px',
-        maxWidth: '360px',
-        padding: '0',
-        overflow: 'hidden',
-        position: 'sticky',
-        top: '16px',
-      }}
-    >
+  // phone: the box is not in the page; the basket in the bottom bar opens it in a window
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const o = () => setOpen(true);
+    window.addEventListener(BASKET_OPEN, o);
+    return () => window.removeEventListener(BASKET_OPEN, o);
+  }, []);
+  const content = (
+    <>
       <img src={img} alt="" style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />{' '}
       <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -95,7 +93,80 @@ export function OrderSummary({
         </div>
         {footer}
       </div>
-    </aside>
+    </>
+  );
+  return (
+    <>
+      <aside
+        className="card order-aside"
+        aria-label="Ваш заказ"
+        style={{
+          flex: '1 1 300px',
+          maxWidth: '360px',
+          padding: '0',
+          overflow: 'hidden',
+          position: 'sticky',
+          top: '16px',
+        }}
+      >
+        {content}
+      </aside>
+      {open ? (
+        <BasketWindow
+          onClose={() => setOpen(false)}
+          onNext={() => {
+            setOpen(false);
+            basketNext();
+          }}
+        >
+          {content}
+        </BasketWindow>
+      ) : null}
+    </>
+  );
+}
+
+/** the order in a window over the page (phone): what is chosen so far, «Продолжить» or close */
+function BasketWindow({ children, onClose, onNext }: { children: ReactNode; onClose: () => void; onNext: () => void }) {
+  const x = useRef<HTMLButtonElement>(null);
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    const back = document.activeElement as HTMLElement | null;
+    x.current?.focus();
+    const k = (e: KeyboardEvent) => e.key === 'Escape' && close.current();
+    document.addEventListener('keydown', k);
+    const ov = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', k);
+      document.body.style.overflow = ov;
+      back?.focus?.();
+    };
+  }, []);
+  return (
+    <div className="bk-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bk" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+        <div className="bk-head">
+          <span>
+            <h2 id="bkTitle">Ваш заказ</h2>
+            <span className="bk-sub">Вы уже выбрали</span>
+          </span>
+          <button type="button" className="bk-x" onClick={onClose} ref={x} aria-label="Закрыть">
+            ✕
+          </button>
+        </div>
+        <div className="bk-body">{children}</div>
+        <div className="bk-foot">
+          <button type="button" className="btn btn-primary" onClick={onNext}>
+            Продолжить →
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Закрыть
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

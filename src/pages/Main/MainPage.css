@@ -439,33 +439,6 @@ body .pg-main .card.resort:hover {
   }
 }
 @media (max-width: 760px) {
-  /* phone header: the logo, then the menu, then phone and language */
-  .pg-main .site-header > div {
-    gap: 10px 16px !important;
-    padding-top: 12px !important;
-    padding-bottom: 10px !important;
-  }
-  .pg-main .hero-left {
-    gap: 10px;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-  .pg-main .site-header nav {
-    gap: 6px 18px !important;
-    max-width: 100%;
-  }
-  .pg-main .site-header .navlink {
-    font-size: 16px;
-    white-space: nowrap;
-  }
-  .pg-main .lang select {
-    min-height: 42px;
-    font-size: 16px;
-  }
-  .pg-main .lang svg {
-    top: 13px;
-  }
   .pg-main .hero-in {
     padding-top: 40px;
   }

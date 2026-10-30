@@ -139,7 +139,10 @@ export function SearchCard({
     setHop((h) => h + 1);
     if (step === 'place') {
       bringUp(placeAt.current);
-      placeAt.current?.querySelector<HTMLInputElement>('input')?.focus();
+      // phone: the field is a button that opens the list of resorts
+      const f = placeAt.current?.querySelector<HTMLElement>('input, .ps-btn');
+      if (f?.classList.contains('ps-btn')) f.click();
+      else f?.focus();
     } else onOpenCal();
   };
 
@@ -158,7 +161,7 @@ export function SearchCard({
       <div className="search-grid">
         <div className={'sf sf-dest' + (tipOn('place') ? ' sf-next' : '')}>
           <label className="lbl" htmlFor="city">
-            Курорт или санаторий
+            Курорт<span className="sf-dest-x"> или санаторий</span>
           </label>
           <div className="sf-at" ref={placeAt}>
             {tip('place')}
