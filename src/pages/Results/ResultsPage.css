@@ -489,3 +489,10 @@
     padding: 14px 0 16px !important;
   }
 }
+
+/* who meets the guest: heads under the facts, a thin line above */
+.pg-results .res-team {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #ece8df;
+}

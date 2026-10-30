@@ -16,6 +16,8 @@ import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import { NextTip } from '../../components/NextTip';
 import { useLiftFabs } from '../../components/StepNext';
+import { TeamHeads } from '../../components/TeamHeads';
+import { STAFF, teamOf, type StaffRole } from '../../data/team';
 import './RoomsPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -24,13 +26,6 @@ const HELP_CTX: HelpContextInfo = {
   out: '2026-11-18',
   bottom: '96px',
 };
-
-/** who meets the guest at the sanatorium (illustrative photos until the sanatorium sends its own) */
-const PEOPLE = [
-  { img: '/img/82493a836fac6144cdfcf1d45964e670.jpg', role: 'Врач', d: 'Консультация и назначение процедур' },
-  { img: '/img/1e720a808ad884024d7c6a1cd741bb71.jpg', role: 'Реабилитолог', d: 'Сопровождение во время отдыха' },
-  { img: '/img/93118f2665a62c9ec3f6b47389a7993c.jpg', role: 'Администратор', d: 'Помощь на русском языке' },
-];
 
 type Program = ReturnType<typeof api.getRoomPrograms>['programs'][number];
 const TIER_ORDER = { base: 0, recommended: 1, premium: 2 } as const;
@@ -135,6 +130,8 @@ class RoomsLogic extends PageLogic {
       sumParty: party.replace(/^за /, 'на '),
       sumAdv: order.advanceLabel,
       sumFull: order.fullOnly,
+      // the people of this sanatorium (0–3)
+      team: teamOf(booking.hotelId || 'egle-comfort'),
     };
   }
 }
@@ -223,10 +220,12 @@ function ProgramCard({ p }: { p: Card }) {
 /** the full programme over the page: what is included, the day plan, choose or close */
 function ProgramModal({
   m,
+  team,
   onClose,
   onPick,
 }: {
   m: NonNullable<ReturnType<RoomsLogic['renderVals']>['more']>;
+  team: StaffRole[];
   onClose: () => void;
   onPick: () => void;
 }) {
@@ -290,6 +289,12 @@ function ProgramModal({
               </li>
             ))}
           </ul>
+          {team.length ? (
+            <>
+              <h3>Кто вас встретит</h3>
+              <TeamHeads roles={team} variant="list" size={56} />
+            </>
+          ) : null}
           <h3>Подробно о программе</h3>
           <div className="pm-det">
             {m.detLines.map((l, i) =>
@@ -431,25 +436,27 @@ export default function RoomsPage() {
             </svg>
             Процедуры назначает врач после консультации. Улучшить программу можно и на месте — по наличию.
           </p>
-          {/* the people who meet the guest */}
-          <section className="rm-people" aria-labelledby="rmPeople">
-            <div className="rm-people-t">
-              <h2 id="rmPeople">В санатории вас встретят люди</h2>
-              <p>Консультация врача — в каждой программе. Помощь с организацией — на русском.</p>
-            </div>
-            <ul>
-              {PEOPLE.map((x) => (
-                <li key={x.role}>
-                  <img src={x.img} alt="" width="72" height="72" />
-                  <span>
-                    <strong>{x.role}</strong>
-                    <span>{x.d}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <span className="rm-people-note">Фото для примера</span>
-          </section>
+          {/* the people who meet the guest (this sanatorium's team) */}
+          {v.team.length ? (
+            <section className="rm-people" aria-labelledby="rmPeople">
+              <div className="rm-people-t">
+                <h2 id="rmPeople">В санатории вас встретят люди</h2>
+                <p>Консультация врача — в каждой программе. Помощь с организацией — на русском.</p>
+              </div>
+              <ul>
+                {v.team.map((r) => (
+                  <li key={r}>
+                    <img src={STAFF[r].img} alt="" width="72" height="72" />
+                    <span>
+                      <strong>{STAFF[r].role}</strong>
+                      <span>{STAFF[r].d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <span className="rm-people-note">Фото для примера</span>
+            </section>
+          ) : null}
           {/* talk it over with the family: send the offer or get told about a price change */}
           <section id="share" className="card rm-share">
             <h2>Хотите посоветоваться с близкими?</h2>
@@ -508,7 +515,7 @@ export default function RoomsPage() {
         </div>
         <SiteFooter padding="24px 24px" pinned={false} />
       </div>
-      {v.more ? <ProgramModal m={v.more} onClose={v.closeMore} onPick={v.pickMore} /> : null}
+      {v.more ? <ProgramModal m={v.more} team={v.team} onClose={v.closeMore} onPick={v.pickMore} /> : null}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>
   );

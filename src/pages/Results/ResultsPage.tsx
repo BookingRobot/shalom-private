@@ -14,7 +14,8 @@ import { blockedNights, blockedNote, restartNote, daysText } from '../../lib/sta
 import { CalNotice } from '../../components/calendar/CalNotice';
 import { isFlightDay } from '../../data/flights';
 import { ICON_PATHS } from '../../data/iconPaths';
-import { awardsOf } from '../../data/awards';
+import { teamOf } from '../../data/team';
+import { TeamHeads } from '../../components/TeamHeads';
 import { CAR_ICON, FILTER_GROUPS } from '../../data/filters';
 import { BUSY_LOOK, FREE_LOOK, freeFrom, overlaps, roomDayBusy } from '../../data/roomAvailability';
 import { api } from '../../api';
@@ -343,7 +344,6 @@ class ResultsLogic extends PageLogic {
       };
       const shown = !!open[h.id];
       const isOpen = shown && !closing[h.id];
-      const aw = awardsOf[h.id] || [];
       // the next step after the search: open the rooms of the first (promoted) sanatorium;
       // once rooms are open: choose the cheapest free room of the sanatorium opened last
       const tipOn = idx === 0 && !anyOpen && !st.rmTipX;
@@ -355,8 +355,8 @@ class ResultsLogic extends PageLogic {
             cal: { id: h.id, picked: iso(checkin), month: checkin.getUTCMonth(), year: checkin.getUTCFullYear() },
           }),
         stars: '★'.repeat(h.starsN),
-        awards: aw,
-        hasAwards: aw.length > 0,
+        // who meets the guest: the doctor, the rehabilitologist, the administrator (0–3 heads)
+        team: teamOf(h.id),
         ppn: ppn(h.price),
         advMin: Math.min(...h.offers.map((o) => o.adv)),
         price: fmt(h.price),
@@ -1758,43 +1758,10 @@ export default function ResultsPage() {
                           </Fragment>
                         ))}
                       </div>
-                      {h.hasAwards ? (
-                        <>
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: '8px',
-                              flexWrap: 'wrap',
-                              marginTop: 'auto',
-                              paddingTop: '4px',
-                            }}
-                          >
-                            {(h.awards || []).map((w: any, _i1: number) => (
-                              <Fragment key={_i1}>
-                                <span className="badge">
-                                  {w.d === CAR_ICON ? (
-                                    <VanIcon height={16} />
-                                  ) : (
-                                    <svg
-                                      width="16"
-                                      height="16"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="#1F5F4A"
-                                      strokeWidth="2"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      aria-hidden="true"
-                                    >
-                                      <IconPath d={w.d} />
-                                    </svg>
-                                  )}
-                                  {w.t}
-                                </span>
-                              </Fragment>
-                            ))}
-                          </div>
-                        </>
+                      {h.team.length ? (
+                        <div className="res-team">
+                          <TeamHeads roles={h.team} size={46} />
+                        </div>
                       ) : null}
                     </div>
                     <div
