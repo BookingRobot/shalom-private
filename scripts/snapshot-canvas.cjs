@@ -96,9 +96,34 @@ const BOARDS = [
   },
   {
     file: 'Rooms.dc.html',
-    title: 'Шаг 1 · Номер и программа',
+    title: 'Шаг 1 · Программа: дешёвая · рекомендуем Atlantis · премиум',
     route: '/rooms',
-    setup: async (p) => p.click('text=Отправить предложение семье'),
+    links: [
+      ['.pg-more', '', 'Rooms-more.dc.html'],
+      ['.pg-all', '', 'Rooms-all.dc.html'],
+    ],
+  },
+  {
+    // «Узнать больше о программе»: the full programme in a window over the page
+    file: 'Rooms-more.dc.html',
+    title: 'Шаг 1 · «Узнать больше о программе» (окно поверх страницы)',
+    route: '/rooms',
+    setup: async (p) => p.click('.pg-card.rec .pg-more'),
+    links: [
+      ['.pm-close', '', 'Rooms.dc.html'],
+      ['.pm-close-b', '', 'Rooms.dc.html'],
+    ],
+  },
+  {
+    // more programmes of the sanatorium, under the three
+    file: 'Rooms-all.dc.html',
+    title: 'Шаг 1 · «Ещё программы этого санатория» открыто',
+    route: '/rooms',
+    setup: async (p) => p.click('.pg-all'),
+    links: [
+      ['.pg-all', '', 'Rooms.dc.html'],
+      ['.pg-more', '', 'Rooms-more.dc.html'],
+    ],
   },
   {
     file: 'Transfer.dc.html',
