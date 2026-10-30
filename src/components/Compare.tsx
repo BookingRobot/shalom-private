@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { teamOf } from '../data/team';
+import { TeamHeads } from './TeamHeads';
 import { transferBySanatorium } from '../data/transferPolicy';
 import { useBooking } from '../context/BookingContext';
 import { toNum } from '../lib/format';
@@ -61,12 +63,14 @@ export function Compare({
   }, [open]);
   if (list.length === 0) return null;
   const g = { adults: booking.adults, children: booking.children };
-  const rows: [string, (h: CompareHotel) => string][] = [
+  const rows: [string, (h: CompareHotel) => ReactNode][] = [
     [
       booking.adults === 1 ? 'Цена за одного' : 'Цена на человека',
       (h) => eur(quote(toNum(h.price), g, booking.flightPackage, transferBySanatorium(h.id)).perPerson),
     ],
     ['Категория', (h) => '★'.repeat(h.starsN)],
+    // who meets the guest: more heads — more people to help
+    ['Кто вас встретит', (h) => (teamOf(h.id).length ? <TeamHeads roles={teamOf(h.id)} size={40} /> : '—')],
     ['Процедуры', procs],
     ['Питание', (h) => meals(h.tags)],
     ['Консультация врача', (h) => yes(h.tags.includes('doctor'))],
