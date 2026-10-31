@@ -519,7 +519,11 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       ) : null}
 
       {stage === 'form' || stage === 'sending' || stage === 'done' || stage === 'github' ? (
-        <div className="fb-overlay" data-canvas="feedback-form" onClick={(e) => e.target === e.currentTarget && close()}>
+        <div
+          className="fb-overlay"
+          data-canvas="feedback-form"
+          onClick={(e) => e.target === e.currentTarget && close()}
+        >
           <div className="fb-panel" role="dialog" aria-modal="true" aria-labelledby="fbTitle" onPaste={onPaste}>
             <div className="fb-head">
               <div>

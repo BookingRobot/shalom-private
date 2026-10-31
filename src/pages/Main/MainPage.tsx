@@ -296,25 +296,7 @@ export default function MainPage() {
           </div>
           <HeaderAside gap={20} wrap={false}>
             <PhoneLink size={18} icon={20} gap={8} />
-            <div className="lang">
-              <select aria-label="Язык">
-                <option>RU</option>
-                <option>LT</option>
-                <option>EN</option>
-              </select>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </div>
+            {/* no language switch until a second language is complete (src/i18n/t.ts) */}
           </HeaderAside>
         </HeaderBar>
         {/* Hero: lakes and forests of Lithuania, the heading, and the search card lying over the photo's lower edge */}

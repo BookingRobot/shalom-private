@@ -6,6 +6,7 @@
  *   { "canvas": "transfer-flight", "role": "radio", "name": "Нет" } — a role inside that block, by its name
  *   { "role": "button", "name": "Помогите выбрать санаторий" }     — a role anywhere on the page
  *   { "id": "datein" }                                             — a form field (the id its <label> points to)
+ *   { "canvas": "tickets-calendar", "role": "button", "days": true } — a calendar's open days
  *   … plus "nth": 2 (0-based) when several match.
  *
  * The same spec works in Playwright (actions: click, check) and inside the page (links for Play).
@@ -54,6 +55,8 @@ window.__find = function (spec) {
       out = [];
       roots.forEach((r) => r.querySelectorAll(spec.role ? ROLE[spec.role] : '*').forEach((el) => out.push(el)));
       if (spec.name) out = out.filter((el) => norm(nameOf(el)).includes(norm(spec.name)));
+      // a calendar's days: enabled buttons whose text starts with the day number
+      if (spec.days) out = out.filter((el) => !el.disabled && /^\\d/.test(el.textContent.trim()));
       if (spec.text) out = out.filter((el) => !el.children.length && norm(el.textContent).includes(norm(spec.text)));
     }
   }

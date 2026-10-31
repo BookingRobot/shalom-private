@@ -144,7 +144,11 @@ export function Compare({
         </span>
       </div>
       {open ? (
-        <div className="cmp-overlay" data-canvas="compare-dialog" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
+        <div
+          className="cmp-overlay"
+          data-canvas="compare-dialog"
+          onClick={(e) => e.target === e.currentTarget && setOpen(false)}
+        >
           <div role="dialog" aria-modal="true" aria-labelledby="cmpTitle" className="cmp-dialog">
             <div className="cmp-head">
               <h2 id="cmpTitle" className="cmp-title">

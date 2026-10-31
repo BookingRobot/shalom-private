@@ -182,7 +182,9 @@ async function snapshot(browser, bd, named, sizes, extra) {
     document
       .querySelectorAll('select')
       .forEach((s) =>
-        Array.from(s.options).forEach((o) => (o.selected ? o.setAttribute('selected', '') : o.removeAttribute('selected'))),
+        Array.from(s.options).forEach((o) =>
+          o.selected ? o.setAttribute('selected', '') : o.removeAttribute('selected'),
+        ),
       );
     const dialog = document.querySelector('[role="dialog"]');
     const bottom = dialog ? dialog.getBoundingClientRect().bottom + window.scrollY + 40 : 0;
@@ -202,7 +204,10 @@ async function snapshot(browser, bd, named, sizes, extra) {
     interactive: !!(bd.build || bd.links),
     ...(vp.width !== 1280 ? { w: vp.width } : {}),
   };
-  const warn = [errs.length ? 'ERR ' + errs.join(';') : '', missing && missing.length ? 'no link target: ' + missing.join(' ') : '']
+  const warn = [
+    errs.length ? 'ERR ' + errs.join(';') : '',
+    missing && missing.length ? 'no link target: ' + missing.join(' ') : '',
+  ]
     .filter(Boolean)
     .join(' · ');
   console.log(bd.file, h, warn);
