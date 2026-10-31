@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.4;
 }
 .ft-agency-t a {
@@ -33,5 +33,5 @@
   text-decoration: underline;
 }
 .ft-agency.light .ft-agency-t {
-  color: #3e4b44;
+  color: var(--ink-2);
 }

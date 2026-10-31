@@ -74,9 +74,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             height: '200px',
             alignSelf: 'flex-start',
             margin: '14px 0 14px 14px',
-            borderRadius: 'var(--r)',
+            borderRadius: 'var(--r-field)',
             overflow: 'hidden',
-            background: '#2B3A33',
+            background: 'var(--ink)',
           }}
         >
           <img
@@ -98,12 +98,12 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   position: 'absolute',
                   left: '10px',
                   top: '10px',
-                  background: '#5E6862',
-                  color: '#fff',
-                  fontSize: '14px',
+                  background: 'var(--muted)',
+                  color: 'var(--paper)',
+                  fontSize: '16px',
                   fontWeight: '800',
                   padding: '5px 10px',
-                  borderRadius: 'var(--r)',
+                  borderRadius: 'var(--r-field)',
                 }}
               >
                 Занят на ваши даты
@@ -149,8 +149,8 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             {o.pill}
           </span>
           <h3 style={{ fontSize: '22px', color: o.nameColor }}>{o.short}</h3>
-          <div style={{ fontSize: '15px', color: '#3E4B44' }}>{o.roomLine}</div>
-          <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>{o.progLine}</div>
+          <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{o.roomLine}</div>
+          <div style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '-4px' }}>{o.progLine}</div>
           <ul className="room-incl" aria-label="Входит в программу">
             {ROOM_INCL.map((it) => (
               <li key={it.t}>
@@ -159,7 +159,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="1.9"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -179,7 +179,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             display: 'flex',
             flexDirection: 'column',
             gap: '2px',
-            borderLeft: '1px solid #E3DED2',
+            borderLeft: '1px solid var(--line)',
             justifyContent: 'center',
           }}
         >
@@ -204,11 +204,11 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           ) : null}
           {o.busy ? (
             <>
-              <span style={{ fontSize: '18px', fontWeight: '800', color: '#3E4B44', lineHeight: '1.25' }}>
+              <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--ink-2)', lineHeight: '1.25' }}>
                 Занят на {o.busyRange}
               </span>
-              <span style={{ fontSize: '15px', color: '#3E4B44', marginTop: '4px' }}>
-                Свободен: <strong style={{ color: '#1C2620' }}>{o.nextFree}</strong>
+              <span style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '4px' }}>
+                Свободен: <strong style={{ color: 'var(--ink)' }}>{o.nextFree}</strong>
               </span>
               <button
                 type="button"
@@ -245,13 +245,13 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           gap: '12px',
           width: '100%',
           border: 'none',
-          borderTop: '1px solid #E3DED2',
-          background: '#FAFBF9',
+          borderTop: '1px solid var(--line)',
+          background: 'var(--sand)',
           padding: '12px 18px',
           minHeight: '48px',
           cursor: 'pointer',
           fontWeight: '600',
-          fontSize: '15px',
+          fontSize: '16px',
           textAlign: 'left',
         }}
       >
@@ -261,7 +261,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             height="20"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#1F5F4A"
+            stroke="var(--green)"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -277,7 +277,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
           height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#1F5F4A"
+          stroke="var(--green)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -295,17 +295,17 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               flexDirection: 'column',
               gap: '18px',
               padding: '18px 18px 18px',
-              borderTop: '1px solid #E3DED2',
-              background: '#FAFBF9',
+              borderTop: '1px solid var(--line)',
+              background: 'var(--sand)',
             }}
           >
             {/* 0. Programmes available for this room (cheapest first) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div
                 style={{
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  color: '#5E6862',
+                  color: 'var(--muted)',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}
@@ -326,7 +326,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       padding: '10px 16px',
                       border: `2px solid ${pr.border ?? ''}`,
                       background: pr.bg,
-                      borderRadius: 'var(--r)',
+                      borderRadius: 'var(--r-field)',
                       cursor: 'pointer',
                       textAlign: 'left',
                     }}
@@ -341,7 +341,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         flex: 'none',
-                        background: '#fff',
+                        background: 'var(--paper)',
                       }}
                     >
                       <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: pr.dot }} />
@@ -351,7 +351,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       height="28"
                       viewBox="-1 -1 26 26"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -370,7 +370,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       }}
                     >
                       <strong style={{ fontSize: '17px' }}>{pr.name}</strong>
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>{pr.sub}</span>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{pr.sub}</span>
                     </span>
                     <span
                       style={{
@@ -381,7 +381,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                       }}
                     >
                       <strong style={{ fontSize: '18px', whiteSpace: 'nowrap' }}>{pr.price}</strong>
-                      <span style={{ fontSize: '14px', color: pr.diffColor, whiteSpace: 'nowrap' }}>{pr.diff}</span>
+                      <span style={{ fontSize: '16px', color: pr.diffColor, whiteSpace: 'nowrap' }}>{pr.diff}</span>
                     </span>
                   </button>
                 </Fragment>
@@ -391,9 +391,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div
                 style={{
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  color: '#5E6862',
+                  color: 'var(--muted)',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                 }}
@@ -411,9 +411,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                   <Fragment key={_i1}>
                     <div
                       style={{
-                        background: '#EEF5F1',
-                        border: '1px solid #C8DED3',
-                        borderRadius: 'var(--r)',
+                        background: 'var(--green-soft)',
+                        border: '1px solid var(--green-line)',
+                        borderRadius: 'var(--r-field)',
                         padding: '14px 16px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -427,7 +427,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                           height="34"
                           viewBox="-1 -1 26 26"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -442,14 +442,14 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                             fontSize: '32px',
                             fontWeight: '700',
                             lineHeight: '1',
-                            color: '#1F5F4A',
+                            color: 'var(--green)',
                           }}
                         >
                           {v.big}
                         </span>
                       </div>
-                      <strong style={{ fontSize: '16px', lineHeight: '1.2', color: '#1C2620' }}>{v.label}</strong>
-                      <span style={{ fontSize: '14px', lineHeight: '1.3', color: '#3E4B44' }}>{v.sub}</span>
+                      <strong style={{ fontSize: '16px', lineHeight: '1.2', color: 'var(--ink)' }}>{v.label}</strong>
+                      <span style={{ fontSize: '16px', lineHeight: '1.3', color: 'var(--ink-2)' }}>{v.sub}</span>
                     </div>
                   </Fragment>
                 ))}
@@ -460,9 +460,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div
                   style={{
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: '700',
-                    color: '#5E6862',
+                    color: 'var(--muted)',
                     textTransform: 'uppercase',
                     letterSpacing: '.04em',
                   }}
@@ -472,13 +472,13 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {(o.prog || []).map((p: any, _i1: number) => (
                     <Fragment key={_i1}>
-                      <div className="fact" style={{ color: '#1C2620', fontSize: '16px' }}>
+                      <div className="fact" style={{ color: 'var(--ink)', fontSize: '16px' }}>
                         <svg
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -495,9 +495,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
               <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div
                   style={{
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: '700',
-                    color: '#5E6862',
+                    color: 'var(--muted)',
                     textTransform: 'uppercase',
                     letterSpacing: '.04em',
                   }}
@@ -513,13 +513,13 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 >
                   {(o.amen || []).map((a: any, _i1: number) => (
                     <Fragment key={_i1}>
-                      <div className="fact" style={{ color: '#1C2620' }}>
+                      <div className="fact" style={{ color: 'var(--ink)' }}>
                         <svg
                           width="22"
                           height="22"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#3E4B44"
+                          stroke="var(--ink-2)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -532,7 +532,7 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                     </Fragment>
                   ))}
                 </div>
-                <p style={{ margin: '0', fontSize: '14px', color: '#3E4B44' }}>{o.roomText}</p>
+                <p style={{ margin: '0', fontSize: '16px', color: 'var(--ink-2)' }}>{o.roomText}</p>
               </div>
             </div>
             <div
@@ -540,16 +540,16 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '3px',
-                background: '#FAF8F3',
-                borderRadius: 'var(--r)',
+                background: 'var(--sand)',
+                borderRadius: 'var(--r-field)',
                 padding: '12px 16px',
               }}
             >
               <div
                 style={{
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  color: '#5E6862',
+                  color: 'var(--muted)',
                   textTransform: 'uppercase',
                   letterSpacing: '.04em',
                   marginBottom: '4px',
@@ -561,9 +561,9 @@ export function RoomCard({ o, nightsLabel }: { o: any; nightsLabel: string }) {
                 <Fragment key={_i1}>
                   <div
                     style={{
-                      fontSize: '15px',
+                      fontSize: '16px',
                       lineHeight: '1.45',
-                      color: '#1C2620',
+                      color: 'var(--ink)',
                       fontWeight: l.fw,
                       paddingLeft: l.pl,
                       marginTop: l.mt,

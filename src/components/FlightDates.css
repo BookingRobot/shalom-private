@@ -15,9 +15,9 @@
   max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
-  background: #fff;
-  color: #1c2620;
-  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--r-card);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   animation: fdIn 0.32s cubic-bezier(0.22, 0.8, 0.24, 1) both;
@@ -28,7 +28,7 @@
   justify-content: space-between;
   gap: 14px;
   padding: 18px 22px 12px;
-  border-bottom: 1px solid #ece8df;
+  border-bottom: 1px solid var(--line);
 }
 .fd-head > span {
   display: flex;
@@ -41,17 +41,17 @@
   font-size: 24px;
 }
 .fd-sub {
-  font-size: 15.5px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .fd-x {
   flex: none;
   width: 44px;
   height: 44px;
-  border: 1px solid #e3ded2;
+  border: 1px solid var(--line);
   border-radius: 50%;
-  background: #fff;
-  color: #1c2620;
+  background: var(--paper);
+  color: var(--ink);
   font-size: 17px;
   cursor: pointer;
 }
@@ -68,12 +68,12 @@
 .fd-step {
   margin: 0;
   padding: 10px 14px;
-  border-radius: 10px;
-  background: #eef5f1;
+  border-radius: var(--r-field);
+  background: var(--green-soft);
   font-size: 17px;
 }
 .fd-was {
-  color: #5e6862;
+  color: var(--muted);
 }
 .fd .months-calendar .cell:disabled {
   cursor: default;
@@ -86,7 +86,7 @@
   gap: 12px;
   flex-wrap: wrap;
   padding: 12px 22px 16px;
-  border-top: 1px solid #ece8df;
+  border-top: 1px solid var(--line);
 }
 .page .fd-foot .btn {
   min-height: 52px;
@@ -103,7 +103,7 @@
   }
   .fd {
     max-height: calc(100vh - 16px);
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-card) var(--r-card) 0 0;
   }
   .fd-head {
     padding: 14px 16px 10px;

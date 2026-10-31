@@ -64,7 +64,7 @@ export default function DonePage() {
                 width: '96px',
                 height: '96px',
                 borderRadius: '50%',
-                background: '#C9E3D3',
+                background: 'var(--green-line)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -76,7 +76,7 @@ export default function DonePage() {
                 height="48"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -96,12 +96,12 @@ export default function DonePage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    background: '#FFF1D6',
-                    color: '#8A5A00',
+                    background: 'var(--warn-bg)',
+                    color: 'var(--warn-ink)',
                     fontWeight: '700',
-                    fontSize: '15px',
+                    fontSize: '16px',
                     padding: '7px 12px',
-                    borderRadius: 'var(--r)',
+                    borderRadius: 'var(--r-field)',
                   }}
                 >
                   <svg
@@ -121,16 +121,17 @@ export default function DonePage() {
                   Ожидаем подтверждение санатория
                 </span>
               </div>
-              <p style={{ fontSize: '17px', color: '#3E4B44' }}>
-                Детали заказа отправлены на <strong style={{ color: '#1C2620' }}>name@gmail.com</strong> и в WhatsApp.
+              <p style={{ fontSize: '17px', color: 'var(--ink-2)' }}>
+                Детали заказа отправлены на <strong style={{ color: 'var(--ink)' }}>name@gmail.com</strong> и в
+                WhatsApp.
               </p>
             </div>
           </div>
           {/* Next step band */}
           <div
             style={{
-              background: '#DDEBE2',
-              borderRadius: 'var(--r)',
+              background: 'var(--green-line)',
+              borderRadius: 'var(--r-field)',
               padding: '18px 24px',
               display: 'flex',
               alignItems: 'center',
@@ -142,7 +143,7 @@ export default function DonePage() {
               height="44"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#1F5F4A"
+              stroke="var(--green)"
               strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -150,14 +151,14 @@ export default function DonePage() {
               style={{ flex: 'none' }}
             >
               <path d="M3 6h18v12H3zM3 6l9 7 9-7" />
-              <circle cx="18" cy="17" r="4.5" fill="#DDEBE2" />
+              <circle cx="18" cy="17" r="4.5" fill="var(--green-line)" />
               <path d="M18 15v2l1.5 1" />
             </svg>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>
+              <strong style={{ fontSize: '18px', color: 'var(--green)' }}>
                 Следующий шаг — подтверждение санатория до 28 октября.
               </strong>
-              <span style={{ fontSize: '16px', color: '#1C2620' }}>Сейчас от вас ничего не требуется.</span>
+              <span style={{ fontSize: '16px', color: 'var(--ink)' }}>Сейчас от вас ничего не требуется.</span>
             </div>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'start' }}>
@@ -169,20 +170,20 @@ export default function DonePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
                   <h2 style={{ fontSize: '26px' }}>Что дальше</h2>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                     До заезда {daysLeft} {plural(daysLeft, ['день', 'дня', 'дней'])}
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <div className="tl">
                     <div className="line" />
-                    <div className="dot" style={{ background: '#1F5F4A', borderColor: '#1F5F4A' }}>
+                    <div className="dot" style={{ background: 'var(--green)', borderColor: 'var(--green)' }}>
                       <svg
                         width="20"
                         height="20"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#fff"
+                        stroke="var(--paper)"
                         strokeWidth="3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -196,20 +197,20 @@ export default function DonePage() {
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Депозит получен
                       </strong>
-                      <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Оплата {o.advanceLabel} прошла успешно. Цена больше не изменится.
                       </span>
                     </div>
                   </div>
-                  <div className="tl" style={{ background: '#FFF6E6' }}>
+                  <div className="tl" style={{ background: 'var(--warn-bg)' }}>
                     <div className="line" />
-                    <div className="dot" style={{ borderColor: '#C9893A' }}>
+                    <div className="dot" style={{ borderColor: 'var(--accent)' }}>
                       <svg
                         width="20"
                         height="20"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#C9893A"
+                        stroke="var(--accent)"
                         strokeWidth="2.4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -220,13 +221,13 @@ export default function DonePage() {
                       </svg>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip" style={{ background: '#FFF1D6', color: '#8A5A00' }}>
+                      <span className="chip" style={{ background: 'var(--warn-bg)', color: 'var(--warn-ink)' }}>
                         До 28 октября
                       </span>
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Подтверждение санатория
                       </strong>
-                      <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Отправим ваучер с номером брони на почту и в WhatsApp.
                       </span>
                     </div>
@@ -239,7 +240,7 @@ export default function DonePage() {
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Памятка и встреча
                       </strong>
-                      <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Пришлём время встречи, контакты водителя и список вещей.
                       </span>
                     </div>
@@ -252,7 +253,7 @@ export default function DonePage() {
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Заезд в санаторий
                       </strong>
-                      <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Всё оплачено заранее — на месте доплачивать ничего не нужно.
                       </span>
                     </div>
@@ -264,7 +265,7 @@ export default function DonePage() {
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
                         Выезд и обратный трансфер
                       </strong>
-                      <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Время подачи автомобиля согласуем отдельно.
                       </span>
                     </div>
@@ -311,9 +312,9 @@ export default function DonePage() {
               </Link>
               <section
                 style={{
-                  background: '#EEF5F1',
-                  border: '1px solid #C8DED3',
-                  borderRadius: 'var(--r)',
+                  background: 'var(--green-soft)',
+                  border: '1px solid var(--green-line)',
+                  borderRadius: 'var(--r-field)',
                   padding: '22px 24px',
                   display: 'flex',
                   gap: '18px',
@@ -326,7 +327,7 @@ export default function DonePage() {
                   height="44"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -340,10 +341,10 @@ export default function DonePage() {
                     <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '20px' }}>
                       Нужна помощь? Мы на связи
                     </strong>
-                    <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                    <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                       Отвечаем на русском языке.
                       <br />
-                      Назовите номер заказа <strong style={{ color: '#1C2620' }}>12345</strong>.
+                      Назовите номер заказа <strong style={{ color: 'var(--ink)' }}>12345</strong>.
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -406,7 +407,7 @@ export default function DonePage() {
                     <div style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px', fontWeight: '600' }}>
                       Эгле Комфорт
                     </div>
-                    <span style={{ color: '#8A6500', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
+                    <span style={{ color: 'var(--warn-ink)', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
                   </div>
                   <div className="fact">
                     <svg
@@ -414,7 +415,7 @@ export default function DonePage() {
                       height="20"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -428,8 +429,8 @@ export default function DonePage() {
                   <div
                     style={{
                       display: 'flex',
-                      borderTop: '1px solid #E3DED2',
-                      borderBottom: '1px solid #E3DED2',
+                      borderTop: '1px solid var(--line)',
+                      borderBottom: '1px solid var(--line)',
                       padding: '10px 0',
                     }}
                   >
@@ -440,17 +441,17 @@ export default function DonePage() {
                         flexDirection: 'column',
                         gap: '2px',
                         paddingRight: '12px',
-                        borderRight: '1px solid #E3DED2',
+                        borderRight: '1px solid var(--line)',
                       }}
                     >
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>Заезд</span>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Заезд</span>
                       <span className="fact" style={{ fontWeight: '700' }}>
                         <svg
                           width="18"
                           height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           aria-hidden="true"
@@ -463,14 +464,14 @@ export default function DonePage() {
                     <div
                       style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '12px' }}
                     >
-                      <span style={{ fontSize: '14px', color: '#3E4B44' }}>Выезд</span>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Выезд</span>
                       <span className="fact" style={{ fontWeight: '700' }}>
                         <svg
                           width="18"
                           height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           aria-hidden="true"
@@ -487,7 +488,7 @@ export default function DonePage() {
                       height="20"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -503,7 +504,7 @@ export default function DonePage() {
                       height="20"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -519,7 +520,7 @@ export default function DonePage() {
                       height="20"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -535,7 +536,7 @@ export default function DonePage() {
                       height="20"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -556,43 +557,48 @@ export default function DonePage() {
               <div className="card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <h2 style={{ fontSize: '22px' }}>Стоимость и оплата</h2>
                 <div className="row">
-                  <span style={{ color: '#3E4B44' }}>Проживание и программа{o.stayCalc ? ', ' + o.stayCalc : ''}</span>
+                  <span style={{ color: 'var(--ink-2)' }}>
+                    Проживание и программа{o.stayCalc ? ', ' + o.stayCalc : ''}
+                  </span>
                   <strong>{o.stayLabel}</strong>
                 </div>
                 {o.flight ? (
                   <div className="row">
-                    <span style={{ color: '#3E4B44' }}>Перелёт и трансфер</span>
+                    <span style={{ color: 'var(--ink-2)' }}>Перелёт и трансфер</span>
                     <strong>{o.flightLabel}</strong>
                   </div>
                 ) : null}
                 {o.transfer ? (
                   <div className="row">
-                    <span style={{ color: '#3E4B44' }}>{o.transferKind}</span>
+                    <span style={{ color: 'var(--ink-2)' }}>{o.transferKind}</span>
                     <strong>{o.transferLabel}</strong>
                   </div>
                 ) : null}
-                <div className="row" style={{ borderTop: '1px solid #E3DED2', paddingTop: '10px', fontSize: '18px' }}>
+                <div
+                  className="row"
+                  style={{ borderTop: '1px solid var(--line)', paddingTop: '10px', fontSize: '18px' }}
+                >
                   <strong>Всего</strong>
                   <strong style={{ fontSize: '20px' }}>{o.totalLabel}</strong>
                 </div>
                 <div className="row">
-                  <span style={{ color: '#3E4B44' }}>Оплачено</span>
-                  <strong style={{ color: '#1F5F4A' }}>{o.advanceLabel} ✓</strong>
+                  <span style={{ color: 'var(--ink-2)' }}>Оплачено</span>
+                  <strong style={{ color: 'var(--green)' }}>{o.advanceLabel} ✓</strong>
                 </div>
                 <div
                   style={{
-                    background: '#EEF5F1',
-                    borderRadius: 'var(--r)',
+                    background: 'var(--green-soft)',
+                    borderRadius: 'var(--r-field)',
                     padding: '12px 16px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '2px',
                   }}
                 >
-                  <span style={{ color: '#1F5F4A', fontSize: '15px', fontWeight: '700' }}>
+                  <span style={{ color: 'var(--green)', fontSize: '16px', fontWeight: '700' }}>
                     Осталось оплатить до {o.dueDate}
                   </span>
-                  <strong style={{ fontSize: '28px', lineHeight: '1.1', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
+                  <strong style={{ fontSize: '28px', lineHeight: '1.1', color: 'var(--green)', whiteSpace: 'nowrap' }}>
                     {eur(o.total - o.advance)}
                   </strong>
                 </div>
@@ -601,14 +607,20 @@ export default function DonePage() {
                   <span>До {o.dueDate} отмена бесплатная.</span>
                 </div>
                 <div
-                  style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', fontSize: '14px', color: '#3E4B44' }}
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'flex-start',
+                    fontSize: '16px',
+                    color: 'var(--ink-2)',
+                  }}
                 >
                   <svg
                     width="18"
                     height="18"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#5E6862"
+                    stroke="var(--muted)"
                     strokeWidth="2"
                     strokeLinecap="round"
                     aria-hidden="true"
@@ -624,7 +636,7 @@ export default function DonePage() {
           </div>
         </div>
         <HelpStripBand />
-        <footer style={{ background: '#fff', borderTop: '1px solid #E3DED2' }}>
+        <footer style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
           <div
             style={{
               maxWidth: '1180px',
@@ -635,7 +647,7 @@ export default function DonePage() {
               alignItems: 'center',
               gap: '24px',
               flexWrap: 'wrap',
-              fontSize: '15px',
+              fontSize: '16px',
             }}
           >
             <div
@@ -649,16 +661,16 @@ export default function DonePage() {
               }}
             >
               <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
+                <rect x="1" y="1" width="38" height="38" fill="var(--green)" />
+                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="var(--sand)" />
               </svg>
               Санатории Литвы
             </div>
             <div style={{ display: 'flex', gap: '24px' }}>
-              <Link to="/rules#contact" style={{ textDecoration: 'none', color: '#3E4B44' }}>
+              <Link to="/rules#contact" style={{ textDecoration: 'none', color: 'var(--ink-2)' }}>
                 Контакты
               </Link>
-              <Link to="/rules" style={{ textDecoration: 'none', color: '#3E4B44' }}>
+              <Link to="/rules" style={{ textDecoration: 'none', color: 'var(--ink-2)' }}>
                 Оплата и отмена
               </Link>
             </div>

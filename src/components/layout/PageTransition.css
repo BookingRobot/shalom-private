@@ -9,7 +9,7 @@
   justify-content: center;
   gap: 14px;
   /* covers the new page at once (no flash of it), the spinner itself fades in */
-  background: #f4f1ea;
+  background: var(--sand);
 }
 .pt-load.out {
   animation: ptOut 0.26s ease-in both;
@@ -19,8 +19,8 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 3px solid #c8ded3;
-  border-top-color: #1f5f4a;
+  border: 3px solid var(--green-line);
+  border-top-color: var(--green);
   animation:
     ptSpin 0.75s linear infinite,
     ptIn 0.2s ease-out both;
@@ -29,7 +29,7 @@
   font:
     600 15px Manrope,
     sans-serif;
-  color: #5e6862;
+  color: var(--muted);
   animation: ptIn 0.2s ease-out both;
 }
 @keyframes ptSpin {

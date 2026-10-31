@@ -106,7 +106,7 @@ export function GuestsPicker({
             height="26"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#1F5F4A"
+            stroke="var(--green)"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -124,7 +124,7 @@ export function GuestsPicker({
             height="18"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#1F5F4A"
+            stroke="var(--green)"
             strokeWidth="2.5"
             strokeLinecap="round"
             aria-hidden="true"
@@ -141,7 +141,7 @@ export function GuestsPicker({
             height="20"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#1F5F4A"
+            stroke="var(--green)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -169,7 +169,13 @@ export function GuestsPicker({
             </span>
             {children ? (
               <span
-                style={{ display: 'block', whiteSpace: 'nowrap', fontSize: '13px', fontWeight: 600, color: '#5E6862' }}
+                style={{
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--muted)',
+                }}
               >
                 + {children}
                 {NB}
@@ -182,7 +188,7 @@ export function GuestsPicker({
             height="18"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#1F5F4A"
+            stroke="var(--green)"
             strokeWidth="2.5"
             strokeLinecap="round"
             aria-hidden="true"

@@ -14,9 +14,9 @@
   height: var(--th, 44px);
   border-radius: 50%;
   object-fit: cover;
-  border: 2.5px solid #fff;
+  border: 2.5px solid var(--paper);
   box-shadow: 0 1px 5px rgba(28, 38, 32, 0.16);
-  background: #eef2ef;
+  background: var(--green-soft);
 }
 .team-heads img + img {
   margin-left: calc(var(--th, 44px) * -0.28);
@@ -28,13 +28,13 @@
   min-width: 0;
 }
 .team-t strong {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1c2620;
+  color: var(--ink);
 }
 .team-t span {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .team-list {
   list-style: none;
@@ -53,7 +53,7 @@
   flex: none;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #fff;
+  border: 3px solid var(--paper);
   box-shadow: 0 2px 8px rgba(28, 38, 32, 0.14);
 }
 .team-list li > span {
@@ -63,11 +63,11 @@
 }
 .team-list strong {
   font-size: 16px;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .team-list li > span > span {
-  font-size: 14.5px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 /* in the comparison table: the heads keep their size, the line goes under them */
 .page .cmp-cell .team-heads img,

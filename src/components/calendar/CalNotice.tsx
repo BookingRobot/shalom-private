@@ -10,7 +10,7 @@ export function CalNotice({ text, onClose, onAsk }: { text: string; onClose: () 
         height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#8A5A00"
+        stroke="var(--warn-ink)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

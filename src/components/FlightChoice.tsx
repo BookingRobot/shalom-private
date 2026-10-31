@@ -224,7 +224,7 @@ export function FlightChoice() {
       <button type="button" className={'fly-help ' + (askedHelp ? 'on' : '')} onClick={pickHelp}>
         {askedHelp ? (
           <>
-            <CheckIcon size={16} color="#1F5F4A" strokeWidth={2.6} />
+            <CheckIcon size={16} color="var(--green)" strokeWidth={2.6} />
             Консультант подберёт рейс и перезвонит — заказ сохранится, можно продолжать
           </>
         ) : (

@@ -147,7 +147,7 @@ export default function PaymentPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Как вам удобнее оплатить?</h1>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
                 Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
               </p>
             </div>
@@ -247,7 +247,7 @@ export default function PaymentPage() {
                   height="26"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -258,7 +258,7 @@ export default function PaymentPage() {
                   <path d="M2 10h20M6 15h4" />
                 </svg>
                 <h2 style={{ fontSize: '24px' }}>Оплата картой</h2>
-                <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                   Visa, Mastercard, Isracard, Amex · Apple Pay, Google Pay
                 </span>
               </div>
@@ -271,7 +271,7 @@ export default function PaymentPage() {
                     gap: '10px',
                     alignItems: 'flex-start',
                     fontSize: '16px',
-                    color: '#3E4B44',
+                    color: 'var(--ink-2)',
                   }}
                 >
                   <svg
@@ -279,7 +279,7 @@ export default function PaymentPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -296,7 +296,14 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              <div style={{ fontSize: '16px', color: '#3E4B44', borderTop: '1px solid #E3DED2', paddingTop: '12px' }}>
+              <div
+                style={{
+                  fontSize: '16px',
+                  color: 'var(--ink-2)',
+                  borderTop: '1px solid var(--line)',
+                  paddingTop: '12px',
+                }}
+              >
                 Нужен банковский перевод (например, оплачивает организация)?{' '}
                 <a href={PHONE_TEL} style={{ fontWeight: '700' }}>
                   Позвоните нам
@@ -330,7 +337,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -357,7 +364,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -376,7 +383,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#C9893A"
+                    stroke="var(--accent)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -404,7 +411,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -424,8 +431,8 @@ export default function PaymentPage() {
                 className="chk"
                 style={{
                   padding: '14px 16px',
-                  border: '2px solid #CFC9BB',
-                  borderRadius: 'var(--r)',
+                  border: '2px solid var(--line-strong)',
+                  borderRadius: 'var(--r-field)',
                   marginTop: '4px',
                 }}
               >
@@ -440,8 +447,8 @@ export default function PaymentPage() {
                 className="chk"
                 style={{
                   padding: '14px 16px',
-                  border: '2px solid #CFC9BB',
-                  borderRadius: 'var(--r)',
+                  border: '2px solid var(--line-strong)',
+                  borderRadius: 'var(--r-field)',
                   marginTop: '4px',
                 }}
               >
@@ -506,8 +513,8 @@ export default function PaymentPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
-                  background: '#EEF5F1',
-                  borderRadius: 'var(--r)',
+                  background: 'var(--green-soft)',
+                  borderRadius: 'var(--r-field)',
                   padding: '12px 14px',
                 }}
               >
@@ -519,13 +526,13 @@ export default function PaymentPage() {
                     gap: '12px',
                     fontSize: '18px',
                     fontWeight: '700',
-                    color: '#1F5F4A',
+                    color: 'var(--green)',
                   }}
                 >
                   <span>Платите сейчас</span>
                   <strong style={{ fontSize: '24px', fontWeight: '800', whiteSpace: 'nowrap' }}>{v.amount}</strong>
                 </div>
-                <div style={{ fontSize: '16px', lineHeight: '1.5', color: '#3E4B44' }}>{v.rest}</div>
+                <div style={{ fontSize: '16px', lineHeight: '1.5', color: 'var(--ink-2)' }}>{v.rest}</div>
               </div>
             }
           />

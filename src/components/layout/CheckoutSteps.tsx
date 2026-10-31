@@ -34,7 +34,7 @@ export function CheckoutSteps({
       </span>
     ) : null;
   return (
-    <div style={{ background: '#fff', borderBottom: '1px solid #E3DED2' }}>
+    <div style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
       <div
         className={'checkout-steps' + (compact ? ' compact' : '')}
         aria-label="Шаги оформления"
@@ -69,7 +69,7 @@ export function CheckoutSteps({
                 height="18"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#CFC9BB"
+                stroke="var(--line-strong)"
                 strokeWidth="2.5"
                 aria-hidden="true"
               >
@@ -91,7 +91,7 @@ export function CheckoutSteps({
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke={finished ? '#1F5F4A' : '#8A968F'}
+            stroke={finished ? 'var(--green)' : 'var(--muted-2)'}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

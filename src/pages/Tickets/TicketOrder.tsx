@@ -403,7 +403,7 @@ export function TicketOrder({
               height="36"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#fff"
+              stroke="var(--paper)"
               strokeWidth="2.6"
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -279,9 +279,9 @@ export function ResortModal({
                       <svg width="68" height="48" viewBox="0 0 68 48">
                         <path
                           d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.4 34 .4 34 .4s-21.2 0-26.5 1.3a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.6 34 47.6 34 47.6s21.2 0 26.5-1.3a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z"
-                          fill="#f00"
+                          fill="var(--danger)"
                         />
-                        <path d="M45 24 27 14v20z" fill="#fff" />
+                        <path d="M45 24 27 14v20z" fill="var(--paper)" />
                       </svg>
                     </span>
                   </span>

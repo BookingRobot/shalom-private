@@ -14,7 +14,7 @@ import {
 import { HelpStripBand, type HelpStripText } from './HelpStrip';
 import './SiteFooter.css';
 
-const linkStyle = { color: '#D9E2DC', textDecoration: 'none' };
+const linkStyle = { color: 'var(--green-line)', textDecoration: 'none' };
 
 /** Default right-hand links: how to pay, cancellation terms. */
 export const FooterLinks = () => (
@@ -77,7 +77,7 @@ export function SiteFooter({
   return (
     <>
       <HelpStripBand text={help} pinned={pinned} />
-      <footer style={{ background: '#1C2620', color: '#D9E2DC' }}>
+      <footer style={{ background: 'var(--ink)', color: 'var(--green-line)' }}>
         <div
           style={{
             maxWidth: '1180px',

@@ -194,10 +194,10 @@ class HotelLogic extends PageLogic {
             pi === 0
               ? 'самая доступная'
               : '+' + eur(placePrice(p.priceN, GQ) - placePrice(PROGS[0].priceN, GQ)) + ' с человека',
-          diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
-          border: on ? '#1F5F4A' : '#CFC9BB',
-          bg: on ? '#EEF5F1' : '#fff',
-          dot: on ? '#1F5F4A' : 'transparent',
+          diffColor: pi === 0 ? 'var(--green)' : 'var(--ink-2)',
+          border: on ? 'var(--green)' : 'var(--line-strong)',
+          bg: on ? 'var(--green-soft)' : 'var(--paper)',
+          dot: on ? 'var(--green)' : 'transparent',
           pick: () => this.setState({ ps: { ...ps, [r.n]: pi } }),
         };
       });
@@ -257,7 +257,7 @@ class HotelLogic extends PageLogic {
         selPrice: eur(quote(sp.priceN + addN, GQ, this.props.booking.booking.flightPackage, true).total),
         detBtn: 'Программы для этого номера (' + PROGS.length + ') и что входит',
         detChev: dOpen ? 'rotate(180deg)' : 'none',
-        border: r.top ? '#1F5F4A' : '#E3DED2',
+        border: r.top ? 'var(--green)' : 'var(--line)',
         detOpen: dOpen,
         toggleDet: () => this.setState({ det: { ...det, [r.n]: !dOpen } }),
       };
@@ -323,8 +323,8 @@ class HotelLogic extends PageLogic {
           sub: '',
           bg: 'transparent',
           border: 'transparent',
-          color: '#1C2620',
-          subColor: '#3E4B44',
+          color: 'var(--ink)',
+          subColor: 'var(--ink-2)',
           off: true,
           cursor: 'default',
           aria: '',
@@ -336,9 +336,9 @@ class HotelLogic extends PageLogic {
         const full = !past && (!nightFree(info.id, iso(date)) || (st.calRoom ? roomDayBusy(st.calRoom, date) : false));
         /* [ПРИМЕР] нет мест ни в одном объекте */ const p = ppnDay(date),
           r = p / curPpn;
-        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.03 ? '#FFF6E3' : '#FCEDE9',
-          color = '#1C2620',
-          subColor = '#3E4B44',
+        let bg = r < 0.97 ? 'var(--green-soft)' : r <= 1.03 ? 'var(--warn-bg)' : 'var(--danger-bg)',
+          color = 'var(--ink)',
+          subColor = 'var(--ink-2)',
           border = 'transparent';
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut),
@@ -346,21 +346,21 @@ class HotelLogic extends PageLogic {
         // the first "нет мест" day after check-in still works as the check-out day
         const canOut = full && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, blocked).length;
         if (past) {
-          bg = '#E8E6E1';
-          color = '#9AA39E';
-          subColor = '#9AA39E';
+          bg = 'var(--line)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--muted-2)';
         }
         if (full) {
-          bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)';
-          color = '#8A968F';
-          subColor = '#8A5A00';
+          bg = 'repeating-linear-gradient(135deg,var(--sand) 0 6px,var(--line-strong) 6px 12px)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--warn-ink)';
         }
-        if (between) border = '#1F5F4A';
+        if (between) border = 'var(--green)';
         if (isIn || isOut) {
-          bg = '#1F5F4A';
-          color = '#fff';
-          subColor = '#D9E2DC';
-          border = '#1F5F4A';
+          bg = 'var(--green)';
+          color = 'var(--paper)';
+          subColor = 'var(--green-line)';
+          border = 'var(--green)';
         }
         cells.push({
           day: d,
@@ -452,8 +452,15 @@ class HotelLogic extends PageLogic {
             : diff < 0
               ? '↑ дороже на ' + fmt(-diff) + '\u00a0€'
               : 'та же цена',
-      diffBg: !selN || selN !== nights ? '#EEF5F1' : diff > 0 ? '#DFF0E4' : diff < 0 ? '#FBE3DE' : '#F4F1EA',
-      diffColor: diff > 0 ? '#1F5F4A' : diff < 0 ? '#B3261E' : '#3E4B44',
+      diffBg:
+        !selN || selN !== nights
+          ? 'var(--green-soft)'
+          : diff > 0
+            ? 'var(--green-soft)'
+            : diff < 0
+              ? 'var(--danger-bg)'
+              : 'var(--sand)',
+      diffColor: diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--danger)' : 'var(--ink-2)',
       applyOff: !(sIn && sOut) || selBlocked,
       applyCal: () => {
         if (!(sIn && sOut && !selBlocked)) return;
@@ -625,7 +632,7 @@ export default function HotelPage() {
             gap: '18px',
           }}
         >
-          <div style={{ fontSize: '15px', color: '#3E4B44' }}>
+          <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
             <Link to="/">Санатории</Link> → <Link to={v.info.resortLink}>{v.info.resort}</Link> → {v.info.short}
           </div>
           <div
@@ -641,7 +648,7 @@ export default function HotelPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                 <h1 style={{ fontSize: '32px' }}>{v.info.name}</h1>
                 <span
-                  style={{ color: '#8A6500', fontSize: '20px', letterSpacing: '1px' }}
+                  style={{ color: 'var(--warn-ink)', fontSize: '20px', letterSpacing: '1px' }}
                   aria-label={v.info.starsN + ' звезды'}
                 >
                   {'★'.repeat(v.info.starsN)}
@@ -653,7 +660,7 @@ export default function HotelPage() {
                   height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -682,8 +689,8 @@ export default function HotelPage() {
                 position: 'relative',
                 padding: '0',
                 border: 'none',
-                background: '#2B3A33',
-                borderRadius: 'var(--r)',
+                background: 'var(--ink)',
+                borderRadius: 'var(--r-field)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -702,11 +709,11 @@ export default function HotelPage() {
                   left: '10px',
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: 'var(--paper)',
+                  fontSize: '16px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: 'var(--r)',
+                  borderRadius: 'var(--r-field)',
                 }}
               >
                 {v.tiles[0].label}
@@ -720,8 +727,8 @@ export default function HotelPage() {
                 position: 'relative',
                 padding: '0',
                 border: 'none',
-                background: '#2B3A33',
-                borderRadius: 'var(--r)',
+                background: 'var(--ink)',
+                borderRadius: 'var(--r-field)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -740,11 +747,11 @@ export default function HotelPage() {
                   left: '10px',
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: 'var(--paper)',
+                  fontSize: '16px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: 'var(--r)',
+                  borderRadius: 'var(--r-field)',
                 }}
               >
                 {v.tiles[1].label}
@@ -758,8 +765,8 @@ export default function HotelPage() {
                 position: 'relative',
                 padding: '0',
                 border: 'none',
-                background: '#2B3A33',
-                borderRadius: 'var(--r)',
+                background: 'var(--ink)',
+                borderRadius: 'var(--r-field)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -778,11 +785,11 @@ export default function HotelPage() {
                   left: '10px',
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: 'var(--paper)',
+                  fontSize: '16px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: 'var(--r)',
+                  borderRadius: 'var(--r-field)',
                 }}
               >
                 {v.tiles[2].label}
@@ -796,8 +803,8 @@ export default function HotelPage() {
                 position: 'relative',
                 padding: '0',
                 border: 'none',
-                background: '#2B3A33',
-                borderRadius: 'var(--r)',
+                background: 'var(--ink)',
+                borderRadius: 'var(--r-field)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 height: '250px',
@@ -816,11 +823,11 @@ export default function HotelPage() {
                   left: '10px',
                   bottom: '10px',
                   background: 'rgba(28,38,32,.8)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: 'var(--paper)',
+                  fontSize: '16px',
                   fontWeight: '700',
                   padding: '5px 9px',
-                  borderRadius: 'var(--r)',
+                  borderRadius: 'var(--r-field)',
                 }}
               />
               <span
@@ -831,7 +838,7 @@ export default function HotelPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
+                  color: 'var(--paper)',
                   fontWeight: '800',
                   fontSize: '16px',
                   textAlign: 'center',
@@ -872,7 +879,7 @@ export default function HotelPage() {
                 >
                   <div
                     style={{
-                      color: '#fff',
+                      color: 'var(--paper)',
                       fontFamily: 'Montserrat,Manrope,sans-serif',
                       fontSize: '18px',
                       fontWeight: '600',
@@ -887,12 +894,12 @@ export default function HotelPage() {
                       minHeight: '44px',
                       padding: '0 16px',
                       border: 'none',
-                      background: '#fff',
-                      color: '#1C2620',
+                      background: 'var(--paper)',
+                      color: 'var(--ink)',
                       fontWeight: '800',
                       fontSize: '16px',
                       cursor: 'pointer',
-                      borderRadius: 'var(--r)',
+                      borderRadius: 'var(--r-field)',
                     }}
                   >
                     Закрыть ✕
@@ -930,10 +937,10 @@ export default function HotelPage() {
                             maxHeight: '680px',
                             objectFit: 'cover',
                             display: 'block',
-                            borderRadius: 'var(--r)',
+                            borderRadius: 'var(--r-field)',
                           }}
                         />
-                        <figcaption style={{ color: '#D9E2DC', fontSize: '15px' }}>
+                        <figcaption style={{ color: 'var(--green-line)', fontSize: '16px' }}>
                           {p.n}. {p.alt}
                         </figcaption>
                       </figure>
@@ -948,14 +955,14 @@ export default function HotelPage() {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              background: '#EEF5F1',
-              border: '1px solid #C8DED3',
-              borderRadius: 'var(--r)',
+              background: 'var(--green-soft)',
+              border: '1px solid var(--green-line)',
+              borderRadius: 'var(--r-field)',
             }}
           >
             {(v.strip || []).map((x: string) => (
               <div className="strip" key={x}>
-                <span style={{ color: '#1F5F4A', display: 'inline-flex' }}>{pickIcon(x)}</span>
+                <span style={{ color: 'var(--green)', display: 'inline-flex' }}>{pickIcon(x)}</span>
                 {x}
               </div>
             ))}
@@ -979,9 +986,9 @@ export default function HotelPage() {
               <div style={{ flex: '1 1 100%', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div
                   style={{
-                    background: '#EEF5F1',
-                    border: '2px solid #1F5F4A',
-                    borderRadius: 'var(--r)',
+                    background: 'var(--green-soft)',
+                    border: '2px solid var(--green)',
+                    borderRadius: 'var(--r-field)',
                     padding: '14px 20px',
                     display: 'flex',
                     alignItems: 'center',
@@ -996,7 +1003,7 @@ export default function HotelPage() {
                       height="30"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -1008,9 +1015,9 @@ export default function HotelPage() {
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span
                         style={{
-                          fontSize: '14px',
+                          fontSize: '16px',
                           fontWeight: '700',
-                          color: '#3E4B44',
+                          color: 'var(--ink-2)',
                           textTransform: 'uppercase',
                           letterSpacing: '.04em',
                         }}
@@ -1106,7 +1113,7 @@ export default function HotelPage() {
                   <>
                     <div id="rooms" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '6px' }}>
                       <h2 style={{ fontSize: '28px' }}>Выберите номер</h2>
-                      <div style={{ fontSize: '16px', color: '#3E4B44' }}>
+                      <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                         Цена за весь заезд ({v.guestsWho}) — с самой доступной программой. Программу можно улучшить
                         внутри карточки номера.
                       </div>
@@ -1140,10 +1147,10 @@ export default function HotelPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
-                    fontSize: '15px',
-                    color: '#3E4B44',
-                    background: '#EEF5F1',
-                    borderRadius: 'var(--r)',
+                    fontSize: '16px',
+                    color: 'var(--ink-2)',
+                    background: 'var(--green-soft)',
+                    borderRadius: 'var(--r-field)',
                     padding: '10px 16px',
                   }}
                 >
@@ -1152,7 +1159,7 @@ export default function HotelPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="1.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1173,7 +1180,7 @@ export default function HotelPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1186,10 +1193,10 @@ export default function HotelPage() {
                   <>
                     <div
                       style={{
-                        background: '#fff',
-                        border: '1px solid #E3DED2',
+                        background: 'var(--paper)',
+                        border: '1px solid var(--line)',
                         borderTop: 'none',
-                        borderRadius: '0 0 var(--r) var(--r)',
+                        borderRadius: '0 0 var(--r-field) var(--r-field)',
                         padding: '18px 18px 16px',
                         marginTop: '-8px',
                         display: 'flex',
@@ -1204,7 +1211,7 @@ export default function HotelPage() {
                             height="20"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="#1F5F4A"
+                            stroke="var(--green)"
                             strokeWidth="1.8"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1221,7 +1228,7 @@ export default function HotelPage() {
                             height="20"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="#1F5F4A"
+                            stroke="var(--green)"
                             strokeWidth="1.8"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1243,13 +1250,13 @@ export default function HotelPage() {
                           flexDirection: 'column',
                           gap: '10px',
                           padding: '14px 18px 14px',
-                          background: '#EDF4EF',
-                          border: '1px solid #C8DED3',
-                          borderRadius: 'var(--r)',
+                          background: 'var(--green-soft)',
+                          border: '1px solid var(--green-line)',
+                          borderRadius: 'var(--r-field)',
                         }}
                       >
                         <div style={{ fontWeight: '800', fontSize: '17px' }}>{v.freeTr}</div>
-                        <div style={{ fontWeight: '700', fontSize: '15px', color: '#3E4B44' }}>
+                        <div style={{ fontWeight: '700', fontSize: '16px', color: 'var(--ink-2)' }}>
                           Как проходит трансфер
                         </div>
                         <div
@@ -1278,9 +1285,9 @@ export default function HotelPage() {
                             />
                             <span
                               style={{
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                                 textAlign: 'center',
                                 lineHeight: '1.2',
                               }}
@@ -1289,8 +1296,8 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontSize: '14px',
-                                color: '#3E4B44',
+                                fontSize: '16px',
+                                color: 'var(--ink-2)',
                                 textAlign: 'center',
                                 lineHeight: '1.3',
                                 maxWidth: '160px',
@@ -1304,7 +1311,7 @@ export default function HotelPage() {
                             height="12"
                             viewBox="0 0 46 12"
                             fill="none"
-                            stroke="#7FB49A"
+                            stroke="var(--green-mid)"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1331,9 +1338,9 @@ export default function HotelPage() {
                             />
                             <span
                               style={{
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                                 textAlign: 'center',
                                 lineHeight: '1.2',
                               }}
@@ -1342,8 +1349,8 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontSize: '14px',
-                                color: '#3E4B44',
+                                fontSize: '16px',
+                                color: 'var(--ink-2)',
                                 textAlign: 'center',
                                 lineHeight: '1.3',
                                 maxWidth: '160px',
@@ -1357,7 +1364,7 @@ export default function HotelPage() {
                             height="12"
                             viewBox="0 0 46 12"
                             fill="none"
-                            stroke="#7FB49A"
+                            stroke="var(--green-mid)"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1384,9 +1391,9 @@ export default function HotelPage() {
                             />
                             <span
                               style={{
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                                 textAlign: 'center',
                                 lineHeight: '1.2',
                               }}
@@ -1395,8 +1402,8 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontSize: '14px',
-                                color: '#3E4B44',
+                                fontSize: '16px',
+                                color: 'var(--ink-2)',
                                 textAlign: 'center',
                                 lineHeight: '1.3',
                                 maxWidth: '160px',
@@ -1410,7 +1417,7 @@ export default function HotelPage() {
                             height="12"
                             viewBox="0 0 46 12"
                             fill="none"
-                            stroke="#7FB49A"
+                            stroke="var(--green-mid)"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1437,9 +1444,9 @@ export default function HotelPage() {
                             />
                             <span
                               style={{
-                                fontSize: '15px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                                 textAlign: 'center',
                                 lineHeight: '1.2',
                               }}
@@ -1448,8 +1455,8 @@ export default function HotelPage() {
                             </span>
                             <span
                               style={{
-                                fontSize: '14px',
-                                color: '#3E4B44',
+                                fontSize: '16px',
+                                color: 'var(--ink-2)',
                                 textAlign: 'center',
                                 lineHeight: '1.3',
                                 maxWidth: '160px',
@@ -1461,13 +1468,13 @@ export default function HotelPage() {
                         </div>
                         <div
                           style={{
-                            fontSize: '14px',
-                            color: '#3E4B44',
+                            fontSize: '16px',
+                            color: 'var(--ink-2)',
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '4px',
                             paddingTop: '4px',
-                            borderTop: '1px solid #C8DED3',
+                            borderTop: '1px solid var(--green-line)',
                           }}
                         >
                           <span>
@@ -1489,7 +1496,7 @@ export default function HotelPage() {
                       height="22"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -1505,7 +1512,7 @@ export default function HotelPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1518,10 +1525,10 @@ export default function HotelPage() {
                   <>
                     <div
                       style={{
-                        background: '#fff',
-                        border: '1px solid #E3DED2',
+                        background: 'var(--paper)',
+                        border: '1px solid var(--line)',
                         borderTop: 'none',
-                        borderRadius: '0 0 var(--r) var(--r)',
+                        borderRadius: '0 0 var(--r-field) var(--r-field)',
                         padding: '18px 18px 16px',
                         marginTop: '-8px',
                         display: 'flex',
@@ -1535,9 +1542,9 @@ export default function HotelPage() {
                             display: 'flex',
                             gap: '14px',
                             alignItems: 'center',
-                            background: '#EEF5F1',
-                            border: '1px solid #C8DED3',
-                            borderRadius: 'var(--r)',
+                            background: 'var(--green-soft)',
+                            border: '1px solid var(--green-line)',
+                            borderRadius: 'var(--r-field)',
                             padding: '14px 16px',
                           }}
                         >
@@ -1546,9 +1553,9 @@ export default function HotelPage() {
                               width: '52px',
                               height: '52px',
                               flex: 'none',
-                              background: '#fff',
-                              border: '1px solid #C8DED3',
-                              borderRadius: 'var(--r)',
+                              background: 'var(--paper)',
+                              border: '1px solid var(--green-line)',
+                              borderRadius: 'var(--r-field)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1559,7 +1566,7 @@ export default function HotelPage() {
                               height="30"
                               viewBox="0 0 24 24"
                               fill="none"
-                              stroke="#1F5F4A"
+                              stroke="var(--green)"
                               strokeWidth="1.8"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -1571,9 +1578,9 @@ export default function HotelPage() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             <span
                               style={{
-                                fontSize: '14px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#3E4B44',
+                                color: 'var(--ink-2)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '.04em',
                               }}
@@ -1586,12 +1593,12 @@ export default function HotelPage() {
                                 fontSize: '26px',
                                 fontWeight: '600',
                                 lineHeight: '1',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                               }}
                             >
                               с {v.times?.checkin}
                             </span>
-                            <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkinDate}</span>
+                            <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.times?.checkinDate}</span>
                           </div>
                         </div>
                         <div
@@ -1599,9 +1606,9 @@ export default function HotelPage() {
                             display: 'flex',
                             gap: '14px',
                             alignItems: 'center',
-                            background: '#F7F5F0',
-                            border: '1px solid #E3DED2',
-                            borderRadius: 'var(--r)',
+                            background: 'var(--sand)',
+                            border: '1px solid var(--line)',
+                            borderRadius: 'var(--r-field)',
                             padding: '14px 16px',
                           }}
                         >
@@ -1610,9 +1617,9 @@ export default function HotelPage() {
                               width: '52px',
                               height: '52px',
                               flex: 'none',
-                              background: '#fff',
-                              border: '1px solid #E3DED2',
-                              borderRadius: 'var(--r)',
+                              background: 'var(--paper)',
+                              border: '1px solid var(--line)',
+                              borderRadius: 'var(--r-field)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1623,7 +1630,7 @@ export default function HotelPage() {
                               height="30"
                               viewBox="0 0 24 24"
                               fill="none"
-                              stroke="#1F5F4A"
+                              stroke="var(--green)"
                               strokeWidth="1.8"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -1635,9 +1642,9 @@ export default function HotelPage() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             <span
                               style={{
-                                fontSize: '14px',
+                                fontSize: '16px',
                                 fontWeight: '700',
-                                color: '#3E4B44',
+                                color: 'var(--ink-2)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '.04em',
                               }}
@@ -1650,12 +1657,12 @@ export default function HotelPage() {
                                 fontSize: '26px',
                                 fontWeight: '600',
                                 lineHeight: '1',
-                                color: '#1C2620',
+                                color: 'var(--ink)',
                               }}
                             >
                               до {v.times?.checkout}
                             </span>
-                            <span style={{ fontSize: '14px', color: '#3E4B44' }}>{v.times?.checkoutDate}</span>
+                            <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.times?.checkoutDate}</span>
                           </div>
                         </div>
                       </div>
@@ -1664,14 +1671,14 @@ export default function HotelPage() {
                           <Fragment key={_i0}>
                             <div
                               className="ico"
-                              style={{ fontSize: '15px', color: '#3E4B44', alignItems: 'flex-start' }}
+                              style={{ fontSize: '16px', color: 'var(--ink-2)', alignItems: 'flex-start' }}
                             >
                               <svg
                                 width="20"
                                 height="20"
                                 viewBox="0 0 24 24"
                                 fill="none"
-                                stroke="#1F5F4A"
+                                stroke="var(--green)"
                                 strokeWidth="1.8"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -1681,7 +1688,7 @@ export default function HotelPage() {
                                 <IconPath d={n.d} />
                               </svg>
                               <span>
-                                <strong style={{ color: '#1C2620' }}>{n.t}</strong> — {n.s}
+                                <strong style={{ color: 'var(--ink)' }}>{n.t}</strong> — {n.s}
                               </span>
                             </div>
                           </Fragment>
@@ -1697,7 +1704,7 @@ export default function HotelPage() {
                       height="22"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#1F5F4A"
+                      stroke="var(--green)"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -1713,7 +1720,7 @@ export default function HotelPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1726,10 +1733,10 @@ export default function HotelPage() {
                   <>
                     <div
                       style={{
-                        background: '#fff',
-                        border: '1px solid #E3DED2',
+                        background: 'var(--paper)',
+                        border: '1px solid var(--line)',
                         borderTop: 'none',
-                        borderRadius: '0 0 var(--r) var(--r)',
+                        borderRadius: '0 0 var(--r-field) var(--r-field)',
                         padding: '18px 18px 16px',
                         marginTop: '-8px',
                         display: 'flex',
@@ -1745,9 +1752,9 @@ export default function HotelPage() {
                                 display: 'flex',
                                 gap: '12px',
                                 alignItems: 'flex-start',
-                                background: '#F7F5F0',
-                                border: '1px solid #E3DED2',
-                                borderRadius: 'var(--r)',
+                                background: 'var(--sand)',
+                                border: '1px solid var(--line)',
+                                borderRadius: 'var(--r-field)',
                                 padding: '12px 14px',
                               }}
                             >
@@ -1756,9 +1763,9 @@ export default function HotelPage() {
                                   width: '48px',
                                   height: '48px',
                                   flex: 'none',
-                                  background: '#EEF5F1',
-                                  border: '1px solid #C8DED3',
-                                  borderRadius: 'var(--r)',
+                                  background: 'var(--green-soft)',
+                                  border: '1px solid var(--green-line)',
+                                  borderRadius: 'var(--r-field)',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
@@ -1769,7 +1776,7 @@ export default function HotelPage() {
                                   height="28"
                                   viewBox="0 0 24 24"
                                   fill="none"
-                                  stroke="#1F5F4A"
+                                  stroke="var(--green)"
                                   strokeWidth="1.7"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -1779,10 +1786,12 @@ export default function HotelPage() {
                                 </svg>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '0' }}>
-                                <strong style={{ fontSize: '16px', lineHeight: '1.25', color: '#1C2620' }}>
+                                <strong style={{ fontSize: '16px', lineHeight: '1.25', color: 'var(--ink)' }}>
                                   {s.t}
                                 </strong>
-                                <span style={{ fontSize: '14px', lineHeight: '1.35', color: '#3E4B44' }}>{s.s}</span>
+                                <span style={{ fontSize: '16px', lineHeight: '1.35', color: 'var(--ink-2)' }}>
+                                  {s.s}
+                                </span>
                               </div>
                             </div>
                           </Fragment>
@@ -1793,8 +1802,8 @@ export default function HotelPage() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '10px',
-                          fontSize: '15px',
-                          color: '#3E4B44',
+                          fontSize: '16px',
+                          color: 'var(--ink-2)',
                         }}
                       >
                         <svg
@@ -1802,7 +1811,7 @@ export default function HotelPage() {
                           height="20"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1851,8 +1860,8 @@ export default function HotelPage() {
               aria-modal="true"
               aria-labelledby="calTitle"
               style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
+                background: 'var(--paper)',
+                borderRadius: 'var(--r-field)',
                 width: 'min(1120px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1866,7 +1875,7 @@ export default function HotelPage() {
                   <h2 id="calTitle" style={{ fontSize: '24px' }}>
                     Выберите даты поездки
                   </h2>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>
+                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                     {v.flexMode
                       ? 'Выберите месяц и сколько ночей — подберём лучшие даты с рейсами'
                       : v.calHint + ' · цены — за человека в сутки'}
@@ -1879,9 +1888,9 @@ export default function HotelPage() {
                           alignSelf: 'flex-start',
                           alignItems: 'center',
                           gap: '8px',
-                          background: '#FFF6E3',
-                          border: '1px solid #F0DDB8',
-                          borderRadius: 'var(--r)',
+                          background: 'var(--warn-bg)',
+                          border: '1px solid var(--warn-line)',
+                          borderRadius: 'var(--r-field)',
                           padding: '6px 12px',
                           fontSize: '16px',
                           marginTop: '4px',
@@ -1931,7 +1940,7 @@ export default function HotelPage() {
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '12px 16px',
-                  borderTop: '1px solid #E3DED2',
+                  borderTop: '1px solid var(--line)',
                   paddingTop: '12px',
                 }}
               >
@@ -1946,7 +1955,7 @@ export default function HotelPage() {
                     height="26"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1960,13 +1969,13 @@ export default function HotelPage() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.selNights}</strong>
+                    <strong style={{ fontSize: '18px', color: 'var(--green)' }}>{v.selNights}</strong>
                   </div>
                   <div className="cal-price" style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">«Миди», {v.guestsWho}</span>
                     <strong style={{ fontSize: '18px' }}>
                       {v.newTotal}{' '}
-                      <small style={{ fontSize: '14px', fontWeight: 700, color: v.diffColor }}>{v.diffText}</small>
+                      <small style={{ fontSize: '16px', fontWeight: 700, color: v.diffColor }}>{v.diffText}</small>
                     </strong>
                   </div>
                 </div>

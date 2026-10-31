@@ -3,32 +3,14 @@
  * iPhone-like choices (segmented tabs, light-green selection with a check mark).
  * Loaded after every other stylesheet; `body .page …` outranks the page styles.
  */
-:root {
-  --r-sm: 8px;
-  --r: 10px;
-  --r-md: 12px;
-  --r-lg: 14px;
-  --r-xl: 18px;
-  --line: #e4e0d6;
-  --line-strong: #d1cbbf;
-  --green: #1f5f4a;
-  --sel-bg: #e6f2ea;
-  --sel-bd: #8fc0a6;
-  --sh-xs: 0 1px 2px rgba(28, 38, 32, 0.06);
-  --sh-sm: 0 1px 2px rgba(28, 38, 32, 0.05), 0 3px 10px rgba(28, 38, 32, 0.05);
-  --sh: 0 1px 2px rgba(28, 38, 32, 0.04), 0 8px 24px rgba(28, 38, 32, 0.06);
-  --sh-lg: 0 2px 8px rgba(18, 34, 27, 0.08), 0 30px 80px rgba(18, 34, 27, 0.26);
-  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='10' fill='%231F5F4A'/%3E%3Cpath d='M5.6 10.3l2.9 2.9 5.9-6.2' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-
 /* ── surfaces ── */
 body .page .card {
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   border-color: var(--line);
   box-shadow: var(--sh);
 }
 body .page .card img {
-  border-radius: var(--r);
+  border-radius: var(--r-field);
 }
 /* a photo along the card's edge is clipped by the card itself */
 body .page .card > img:first-child {
@@ -37,7 +19,7 @@ body .page .card > img:first-child {
 
 /* ── buttons ── */
 body .page .btn {
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   transition:
     background-color 0.15s,
     border-color 0.15s,
@@ -58,7 +40,7 @@ body .page .btn-primary:disabled {
 }
 body .page .btn-secondary {
   border-width: 1.5px;
-  border-color: #a8c7b7;
+  border-color: var(--green-mid);
   box-shadow: var(--sh-xs);
 }
 body .page .btn-secondary:hover {
@@ -67,7 +49,7 @@ body .page .btn-secondary:hover {
 
 /* ── fields ── */
 body .page .input {
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   border-width: 1.5px;
   border-color: var(--line-strong);
   box-shadow: inset 0 1px 2px rgba(28, 38, 32, 0.04);
@@ -80,7 +62,7 @@ body .page .input:focus {
 
 /* ── choices: cards with a radio, tiles, chips ── */
 body .page :is(.choice, .tile, .prog, .pill, .ftog-box, .fd-opt, .fd-tile, .preset, .pick, .navbtn) {
-  border-radius: var(--r-md);
+  border-radius: var(--r-field);
   border-width: 1.5px;
   border-color: var(--line-strong);
   box-shadow: var(--sh-xs);
@@ -97,7 +79,7 @@ body .page :is(.choice, .tile, .prog, .pill, .ftog-box).on {
 body .page :is(.fd-tile, .pick).on {
   background: var(--sel-bg);
   border-color: var(--sel-bd);
-  color: #1c2620;
+  color: var(--ink);
   box-shadow: none;
 }
 body .page .fd-tile.on strong::before {
@@ -110,7 +92,7 @@ body .page .fd-tile.on strong::before {
   background: var(--check) center / contain no-repeat;
 }
 body .page .fd-tile.on span {
-  color: #5e6862;
+  color: var(--muted);
 }
 body .page .fd-tile.on small {
   color: var(--green);
@@ -119,7 +101,7 @@ body .page .pick.on {
   color: var(--green);
 }
 body .page :is(.qf-chip, .ps-chip) {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border-color: var(--line-strong);
   box-shadow: var(--sh-xs);
 }
@@ -138,22 +120,22 @@ body .page .rowpick.on {
 /* segmented control: grey track, the chosen part lifts out in white */
 body .page .dm-tabs {
   border: 0;
-  border-radius: var(--r-md);
-  background: #ebe8e1;
+  border-radius: var(--r-field);
+  background: var(--line);
   padding: 4px;
   gap: 2px;
   overflow: visible;
 }
 body .page .dm-tabs button {
   min-height: 40px;
-  border-radius: 9px;
+  border-radius: var(--r-field);
   background: transparent;
-  color: #3e4b44;
+  color: var(--ink-2);
   font-weight: 600;
 }
 body .page .dm-tabs button.on {
-  background: #fff;
-  color: #1c2620;
+  background: var(--paper);
+  color: var(--ink);
   font-weight: 800;
   box-shadow:
     0 1px 2px rgba(28, 38, 32, 0.1),
@@ -162,13 +144,13 @@ body .page .dm-tabs button.on {
 
 /* calendar */
 body .page .months-calendar .cell {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-field);
 }
 body .page .lg i {
   border-radius: 5px;
 }
 body .page .cal-note {
-  border-radius: var(--r-md);
+  border-radius: var(--r-field);
   box-shadow: var(--sh-sm);
 }
 /* the dialog's "✕ Закрыть" reads as a quiet text button */
@@ -189,12 +171,12 @@ body .page .cal-dlg > div:first-child > .btn-secondary:hover {
 
 /* ── pop-ups: rounder corners, a soft deep shadow, the page blurred behind ── */
 body .page [role='dialog']:not(.gp-pop) {
-  border-radius: var(--r-xl) !important;
+  border-radius: var(--r-card) !important;
   box-shadow: var(--sh-lg) !important;
 }
 body .page .gp-pop,
 body .page .ps-list {
-  border-radius: var(--r-lg) !important;
+  border-radius: var(--r-card) !important;
   box-shadow: var(--sh) !important;
 }
 body .page div[style*='position: fixed']:has(> [role='dialog']) {
@@ -216,14 +198,14 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #6b746f;
+  color: var(--muted);
 }
 .page .ios-list {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-field);
   box-shadow: var(--sh-xs);
   overflow: hidden;
 }
@@ -238,7 +220,7 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   border: 0;
   background: transparent;
   font: inherit;
-  color: #1c2620;
+  color: var(--ink);
   text-align: left;
   transition: background-color 0.15s;
 }
@@ -254,7 +236,7 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   cursor: pointer;
 }
 .page button.ios-row:hover {
-  background: #f6f8f6;
+  background: var(--green-soft);
 }
 .page .ios-row.on,
 .page button.ios-row.on:hover {
@@ -282,18 +264,18 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   line-height: 1.3;
 }
 .page .ios-sub {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.4;
-  color: #5e6862;
+  color: var(--muted);
 }
 .page .ios-end {
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #5e6862;
+  color: var(--muted);
   white-space: nowrap;
 }
 .page .ios-end.ok,
@@ -301,7 +283,7 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   color: var(--green);
 }
 .page .ios-end.warn {
-  color: #8a5a00;
+  color: var(--warn-ink);
 }
 .page .ios-ico {
   flex: none;
@@ -310,21 +292,21 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9px;
+  border-radius: var(--r-field);
   background: var(--sel-bg);
   color: var(--green);
 }
 .page .ios-ico.warn {
-  background: #fff3dc;
-  color: #8a5a00;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
 }
 .page .ios-radio {
   flex: none;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid #b9b3a6;
-  background: #fff;
+  border: 2px solid var(--muted-2);
+  background: var(--paper);
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
@@ -332,7 +314,7 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
 .page .ios-radio.on {
   border-color: var(--green);
   box-shadow:
-    inset 0 0 0 5px #fff,
+    inset 0 0 0 5px var(--paper),
     inset 0 0 0 12px var(--green);
 }
 .page .ios-note {
@@ -343,7 +325,7 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   padding: 0 4px;
   font-size: 16px;
   line-height: 1.45;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .ios-note-i {
   flex: none;
@@ -354,15 +336,15 @@ body .page div[style*='position: fixed']:has(> [role='dialog']) {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #c9893a;
-  color: #fff;
-  font-size: 14px;
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 16px;
   font-weight: 800;
 }
 .page .ios-foot {
   padding: 0 4px;
-  font-size: 14px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .page .ios-in {
   animation: iosIn 0.3s ease-out;
@@ -416,7 +398,7 @@ body .page .wz-grid .wz-opt {
   font-size: 18px;
   line-height: 1.25;
   border: 1.5px solid var(--line-strong);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   box-shadow: var(--sh-xs);
   transition:
     border-color 0.15s,
@@ -426,7 +408,7 @@ body .page .wz-grid .wz-opt {
 body .page .wz-grid .wz-opt:hover,
 body .page .wz-grid .wz-opt:focus-visible {
   border-color: var(--sel-bd);
-  background: #fff;
+  background: var(--paper);
   box-shadow: var(--sh);
   transform: translateY(-2px);
 }
@@ -435,7 +417,7 @@ body .page .wz-grid .wz-opt:active {
   transform: none;
 }
 body .page .wz-grid .wz-opt small {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.35;
 }
 body .page .wz-ico {
@@ -462,7 +444,7 @@ body .page .wz-dots i {
   width: 22px;
   height: 4px;
   border-radius: 2px;
-  background: #dcd7cc;
+  background: var(--line-strong);
 }
 body .page .wz-dots i.on {
   background: var(--green);
@@ -503,13 +485,13 @@ body .page .wz-head .wz-close:hover {
 /* hotel page "Ваши даты" bar: nights, then a tappable guests chip */
 body .page .hb-nights {
   font-size: 17px;
-  color: #1c2620;
+  color: var(--ink);
   padding-left: 14px;
-  border-left: 1px solid #c8ded3;
+  border-left: 1px solid var(--green-line);
 }
 body .page .hb-guests {
   padding-left: 6px;
-  border-left: 1px solid #c8ded3;
+  border-left: 1px solid var(--green-line);
 }
 body .page .gp-inline {
   display: inline-flex;
@@ -518,10 +500,10 @@ body .page .gp-inline {
   min-height: 52px;
   padding: 4px 12px 4px 10px;
   border: 1.5px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-field);
   background: transparent;
   font: inherit;
-  color: #1c2620;
+  color: var(--ink);
   text-align: left;
   cursor: pointer;
   transition:
@@ -530,7 +512,7 @@ body .page .gp-inline {
 }
 body .page .gp-inline:hover,
 body .page .gp-inline[aria-expanded='true'] {
-  background: #fff;
+  background: var(--paper);
   border-color: var(--sel-bd);
   box-shadow: var(--sh-xs);
 }
@@ -544,7 +526,7 @@ body .page .gp-inline-l {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 body .page .gp-inline-t strong {
   font-size: 18px;

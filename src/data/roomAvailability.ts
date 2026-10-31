@@ -28,19 +28,19 @@ export const freeFrom = (key) => {
 };
 
 export const BUSY_LOOK = {
-  cardBorder: '1px solid #E3DED2',
-  cardBg: '#F7F5F0',
+  cardBorder: '1px solid var(--line)',
+  cardBg: 'var(--sand)',
   imgFilter: 'grayscale(1) opacity(.7)',
-  pillBg: '#E8E6E1',
-  pillColor: '#5E6862',
-  nameColor: '#5E6862',
+  pillBg: 'var(--line)',
+  pillColor: 'var(--muted)',
+  nameColor: 'var(--muted)',
 };
 
 export const FREE_LOOK = {
-  cardBorder: '1px solid #E3DED2',
-  cardBg: '#fff',
+  cardBorder: '1px solid var(--line)',
+  cardBg: 'var(--paper)',
   imgFilter: 'none',
-  pillBg: '#EEF5F1',
-  pillColor: '#1F5F4A',
-  nameColor: '#1C2620',
+  pillBg: 'var(--green-soft)',
+  pillColor: 'var(--green)',
+  nameColor: 'var(--ink)',
 };

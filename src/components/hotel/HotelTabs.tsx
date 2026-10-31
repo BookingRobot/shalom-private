@@ -269,7 +269,7 @@ function About({ info, onRooms, onPhoto }: { info: HotelInfo; onRooms: () => voi
   );
 }
 
-const AV_COLORS = ['#E6F2EA', '#EEE9F7', '#FFF1DC', '#E4EEF6', '#FCEDE9'];
+const AV_COLORS = ['var(--green-soft)', '#EEE9F7', 'var(--warn-bg)', '#E4EEF6', 'var(--danger-bg)'];
 
 function Reviews({ info, onRooms }: { info: HotelInfo; onRooms: () => void }) {
   const r = info.rating;

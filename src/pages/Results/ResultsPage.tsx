@@ -61,7 +61,12 @@ class ResultsLogic extends PageLogic {
     // a link may carry the guest's filters (?f=daily,doctor): only then they are on
     const fq = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('f') : null;
     if (fq) {
-      const on = Object.fromEntries(fq.split(',').filter(Boolean).map((k) => [k, true]));
+      const on = Object.fromEntries(
+        fq
+          .split(',')
+          .filter(Boolean)
+          .map((k) => [k, true]),
+      );
       this.state.f = on;
       this.state.pf = { ...on };
     }
@@ -393,7 +398,7 @@ class ResultsLogic extends PageLogic {
         open: shown,
         closing: shown && !isOpen,
         tipOn,
-        border: isOpen ? '#1F5F4A' : '#E3DED2',
+        border: isOpen ? 'var(--green)' : 'var(--line)',
         btnLabel: isOpen ? 'Скрыть варианты' : 'Номера и программы',
         chips: [
           h.tags.includes('doctor') ? { t: 'Врач включён', d: ICON_PATHS.doctor } : null,
@@ -476,10 +481,10 @@ class ResultsLogic extends PageLogic {
                   pi === 0
                     ? 'самая доступная'
                     : '+' + eur(placePrice(p.priceN, GQ) - placePrice(progs[0].priceN, GQ)) + ' с человека',
-                diffColor: pi === 0 ? '#1F5F4A' : '#3E4B44',
-                border: on ? '#1F5F4A' : '#CFC9BB',
-                bg: on ? '#EEF5F1' : '#fff',
-                dot: on ? '#1F5F4A' : 'transparent',
+                diffColor: pi === 0 ? 'var(--green)' : 'var(--ink-2)',
+                border: on ? 'var(--green)' : 'var(--line-strong)',
+                bg: on ? 'var(--green-soft)' : 'var(--paper)',
+                dot: on ? 'var(--green)' : 'transparent',
                 pick: () => this.setState({ ps: { ...ps, [key]: pi } }),
               };
             });
@@ -584,7 +589,7 @@ class ResultsLogic extends PageLogic {
           sub: '',
           bg: 'transparent',
           border: 'transparent',
-          color: '#1C2620',
+          color: 'var(--ink)',
           off: true,
           cursor: 'default',
           aria: '',
@@ -598,16 +603,16 @@ class ResultsLogic extends PageLogic {
         const isCur = iso(date) === iso(checkin),
           isPick = iso(date) === iso(picked);
         const r = p / curP;
-        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.03 ? '#FFF6E3' : '#FCEDE9';
-        if (so || past) bg = '#E8E6E1';
+        let bg = r < 0.97 ? 'var(--green-soft)' : r <= 1.03 ? 'var(--warn-bg)' : 'var(--danger-bg)';
+        if (so || past) bg = 'var(--line)';
         cells.push({
           day: d,
           fly: isFlightDay(date) && !past,
           text: so || past ? (past ? '' : 'Нет мест') : p + '\u00a0€',
           sub: isPick ? '✓ заезд' : isCur ? 'ваш заезд' : '',
           bg,
-          border: isPick ? '#1F5F4A' : isCur ? '#1C2620' : 'transparent',
-          color: isPick ? '#1F5F4A' : '#1C2620',
+          border: isPick ? 'var(--green)' : isCur ? 'var(--ink)' : 'transparent',
+          color: isPick ? 'var(--green)' : 'var(--ink)',
           off: past,
           cursor: so || past ? 'not-allowed' : 'pointer',
           aria: d + ' ' + MONTHS[m0] + (so ? ', нет мест' : ', ' + p + '\u00a0€ за человека в сутки'),
@@ -661,8 +666,8 @@ class ResultsLogic extends PageLogic {
             : diff < 0
               ? '↑ Дороже на ' + fmt(-diff) + '\u00a0€'
               : 'Та же цена, что и на ваши даты',
-        diffBg: diff > 0 ? '#DFF0E4' : diff < 0 ? '#FBE3DE' : '#F4F1EA',
-        diffColor: diff > 0 ? '#1F5F4A' : diff < 0 ? '#B3261E' : '#3E4B44',
+        diffBg: diff > 0 ? 'var(--green-soft)' : diff < 0 ? 'var(--danger-bg)' : 'var(--sand)',
+        diffColor: diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--danger)' : 'var(--ink-2)',
       };
     }
     const calVals = {
@@ -749,8 +754,8 @@ class ResultsLogic extends PageLogic {
           sub: '',
           bg: 'transparent',
           border: 'transparent',
-          color: '#1C2620',
-          subColor: '#3E4B44',
+          color: 'var(--ink)',
+          subColor: 'var(--ink-2)',
           off: true,
           cursor: 'default',
           aria: '',
@@ -763,9 +768,9 @@ class ResultsLogic extends PageLogic {
         const rBusy = !past && !full && !!sRoom && roomDayBusy(sRoom.key, date); // this room is taken that night
         /* [ПРИМЕР] нет мест ни в одном объекте */ const p = avgPpn(date),
           r = p / AVG;
-        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9',
-          color = '#1C2620',
-          subColor = '#3E4B44',
+        let bg = r < 0.97 ? 'var(--green-soft)' : r <= 1.05 ? 'var(--warn-bg)' : 'var(--danger-bg)',
+          color = 'var(--ink)',
+          subColor = 'var(--ink-2)',
           border = 'transparent';
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut),
@@ -773,21 +778,21 @@ class ResultsLogic extends PageLogic {
         // the first "нет мест" day after check-in still works as the check-out day
         const canOut = (full || rBusy) && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, sBlocked).length;
         if (past) {
-          bg = '#E8E6E1';
-          color = '#9AA39E';
-          subColor = '#9AA39E';
+          bg = 'var(--line)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--muted-2)';
         }
         if (full || rBusy) {
-          bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)';
-          color = '#8A968F';
-          subColor = '#8A5A00';
+          bg = 'repeating-linear-gradient(135deg,var(--sand) 0 6px,var(--line-strong) 6px 12px)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--warn-ink)';
         }
-        if (between) border = '#1F5F4A';
+        if (between) border = 'var(--green)';
         if (isIn || isOut) {
-          bg = '#1F5F4A';
-          color = '#fff';
-          subColor = '#D9E2DC';
-          border = '#1F5F4A';
+          bg = 'var(--green)';
+          color = 'var(--paper)';
+          subColor = 'var(--green-line)';
+          border = 'var(--green)';
         }
         cells.push({
           day: d,
@@ -1042,7 +1047,7 @@ export default function ResultsPage() {
           <PhoneLink />
         </HeaderBar>
         {/* Search band: the same card as on the home page */}
-        <section style={{ background: '#1F5F4A' }}>
+        <section style={{ background: 'var(--green)' }}>
           <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '16px 24px 18px' }}>
             <SearchCard inLabel={v.sInLabel} outLabel={v.sOutLabel} onOpenCal={v.sOpenCal} />
           </div>
@@ -1058,7 +1063,7 @@ export default function ResultsPage() {
             gap: '18px',
           }}
         >
-          <div style={{ fontSize: '15px', color: '#3E4B44' }}>
+          <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
             <Link to="/">Главная</Link> › Друскининкай
           </div>
           <div
@@ -1072,7 +1077,7 @@ export default function ResultsPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <h1 style={{ fontSize: '32px' }}>Санатории Друскининкая</h1>
-              <div style={{ fontSize: '17px', color: '#3E4B44' }}>
+              <div style={{ fontSize: '17px', color: 'var(--ink-2)' }}>
                 {v.dateRange} · {v.nightsLabel} · {v.guestsLine}
               </div>
             </div>
@@ -1139,7 +1144,7 @@ export default function ResultsPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '16px',
-                  borderColor: '#1F5F4A',
+                  borderColor: 'var(--green)',
                 }}
               >
                 <div
@@ -1147,7 +1152,7 @@ export default function ResultsPage() {
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <h2 style={{ fontSize: '24px' }}>Уточните выбор</h2>
-                    <span style={{ fontSize: '16px', color: '#3E4B44' }}>Отметьте, что для вас важно</span>
+                    <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Отметьте, что для вас важно</span>
                   </div>
                   <button type="button" className="acc" onClick={v.closeF} style={{ minHeight: '40px' }}>
                     Свернуть
@@ -1179,7 +1184,7 @@ export default function ResultsPage() {
                             height="22"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="#1F5F4A"
+                            stroke="var(--green)"
                             strokeWidth="1.8"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -1250,7 +1255,7 @@ export default function ResultsPage() {
                   <>
                     <div
                       style={{
-                        borderTop: '1px solid #E3DED2',
+                        borderTop: '1px solid var(--line)',
                         paddingTop: '14px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -1264,7 +1269,7 @@ export default function ResultsPage() {
                         style={{
                           fontSize: '18px',
                           fontFamily: 'Montserrat,Manrope,sans-serif',
-                          color: '#1C2620',
+                          color: 'var(--ink)',
                           gap: '12px',
                         }}
                       >
@@ -1274,7 +1279,7 @@ export default function ResultsPage() {
                           height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1282,7 +1287,7 @@ export default function ResultsPage() {
                         >
                           <path d="m18 15-6-6-6 6" />
                         </svg>
-                        <span style={{ fontSize: '16px', color: '#1F5F4A', fontFamily: 'Manrope,sans-serif' }}>
+                        <span style={{ fontSize: '16px', color: 'var(--green)', fontFamily: 'Manrope,sans-serif' }}>
                           Свернуть
                         </span>
                       </button>
@@ -1293,7 +1298,7 @@ export default function ResultsPage() {
                             flexDirection: 'column',
                             gap: '14px',
                             paddingRight: '20px',
-                            borderRight: '1px solid #E3DED2',
+                            borderRight: '1px solid var(--line)',
                           }}
                         >
                           <div>
@@ -1352,7 +1357,7 @@ export default function ResultsPage() {
                             flexDirection: 'column',
                             gap: '4px',
                             padding: '0 20px',
-                            borderRight: '1px solid #E3DED2',
+                            borderRight: '1px solid var(--line)',
                           }}
                         >
                           <div
@@ -1373,7 +1378,7 @@ export default function ResultsPage() {
                                     height="20"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="#1F5F4A"
+                                    stroke="var(--green)"
                                     strokeWidth="1.8"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -1409,7 +1414,7 @@ export default function ResultsPage() {
                                       height="20"
                                       viewBox="0 0 24 24"
                                       fill="none"
-                                      stroke="#1F5F4A"
+                                      stroke="var(--green)"
                                       strokeWidth="1.8"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
@@ -1444,7 +1449,7 @@ export default function ResultsPage() {
                                       height="20"
                                       viewBox="0 0 24 24"
                                       fill="none"
-                                      stroke="#1F5F4A"
+                                      stroke="var(--green)"
                                       strokeWidth="1.8"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
@@ -1472,7 +1477,7 @@ export default function ResultsPage() {
                     justifyContent: 'space-between',
                     gap: '16px',
                     flexWrap: 'wrap',
-                    borderTop: '1px solid #E3DED2',
+                    borderTop: '1px solid var(--line)',
                     paddingTop: '16px',
                   }}
                 >
@@ -1484,7 +1489,7 @@ export default function ResultsPage() {
                           height="24"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1517,7 +1522,7 @@ export default function ResultsPage() {
                       <button type="button" className="linkbtn" onClick={v.clearPending} style={{ fontSize: '17px' }}>
                         Сбросить выбор
                       </button>
-                      <span style={{ fontSize: '16px', color: '#3E4B44' }}>{v.pendCount}</span>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.pendCount}</span>
                     </>
                   ) : null}
                   <button
@@ -1541,12 +1546,12 @@ export default function ResultsPage() {
                   alignItems: 'center',
                   gap: '12px',
                   flexWrap: 'wrap',
-                  background: '#EEF5F1',
-                  borderRadius: 'var(--r)',
+                  background: 'var(--green-soft)',
+                  borderRadius: 'var(--r-field)',
                   padding: '12px 18px',
                 }}
               >
-                <span style={{ fontSize: '16px', fontWeight: '700', color: '#3E4B44' }}>Выбрано:</span>
+                <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--ink-2)' }}>Выбрано:</span>
                 {(v.active || []).map((a: any, _i0: number) => (
                   <Fragment key={_i0}>
                     <button
@@ -1558,13 +1563,13 @@ export default function ResultsPage() {
                         gap: '10px',
                         minHeight: '44px',
                         padding: '0 16px',
-                        border: '1px solid #C8DED3',
-                        background: '#fff',
-                        color: '#1C2620',
+                        border: '1px solid var(--green-line)',
+                        background: 'var(--paper)',
+                        color: 'var(--ink)',
                         fontWeight: '600',
                         fontSize: '16px',
                         cursor: 'pointer',
-                        borderRadius: 'var(--r)',
+                        borderRadius: 'var(--r-field)',
                       }}
                     >
                       {a.t}
@@ -1573,7 +1578,7 @@ export default function ResultsPage() {
                         height="16"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="3"
                         strokeLinecap="round"
                         aria-hidden="true"
@@ -1605,7 +1610,9 @@ export default function ResultsPage() {
             }}
           >
             <h2 style={{ fontSize: '24px' }}>{v.foundLabel}</h2>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', color: '#3E4B44' }}>
+            <label
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', color: 'var(--ink-2)' }}
+            >
               Сортировка:
               <select
                 className="input"
@@ -1616,9 +1623,9 @@ export default function ResultsPage() {
                   width: 'auto',
                   paddingRight: '40px',
                   fontWeight: '700',
-                  color: '#1C2620',
+                  color: 'var(--ink)',
                   background:
-                    "#fff url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231F5F4A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\") no-repeat right 12px center",
+                    "var(--paper) url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231F5F4A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\") no-repeat right 12px center",
                 }}
               >
                 <option value="pop">Сначала популярные</option>
@@ -1642,7 +1649,7 @@ export default function ResultsPage() {
                   }}
                 >
                   <div style={{ fontWeight: '800', fontSize: '20px' }}>По этим условиям ничего не нашлось</div>
-                  <p style={{ margin: '0', fontSize: '16px', color: '#3E4B44' }}>
+                  <p style={{ margin: '0', fontSize: '16px', color: 'var(--ink-2)' }}>
                     Снимите одно из условий — или позвоните, подберём вручную.
                   </p>
                   <button type="button" className="btn btn-secondary" onClick={v.reset}>
@@ -1673,8 +1680,8 @@ export default function ResultsPage() {
                         position: 'relative',
                         display: 'block',
                         margin: '14px 0 14px 14px',
-                        background: '#2B3A33',
-                        borderRadius: 'var(--r)',
+                        background: 'var(--ink)',
+                        borderRadius: 'var(--r-field)',
                         overflow: 'hidden',
                       }}
                     >
@@ -1697,21 +1704,26 @@ export default function ResultsPage() {
                     >
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                         <h2 style={{ fontSize: '23px' }}>
-                          <Link to={'/hotel?h=' + h.id} style={{ textDecoration: 'none', color: '#1C2620' }}>
+                          <Link to={'/hotel?h=' + h.id} style={{ textDecoration: 'none', color: 'var(--ink)' }}>
                             {h.name}
                           </Link>
                         </h2>
                         <span
-                          style={{ color: '#8A6500', fontSize: '18px', letterSpacing: '1px', whiteSpace: 'nowrap' }}
+                          style={{
+                            color: 'var(--warn-ink)',
+                            fontSize: '18px',
+                            letterSpacing: '1px',
+                            whiteSpace: 'nowrap',
+                          }}
                         >
                           {h.stars}
                         </span>
                       </div>
-                      <div style={{ fontSize: '15px', color: '#3E4B44', marginTop: '-4px' }}>{h.sub}</div>
+                      <div style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '-4px' }}>{h.sub}</div>
                       <div
                         style={{
-                          background: '#EEF5F1',
-                          borderRadius: 'var(--r)',
+                          background: 'var(--green-soft)',
+                          borderRadius: 'var(--r-field)',
                           padding: '10px 16px',
                           display: 'flex',
                           alignItems: 'center',
@@ -1724,7 +1736,7 @@ export default function ResultsPage() {
                           height="38"
                           viewBox="-1 -1 26 26"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1733,7 +1745,7 @@ export default function ResultsPage() {
                         >
                           <path d="M12 20c-2-2-3-5-3-8 0-3 1-6 3-8 2 2 3 5 3 8 0 3-1 6-3 8zM12 20c-4-1-7-4-8-8 3 0 6 2 8 5M12 20c4-1 7-4 8-8-3 0-6 2-8 5M4 20c3 1 5 1 8 0 3 1 5 1 8 0" />
                         </svg>
-                        <span style={{ fontSize: '18px', fontWeight: '800', color: '#1C2620', lineHeight: '1.15' }}>
+                        <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--ink)', lineHeight: '1.15' }}>
                           {h.procT}
                         </span>
                       </div>
@@ -1742,7 +1754,7 @@ export default function ResultsPage() {
                       >
                         {(h.chips || []).map((c: any, _i1: number) => (
                           <Fragment key={_i1}>
-                            <span className="fact" style={{ fontSize: '15px', color: '#1C2620' }}>
+                            <span className="fact" style={{ fontSize: '16px', color: 'var(--ink)' }}>
                               {c.d === CAR_ICON ? (
                                 <VanIcon height={18} />
                               ) : (
@@ -1751,7 +1763,7 @@ export default function ResultsPage() {
                                   height="22"
                                   viewBox="0 0 24 24"
                                   fill="none"
-                                  stroke="#1F5F4A"
+                                  stroke="var(--green)"
                                   strokeWidth="1.8"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -1777,7 +1789,7 @@ export default function ResultsPage() {
                       style={{
                         flex: '0 0 220px',
                         padding: '16px 18px',
-                        borderLeft: '1px solid #E3DED2',
+                        borderLeft: '1px solid var(--line)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '4px',
@@ -1827,7 +1839,7 @@ export default function ResultsPage() {
                         type="button"
                         className="btn btn-secondary"
                         onClick={h.openCal}
-                        style={{ minHeight: '46px', fontSize: '15px', padding: '0 14px', marginTop: '8px' }}
+                        style={{ minHeight: '46px', fontSize: '16px', padding: '0 14px', marginTop: '8px' }}
                       >
                         <svg
                           width="20"
@@ -1861,8 +1873,8 @@ export default function ResultsPage() {
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '10px',
-                            background: '#F4F7F5',
-                            borderTop: '1px solid #E3DED2',
+                            background: 'var(--green-soft)',
+                            borderTop: '1px solid var(--line)',
                           }}
                         >
                           {/* rooms of this sanatorium: indented with a guide line so the next sanatorium is not mistaken for a room */}
@@ -1875,7 +1887,7 @@ export default function ResultsPage() {
                               top: '0',
                               bottom: '18px',
                               width: '3px',
-                              background: '#C8DED3',
+                              background: 'var(--green-line)',
                             }}
                           />
                           <div
@@ -1883,9 +1895,9 @@ export default function ResultsPage() {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '8px',
-                              fontSize: '15px',
+                              fontSize: '16px',
                               fontWeight: '700',
-                              color: '#1F5F4A',
+                              color: 'var(--green)',
                               textTransform: 'uppercase',
                               letterSpacing: '.04em',
                             }}
@@ -1915,8 +1927,8 @@ export default function ResultsPage() {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '8px',
-                              fontSize: '15px',
-                              color: '#3E4B44',
+                              fontSize: '16px',
+                              color: 'var(--ink-2)',
                               padding: '2px 2px',
                             }}
                           >
@@ -1925,7 +1937,7 @@ export default function ResultsPage() {
                               height="20"
                               viewBox="0 0 24 24"
                               fill="none"
-                              stroke="#1F5F4A"
+                              stroke="var(--green)"
                               strokeWidth="2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -1953,7 +1965,7 @@ export default function ResultsPage() {
               gap: '14px',
               marginTop: '10px',
               paddingTop: '22px',
-              borderTop: '2px dashed #CFC9BB',
+              borderTop: '2px dashed var(--line-strong)',
             }}
           >
             <div
@@ -1966,10 +1978,10 @@ export default function ResultsPage() {
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <h2 id="sold" style={{ fontSize: '24px', color: '#3E4B44', scrollMarginTop: '16px' }}>
+                <h2 id="sold" style={{ fontSize: '24px', color: 'var(--ink-2)', scrollMarginTop: '16px' }}>
                   Нет свободных мест на ваши даты · {v.soldCount}
                 </h2>
-                <span style={{ fontSize: '16px', color: '#5E6862' }}>
+                <span style={{ fontSize: '16px', color: 'var(--muted)' }}>
                   На {v.dateRange} эти санатории заняты. Описание можно посмотреть, а забронировать — на другие даты.
                 </span>
               </div>
@@ -1980,9 +1992,9 @@ export default function ResultsPage() {
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    background: '#F7F5F0',
-                    border: '1px solid #E3DED2',
-                    borderRadius: 'var(--r)',
+                    background: 'var(--sand)',
+                    border: '1px solid var(--line)',
+                    borderRadius: 'var(--r-field)',
                     overflow: 'hidden',
                   }}
                 >
@@ -1994,9 +2006,9 @@ export default function ResultsPage() {
                       position: 'relative',
                       display: 'block',
                       margin: '12px 0 12px 12px',
-                      borderRadius: 'var(--r)',
+                      borderRadius: 'var(--r-field)',
                       overflow: 'hidden',
-                      background: '#C9C4BA',
+                      background: 'var(--line-strong)',
                     }}
                   >
                     {' '}
@@ -2018,12 +2030,12 @@ export default function ResultsPage() {
                         position: 'absolute',
                         left: '8px',
                         top: '8px',
-                        background: '#5E6862',
-                        color: '#fff',
-                        fontSize: '14px',
+                        background: 'var(--muted)',
+                        color: 'var(--paper)',
+                        fontSize: '16px',
                         fontWeight: '800',
                         padding: '5px 10px',
-                        borderRadius: 'var(--r)',
+                        borderRadius: 'var(--r-field)',
                       }}
                     >
                       Нет мест
@@ -2040,18 +2052,18 @@ export default function ResultsPage() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
-                      <h3 style={{ fontSize: '20px', color: '#3E4B44' }}>
-                        <Link to={'/hotel?h=' + u.id} style={{ color: '#3E4B44', textDecoration: 'none' }}>
+                      <h3 style={{ fontSize: '20px', color: 'var(--ink-2)' }}>
+                        <Link to={'/hotel?h=' + u.id} style={{ color: 'var(--ink-2)', textDecoration: 'none' }}>
                           {u.name}
                         </Link>
                       </h3>
-                      <span style={{ color: '#A39F96', fontSize: '16px', letterSpacing: '1px' }}>{u.stars}</span>
+                      <span style={{ color: 'var(--muted-2)', fontSize: '16px', letterSpacing: '1px' }}>{u.stars}</span>
                     </div>
-                    <span style={{ fontSize: '15px', color: '#5E6862' }}>{u.sub}</span>
+                    <span style={{ fontSize: '16px', color: 'var(--muted)' }}>{u.sub}</span>
                     <div style={{ display: 'flex', gap: '6px 16px', flexWrap: 'wrap', marginTop: '2px' }}>
                       {(u.chips || []).map((c: any, _i1: number) => (
                         <Fragment key={_i1}>
-                          <span className="fact" style={{ color: '#5E6862' }}>
+                          <span className="fact" style={{ color: 'var(--muted)' }}>
                             {c.d === CAR_ICON ? (
                               <VanIcon height={18} />
                             ) : (
@@ -2060,7 +2072,7 @@ export default function ResultsPage() {
                                 height="18"
                                 viewBox="0 0 24 24"
                                 fill="none"
-                                stroke="#8A968F"
+                                stroke="var(--muted-2)"
                                 strokeWidth="1.8"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -2074,7 +2086,7 @@ export default function ResultsPage() {
                         </Fragment>
                       ))}
                     </div>
-                    <span style={{ fontSize: '15px', color: '#1C2620', marginTop: '4px' }}>
+                    <span style={{ fontSize: '16px', color: 'var(--ink)', marginTop: '4px' }}>
                       Ближайшие свободные даты: <strong>{u.next}</strong>
                     </span>
                   </div>
@@ -2086,7 +2098,7 @@ export default function ResultsPage() {
                       flexDirection: 'column',
                       gap: '8px',
                       justifyContent: 'center',
-                      borderLeft: '1px solid #E3DED2',
+                      borderLeft: '1px solid var(--line)',
                       margin: '12px 0',
                     }}
                   >
@@ -2095,10 +2107,10 @@ export default function ResultsPage() {
                       to={'/hotel?h=' + u.id}
                       style={{
                         minHeight: '46px',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         padding: '0 14px',
-                        borderColor: '#8A968F',
-                        color: '#3E4B44',
+                        borderColor: 'var(--muted-2)',
+                        color: 'var(--ink-2)',
                       }}
                     >
                       Посмотреть санаторий
@@ -2107,7 +2119,7 @@ export default function ResultsPage() {
                       type="button"
                       className="btn btn-primary"
                       onClick={u.notify}
-                      style={{ minHeight: '46px', fontSize: '15px', padding: '0 14px', gap: '8px' }}
+                      style={{ minHeight: '46px', fontSize: '16px', padding: '0 14px', gap: '8px' }}
                     >
                       <HeadsetIcon size={20} />
                       Свяжитесь со мной
@@ -2144,8 +2156,8 @@ export default function ResultsPage() {
               aria-modal="true"
               aria-labelledby="calTitle"
               style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
+                background: 'var(--paper)',
+                borderRadius: 'var(--r-field)',
                 maxWidth: '1040px',
                 width: '100%',
                 padding: '18px 24px 16px',
@@ -2160,7 +2172,7 @@ export default function ResultsPage() {
                   <h2 id="calTitle" style={{ fontSize: '24px' }}>
                     Выберите дату заезда
                   </h2>
-                  <div style={{ fontSize: '17px', color: '#1C2620' }}>{v.cal?.hotelName}</div>
+                  <div style={{ fontSize: '17px', color: 'var(--ink)' }}>{v.cal?.hotelName}</div>
                 </div>
                 <button
                   type="button"
@@ -2174,7 +2186,7 @@ export default function ResultsPage() {
                     cursor: 'pointer',
                     fontSize: '26px',
                     lineHeight: '1',
-                    color: '#1C2620',
+                    color: 'var(--ink)',
                   }}
                 >
                   ✕
@@ -2186,11 +2198,11 @@ export default function ResultsPage() {
                   alignItems: 'center',
                   gap: '12px',
                   flexWrap: 'wrap',
-                  background: '#EEF5F1',
-                  borderRadius: 'var(--r)',
+                  background: 'var(--green-soft)',
+                  borderRadius: 'var(--r-field)',
                   padding: '8px 14px',
                   fontSize: '16px',
-                  color: '#1F5F4A',
+                  color: 'var(--green)',
                   fontWeight: '700',
                 }}
               >
@@ -2199,7 +2211,7 @@ export default function ResultsPage() {
                   height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -2208,7 +2220,7 @@ export default function ResultsPage() {
                   <path d="M3 5h18v16H3zM16 3v4M8 3v4M3 10h18" />
                 </svg>
                 Ваши даты: {v.curRange} · ≈ {v.cal?.curPpn}&nbsp;€ / чел. в сутки
-                <span style={{ fontWeight: '400', color: '#3E4B44' }}>
+                <span style={{ fontWeight: '400', color: 'var(--ink-2)' }}>
                   · 2 взрослых · {v.nightsLabel} · {v.cal?.room} · {v.cal?.prog}
                 </span>
               </div>
@@ -2218,13 +2230,13 @@ export default function ResultsPage() {
                   style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '8px' }}
                 >
                   <div style={{ fontSize: '17px', fontWeight: '800' }}>Средняя цена за 1 человека в сутки</div>
-                  <div style={{ fontSize: '14px', color: '#3E4B44', marginTop: '-6px' }}>
+                  <div style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '-6px' }}>
                     При заезде в выбранный день на {v.nightsLabel}. Точная сумма за весь отдых — в блоке «Новые даты».
                   </div>
                   <div
                     style={{
-                      border: '1px solid #E3DED2',
-                      borderRadius: 'var(--r)',
+                      border: '1px solid var(--line)',
+                      borderRadius: 'var(--r-field)',
                       padding: '10px 12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -2241,10 +2253,10 @@ export default function ResultsPage() {
                         style={{
                           width: '38px',
                           height: '38px',
-                          border: '2px solid #CFC9BB',
-                          background: '#fff',
+                          border: '2px solid var(--line-strong)',
+                          background: 'var(--paper)',
                           cursor: 'pointer',
-                          borderRadius: 'var(--r)',
+                          borderRadius: 'var(--r-field)',
                           fontSize: '20px',
                         }}
                       >
@@ -2258,10 +2270,10 @@ export default function ResultsPage() {
                         style={{
                           width: '38px',
                           height: '38px',
-                          border: '2px solid #CFC9BB',
-                          background: '#fff',
+                          border: '2px solid var(--line-strong)',
+                          background: 'var(--paper)',
                           cursor: 'pointer',
-                          borderRadius: 'var(--r)',
+                          borderRadius: 'var(--r-field)',
                           fontSize: '20px',
                         }}
                       >
@@ -2273,9 +2285,9 @@ export default function ResultsPage() {
                         display: 'grid',
                         gridTemplateColumns: 'repeat(7,minmax(0,1fr))',
                         gap: '4px',
-                        fontSize: '14px',
+                        fontSize: '16px',
                         fontWeight: '700',
-                        color: '#5E6862',
+                        color: 'var(--muted)',
                         textAlign: 'center',
                       }}
                     >
@@ -2304,7 +2316,7 @@ export default function ResultsPage() {
                               padding: '3px 6px',
                               border: `2px solid ${c.border ?? ''}`,
                               background: c.bg,
-                              borderRadius: 'var(--r)',
+                              borderRadius: 'var(--r-field)',
                               cursor: c.cursor,
                               display: 'flex',
                               flexDirection: 'column',
@@ -2313,9 +2325,11 @@ export default function ResultsPage() {
                               textAlign: 'left',
                             }}
                           >
-                            <span style={{ fontSize: '13px', color: '#3E4B44' }}>{c.day}</span>
+                            <span style={{ fontSize: '13px', color: 'var(--ink-2)' }}>{c.day}</span>
                             <span style={{ fontSize: '16px', fontWeight: '800', color: c.color }}>{c.text}</span>
-                            <span style={{ fontSize: '12px', color: '#1F5F4A', fontWeight: '700', lineHeight: '1.1' }}>
+                            <span
+                              style={{ fontSize: '13px', color: 'var(--green)', fontWeight: '700', lineHeight: '1.1' }}
+                            >
                               {c.sub}
                             </span>
                             {c.fly ? (
@@ -2329,7 +2343,7 @@ export default function ResultsPage() {
                                     height="16"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="#1F5F4A"
+                                    stroke="var(--green)"
                                     strokeWidth="1.8"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -2351,9 +2365,9 @@ export default function ResultsPage() {
                   style={{
                     flex: '1 1 280px',
                     maxWidth: '320px',
-                    background: '#EEF5F1',
-                    border: '1px solid #C8DED3',
-                    borderRadius: 'var(--r)',
+                    background: 'var(--green-soft)',
+                    border: '1px solid var(--green-line)',
+                    borderRadius: 'var(--r-field)',
                     padding: '14px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2365,15 +2379,15 @@ export default function ResultsPage() {
                       fontFamily: 'Montserrat,Manrope,sans-serif',
                       fontSize: '20px',
                       fontWeight: '600',
-                      color: '#1F5F4A',
+                      color: 'var(--green)',
                     }}
                   >
                     Новые даты
                   </div>
                   <div
                     style={{
-                      background: '#fff',
-                      borderRadius: 'var(--r)',
+                      background: 'var(--paper)',
+                      borderRadius: 'var(--r-field)',
                       padding: '12px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -2382,11 +2396,11 @@ export default function ResultsPage() {
                   >
                     <div style={{ display: 'flex', gap: '24px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#3E4B44' }}>Заезд</span>
+                        <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Заезд</span>
                         <strong style={{ fontSize: '17px' }}>{v.cal?.newIn}</strong>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#3E4B44' }}>Выезд</span>
+                        <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Выезд</span>
                         <strong style={{ fontSize: '17px' }}>{v.cal?.newOut}</strong>
                       </div>
                     </div>
@@ -2395,11 +2409,11 @@ export default function ResultsPage() {
                       <span style={{ fontSize: '24px', fontWeight: '800', lineHeight: '1' }}>
                         {v.cal?.newPpn}&nbsp;€
                       </span>
-                      <span style={{ fontSize: '15px', fontWeight: '700' }}>/ чел. в сутки</span>
+                      <span style={{ fontSize: '16px', fontWeight: '700' }}>/ чел. в сутки</span>
                     </div>
                     <div
                       style={{
-                        borderTop: '1px solid #E3DED2',
+                        borderTop: '1px solid var(--line)',
                         paddingTop: '6px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -2409,16 +2423,21 @@ export default function ResultsPage() {
                       <strong style={{ fontSize: '26px', lineHeight: '1.1' }}>{v.cal?.newTotal}&nbsp;€</strong>
                     </div>
                     <div
-                      style={{ background: '#F4F1EA', borderRadius: 'var(--r)', padding: '6px 10px', fontSize: '15px' }}
+                      style={{
+                        background: 'var(--sand)',
+                        borderRadius: 'var(--r-field)',
+                        padding: '6px 10px',
+                        fontSize: '16px',
+                      }}
                     >
                       На ваши даты — <strong>{v.cal?.curTotal}&nbsp;€</strong>
                     </div>
                     <div
                       style={{
                         background: v.cal?.diffBg,
-                        borderRadius: 'var(--r)',
+                        borderRadius: 'var(--r-field)',
                         padding: '6px 10px',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         fontWeight: '800',
                         color: v.cal?.diffColor,
                       }}
@@ -2432,30 +2451,45 @@ export default function ResultsPage() {
                       gap: '6px 14px',
                       flexWrap: 'wrap',
                       fontSize: '13px',
-                      color: '#3E4B44',
+                      color: 'var(--ink-2)',
                       paddingTop: '4px',
-                      borderTop: '1px solid #C8DED3',
+                      borderTop: '1px solid var(--green-line)',
                     }}
                   >
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span
-                        style={{ width: '22px', height: '16px', background: '#E9F4EC', border: '1px solid #C8DED3' }}
+                        style={{
+                          width: '22px',
+                          height: '16px',
+                          background: 'var(--green-soft)',
+                          border: '1px solid var(--green-line)',
+                        }}
                       />
                       Дешевле
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span
-                        style={{ width: '22px', height: '16px', background: '#FFF6E3', border: '1px solid #F0DDB8' }}
+                        style={{
+                          width: '22px',
+                          height: '16px',
+                          background: 'var(--warn-bg)',
+                          border: '1px solid var(--warn-line)',
+                        }}
                       />
                       Средняя цена
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span
-                        style={{ width: '22px', height: '16px', background: '#FCEDE9', border: '1px solid #F0CFC6' }}
+                        style={{
+                          width: '22px',
+                          height: '16px',
+                          background: 'var(--danger-bg)',
+                          border: '1px solid var(--danger-bg)',
+                        }}
                       />
                       Дороже
                     </span>
-                    <details style={{ display: 'inline-block', fontSize: '14px', color: '#3E4B44' }}>
+                    <details style={{ display: 'inline-block', fontSize: '16px', color: 'var(--ink-2)' }}>
                       <summary
                         style={{
                           display: 'flex',
@@ -2470,7 +2504,7 @@ export default function ResultsPage() {
                           height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#1F5F4A"
+                          stroke="var(--green)"
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -2479,7 +2513,7 @@ export default function ResultsPage() {
                           <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
                         </svg>
                         <span>
-                          <strong style={{ color: '#1C2620' }}>Рейсы из Израиля</strong> — вт, чт, вс
+                          <strong style={{ color: 'var(--ink)' }}>Рейсы из Израиля</strong> — вт, чт, вс
                         </span>
                         <span
                           style={{
@@ -2489,9 +2523,9 @@ export default function ResultsPage() {
                             width: '20px',
                             height: '20px',
                             borderRadius: '50%',
-                            border: '1.5px solid #1F5F4A',
-                            color: '#1F5F4A',
-                            fontSize: '12px',
+                            border: '1.5px solid var(--green)',
+                            color: 'var(--green)',
+                            fontSize: '13px',
                             fontWeight: '800',
                           }}
                         >
@@ -2502,12 +2536,12 @@ export default function ResultsPage() {
                         style={{
                           marginTop: '8px',
                           maxWidth: '420px',
-                          background: '#F4F1EA',
-                          borderRadius: 'var(--r)',
+                          background: 'var(--sand)',
+                          borderRadius: 'var(--r-field)',
                           padding: '10px 12px',
-                          fontSize: '14px',
+                          fontSize: '16px',
                           lineHeight: '1.45',
-                          color: '#1C2620',
+                          color: 'var(--ink)',
                         }}
                       >
                         Прямые рейсы Тель-Авив ⇄ Вильнюс выполняют <strong>Israir</strong> и <strong>Arkia</strong> (с
@@ -2517,7 +2551,12 @@ export default function ResultsPage() {
                     </details>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span
-                        style={{ width: '22px', height: '16px', background: '#E8E6E1', border: '1px solid #D2CFC7' }}
+                        style={{
+                          width: '22px',
+                          height: '16px',
+                          background: 'var(--line)',
+                          border: '1px solid var(--line-strong)',
+                        }}
                       />
                       Нет мест
                     </span>
@@ -2531,7 +2570,7 @@ export default function ResultsPage() {
                   alignItems: 'center',
                   gap: '16px',
                   flexWrap: 'wrap',
-                  borderTop: '1px solid #E3DED2',
+                  borderTop: '1px solid var(--line)',
                   paddingTop: '12px',
                 }}
               >
@@ -2577,8 +2616,8 @@ export default function ResultsPage() {
               aria-modal="true"
               aria-labelledby="sCalTitle"
               style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
+                background: 'var(--paper)',
+                borderRadius: 'var(--r-field)',
                 width: 'min(1120px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -2592,8 +2631,10 @@ export default function ResultsPage() {
                   <h2 id="sCalTitle" style={{ fontSize: '24px' }}>
                     {v.sCalTitle}
                   </h2>
-                  {v.sRoomLine ? <strong style={{ fontSize: '16px', color: '#1C2620' }}>{v.sRoomLine}</strong> : null}
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.sCalHint}</span>
+                  {v.sRoomLine ? (
+                    <strong style={{ fontSize: '16px', color: 'var(--ink)' }}>{v.sRoomLine}</strong>
+                  ) : null}
+                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.sCalHint}</span>
                 </div>
                 <button
                   type="button"
@@ -2639,7 +2680,7 @@ export default function ResultsPage() {
                   justifyContent: 'space-between',
                   gap: '16px',
                   flexWrap: 'wrap',
-                  borderTop: '1px solid #E3DED2',
+                  borderTop: '1px solid var(--line)',
                   paddingTop: '12px',
                 }}
               >
@@ -2654,7 +2695,7 @@ export default function ResultsPage() {
                     height="26"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -2668,7 +2709,7 @@ export default function ResultsPage() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.sSelNights}</strong>
+                    <strong style={{ fontSize: '18px', color: 'var(--green)' }}>{v.sSelNights}</strong>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>

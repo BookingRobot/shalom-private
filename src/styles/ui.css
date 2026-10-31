@@ -1,9 +1,9 @@
 /* Shared basics for every booking page (inside .page): links and headings. */
 .page a {
-  color: #1f5f4a;
+  color: var(--green);
 }
 .page a:hover {
-  color: #143f31;
+  color: var(--green-deep);
 }
 .page h1,
 .page h2,
@@ -43,9 +43,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 18px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.35;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .room-incl li {
   display: inline-flex;
@@ -65,15 +65,15 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   left: 0;
   width: max(100%, 290px);
   max-width: calc(100vw - 32px);
-  background: #fff;
-  border: 1px solid #cfc9bb;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-field);
   box-shadow: 0 12px 32px rgba(28, 38, 32, 0.18);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  color: #1c2620;
+  color: var(--ink);
   text-align: left;
 }
 .page .gp-row {
@@ -91,8 +91,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 17px;
 }
 .page .gp-name span {
-  font-size: 14px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .page .gp-step {
   display: flex;
@@ -103,10 +103,10 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 2px solid #1f5f4a;
+  border: 2px solid var(--green);
   border-radius: 50%;
-  background: #fff;
-  color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
   font-size: 22px;
   font-weight: 700;
   line-height: 1;
@@ -116,7 +116,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   justify-content: center;
 }
 .page .gp-btn:hover:not(:disabled) {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .page .gp-btn:disabled {
   opacity: 0.35;
@@ -129,7 +129,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .gp-sep {
   height: 1px;
-  background: #e3ded2;
+  background: var(--line);
 }
 .page .gp-done {
   min-height: 44px;
@@ -147,38 +147,38 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-weight: 800;
   line-height: 1.1;
   white-space: nowrap;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .pbox-big small {
   font-size: 18px;
   font-weight: 600;
 }
 .page .pbox-note {
-  font-size: 15px;
-  color: #1c2620;
+  font-size: 16px;
+  color: var(--ink);
   font-weight: 600;
   line-height: 1.3;
 }
 .page .pbox-sub {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .pbox-total {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
   margin-top: 4px;
 }
 .page .pbox-total strong {
-  color: #1c2620;
+  color: var(--ink);
   white-space: nowrap;
 }
 .page .pbox-det {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .pbox-det summary {
   cursor: pointer;
-  color: #1f5f4a;
+  color: var(--green);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -201,41 +201,41 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 10px;
   cursor: pointer;
   font-size: 16px;
-  color: #1c2620;
+  color: var(--ink);
   padding: 8px 14px 8px 10px;
-  border: 1.5px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   align-self: flex-start;
   line-height: 1.3;
 }
 .page .ftog-box.on {
-  border-color: #1f5f4a;
-  background: #eef5f1;
-  color: #1f5f4a;
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
 }
 .page .ftog-box input {
   width: 22px;
   height: 22px;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   margin: 0;
   flex: none;
 }
 .page .ftog-box strong {
   display: block;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .ftog-sub {
   display: block;
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .ftog-warn {
-  font-size: 14px;
-  color: #8a5a00;
-  background: #fff1d6;
+  font-size: 16px;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
   padding: 6px 10px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   align-self: flex-start;
 }
 
@@ -258,20 +258,20 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   text-align: center;
 }
 .page .share-btn.on {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .page .share-panel {
-  border: 1px solid #e3ded2;
-  background: #fafbf9;
-  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: var(--sand);
+  border-radius: var(--r-field);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .page .share-hint {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .share-text {
   margin: 0;
@@ -282,10 +282,10 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     'Segoe UI',
     Arial,
     sans-serif;
-  background: #fff;
-  border: 1px solid #e3ded2;
+  background: var(--paper);
+  border: 1px solid var(--line);
   padding: 10px 12px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .share-form {
   display: flex;
@@ -297,20 +297,20 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
 }
 .page .share-agree input {
   width: 22px;
   height: 22px;
   margin: 1px 0 0;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   flex: none;
 }
 .page .share-ok {
   font-size: 16px;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .page .btn:disabled {
   opacity: 0.5;
@@ -327,9 +327,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   justify-content: space-between;
   gap: 10px 16px;
   flex-wrap: wrap;
-  background: #fff;
-  border: 2px solid #1f5f4a;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 2px solid var(--green);
+  border-radius: var(--r-field);
   padding: 10px 16px;
   box-shadow: 0 -6px 20px rgba(28, 38, 32, 0.12);
   font-size: 16px;
@@ -356,8 +356,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   justify-content: center;
 }
 .page .cmp-dialog {
-  background: #fff;
-  border-radius: var(--r);
+  background: var(--paper);
+  border-radius: var(--r-field);
   width: min(1040px, 100%);
   padding: 24px 26px;
   display: flex;
@@ -376,7 +376,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   grid-template-columns: 190px repeat(var(--n), minmax(0, 1fr));
   gap: 12px;
   padding: 10px 0;
-  border-top: 1px solid #e3ded2;
+  border-top: 1px solid var(--line);
   font-size: 16px;
   align-items: start;
 }
@@ -385,34 +385,34 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .cmp-lbl {
   font-weight: 700;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .cmp-cell {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .cmp-cell img {
   width: 100%;
   height: 110px;
   object-fit: cover;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
 }
 .page .cmp-x {
   align-self: flex-start;
   border: none;
   background: none;
-  color: #1f5f4a;
+  color: var(--green);
   text-decoration: underline;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   padding: 0;
 }
 .page .cmp-foot {
   margin: 0;
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 @media (max-width: 600px) {
   .page .cmp-row {
@@ -432,7 +432,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   margin-top: 8px;
@@ -441,7 +441,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .cmp-check input {
   width: 22px;
   height: 22px;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   margin: 0;
 }
 
@@ -458,8 +458,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   justify-content: center;
 }
 .page .wz {
-  background: #fff;
-  border-radius: var(--r);
+  background: var(--paper);
+  border-radius: var(--r-field);
   width: min(720px, 100%);
   padding: 24px 26px;
   display: flex;
@@ -474,9 +474,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 12px;
 }
 .page .wz-step {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .page .wz-close {
   min-height: 44px;
@@ -491,37 +491,37 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .wz-opt {
   min-height: 60px;
   padding: 12px 18px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   text-align: left;
   font-size: 19px;
   font-weight: 700;
-  color: #1c2620;
+  color: var(--ink);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 .page .wz-opt small {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .wz-opt:hover,
 .page .wz-opt:focus-visible {
-  border-color: #1f5f4a;
-  background: #eef5f1;
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 .page .wz-note {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .wz-back {
   align-self: flex-start;
   border: none;
   background: none;
-  color: #1f5f4a;
+  color: var(--green);
   font-size: 17px;
   font-weight: 700;
   cursor: pointer;
@@ -537,15 +537,15 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 14px;
   align-items: center;
   flex-wrap: wrap;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
   padding: 12px;
 }
 .page .wz-card img {
   width: 120px;
   height: 84px;
   object-fit: cover;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   flex: none;
 }
 .page .wz-body {
@@ -559,12 +559,12 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 18px;
 }
 .page .wz-stars {
-  color: #8a5a00;
-  font-size: 15px;
+  color: var(--warn-ink);
+  font-size: 16px;
 }
 .page .wz-why {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .wz-price {
   font-size: 16px;
@@ -576,9 +576,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .wz-disc {
   margin: 0;
-  font-size: 15px;
-  color: #3e4b44;
-  background: #f4f1ea;
+  font-size: 16px;
+  color: var(--ink-2);
+  background: var(--sand);
   padding: 10px 12px;
 }
 .page .wz-foot {
@@ -591,8 +591,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   background: none;
   padding: 0;
   text-align: left;
-  color: #1f5f4a;
-  font-size: 15px;
+  color: var(--green);
+  font-size: 16px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -603,21 +603,21 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .qf-chip {
   min-height: 40px;
   padding: 0 14px;
-  border: 1.5px solid #cfc9bb;
-  border-radius: 20px;
-  background: #fff;
-  font-size: 15px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  font-size: 16px;
   font-weight: 600;
-  color: #1c2620;
+  color: var(--ink);
   cursor: pointer;
 }
 .page .qf-chip:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .page .qf-chip.on {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
 }
 .page .flex-dates {
   display: flex;
@@ -652,18 +652,18 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-wrap: wrap;
   min-height: 52px;
   padding: 10px 16px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   cursor: pointer;
   text-align: left;
   font-size: 17px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .fd-opt:hover,
 .page .fd-opt:focus-visible {
-  border-color: #1f5f4a;
-  background: #eef5f1;
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 .page .fd-when {
   font-weight: 700;
@@ -675,22 +675,22 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 16px;
 }
 .page .fd-best {
-  background: #e9f4ec;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
   font-size: 13px;
   font-weight: 800;
   padding: 2px 8px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
 }
 .page .fd-note,
 .page .fd-empty {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .dm-tabs {
   display: inline-flex;
-  border: 2px solid #1f5f4a;
-  border-radius: var(--r);
+  border: 2px solid var(--green);
+  border-radius: var(--r-field);
   align-self: flex-start;
   overflow: hidden;
 }
@@ -698,15 +698,15 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   min-height: 44px;
   padding: 0 18px;
   border: none;
-  background: #fff;
-  color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
 }
 .page .dm-tabs button.on {
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
 }
 
 /* Resort or sanatorium search */
@@ -720,9 +720,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   margin: 0;
   padding: 6px 0;
   list-style: none;
-  background: #fff;
-  border: 1px solid #cfc9bb;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-field);
   box-shadow: 0 12px 32px rgba(28, 38, 32, 0.18);
   max-height: 360px;
   overflow: auto;
@@ -737,47 +737,47 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .ps-opt strong {
   font-size: 17px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .ps-opt span {
-  font-size: 14px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .page .ps-opt.on {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .page .ps-empty {
   padding: 8px 14px;
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .ps-chips {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 8px;
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .ps-chip {
   min-height: 36px;
   padding: 0 12px;
-  border: 1.5px solid #cfc9bb;
-  border-radius: 18px;
-  background: #fff;
-  font-size: 15px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--paper);
+  font-size: 16px;
   font-weight: 600;
-  color: #1f5f4a;
+  color: var(--green);
   cursor: pointer;
 }
 .page .ps-chip:hover {
-  border-color: #1f5f4a;
-  background: #eef5f1;
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 .page .wz-link {
   font-size: 16px;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
   text-underline-offset: 3px;
 }
 @media (min-width: 700px) {
@@ -798,10 +798,10 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 44px;
   font-size: 26px;
   line-height: 1;
-  color: #1f5f4a;
-  border: 2px solid #cfc9bb;
-  background: #fff;
-  border-radius: var(--r);
+  color: var(--green);
+  border: 2px solid var(--line-strong);
+  background: var(--paper);
+  border-radius: var(--r-field);
   cursor: pointer;
 }
 .page .fd-car .navbtn:disabled {
@@ -821,12 +821,12 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   align-items: flex-start;
   gap: 0;
   padding: 8px 10px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   cursor: pointer;
   text-align: left;
-  color: #1c2620;
+  color: var(--ink);
   min-width: 0;
 }
 .page .fd-tile strong {
@@ -834,26 +834,26 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .fd-tile span {
   font-size: 13px;
-  color: #5e6862;
+  color: var(--muted);
 }
 .page .fd-tile small {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
   margin-top: 2px;
   white-space: nowrap;
 }
 .page .fd-tile:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .page .fd-tile.on {
-  border-color: #1f5f4a;
-  background: #1f5f4a;
-  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
 }
 .page .fd-tile.on span,
 .page .fd-tile.on small {
-  color: #d9e2dc;
+  color: var(--green-line);
 }
 @media (max-width: 600px) {
   .page .fd-car {
@@ -870,10 +870,10 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     padding: 6px 5px;
   }
   .page .fd-tile strong {
-    font-size: 14px;
+    font-size: 16px;
   }
   .page .fd-tile small {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 .page .fd-when {
@@ -882,14 +882,14 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 2px;
 }
 .page .fd-fly {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .page .fd-go {
   font-size: 22px;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .page button.wz-link {
   border: none;
@@ -903,7 +903,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .wz-intro {
   margin: 4px 0 0;
   font-size: 16px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 
 /* Resort story pop-up: big, scrolls inside; «Закрыть» always at hand (top and bottom) */
@@ -920,8 +920,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .rs {
   position: relative;
-  background: #fff;
-  border-radius: 16px;
+  background: var(--paper);
+  border-radius: var(--r-card);
   width: min(1180px, 100%);
   height: min(940px, calc(100vh - 32px));
   height: min(940px, calc(100dvh - 32px));
@@ -955,7 +955,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   position: relative;
   z-index: 1;
   padding: 26px 32px;
-  color: #fff;
+  color: var(--paper);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -964,7 +964,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-family: Montserrat, Manrope, sans-serif;
   font-size: 56px;
   line-height: 1.05;
-  color: #fff;
+  color: var(--paper);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
 }
 .page .rs-hero-text span {
@@ -982,9 +982,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   min-height: 46px;
   padding: 0 18px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.95);
-  color: #1c2620;
+  color: var(--ink);
   font: inherit;
   font-size: 17px;
   font-weight: 700;
@@ -992,7 +992,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   cursor: pointer;
 }
 .page .rs .rs-close:hover {
-  background: #fff;
+  background: var(--paper);
 }
 /* the resort tabs stay on top while reading */
 .page .rs-tabs {
@@ -1002,7 +1002,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: flex;
   gap: 4px;
   padding: 10px 170px 0 26px;
-  border-bottom: 1px solid #e3ded2;
+  border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
   flex-wrap: wrap;
@@ -1013,13 +1013,13 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   padding: 10px 14px;
   font-size: 17px;
   font-weight: 700;
-  color: #3e4b44;
+  color: var(--ink-2);
   cursor: pointer;
   border-bottom: 3px solid transparent;
 }
 .page .rs-tabs button.on {
-  color: #1f5f4a;
-  border-bottom-color: #1f5f4a;
+  color: var(--green);
+  border-bottom-color: var(--green);
 }
 .page .rs-body {
   display: flex;
@@ -1041,7 +1041,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .rs-main .rs-lead {
   font-size: 20px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .rs-main h3 {
   font-family: Montserrat, Manrope, sans-serif;
@@ -1075,8 +1075,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 17px;
 }
 .page .rs-why li > span:last-child > span {
-  font-size: 15.5px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .rs-ico {
   flex: none;
@@ -1085,8 +1085,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #e6f2ea;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
 }
 /* nature: a clean iPhone-like list */
 .page .rs-list {
@@ -1099,7 +1099,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-direction: column;
   gap: 2px;
   padding: 12px 0;
-  border-bottom: 1px solid #ece8df;
+  border-bottom: 1px solid var(--line);
   line-height: 1.4;
 }
 .page .rs-list li:last-child {
@@ -1109,12 +1109,12 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 17px;
 }
 .page .rs-list span {
-  font-size: 15.5px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .rs-main .rs-sub {
   margin-top: -6px;
-  color: #3e4b44;
+  color: var(--ink-2);
   font-size: 17px;
 }
 /* three weeks: a quiet timeline — a numbered circle, the line between, no boxes */
@@ -1142,7 +1142,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   bottom: 4px;
   width: 2px;
   border-radius: 2px;
-  background: #cfe3d6;
+  background: var(--green-line);
 }
 .page .rs-wk {
   display: grid;
@@ -1150,8 +1150,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
   font-size: 19px;
   font-weight: 800;
 }
@@ -1163,11 +1163,11 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .rs-weeks strong {
   font-size: 19px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .rs-weeks li > span:last-child > span {
   font-size: 17px;
-  color: #2f3a34;
+  color: var(--ink);
 }
 /* what to do: groups in two columns on a laptop, one on a phone */
 .page .rs-fun {
@@ -1181,7 +1181,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 10px;
   margin: 0 0 2px;
   font-size: 19px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .rs-ico.rs-ico-s {
   width: 38px;
@@ -1192,8 +1192,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: 12px;
-  background: #f1f6f3;
+  border-radius: var(--r-field);
+  background: var(--green-soft);
   font-size: 17px;
   line-height: 1.5;
 }
@@ -1209,7 +1209,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 100%;
   height: 180px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: var(--r-field);
 }
 /* places worth seeing: a clean list — the photo on the left, the story on the right, a thin line between */
 .page .rs-sights {
@@ -1223,7 +1223,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 22px;
   align-items: start;
   padding: 20px 0;
-  border-bottom: 1px solid #ece8df;
+  border-bottom: 1px solid var(--line);
 }
 .page .rs-sight:first-child {
   padding-top: 6px;
@@ -1252,17 +1252,17 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 12px;
-  background: #eef2ef;
+  border-radius: var(--r-field);
+  background: var(--green-soft);
 }
 .page .rs-pic.wide img {
   aspect-ratio: auto;
   height: auto;
 }
 .page .rs-pic figcaption {
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.35;
-  color: #6b766f;
+  color: var(--muted);
 }
 .page .rs-pic figcaption a {
   color: inherit;
@@ -1280,33 +1280,33 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .rs-sight-t strong {
   font-size: 19px;
   line-height: 1.3;
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .rs-sight-meta {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1f5f4a;
+  color: var(--green);
   line-height: 1.4;
 }
 .page .rs-main .rs-sight-t p {
   margin: 4px 0 0;
   font-size: 17px;
   line-height: 1.55;
-  color: #2f3a34;
+  color: var(--ink);
 }
 .page .rs-sight-go {
   display: flex;
   align-items: flex-start;
   gap: 6px;
   margin-top: 6px;
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.4;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .rs-sight-go svg {
   flex: none;
   margin-top: 1px;
-  color: #1f5f4a;
+  color: var(--green);
 }
 @media (max-width: 700px) {
   .page .rs-sight {
@@ -1330,7 +1330,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   grid-template-columns: 68px 1fr;
   gap: 12px;
   padding: 9px 0;
-  border-bottom: 1px solid #ece8df;
+  border-bottom: 1px solid var(--line);
   line-height: 1.4;
 }
 .page .rs-day li:last-child {
@@ -1338,7 +1338,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .page .rs-day time {
   font-weight: 800;
-  color: #1f5f4a;
+  color: var(--green);
   font-variant-numeric: tabular-nums;
 }
 .page .rs-day li > span {
@@ -1349,8 +1349,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   font-size: 17px;
 }
 .page .rs-day li > span > span {
-  font-size: 15.5px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .rs-tips {
   list-style: none;
@@ -1376,8 +1376,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #e6f2ea;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
   font-size: 13px;
   font-weight: 800;
 }
@@ -1402,8 +1402,8 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: block;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: var(--r);
-  background: #2b3a33;
+  border-radius: var(--r-field);
+  background: var(--ink);
 }
 .page .rs-yt-bg,
 .page .rs-yt-thumb {
@@ -1429,16 +1429,16 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.35;
 }
 .page .rs-yt-cap strong {
-  color: #1c2620;
+  color: var(--ink);
 }
 .page .rs-yt-cap span {
-  color: #1f5f4a;
+  color: var(--green);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
 }
 .page .rs-facts {
   margin: 0;
@@ -1449,12 +1449,12 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .rs-facts div {
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #e3ded2;
+  border-bottom: 1px solid var(--line);
   padding-bottom: 8px;
 }
 .page .rs-facts dt {
-  font-size: 14px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .page .rs-facts dd {
   margin: 0;
@@ -1476,7 +1476,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: inline-flex;
   align-items: center;
   cursor: default;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .rs-foot {
   flex: none;
@@ -1485,10 +1485,10 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 10px 18px;
   flex-wrap: wrap;
   padding: 14px 32px calc(14px + env(safe-area-inset-bottom));
-  border-top: 1px solid #e3ded2;
-  background: #fafbf9;
-  font-size: 15px;
-  color: #3e4b44;
+  border-top: 1px solid var(--line);
+  background: var(--sand);
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .page .rs-go {
   min-height: 54px;
@@ -1563,7 +1563,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   }
   .page .rs-tabs button {
     padding: 8px 9px;
-    font-size: 15.5px;
+    font-size: 16px;
   }
   .page .rs-body {
     padding: 20px 16px 28px;
@@ -1608,7 +1608,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   bottom: -16px;
   margin-bottom: -16px;
   padding-bottom: 16px;
-  background: #fff;
+  background: var(--paper);
   z-index: 2;
 }
 .cal-body {
@@ -1642,13 +1642,13 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-left: 1px solid #e3ded2;
+  border-left: 1px solid var(--line);
   padding-left: 20px;
 }
 .cal-side-h {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .cal-pgrid {
   display: grid;
@@ -1658,7 +1658,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .page .cal-pgrid .preset {
   min-height: 40px;
   padding: 0 8px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .cal-legend {
   display: flex;
@@ -1669,9 +1669,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   padding: 0 52px;
 }
 .page .cal-legend .lg {
-  font-size: 14px;
+  font-size: 16px;
   gap: 7px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .cal-legend .lg-fly .info-host {
   align-items: center;
@@ -1680,21 +1680,21 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .cal-legend .lg-fly .info-tip {
   width: 20px;
   height: 20px;
-  font-size: 12px;
+  font-size: 13px;
 }
 .cal-legend .lg-fly .info-pop {
   max-width: 460px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .cal-fly {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
   margin-top: 4px;
 }
 .cal-fly > div {
@@ -1706,7 +1706,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 3px;
 }
 .cal-dlg .months-calendar .cell small {
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
 }
 .cal-dlg .months-calendar .cell > span[title] {
@@ -1763,7 +1763,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   .page .cal-btns .btn {
     flex: 1 1 0;
     padding: 0 8px !important;
-    font-size: 15px !important;
+    font-size: 16px !important;
     min-height: 48px !important;
   }
   .pc-grid button {
@@ -1771,7 +1771,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
     min-height: 46px !important;
   }
   .pc-grid button > span:nth-child(2) {
-    font-size: 12px !important;
+    font-size: 13px !important;
   }
   .pc-grid button > span:nth-child(3) {
     font-size: 10px !important;
@@ -1849,7 +1849,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   }
   .cal-dlg .fd-opt .fd-sum {
     grid-column: 1;
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 
@@ -1860,9 +1860,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   flex-wrap: wrap;
 }
 .page .btn.btn-secondary.f-btn.on {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
 }
 .f-badge {
   display: inline-flex;
@@ -1871,18 +1871,18 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   min-width: 24px;
   height: 24px;
   padding: 0 6px;
-  border-radius: 12px;
-  background: #1f5f4a;
-  color: #fff;
-  font-size: 14px;
+  border-radius: var(--r-field);
+  background: var(--green);
+  color: var(--paper);
+  font-size: 16px;
   font-weight: 800;
 }
 .f-badge:empty {
   display: none;
 }
 .page .btn.f-btn.on .f-badge {
-  background: #fff;
-  color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
 }
 
 /* "нет мест" inside the chosen period: a note slides in above the confirm buttons */
@@ -1893,13 +1893,13 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   gap: 10px 12px;
   flex-wrap: wrap;
   padding: 10px 12px;
-  background: #fff6e3;
-  border: 1px solid #f0ddb8;
-  border-left: 4px solid #c9893a;
-  border-radius: var(--r);
-  font-size: 15px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--r-field);
+  font-size: 16px;
   line-height: 1.4;
-  color: #1c2620;
+  color: var(--ink);
   animation: calNoteIn 0.25s ease-out;
 }
 .cal-note-t {
@@ -1908,17 +1908,17 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 .cal-note-ask {
   min-height: 40px;
   padding: 0 14px;
-  border: 2px solid #1f5f4a;
-  background: #fff;
-  color: #1f5f4a;
+  border: 2px solid var(--green);
+  background: var(--paper);
+  color: var(--green);
   font: inherit;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   cursor: pointer;
 }
 .cal-note-ask:hover {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .cal-note-x {
   width: 36px;
@@ -1926,7 +1926,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   border: 0;
   background: none;
   font-size: 18px;
-  color: #3e4b44;
+  color: var(--ink-2);
   cursor: pointer;
 }
 @keyframes calNoteIn {
@@ -1953,7 +1953,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #1c2620;
+  color: var(--ink);
   line-height: 1.3;
   min-height: 32px;
   align-self: flex-start;
@@ -1965,17 +1965,17 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   width: 22px;
   height: 22px;
   margin: 0 4px 0 0;
-  border: 1.5px solid #b9b3a6;
+  border: 1.5px solid var(--muted-2);
   border-radius: 6px;
-  background: #fff;
+  background: var(--paper);
   cursor: pointer;
   transition:
     background-color 0.15s,
     border-color 0.15s;
 }
 .page .ftog-line input:checked {
-  border-color: #1f5f4a;
-  background: #1f5f4a
+  border-color: var(--green);
+  background: var(--green)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.4l3.2 3.1L15 6.6' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
     center / 16px no-repeat;
 }
@@ -1984,9 +1984,9 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.18);
 }
 .page .ftog-line:hover input:not(:checked) {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .page .ftog-inc {
-  color: #3e4b44;
+  color: var(--ink-2);
   font-weight: 400;
 }

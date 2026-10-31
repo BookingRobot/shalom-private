@@ -21,14 +21,14 @@ export function HelpStrip({
   return (
     <section className="help-strip" aria-label="Помощь консультанта">
       <div className="hs-part hs-what">
-        <HeadsetIcon size={40} color="#1F5F4A" strokeWidth={1.8} />
+        <HeadsetIcon size={40} color="var(--green)" strokeWidth={1.8} />
         <div className="hs-txt">
           <strong className="hs-title">{title}</strong>
           <span>{sub}</span>
         </div>
       </div>
       <div className="hs-part hs-phone">
-        <PhoneIcon size={24} color="#1F5F4A" />
+        <PhoneIcon size={24} color="var(--green)" />
         <div className="hs-txt">
           <a href={PHONE_TEL} dir="ltr" className="hs-tel">
             {PHONE_DISPLAY}
@@ -39,7 +39,7 @@ export function HelpStrip({
         </div>
       </div>
       <button type="button" className="btn btn-primary hs-btn" onClick={help.open} aria-haspopup="dialog">
-        <HeadsetIcon size={20} color="#fff" strokeWidth={2} />
+        <HeadsetIcon size={20} color="var(--paper)" strokeWidth={2} />
         Свяжитесь со мной
       </button>
     </section>

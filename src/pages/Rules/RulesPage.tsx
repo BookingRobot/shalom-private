@@ -41,11 +41,11 @@ export default function RulesPage() {
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '800px' }}>
-            <div style={{ fontSize: '16px', color: '#3E4B44' }}>
+            <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
               <Link to="/">Главная</Link> › Условия
             </div>
             <h1 style={{ fontSize: '32px' }}>Условия бронирования, оплаты и отмены</h1>
-            <p style={{ color: '#3E4B44', fontSize: '18px' }}>
+            <p style={{ color: 'var(--ink-2)', fontSize: '18px' }}>
               Простыми словами — что происходит после заказа, сколько и когда платить, и что будет, если планы
               изменятся.
             </p>
@@ -141,11 +141,11 @@ export default function RulesPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '14px',
-                  border: '2px solid #1F5F4A',
+                  border: '2px solid var(--green)',
                 }}
               >
                 <h2 style={{ fontSize: '23px' }}>3. Отмена и перенос</h2>
-                <p style={{ color: '#3E4B44' }}>
+                <p style={{ color: 'var(--ink-2)' }}>
                   Сроки считаются от даты заезда. Отменить или перенести можно одним звонком или сообщением.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -244,8 +244,8 @@ export default function RulesPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '14px',
-                  background: '#EEF5F1',
-                  borderColor: '#C8DED3',
+                  background: 'var(--green-soft)',
+                  borderColor: 'var(--green-line)',
                 }}
               >
                 <h2 style={{ fontSize: '23px' }}>6. Как с нами связаться</h2>

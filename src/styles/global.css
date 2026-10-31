@@ -4,8 +4,8 @@ html {
 }
 body {
   margin: 0;
-  background: #f4f1ea;
-  color: #1c2620;
+  background: var(--sand);
+  color: var(--ink);
   font-family: Manrope, 'Segoe UI', Arial, sans-serif;
   font-size: 17px;
   line-height: 1.5;
@@ -21,6 +21,6 @@ body {
 }
 /* Keyboard users always see where they are. */
 :focus-visible {
-  outline: 3px solid #c9893a;
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }

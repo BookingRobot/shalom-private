@@ -63,8 +63,8 @@ class GuestsLogic extends PageLogic {
     const vals = {
       dob1: fmtDob(dob.g1),
       dob2: fmtDob(dob.g2),
-      dob1Color: dob.g1 ? '#1C2620' : '#6B776F',
-      dob2Color: dob.g2 ? '#1C2620' : '#6B776F',
+      dob1Color: dob.g1 ? 'var(--ink)' : 'var(--muted)',
+      dob2Color: dob.g2 ? 'var(--ink)' : 'var(--muted)',
       openDob1: open('g1'),
       openDob2: open('g2'),
       dobOpen: !!pk,
@@ -120,7 +120,7 @@ class GuestsLogic extends PageLogic {
           t: String(d),
           cls: d === pk.d ? 'on' : '',
           off: false,
-          border: '#CFC9BB',
+          border: 'var(--line-strong)',
           // the third tap: the date is saved and the window closes — no «Готово» to press
           pick: () => this.setState({ dob: { ...dob, [pk.g]: { y: pk.y, m: pk.m, d } }, pk: null }),
         });
@@ -203,7 +203,7 @@ export default function GuestsPage() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
                 Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для
                 карты лечения.
               </p>
@@ -218,9 +218,9 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: 'var(--r)',
-                    background: '#1F5F4A',
-                    color: '#fff',
+                    borderRadius: 'var(--r-field)',
+                    background: 'var(--green)',
+                    color: 'var(--paper)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -285,7 +285,7 @@ export default function GuestsPage() {
                       <input type="radio" name="g1sex" defaultChecked={true} />
                       Мужской
                     </label>
-                    <label style={{ borderLeft: '2px solid #CFC9BB' }}>
+                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
                       <input type="radio" name="g1sex" />
                       Женский
                     </label>
@@ -325,7 +325,7 @@ export default function GuestsPage() {
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         aria-hidden="true"
@@ -364,9 +364,9 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: 'var(--r)',
-                    background: '#1F5F4A',
-                    color: '#fff',
+                    borderRadius: 'var(--r-field)',
+                    background: 'var(--green)',
+                    color: 'var(--paper)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -418,7 +418,7 @@ export default function GuestsPage() {
                       <input type="radio" name="g2sex" />
                       Мужской
                     </label>
-                    <label style={{ borderLeft: '2px solid #CFC9BB' }}>
+                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
                       <input type="radio" name="g2sex" defaultChecked={true} />
                       Женский
                     </label>
@@ -432,7 +432,7 @@ export default function GuestsPage() {
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
               <h2 style={{ fontSize: '22px' }}>Пожелания к заезду</h2>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '17px' }}>
                 Не обязательно, но санаторию полезно знать заранее.
               </p>
               <div

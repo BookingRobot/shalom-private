@@ -16,7 +16,7 @@ import './SiteHeader.css';
 type Tone = 'light' | 'dark';
 
 /** the site's forest green: the header bar is painted with it, so the agency's logo goes white on it */
-export const HEADER_GREEN = '#1F5F4A';
+export const HEADER_GREEN = 'var(--green)';
 
 /** the parts of the header read it: on the green bar the logo, menu and phone are white */
 const OnGreen = createContext(false);
@@ -267,7 +267,7 @@ export function MainNav({
           aria-current={n.key === active ? 'page' : undefined}
           style={{
             ...(size !== 17 ? { fontSize: `${size}px` } : null),
-            ...(tone === 'dark' ? { color: '#fff' } : n.key === active ? { color: '#1F5F4A' } : null),
+            ...(tone === 'dark' ? { color: 'var(--paper)' } : n.key === active ? { color: 'var(--green)' } : null),
           }}
         >
           {n.label}
@@ -300,14 +300,14 @@ export function PhoneLink({
         alignItems: 'center',
         gap: `${gap}px`,
         textDecoration: 'none',
-        color: tone === 'dark' ? '#fff' : '#1C2620',
+        color: tone === 'dark' ? 'var(--paper)' : 'var(--ink)',
         fontWeight: '800',
         fontSize: `${size}px`,
         padding: '8px 0',
         margin: '-8px 0',
       }}
     >
-      <PhoneIcon size={icon} color={tone === 'dark' ? 'currentColor' : '#1F5F4A'} />
+      <PhoneIcon size={icon} color={tone === 'dark' ? 'currentColor' : 'var(--green)'} />
       {PHONE_DISPLAY}
     </a>
   );

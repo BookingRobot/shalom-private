@@ -1,8 +1,8 @@
 /* «Прямые перелёты»: our colours, light iOS-like search and a calm flight card */
 .pg-tickets {
   margin: 0;
-  background: #f4f1ea;
-  color: #1c2620;
+  background: var(--sand);
+  color: var(--ink);
   font-family: Manrope, 'Segoe UI', Arial, sans-serif;
   font-size: 18px;
   line-height: 1.5;
@@ -25,7 +25,7 @@
   gap: 10px;
   min-height: 52px;
   padding: 0 22px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 17px;
   cursor: pointer;
@@ -34,19 +34,19 @@
   white-space: nowrap;
 }
 .pg-tickets .btn-primary {
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
 }
 .pg-tickets .btn-primary:hover {
-  background: #174b3a;
+  background: var(--green-deep);
 }
 .pg-tickets .btn-secondary {
-  background: #fff;
-  color: #1f5f4a;
-  border-color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
+  border-color: var(--green);
 }
 .pg-tickets .btn-secondary:hover {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .tk-wrap {
   width: 100%;
@@ -55,7 +55,7 @@
   padding: 0 24px;
 }
 .tk-hero {
-  background: linear-gradient(180deg, #e6f2ea 0%, #f4f1ea 100%);
+  background: linear-gradient(180deg, var(--green-soft) 0%, var(--sand) 100%);
   padding: 40px 0 28px;
 }
 .tk-hero h1 {
@@ -64,7 +64,7 @@
 }
 .tk-lead {
   margin: 8px 0 20px;
-  color: #3e4b44;
+  color: var(--ink-2);
   font-size: 18px;
   max-width: 760px;
 }
@@ -74,9 +74,9 @@
   flex-direction: column;
   gap: 14px;
   padding: 18px;
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
   box-shadow: 0 10px 30px rgba(28, 38, 32, 0.08);
 }
 /* round trip / one way: two radio buttons (light green when chosen, with a check) */
@@ -96,11 +96,11 @@
   font:
     600 17px Manrope,
     sans-serif;
-  color: #3e4b44;
+  color: var(--ink-2);
   cursor: pointer;
 }
 .tk-radio.on {
-  color: #1c2620;
+  color: var(--ink);
   font-weight: 700;
 }
 .tk-radio-c {
@@ -108,8 +108,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid #8a968f;
-  background: #fff;
+  border: 2px solid var(--muted-2);
+  background: var(--paper);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -118,20 +118,20 @@
   opacity: 0;
 }
 .tk-radio.on .tk-radio-c {
-  border-color: #1f5f4a;
-  background: #1f5f4a;
+  border-color: var(--green);
+  background: var(--green);
 }
 .tk-radio.on .tk-radio-c svg {
   opacity: 1;
 }
 .tk-radio:hover .tk-radio-c {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .tk-seg-n {
   padding: 1px 8px;
-  border-radius: 999px;
-  background: #e6f2ea;
-  color: #1f5f4a;
+  border-radius: var(--r-pill);
+  background: var(--green-soft);
+  color: var(--green);
   font-size: 13px;
 }
 .tk-fields {
@@ -155,9 +155,9 @@
   gap: 2px;
   min-height: 62px;
   padding: 8px 14px;
-  border: 1.5px solid #d9d3c6;
-  border-radius: 12px;
-  background: #fff;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   text-align: left;
   min-width: 0;
 }
@@ -167,7 +167,7 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 700;
-  color: #5e6862;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -195,36 +195,36 @@
   width: 100%;
 }
 .tk-f-to {
-  background: #faf9f6;
+  background: var(--sand);
 }
 .tk-swap {
   align-self: center;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1.5px solid #d9d3c6;
-  background: #fff;
-  color: #1f5f4a;
+  border: 1.5px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--green);
   font-size: 18px;
   font-weight: 800;
   cursor: pointer;
 }
 .tk-swap:hover,
 .tk-date:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .tk-date {
   cursor: pointer;
 }
 .tk-date.empty .tk-f-v {
-  color: #8a8f8b;
+  color: var(--muted-2);
   font-weight: 600;
 }
 .tk-date.off {
-  background: #faf9f6;
+  background: var(--sand);
 }
 .tk-date.off .tk-f-v {
-  color: #8a8f8b;
+  color: var(--muted-2);
   font-weight: 600;
 }
 .tk-people {
@@ -247,17 +247,17 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid #1f5f4a;
-  background: #fff;
-  color: #1f5f4a;
+  border: 1.5px solid var(--green);
+  background: var(--paper);
+  color: var(--green);
   font-size: 19px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
 }
 .tk-step button:disabled {
-  border-color: #d9d3c6;
-  color: #b8bdb9;
+  border-color: var(--line-strong);
+  color: var(--muted-2);
   cursor: default;
 }
 .tk-step strong {
@@ -311,20 +311,20 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
   font-weight: 800;
 }
 .tk-how li span {
   font-size: 16px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 /* the found flight */
 .tk-res {
   scroll-margin-top: 16px;
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
   box-shadow: 0 10px 30px rgba(28, 38, 32, 0.06);
   overflow: hidden;
 }
@@ -335,14 +335,14 @@
   gap: 12px 20px;
   flex-wrap: wrap;
   padding: 16px 22px;
-  background: #f6faf7;
-  border-bottom: 1px solid #e6efe9;
+  background: var(--green-soft);
+  border-bottom: 1px solid var(--green-soft);
 }
 .tk-ok {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #1f7a4f;
+  color: var(--green);
   font-weight: 700;
   font-size: 17px;
 }
@@ -355,11 +355,11 @@
 .tk-price strong {
   font-size: 30px;
   line-height: 1.1;
-  color: #1c2620;
+  color: var(--ink);
 }
 .tk-price span {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .tk-leg {
   display: grid;
@@ -369,7 +369,7 @@
   padding: 18px 22px;
 }
 .tk-leg + .tk-leg {
-  border-top: 1px dashed #e3ded2;
+  border-top: 1px dashed var(--line);
 }
 .tk-leg-dir {
   display: flex;
@@ -382,10 +382,10 @@
   line-height: 1.3;
 }
 .tk-leg-dir strong {
-  font-size: 15px;
+  font-size: 16px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #5e6862;
+  color: var(--muted);
 }
 .tk-leg-ico {
   display: grid;
@@ -393,13 +393,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #e6f2ea;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
   flex: none;
 }
 .tk-leg-dir.back .tk-leg-ico {
-  background: #f3ecdc;
-  color: #8a6418;
+  background: var(--line);
+  color: var(--warn-ink);
 }
 .tk-leg-way {
   display: grid;
@@ -416,8 +416,8 @@
   font-size: 24px;
 }
 .tk-pt span {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
   white-space: nowrap;
 }
 .tk-pt-end {
@@ -427,8 +427,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1f5f4a;
-  font-size: 14px;
+  color: var(--green);
+  font-size: 16px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -436,7 +436,7 @@
   flex: 1;
   height: 2px;
   min-width: 10px;
-  background: repeating-linear-gradient(90deg, #c8ded3 0 6px, transparent 6px 10px);
+  background: repeating-linear-gradient(90deg, var(--green-line) 0 6px, transparent 6px 10px);
 }
 .tk-line span {
   display: inline-flex;
@@ -454,20 +454,20 @@
   font-size: 16px;
 }
 .tk-leg-meta span {
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .tk-seats {
   margin-top: 2px;
   padding: 1px 8px;
-  border-radius: 999px;
-  background: #eef5f1;
-  color: #1f5f4a;
+  border-radius: var(--r-pill);
+  background: var(--green-soft);
+  color: var(--green);
   font-weight: 700;
 }
 .pg-tickets .tk-seats.few {
-  background: #fff1d6;
-  color: #8a5a00;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
 }
 .tk-incl {
   display: flex;
@@ -475,13 +475,13 @@
   align-items: flex-start;
   gap: 8px 18px;
   padding: 14px 22px;
-  border-top: 1px solid #eeeae1;
-  font-size: 15.5px;
-  color: #3e4b44;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .tk-incl-more {
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .tk-notes {
   margin: 0;
@@ -493,13 +493,13 @@
   align-items: center;
   gap: 10px 14px;
   padding: 14px 22px 18px;
-  border-top: 1px solid #eeeae1;
+  border-top: 1px solid var(--line);
 }
 .pg-tickets .tk-stay {
   margin-left: auto;
   border: 0;
   background: none;
-  color: #1f5f4a;
+  color: var(--green);
   font-weight: 700;
   font-size: 17px;
   cursor: pointer;
@@ -517,13 +517,13 @@
 }
 .tk-none p {
   margin: 0;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 /* compare prices */
 .tk-cmp {
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
   overflow: hidden;
 }
 .tk-cmp-h {
@@ -544,12 +544,12 @@
   line-height: 1.35;
 }
 .tk-cmp-h > span:first-child > span {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .tk-chev {
   font-size: 26px;
-  color: #1f5f4a;
+  color: var(--green);
   transition: transform 0.2s;
 }
 .tk-cmp.open .tk-chev {
@@ -558,7 +558,7 @@
 .tk-cmp-list {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #eeeae1;
+  border-top: 1px solid var(--line);
 }
 .tk-cmp-row {
   display: grid;
@@ -567,17 +567,17 @@
   align-items: center;
   padding: 11px 22px;
   border: 0;
-  border-top: 1px solid #f1eee7;
+  border-top: 1px solid var(--sand);
   background: none;
   text-align: left;
   font-size: 16px;
   cursor: pointer;
 }
 .tk-cmp-row:hover {
-  background: #fafbf9;
+  background: var(--sand);
 }
 .tk-cmp-row.on {
-  background: #eef5f1;
+  background: var(--green-soft);
 }
 .tk-cmp-th {
   border-top: 0;
@@ -586,7 +586,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #5e6862;
+  color: var(--muted);
 }
 .tk-cmp-th:hover {
   background: none;
@@ -603,18 +603,18 @@
 }
 .tk-best {
   padding: 1px 8px;
-  border-radius: 999px;
-  background: #e6f2ea;
-  color: #1f5f4a;
+  border-radius: var(--r-pill);
+  background: var(--green-soft);
+  color: var(--green);
   font-size: 13px;
   font-weight: 800;
 }
 .pg-tickets .tk-more {
   border: 0;
-  border-top: 1px solid #f1eee7;
+  border-top: 1px solid var(--sand);
   background: none;
   padding: 14px;
-  color: #1f5f4a;
+  color: var(--green);
   font-weight: 700;
   cursor: pointer;
 }
@@ -636,8 +636,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px 24px 16px;
-  background: #fff;
-  border-radius: 14px;
+  background: var(--paper);
+  border-radius: var(--r-card);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
 }
 .tk-cal-h {
@@ -655,8 +655,8 @@
   font-size: 24px;
 }
 .tk-cal-h > span > span {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .tk-cal-h .btn {
   min-height: 44px;
@@ -669,14 +669,14 @@
   align-items: center;
   gap: 8px 18px;
   padding-top: 10px;
-  border-top: 1px solid #eeeae1;
+  border-top: 1px solid var(--line);
 }
 .pg-tickets .lg {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 14px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .lg i {
   width: 18px;
@@ -687,7 +687,7 @@
 .tk-cal-dep {
   margin-left: auto;
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
 }
 @media (max-width: 1000px) {
   .tk-fields {
@@ -770,7 +770,7 @@
   }
   .tk-cmp-row {
     padding: 10px 16px;
-    font-size: 15px;
+    font-size: 16px;
   }
   .tk-cmp-p {
     flex-direction: column-reverse;
@@ -806,9 +806,9 @@
   gap: 10px;
   margin: 0;
   padding: 12px 22px;
-  background: #fff6e2;
-  border-top: 1px solid #f1e3bf;
-  color: #6b4a00;
+  background: var(--warn-bg);
+  border-top: 1px solid var(--warn-bg);
+  color: var(--warn-ink);
   font-size: 16px;
 }
 .tk-late > span {
@@ -816,10 +816,10 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #c98a00;
-  color: #fff;
+  background: var(--accent);
+  color: var(--paper);
   font-weight: 800;
-  font-size: 14px;
+  font-size: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -857,34 +857,34 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: #8a8f8b;
+  color: var(--muted-2);
 }
 .tk-steps li > span {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  border: 2px solid #d9d3c6;
+  border: 2px solid var(--line-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 800;
-  background: #fff;
+  background: var(--paper);
 }
 .tk-steps li.on {
-  color: #1c2620;
+  color: var(--ink);
 }
 .tk-steps li.on > span {
-  border-color: #1f5f4a;
-  color: #1f5f4a;
+  border-color: var(--green);
+  color: var(--green);
 }
 .tk-steps li.done {
-  color: #1f5f4a;
+  color: var(--green);
 }
 .tk-steps li.done > span {
-  border-color: #1f5f4a;
-  background: #1f5f4a;
-  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
 }
 .tk-flow-in {
   display: grid;
@@ -903,15 +903,15 @@
 }
 .tk-flow-lead {
   margin: -8px 0 0;
-  color: #3e4b44;
+  color: var(--ink-2);
   font-size: 17px;
 }
 .tk-box {
   margin: 0;
   padding: 18px 20px;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -948,8 +948,8 @@
 }
 .tk-in-l {
   font-weight: 700;
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .tk-in .input {
   min-height: 50px;
@@ -966,17 +966,17 @@
   letter-spacing: 0;
 }
 .tk-in.bad .input {
-  border-color: #c0392b !important;
-  background: #fff8f6;
+  border-color: var(--danger) !important;
+  background: var(--danger-bg);
 }
 .tk-in-err {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #b3261e;
+  color: var(--danger);
 }
 .tk-in-h {
-  font-size: 14px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .tk-tel {
   display: flex;
@@ -1014,9 +1014,9 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px 20px;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
   box-shadow: 0 10px 30px rgba(28, 38, 32, 0.06);
 }
 .tk-sum h3 {
@@ -1031,18 +1031,18 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 15px;
+  font-size: 16px;
 }
 .tk-sum-l {
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #5e6862;
+  color: var(--muted);
 }
 .tk-sum-no {
-  color: #5e6862;
-  font-size: 14px;
+  color: var(--muted);
+  font-size: 16px;
 }
 .tk-sum-total {
   display: flex;
@@ -1050,13 +1050,13 @@
   align-items: baseline;
   gap: 10px;
   padding-top: 12px;
-  border-top: 1px solid #eeeae1;
-  font-size: 15px;
-  color: #3e4b44;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .tk-sum-total strong {
   font-size: 24px;
-  color: #1c2620;
+  color: var(--ink);
   white-space: nowrap;
 }
 /* payment */
@@ -1075,29 +1075,29 @@
   font-size: 16px;
 }
 .tk-names li span {
-  color: #5e6862;
+  color: var(--muted);
 }
 .tk-names-to {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .tk-box .linkbtn {
   align-self: flex-start;
-  font-size: 15px;
+  font-size: 16px;
 }
 .tk-card-sub,
 .tk-card-note {
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .tk-agree {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border: 1.5px solid #e3ded2;
-  border-radius: 12px;
-  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-field);
+  background: var(--paper);
   font-size: 16px;
   cursor: pointer;
 }
@@ -1106,11 +1106,11 @@
   width: 22px;
   height: 22px;
   margin: 1px 0 0;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
 }
 .tk-agree.bad {
-  border-color: #c0392b;
-  background: #fff8f6;
+  border-color: var(--danger);
+  background: var(--danger-bg);
 }
 .pg-tickets .tk-pay {
   min-width: 230px;
@@ -1121,7 +1121,7 @@
   height: 18px;
   border-radius: 50%;
   border: 2.5px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border-top-color: var(--paper);
   animation: tkSpin 0.75s linear infinite;
 }
 @keyframes tkSpin {
@@ -1137,15 +1137,15 @@
   gap: 14px;
   max-width: 760px;
   padding: 26px 28px;
-  border: 1px solid #e3ded2;
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
 }
 .tk-done-ic {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #1f5f4a;
+  background: var(--green);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1156,17 +1156,17 @@
 .tk-done p {
   margin: 0;
   font-size: 17px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .tk-done .tk-sum-legs {
   align-self: stretch;
   padding: 14px 16px;
-  border-radius: 12px;
-  background: #f7f5f0;
+  border-radius: var(--r-field);
+  background: var(--sand);
 }
 .tk-done-q a {
   font-weight: 700;
-  color: #1f5f4a;
+  color: var(--green);
   white-space: nowrap;
 }
 @media (max-width: 1000px) {
@@ -1207,10 +1207,10 @@
 /* fields of the purchase (as on the guests step) */
 .pg-tickets .input {
   min-height: 50px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
   padding: 0 14px;
-  background: #fff;
+  background: var(--paper);
   font-size: 17px;
   width: 100%;
   box-sizing: border-box;
@@ -1223,22 +1223,22 @@
   -webkit-appearance: menulist;
 }
 .pg-tickets .input:focus {
-  outline: 3px solid #9cc9b5;
-  border-color: #1f5f4a;
+  outline: 3px solid var(--green-mid);
+  border-color: var(--green);
 }
 .pg-tickets .input::placeholder {
-  color: #8a8f8b;
+  color: var(--muted-2);
 }
 .pg-tickets .lbl {
   font-weight: 700;
-  font-size: 15px;
-  color: #3e4b44;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-tickets .linkbtn {
   background: none;
   border: none;
   padding: 0;
-  color: #1f5f4a;
+  color: var(--green);
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;

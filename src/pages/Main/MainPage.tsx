@@ -113,8 +113,8 @@ class MainLogic extends PageLogic {
           sub: '',
           bg: 'transparent',
           border: 'transparent',
-          color: '#1C2620',
-          subColor: '#3E4B44',
+          color: 'var(--ink)',
+          subColor: 'var(--ink-2)',
           off: true,
           cursor: 'default',
           aria: '',
@@ -126,9 +126,9 @@ class MainLogic extends PageLogic {
         const full = !past && isSoldOutEverywhere(iso(date)); /* [ПРИМЕР] нет мест ни в одном объекте */
         const p = priceOf(date),
           r = p / BASE;
-        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9';
-        let color = '#1C2620',
-          subColor = '#3E4B44',
+        let bg = r < 0.97 ? 'var(--green-soft)' : r <= 1.05 ? 'var(--warn-bg)' : 'var(--danger-bg)';
+        let color = 'var(--ink)',
+          subColor = 'var(--ink-2)',
           border = 'transparent';
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut);
@@ -136,21 +136,21 @@ class MainLogic extends PageLogic {
         // the first "нет мест" day after check-in still works as the check-out day
         const canOut = full && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, blocked).length;
         if (past) {
-          bg = '#E8E6E1';
-          color = '#9AA39E';
-          subColor = '#9AA39E';
+          bg = 'var(--line)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--muted-2)';
         }
         if (full) {
-          bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)';
-          color = '#8A968F';
-          subColor = '#8A5A00';
+          bg = 'repeating-linear-gradient(135deg,var(--sand) 0 6px,var(--line-strong) 6px 12px)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--warn-ink)';
         }
-        if (between) border = '#1F5F4A';
+        if (between) border = 'var(--green)';
         if (isIn || isOut) {
-          bg = '#1F5F4A';
-          color = '#fff';
-          subColor = '#D9E2DC';
-          border = '#1F5F4A';
+          bg = 'var(--green)';
+          color = 'var(--paper)';
+          subColor = 'var(--green-line)';
+          border = 'var(--green)';
         }
         cells.push({
           day: d,
@@ -352,18 +352,25 @@ export default function MainPage() {
                       style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}
                     >
                       <h3 style={{ fontSize: '18px' }}>{h.name}</h3>
-                      <span style={{ color: '#8A6500', fontSize: '14px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                      <span
+                        style={{
+                          color: 'var(--warn-ink)',
+                          fontSize: '16px',
+                          letterSpacing: '1px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {h.stars}
                       </span>
                     </div>
-                    <div style={{ fontSize: '14px', color: '#3E4B44', marginTop: '-4px' }}>{h.sub}</div>
+                    <div style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '-4px' }}>{h.sub}</div>
                     <div className="feat">
                       <svg
                         width="18"
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -379,7 +386,7 @@ export default function MainPage() {
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -400,12 +407,12 @@ export default function MainPage() {
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.15' }}>
                         <span style={{ fontSize: '20px', fontWeight: '800' }}>от {h.price}&nbsp;€</span>
-                        <span style={{ fontSize: '14px', color: '#5E6862' }}>за человека в сутки</span>
+                        <span style={{ fontSize: '16px', color: 'var(--muted)' }}>за человека в сутки</span>
                       </div>
                       <Link
                         className="btn btn-secondary"
                         to={'/hotel?h=' + h.id}
-                        style={{ minHeight: '42px', fontSize: '15px', padding: '0 16px' }}
+                        style={{ minHeight: '42px', fontSize: '16px', padding: '0 16px' }}
                       >
                         Посмотреть →
                       </Link>
@@ -438,7 +445,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -448,8 +455,8 @@ export default function MainPage() {
                 <circle cx="17" cy="17" r="3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Выберите санаторий</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Сравните программы и стоимость.</span>
+                <strong style={{ fontSize: '16px' }}>Выберите санаторий</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Сравните программы и стоимость.</span>
               </div>
             </div>
             <div className="step">
@@ -459,7 +466,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -470,8 +477,8 @@ export default function MainPage() {
                 <path d="M2 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3M15 21v-3a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Укажите данные гостей</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>При необходимости добавьте трансфер.</span>
+                <strong style={{ fontSize: '16px' }}>Укажите данные гостей</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>При необходимости добавьте трансфер.</span>
               </div>
             </div>
             <div className="step">
@@ -481,7 +488,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -490,8 +497,8 @@ export default function MainPage() {
                 <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Внесите депозит</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>
+                <strong style={{ fontSize: '16px' }}>Внесите депозит</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                   35 € с человека, остаток — за 3 месяца до заезда.
                 </span>
               </div>
@@ -499,7 +506,7 @@ export default function MainPage() {
           </div>
         </section>
         <HelpStripBand maxWidth={1340} />
-        <footer style={{ background: '#1C2620', color: '#D9E2DC' }}>
+        <footer style={{ background: 'var(--ink)', color: 'var(--green-line)' }}>
           <div
             style={{
               maxWidth: '1340px',
@@ -510,7 +517,7 @@ export default function MainPage() {
               alignItems: 'center',
               gap: '24px',
               flexWrap: 'wrap',
-              fontSize: '14px',
+              fontSize: '16px',
             }}
           >
             <div
@@ -521,29 +528,31 @@ export default function MainPage() {
                 fontFamily: 'Montserrat,Manrope,sans-serif',
                 fontSize: '16px',
                 fontWeight: '700',
-                color: '#fff',
+                color: 'var(--paper)',
               }}
             >
               <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
+                <rect x="1" y="1" width="38" height="38" fill="var(--green)" />
+                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="var(--sand)" />
               </svg>
               Санатории Литвы
             </div>
             <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap' }}>
-              <Link to="/rules#contact" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
+              <Link to="/rules#contact" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
                 Контакты
               </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
+              <Link to="/rules" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
                 Условия оплаты
               </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
+              <Link to="/rules" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
                 Отмена бронирования
               </Link>
             </div>
-            <div style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: '#fff' }}>
+            <div
+              style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: 'var(--paper)' }}
+            >
               <span dir="ltr">{PHONE_DISPLAY}</span>
-              <span style={{ fontWeight: '600', color: '#D9E2DC' }}>RU ▾</span>
+              <span style={{ fontWeight: '600', color: 'var(--green-line)' }}>RU ▾</span>
             </div>
             <FooterSlot />
           </div>
@@ -574,8 +583,8 @@ export default function MainPage() {
               aria-modal="true"
               aria-labelledby="calTitle"
               style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
+                background: 'var(--paper)',
+                borderRadius: 'var(--r-field)',
                 width: 'min(1120px,100%)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -589,7 +598,7 @@ export default function MainPage() {
                   <h2 id="calTitle" style={{ fontSize: '24px' }}>
                     Выберите даты поездки
                   </h2>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.calHint}</span>
+                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.calHint}</span>
                 </div>
                 <button
                   type="button"
@@ -635,7 +644,7 @@ export default function MainPage() {
                   justifyContent: 'space-between',
                   gap: '16px',
                   flexWrap: 'wrap',
-                  borderTop: '1px solid #E3DED2',
+                  borderTop: '1px solid var(--line)',
                   paddingTop: '12px',
                 }}
               >
@@ -650,7 +659,7 @@ export default function MainPage() {
                     height="26"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -664,7 +673,7 @@ export default function MainPage() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.selNights}</strong>
+                    <strong style={{ fontSize: '18px', color: 'var(--green)' }}>{v.selNights}</strong>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>

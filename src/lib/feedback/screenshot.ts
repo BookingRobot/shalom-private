@@ -77,7 +77,7 @@ function visiblePart(page: HTMLCanvasElement, body: Box, selected: Box | null) {
   c.height = Math.round(window.innerHeight * ratio);
   const ctx = c.getContext('2d');
   if (!ctx) return page;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, c.width, c.height);
   ctx.drawImage(
     page,
@@ -102,11 +102,15 @@ function visiblePart(page: HTMLCanvasElement, body: Box, selected: Box | null) {
         selected.height * ratio + 2 * pad,
       );
     };
-    frame(7 * ratio, '#ffffff');
-    frame(3.5 * ratio, '#D93025');
+    frame(7 * ratio, '#fff');
+    frame(3.5 * ratio, token('--danger', '#b3261e'));
   }
   return c;
 }
+
+/** a design token's value — the 2D canvas cannot read var(--…) itself */
+const token = (name: string, fallback: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
 /** The screenshot as a Blob, or null when the browser cannot make one (the note goes without it). */
 export async function captureScreenshot(selected: Element | null): Promise<Blob | null> {
@@ -116,7 +120,7 @@ export async function captureScreenshot(selected: Element | null): Promise<Blob 
     const sel = selected ? selected.getBoundingClientRect() : null;
     const opts: Options = {
       scale: Math.min(window.devicePixelRatio || 1, 1.5),
-      backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
+      backgroundColor: getComputedStyle(document.body).backgroundColor || '#fff',
       filter: keepNode,
       onCloneNode: (clone) => redactClone(clone),
       timeout: 8000,

@@ -44,7 +44,7 @@ const CalIcon = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#1F5F4A"
+    stroke="var(--green)"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -210,11 +210,11 @@ export default function TicketsPage() {
         day: d,
         fly: ok,
         sub: isDep ? 'туда' : isRet ? 'обратно' : ok ? legPrice(date, legFrom) + ' €' : '',
-        bg: isDep || isRet ? '#1F5F4A' : ok ? '#E9F4EC' : '#F4F2EE',
-        border: between ? '#1F5F4A' : isDep || isRet ? '#1F5F4A' : 'transparent',
-        color: isDep || isRet ? '#fff' : ok ? '#1C2620' : '#A3ABA6',
-        subColor: isDep || isRet ? '#D9E2DC' : '#3E4B44',
-        planeColor: isDep || isRet ? '#fff' : '#1F5F4A',
+        bg: isDep || isRet ? 'var(--green)' : ok ? 'var(--green-soft)' : 'var(--sand)',
+        border: between ? 'var(--green)' : isDep || isRet ? 'var(--green)' : 'transparent',
+        color: isDep || isRet ? 'var(--paper)' : ok ? 'var(--ink)' : 'var(--muted-2)',
+        subColor: isDep || isRet ? 'var(--green-line)' : 'var(--ink-2)',
+        planeColor: isDep || isRet ? 'var(--paper)' : 'var(--green)',
         off: !ok,
         cursor: ok ? 'pointer' : 'not-allowed',
         aria: d + ' ' + MONTHS[m] + (ok ? ', есть рейс, ' + legPrice(date, legFrom) + ' € с человека' : ', рейса нет'),
@@ -339,7 +339,7 @@ export default function TicketsPage() {
                             height="12"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="#fff"
+                            stroke="var(--paper)"
                             strokeWidth="3.4"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -635,11 +635,11 @@ export default function TicketsPage() {
             />
             <div className="tk-cal-f">
               <span className="lg">
-                <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
+                <i style={{ background: 'var(--green-soft)', border: '1px solid var(--green-line)' }} />
                 есть рейс
               </span>
               <span className="lg">
-                <i style={{ background: '#F4F2EE' }} />
+                <i style={{ background: 'var(--sand)' }} />
                 рейса нет
               </span>
               {cal === 'ret' && dep ? <span className="tk-cal-dep">Туда: {dayLabel(dep)}</span> : null}

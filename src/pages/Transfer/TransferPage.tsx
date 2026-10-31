@@ -351,7 +351,7 @@ const Chevron = () => (
     height="22"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#1F5F4A"
+    stroke="var(--green)"
     strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -365,9 +365,9 @@ const Chevron = () => (
 function BackFlight({ v, id }: { v: any; id: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <label className="lbl" htmlFor={id} style={{ fontSize: '15px' }}>
+      <label className="lbl" htmlFor={id} style={{ fontSize: '16px' }}>
         {v.ourFlight ? 'Ваш рейс и время отправления' : 'Уже есть билеты? Рейс и время отправления'}
-        <span style={{ fontWeight: '400', color: '#5E6862' }}>
+        <span style={{ fontWeight: '400', color: 'var(--muted)' }}>
           {' '}
           · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно'}
         </span>
@@ -498,7 +498,7 @@ export default function TransferPage() {
                         height="40"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#C9893A"
+                        stroke="var(--accent)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -511,15 +511,15 @@ export default function TransferPage() {
                         Вы уверены, что доберётесь сами?
                       </h2>
                     </div>
-                    <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
+                    <p style={{ margin: '0', fontSize: '17px', color: 'var(--ink)' }}>
                       От аэропорта Вильнюса до санатория — 130 км. Прямого автобуса из аэропорта нет: нужно доехать до
                       автовокзала, купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.
                     </p>
                     <div
                       style={{
                         padding: '14px 16px',
-                        background: '#EEF5F1',
-                        borderRadius: 'var(--r)',
+                        background: 'var(--green-soft)',
+                        borderRadius: 'var(--r-field)',
                         fontSize: '16px',
                       }}
                     >
@@ -557,7 +557,7 @@ export default function TransferPage() {
                 <div id="trHow" className="tr-block">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <h2 style={{ fontSize: '23px' }}>Как поедете?</h2>
-                    <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>{v.howNote}</p>
+                    <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '17px' }}>{v.howNote}</p>
                   </div>
                   <div className="tr-how" role="radiogroup" aria-label="Как поедете">
                     <button
@@ -589,7 +589,7 @@ export default function TransferPage() {
                         <span>{v.seatNote}</span>
                         {v.seatTotal ? (
                           <span>
-                            за {v.guestsLabel}: <strong style={{ color: '#1C2620' }}>{v.seatTotal}</strong>
+                            за {v.guestsLabel}: <strong style={{ color: 'var(--ink)' }}>{v.seatTotal}</strong>
                           </span>
                         ) : null}
                       </span>
@@ -626,7 +626,7 @@ export default function TransferPage() {
                         height="22"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#8A5A00"
+                        stroke="var(--warn-ink)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -654,9 +654,9 @@ export default function TransferPage() {
                         flexDirection: 'column',
                         gap: '8px',
                         padding: '14px 18px 12px',
-                        background: '#EDF4EF',
-                        border: '1px solid #C8DED3',
-                        borderRadius: 'var(--r)',
+                        background: 'var(--green-soft)',
+                        border: '1px solid var(--green-line)',
+                        borderRadius: 'var(--r-field)',
                       }}
                     >
                       <div style={{ fontWeight: '800', fontSize: '17px' }}>От встречи до санатория</div>
@@ -703,7 +703,7 @@ export default function TransferPage() {
                         type="button"
                         className="acc"
                         onClick={v.toggleMore}
-                        style={{ alignSelf: 'flex-start', fontSize: '15px', minHeight: '36px' }}
+                        style={{ alignSelf: 'flex-start', fontSize: '16px', minHeight: '36px' }}
                       >
                         {v.moreLabel}
                       </button>
@@ -711,8 +711,8 @@ export default function TransferPage() {
                         <>
                           <div
                             style={{
-                              fontSize: '15px',
-                              color: '#3E4B44',
+                              fontSize: '16px',
+                              color: 'var(--ink-2)',
                               display: 'flex',
                               flexDirection: 'column',
                               gap: '6px',
@@ -746,7 +746,7 @@ export default function TransferPage() {
                           info={v.fromInfo}
                         />
                         {v.fromNote ? (
-                          <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>{v.fromNote}</p>
+                          <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '17px' }}>{v.fromNote}</p>
                         ) : null}
                       </div>
                       <div className="rowlist" role="radiogroup" aria-label="Откуда забрать">
@@ -803,11 +803,11 @@ export default function TransferPage() {
                                     </div>
                                   </div>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label className="lbl" htmlFor="flight" style={{ fontSize: '15px' }}>
+                                    <label className="lbl" htmlFor="flight" style={{ fontSize: '16px' }}>
                                       {v.ourFlight
                                         ? 'Ваш рейс и время прибытия'
                                         : 'Уже есть билеты? Рейс и время прибытия'}
-                                      <span style={{ fontWeight: '400', color: '#5E6862' }}>
+                                      <span style={{ fontWeight: '400', color: 'var(--muted)' }}>
                                         {' '}
                                         · {v.ourFlight ? 'заполнили по вашему перелёту' : 'необязательно'}
                                       </span>
@@ -832,7 +832,7 @@ export default function TransferPage() {
                         <div className="tr-sub ios-in">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label className="lbl" htmlFor="hotelname">
-                              Из какого отеля вас забрать? <span style={{ color: '#B3261E' }}>*</span>
+                              Из какого отеля вас забрать? <span style={{ color: 'var(--danger)' }}>*</span>
                             </label>
                             <input
                               id="hotelname"
@@ -840,7 +840,7 @@ export default function TransferPage() {
                               type="text"
                               placeholder="Название отеля и адрес, например: Artis Centrum Hotels, Liejyklos g. 3"
                             />
-                            <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                            <span style={{ fontSize: '16px', color: 'var(--muted)' }}>
                               Водитель будет ждать у главного входа. Если выезжаете из квартиры — укажите адрес и
                               подъезд.
                             </span>
@@ -848,10 +848,10 @@ export default function TransferPage() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label className="lbl" htmlFor="maplink">
                               Ссылка на Google Maps{' '}
-                              <span style={{ fontWeight: '600', color: '#5E6862' }}>(не обязательно)</span>
+                              <span style={{ fontWeight: '600', color: 'var(--muted)' }}>(не обязательно)</span>
                             </label>
                             <input id="maplink" className="input" type="url" placeholder="https://maps.app.goo.gl/…" />
-                            <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                            <span style={{ fontSize: '16px', color: 'var(--muted)' }}>
                               Откройте отель в Google Maps → «Поделиться» → скопируйте ссылку. Так водитель точно не
                               ошибётся.
                             </span>
@@ -881,13 +881,13 @@ export default function TransferPage() {
                               </span>
                               <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                 <strong style={{ fontSize: '18px' }}>{k.name}</strong>
-                                <span style={{ color: '#3E4B44', fontSize: '15px' }}>{k.info}</span>
+                                <span style={{ color: 'var(--ink-2)', fontSize: '16px' }}>{k.info}</span>
                               </span>
                             </span>
                             <strong style={{ fontSize: '20px', whiteSpace: 'nowrap' }}>{k.price}&nbsp;€</strong>
                           </button>
                         ))}
-                        <span style={{ fontSize: '15px', color: '#5E6862' }}>
+                        <span style={{ fontSize: '16px', color: 'var(--muted)' }}>
                           Цена за автомобиль, сколько бы вас ни было в пределах мест. Ночная подача (23:00–06:00)
                           +20&nbsp;%.
                         </span>
@@ -939,7 +939,7 @@ export default function TransferPage() {
                       </div>
                       {v.backOn ? (
                         <div id="trBackWhere" className="tr-sub ios-in">
-                          <div className="lbl" style={{ fontSize: '17px', color: '#1C2620' }}>
+                          <div className="lbl" style={{ fontSize: '17px', color: 'var(--ink)' }}>
                             Куда отвезти {v.outDay}?
                           </div>
                           <div className="tr-q" role="radiogroup" aria-label="Куда отвезти">
@@ -955,7 +955,7 @@ export default function TransferPage() {
                               </span>
                               <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                 <strong style={{ fontSize: '18px' }}>Туда же, откуда забрали</strong>
-                                <span style={{ color: '#3E4B44', fontSize: '15px' }}>{v.sameInfo}</span>
+                                <span style={{ color: 'var(--ink-2)', fontSize: '16px' }}>{v.sameInfo}</span>
                               </span>
                             </button>
                             <button
@@ -1038,7 +1038,9 @@ export default function TransferPage() {
                           {v.backSame ? (
                             <div className="ios-in" style={{ maxWidth: '420px' }}>
                               <BackFlight v={v} id="backflight2" />
-                              <span style={{ display: 'block', marginTop: '8px', fontSize: '15px', color: '#5E6862' }}>
+                              <span
+                                style={{ display: 'block', marginTop: '8px', fontSize: '16px', color: 'var(--muted)' }}
+                              >
                                 Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.
                               </span>
                             </div>
@@ -1058,12 +1060,12 @@ export default function TransferPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  background: '#EEF5F1',
-                  borderColor: '#C8DED3',
+                  background: 'var(--green-soft)',
+                  borderColor: 'var(--green-line)',
                 }}
               >
                 <div style={{ fontWeight: '800', fontSize: '18px' }}>Хорошо, трансфер не добавляем</div>
-                <p style={{ margin: '0', fontSize: '17px', color: '#1C2620' }}>
+                <p style={{ margin: '0', fontSize: '17px', color: 'var(--ink)' }}>
                   Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно добавить
                   позже — просто позвоните.
                 </p>

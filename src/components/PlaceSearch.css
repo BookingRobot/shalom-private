@@ -8,12 +8,12 @@
   cursor: pointer;
 }
 .page .ps-ph {
-  color: #6b766f;
+  color: var(--muted);
   font-weight: 500;
 }
 .page .ps-chev {
   flex: none;
-  color: #1f5f4a;
+  color: var(--green);
 }
 @media (max-width: 760px) {
   .page .sf-dest-x {
@@ -33,9 +33,9 @@
   width: 100%;
   max-height: calc(100vh - 40px);
   overflow: auto;
-  background: #fff;
-  color: #1c2620;
-  border-radius: 18px 18px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--r-card) var(--r-card) 0 0;
   padding: 8px 16px calc(18px + env(safe-area-inset-bottom));
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
   animation: psUp 0.32s cubic-bezier(0.22, 0.8, 0.24, 1) both;
@@ -46,7 +46,7 @@
   height: 5px;
   margin: 0 auto 8px;
   border-radius: 3px;
-  background: #d9d4c8;
+  background: var(--line-strong);
 }
 .ps-sheet-head {
   display: flex;
@@ -63,9 +63,9 @@
 .ps-sheet-x {
   width: 44px;
   height: 44px;
-  border: 1px solid #e3ded2;
+  border: 1px solid var(--line);
   border-radius: 50%;
-  background: #fff;
+  background: var(--paper);
   font-size: 17px;
   cursor: pointer;
 }
@@ -75,7 +75,7 @@
   padding: 0;
 }
 .ps-sheet-list li + li {
-  border-top: 1px solid #ece8df;
+  border-top: 1px solid var(--line);
 }
 .ps-sheet-list button {
   width: 100%;
@@ -87,7 +87,7 @@
   padding: 10px 12px;
   margin: 2px 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-field);
   background: none;
   color: inherit;
   font: inherit;
@@ -103,22 +103,22 @@
   font-size: 19px;
 }
 .ps-sheet-list button > span > span {
-  font-size: 15px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 /* the chosen resort: light green with a check mark, as on iPhone */
 .ps-sheet-list button.on {
-  background: #eef5f1;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
 }
 .ps-sheet-list button.on svg {
   flex: none;
-  color: #1f5f4a;
+  color: var(--green);
 }
 .ps-sheet-note {
   margin: 10px 4px 0;
-  font-size: 15px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 @keyframes psFade {
   from {

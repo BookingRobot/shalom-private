@@ -1,6 +1,6 @@
 .site-header .navlink {
   text-decoration: none;
-  color: #1c2620;
+  color: var(--ink);
   font-weight: 600;
   font-size: 17px;
   /* larger tap area (≥44px) without changing the layout */
@@ -9,7 +9,7 @@
   margin: -10px 0;
 }
 .site-header .navlink:hover {
-  color: #1f5f4a;
+  color: var(--green);
 }
 /* five menu items: keep the header on one line on smaller laptops */
 @media (max-width: 1240px) and (min-width: 761px) {
@@ -23,7 +23,7 @@
 
 /* the green bar: white logo, menu and phone; quiet notes in a soft white */
 .site-header.on-green {
-  color: #fff;
+  color: var(--paper);
 }
 .site-header.on-green .navlink:hover {
   opacity: 0.8;
@@ -34,7 +34,7 @@
   text-underline-offset: 7px;
 }
 .site-header.on-green a:focus-visible {
-  outline: 3px solid #9cc9b5;
+  outline: 3px solid var(--green-mid);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -92,9 +92,9 @@
     padding: 0 12px;
     margin-left: auto;
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--r-field);
     background: transparent;
-    color: #fff;
+    color: var(--paper);
     font: inherit;
     font-size: 16px;
     font-weight: 700;
@@ -115,7 +115,7 @@
     display: block;
   }
   .site-header .hd-burger:focus-visible {
-    outline: 3px solid #e3a93b;
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
   }
   .site-header .hd-burger-ico {
@@ -170,9 +170,9 @@
     max-height: calc(100% - 24px);
     overflow: auto;
     overscroll-behavior: contain;
-    background: #fff;
-    color: #1c2620;
-    border-radius: 0 0 16px 16px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 0 0 var(--r-card) var(--r-card);
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
     padding: 6px 16px 18px;
     animation: hdDown 0.28s cubic-bezier(0.22, 0.8, 0.24, 1) both;
@@ -183,7 +183,7 @@
     padding: 0;
   }
   .site-header .hd-menu-list li + li {
-    border-top: 1px solid #ece8df;
+    border-top: 1px solid var(--line);
   }
   .site-header .hd-menu-list a {
     display: flex;
@@ -192,30 +192,30 @@
     min-height: 54px;
     font-size: 18px;
     font-weight: 600;
-    color: #1c2620;
+    color: var(--ink);
     text-decoration: none;
   }
   .site-header .hd-menu-list a svg {
-    color: #9aa59f;
+    color: var(--muted-2);
   }
   .site-header .hd-menu-list a[aria-current='page'] {
-    color: #1f5f4a;
+    color: var(--green);
   }
   .site-header .hd-menu-list a[aria-current='page'] svg {
-    color: #1f5f4a;
+    color: var(--green);
   }
   .site-header .hd-menu-k {
     display: block;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
-    color: #5e6862;
+    color: var(--muted);
     margin-bottom: 8px;
   }
   .site-header .hd-menu-call {
     margin-top: 10px;
     padding: 14px;
-    border-radius: 12px;
-    background: #eef5f1;
+    border-radius: var(--r-field);
+    background: var(--green-soft);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -229,9 +229,9 @@
     justify-content: center;
     gap: 10px;
     min-height: 52px;
-    border-radius: 10px;
-    background: #1f5f4a;
-    color: #fff;
+    border-radius: var(--r-field);
+    background: var(--green);
+    color: var(--paper);
     font-size: 19px;
     font-weight: 800;
     text-decoration: none;
@@ -241,10 +241,10 @@
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    border-radius: 10px;
-    border: 1.5px solid #1f5f4a;
-    background: #fff;
-    color: #1f5f4a;
+    border-radius: var(--r-field);
+    border: 1.5px solid var(--green);
+    background: var(--paper);
+    color: var(--green);
     font-size: 16px;
     font-weight: 700;
     text-decoration: none;
@@ -256,24 +256,24 @@
   .site-header .hd-seg {
     display: flex;
     padding: 3px;
-    border-radius: 10px;
-    background: #f0ede5;
+    border-radius: var(--r-field);
+    background: var(--sand);
   }
   .site-header .hd-seg button {
     flex: 1 1 0;
     min-height: 42px;
     border: 0;
-    border-radius: 8px;
+    border-radius: var(--r-field);
     background: transparent;
-    color: #3e4b44;
+    color: var(--ink-2);
     font: inherit;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
   }
   .site-header .hd-seg button.on {
-    background: #fff;
-    color: #1f5f4a;
+    background: var(--paper);
+    color: var(--green);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   }
 }

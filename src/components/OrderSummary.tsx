@@ -10,16 +10,16 @@ const row = {
   alignItems: 'baseline',
   gap: '16px',
 } as const;
-const label = { color: '#3E4B44', fontSize: '16px' } as const;
+const label = { color: 'var(--ink-2)', fontSize: '16px' } as const;
 /** order details (room, programme, guests): medium weight, so the money stands out */
-const detailValue = { fontWeight: '600', textAlign: 'right', color: '#1C2620', textWrap: 'balance' } as const;
+const detailValue = { fontWeight: '600', textAlign: 'right', color: 'var(--ink)', textWrap: 'balance' } as const;
 const priceValue = { fontWeight: '700', textAlign: 'right', whiteSpace: 'nowrap' } as const;
 const section = {
   display: 'flex',
   flexDirection: 'column',
   gap: '8px',
   fontSize: '16px',
-  borderTop: '1px solid #E3DED2',
+  borderTop: '1px solid var(--line)',
   paddingTop: '12px',
 } as const;
 
@@ -59,7 +59,7 @@ export function OrderSummary({
       <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div style={{ fontWeight: '800', fontSize: '18px' }}>{name}</div>
-          <div style={{ fontSize: '16px', color: '#3E4B44' }}>{place}</div>
+          <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{place}</div>
         </div>
         <div style={section}>
           {details.map(([name, value, sub]) => (
@@ -84,7 +84,7 @@ export function OrderSummary({
             justifyContent: 'space-between',
             alignItems: 'baseline',
             gap: '12px',
-            borderTop: '2px solid #1C2620',
+            borderTop: '2px solid var(--ink)',
             paddingTop: '12px',
           }}
         >
@@ -178,10 +178,10 @@ export const AdvanceNote = ({
 }) => (
   <div
     style={{
-      fontSize: '15px',
-      color: '#3E4B44',
-      background: '#F4F1EA',
-      borderRadius: 'var(--r)',
+      fontSize: '16px',
+      color: 'var(--ink-2)',
+      background: 'var(--sand)',
+      borderRadius: 'var(--r-field)',
       padding: '10px 12px',
     }}
   >

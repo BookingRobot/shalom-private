@@ -1,7 +1,7 @@
 .pg-guests {
   margin: 0;
-  background: #f4f1ea;
-  color: #1c2620;
+  background: var(--sand);
+  color: var(--ink);
   font-family: Manrope, 'Segoe UI', Arial, sans-serif;
   font-size: 18px;
   line-height: 1.5;
@@ -20,7 +20,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
@@ -29,60 +29,60 @@
   white-space: nowrap;
 }
 .pg-guests .btn-primary {
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
 }
 .pg-guests .btn-primary:hover {
-  background: #174b3a;
-  color: #fff;
+  background: var(--green-deep);
+  color: var(--paper);
 }
 .pg-guests .btn-secondary {
-  background: #fff;
-  color: #1f5f4a;
-  border-color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
+  border-color: var(--green);
 }
 .pg-guests .btn-secondary:hover {
-  background: #eef5f1;
-  color: #143f31;
+  background: var(--green-soft);
+  color: var(--green-deep);
 }
 .pg-guests .input {
   min-height: 50px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
   padding: 0 16px;
-  background: #fff;
+  background: var(--paper);
   font-size: 18px;
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
 }
 .pg-guests .input:focus {
-  outline: 3px solid #9cc9b5;
-  border-color: #1f5f4a;
+  outline: 3px solid var(--green-mid);
+  border-color: var(--green);
 }
 .pg-guests .input::placeholder {
-  color: #6b776f;
+  color: var(--muted);
 }
 .pg-guests .lbl {
   font-weight: 700;
   font-size: 16px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .pg-guests .hint {
-  font-size: 15px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .pg-guests .card {
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
 }
 .pg-guests .seg {
   display: flex;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
   overflow: hidden;
-  background: #fff;
+  background: var(--paper);
 }
 .pg-guests .seg label {
   flex: 1;
@@ -98,7 +98,7 @@
 .pg-guests .seg label input {
   width: 22px;
   height: 22px;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   margin: 0;
 }
 .pg-guests .chk {
@@ -112,7 +112,7 @@
 .pg-guests .chk input {
   width: 26px;
   height: 26px;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   margin: 0;
   flex: none;
 }
@@ -126,7 +126,7 @@
   font-weight: 600;
 }
 .pg-guests .datebtn:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .pg-guests .pstep {
   display: flex;
@@ -134,52 +134,52 @@
   gap: 10px;
   font-weight: 700;
   font-size: 16px;
-  color: #5e6862;
+  color: var(--muted);
 }
 .pg-guests .pstep .n {
   width: 34px;
   height: 34px;
-  border-radius: var(--r);
-  border: 2px solid #cfc9bb;
+  border-radius: var(--r-field);
+  border: 2px solid var(--line-strong);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--paper);
 }
 .pg-guests .pstep.on {
-  color: #1f5f4a;
+  color: var(--green);
 }
 .pg-guests .pstep.on .n {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
 }
 .pg-guests .pstep.done {
-  color: #1c2620;
+  color: var(--ink);
 }
 .pg-guests .pstep.done .n {
-  background: #eef5f1;
-  border-color: #1f5f4a;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
 }
 .pg-guests .pick {
   min-height: 52px;
-  border: 2px solid #cfc9bb;
-  background: #fff;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  background: var(--paper);
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 20px;
   cursor: pointer;
-  color: #1c2620;
+  color: var(--ink);
 }
 .pg-guests .pick:hover {
-  border-color: #1f5f4a;
-  background: #eef5f1;
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 .pg-guests .pick.on {
-  border-color: #1f5f4a;
-  background: #1f5f4a;
-  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
 }
 .pg-guests .pick:disabled {
   opacity: 0.35;
@@ -188,9 +188,9 @@
 .pg-guests .navbtn {
   width: 56px;
   height: 56px;
-  border: 2px solid #cfc9bb;
-  background: #fff;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  background: var(--paper);
+  border-radius: var(--r-field);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -198,12 +198,12 @@
   flex: none;
 }
 .pg-guests .navbtn:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .pg-guests .wd {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #5e6862;
+  color: var(--muted);
   text-align: center;
   padding: 4px 0;
 }
