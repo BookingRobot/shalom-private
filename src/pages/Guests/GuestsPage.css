@@ -230,3 +230,21 @@
     width: 100%;
   }
 }
+
+/* a name field as in the passport (components/PassportName) */
+.page .g-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.page .g-field .input {
+  text-transform: uppercase;
+}
+.page .g-field .input::placeholder {
+  text-transform: none;
+}
+.page .g-err {
+  font-size: 16px;
+  color: var(--danger);
+}

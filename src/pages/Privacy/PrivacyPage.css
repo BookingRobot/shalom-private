@@ -1,0 +1,51 @@
+/* /privacy — the privacy policy (PrivacyPage.tsx); type and buttons come from RulesPage.css */
+.pg-privacy .pv-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pg-privacy .pv-crumbs {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-privacy h1 {
+  font-size: var(--fs-4);
+}
+.pg-privacy .pv-lead {
+  margin: 0;
+  color: var(--ink-2);
+}
+.pg-privacy .pv-sec {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pg-privacy .pv-sec h2 {
+  font-size: var(--fs-3);
+}
+.pg-privacy .pv-sec p,
+.pg-privacy .pv-sec ul {
+  margin: 0;
+}
+.pg-privacy .pv-sec ul {
+  padding-inline-start: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-privacy .pv-foot {
+  margin: 0;
+  font-size: 16px;
+}
+@media (max-width: 760px) {
+  .pg-privacy .pv-main {
+    padding: 24px 16px 40px;
+  }
+  .pg-privacy .pv-sec {
+    padding: 20px 18px;
+  }
+}

@@ -1,4 +1,8 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import type { Quote } from '../../api/types';
+import { useQuote } from '../../api/useQuote';
+import { track } from '../../lib/analytics';
 import { PHONE_TEL } from '../../data/contacts';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
@@ -6,7 +10,8 @@ import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { orderPriceRows, OrderSummary } from '../../components/OrderSummary';
 import { StepNext } from '../../components/StepNext';
-import { orderSummary } from '../../lib/orderSummary';
+import { guestNames, orderSummary } from '../../lib/orderSummary';
+import { DemoMark } from '../../components/DemoMark';
 import { shortDate } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { DEPOSIT_FLIGHT_PP, persons } from '../../lib/pricing';
@@ -35,7 +40,11 @@ class PaymentLogic extends PageLogic {
     // Agents' terms: a deposit (35 € per person, +100 € per person with flights) fixes the price;
     // the rest is paid before a set date, until which cancellation is free. Close to arrival — pay in full.
     const booking = this.props.booking.booking;
-    const order = orderSummary(booking);
+    // the amounts charged come from the server's quote (the same numbers go on the invoice);
+    // until it arrives the page shows the local estimate and the pay button waits
+    const local = orderSummary(booking);
+    const q: Quote | null = this.state.quote ?? null;
+    const order = q ? { ...local, total: q.total, advance: q.deposit, rest: q.rest, fullOnly: q.fullOnly } : local;
     const plan = order.fullOnly ? 'full' : (this.state.plan ?? 'adv');
     const adv = plan === 'adv';
     const TOTAL = order.total;
@@ -90,7 +99,13 @@ class PaymentLogic extends PageLogic {
       rest: adv
         ? 'Остаток ' + restAmt + '\u00a0€ — до ' + order.dueDate + ', отмена до этой даты бесплатная'
         : 'Всё оплачено. На месте ничего доплачивать не нужно',
-      payLabel: adv ? 'Внести депозит ' + advAmt + '\u00a0€' : 'Оплатить ' + totalAmt + '\u00a0€',
+      payLabel: !q
+        ? 'Считаем сумму…'
+        : adv
+          ? 'Внести депозит ' + advAmt + '\u00a0€'
+          : 'Оплатить ' + totalAmt + '\u00a0€',
+      quoteReady: !!q,
+      quoteFailed: !!this.state.quoteFailed,
     };
   }
 }
@@ -99,6 +114,11 @@ export default function PaymentPage() {
   usePageTitle('Шаг 4 из 4 — оплата');
   const [v, logic] = usePageLogic(PaymentLogic);
   const order = orderSummary(logic.props.booking.booking);
+  const quote = useQuote(logic.props.booking.booking);
+  useEffect(() => {
+    if (quote.data !== (logic.state.quote ?? null) || !!quote.error !== !!logic.state.quoteFailed)
+      logic.setState({ quote: quote.data, quoteFailed: !!quote.error });
+  }, [quote.data, quote.error, logic]);
   return (
     <div className="page pg-payment">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -141,6 +161,9 @@ export default function PaymentPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              // paid: the confirmation may open (StepGuard)
+              if (logic.props.booking.booking.progress < 4) logic.props.booking.update({ progress: 4 });
+              track('Deposit paid', { plan: logic.state.plan ?? 'adv' });
               logic.props.navigate('/done');
             }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
@@ -153,6 +176,7 @@ export default function PaymentPage() {
             </div>
             {/* Plan */}
             <section
+              id="payPlan"
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
@@ -349,7 +373,8 @@ export default function PaymentPage() {
                   <span>
                     {v.fullOnly ? (
                       <>
-                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория
+                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                       </>
                     ) : (
                       <>
@@ -400,7 +425,8 @@ export default function PaymentPage() {
                       </>
                     ) : (
                       <>
-                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем
+                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                       </>
                     )}
                   </span>
@@ -455,8 +481,9 @@ export default function PaymentPage() {
                 {' '}
                 <input type="checkbox" />{' '}
                 <span>
-                  Я ознакомился с <Link to="/rules">условиями бронирования и отмены</Link> и согласен на обработку
-                  персональных данных гостей для оформления заказа.
+                  Я ознакомился с <Link to="/rules#cancel">условиями бронирования и отмены</Link> и согласен на
+                  обработку персональных данных гостей по <Link to="/privacy">политике конфиденциальности</Link> — для
+                  оформления заказа.
                 </span>{' '}
               </label>
             </section>
@@ -489,6 +516,16 @@ export default function PaymentPage() {
                 </>
               }
               missing={() => [
+                ...(v.quoteReady
+                  ? []
+                  : [
+                      {
+                        label: v.quoteFailed
+                          ? 'сумма к оплате — нет связи, позвоните нам'
+                          : 'сумма к оплате (ещё считается)',
+                        target: '#payPlan',
+                      },
+                    ]),
                 // [ТЕСТОВЫЙ РЕЖИМ] any card details are taken, only empty fields are asked for
                 ...cardMissing('pay'),
                 ...(document.querySelector<HTMLInputElement>('#payAgree input')?.checked
@@ -502,7 +539,7 @@ export default function PaymentPage() {
               ['Даты', order.dates],
               ['Номер', order.roomName],
               ['Программа', order.programName, order.programPerDay],
-              ['Гости', 'Mikhail Levin, Irina Levina'],
+              ['Гости', guestNames(logic.props.booking.booking) || order.guests],
               ['Трансфер', order.transferPlaces],
             ]}
             prices={orderPriceRows(order)}

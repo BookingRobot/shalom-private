@@ -5,6 +5,7 @@ import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
 import { eur, quote } from '../lib/pricing';
 import { WIZ_ICONS } from './wizardIcons';
+import './ChooseWizard.css';
 
 /**
  * "Помогите выбрать": three questions, one per screen, big buttons — then 2–3
@@ -125,7 +126,7 @@ export function ChooseWizard({
                 ))}
               </span>
             </span>
-            <h2 id="wzTitle" style={{ fontSize: '26px' }}>
+            <h2 id="wzTitle" className="wz-title">
               {step === 1
                 ? 'Что хотите подлечить?'
                 : step === 2

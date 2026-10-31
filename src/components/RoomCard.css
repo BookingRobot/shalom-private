@@ -1,0 +1,310 @@
+/* Room offer card (results and the sanatorium page) and its open details. */
+body .page .rc {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--rc-border, 1px solid var(--line));
+  background: var(--rc-bg, var(--paper));
+}
+.page .rc-top {
+  display: flex;
+  flex-wrap: wrap;
+}
+.page .rc-pic {
+  position: relative;
+  flex: 0 0 240px;
+  width: 240px;
+  max-width: calc(100% - 28px);
+  height: 200px;
+  align-self: flex-start;
+  margin: 14px 0 14px 14px;
+  border-radius: var(--r-field);
+  overflow: hidden;
+  background: var(--ink);
+}
+.page .rc-pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--rc-filter, none);
+}
+.page .rc-busy-tag {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: var(--muted);
+  color: var(--paper);
+  font-size: 16px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: var(--r-field);
+}
+.page .rc-body {
+  flex: 1 1 300px;
+  min-width: 0;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.page .rc-pill {
+  align-self: flex-start;
+  background: var(--rc-pill-bg, var(--green-soft));
+  color: var(--rc-pill-color, var(--green));
+}
+.page .rc-name {
+  font-size: 22px;
+  color: var(--rc-name, var(--ink));
+}
+.page .rc-line {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.page .rc-line-tight {
+  margin-top: -4px;
+}
+.page .rc-buy {
+  flex: 0 0 240px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--line);
+  justify-content: center;
+}
+.page .rc-choose {
+  min-height: 48px;
+  font-size: 16px;
+  margin-top: 12px;
+}
+.page .next-tip + .rc-choose {
+  margin-top: 0;
+}
+.page .rc-busy-t {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink-2);
+  line-height: 1.25;
+}
+.page .rc-busy-s {
+  font-size: 16px;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+.page .rc-busy-s strong {
+  color: var(--ink);
+}
+.page .rc-dates {
+  min-height: 48px;
+  font-size: 16px;
+  margin-top: 12px;
+  padding: 0 14px;
+}
+.page .rc-det-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: var(--sand);
+  padding: 12px 18px;
+  min-height: 48px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+}
+.page .rc-det-btn > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page .rc-det-btn svg {
+  flex: none;
+}
+.page .rc-chev.open {
+  transform: rotate(180deg);
+}
+@media (max-width: 640px) {
+  .page .rc-buy {
+    flex: 1 1 100%;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    margin: 0 14px;
+    padding: 14px 0 16px;
+  }
+}
+
+/* ── open details ── */
+.page .rd {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+  background: var(--sand);
+}
+.page .rd-sec,
+.page .rd-col,
+.page .rd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.page .rd-cap {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.page .rd-prog {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 16px;
+  border: 2px solid var(--rd-border, var(--line-strong));
+  background: var(--rd-bg, var(--paper));
+  border-radius: var(--r-field);
+  cursor: pointer;
+  text-align: left;
+}
+.page .rd-prog svg {
+  flex: none;
+}
+.page .rd-radio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--rd-border, var(--line-strong));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: var(--paper);
+}
+.page .rd-radio span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rd-dot, transparent);
+}
+.page .rd-prog-t {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.page .rd-prog-t strong {
+  font-size: 17px;
+}
+.page .rd-prog-t span {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.page .rd-prog-p {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.page .rd-prog-p strong {
+  font-size: 18px;
+}
+.page .rd-prog-p span {
+  font-size: 16px;
+}
+.page .rd-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 10px;
+}
+.page .rd-tile {
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: var(--r-field);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 118px;
+}
+.page .rd-tile-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page .rd-tile-top svg {
+  flex: none;
+}
+.page .rd-big {
+  font-family: var(--font-head);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--green);
+}
+.page .rd-tile strong {
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.page .rd-tile > span {
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+.page .rd-cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+.page .rd-col {
+  flex: 1 1 260px;
+}
+.page .rd-fact {
+  color: var(--ink);
+  font-size: 16px;
+}
+.page .rd-amen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+  gap: 8px 12px;
+}
+.page .rd-text {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.page .rd-full {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--sand);
+  border-radius: var(--r-field);
+  padding: 12px 16px;
+}
+.page .rd-full .rd-cap {
+  margin-bottom: 4px;
+}
+.page .rd-line {
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.page .rd-go {
+  display: flex;
+  justify-content: flex-end;
+}
+.page .rd-go .btn {
+  min-height: 52px;
+  font-size: 17px;
+}

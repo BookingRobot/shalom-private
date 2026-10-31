@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { PhoneCodeSelect } from '../../components/PhoneCodeSelect';
+import { PhoneField } from '../../components/PhoneField';
+import { track } from '../../lib/analytics';
+import { checkPhone, nameError } from '../../lib/guestRules';
 import { CardForm, cardMissing } from '../../components/CardForm';
 import { BirthDateField, birthLabel } from '../../components/BirthDate';
 import { PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
@@ -24,7 +26,6 @@ interface Saved {
 }
 
 const KEY = 'br-shalom:tickets';
-const LATIN = /^[A-Za-z][A-Za-z' -]*$/;
 const dayLabel = (s: string) => {
   const d = toD(s);
   return WEEKDAYS_SHORT[d.getUTCDay()].toLowerCase() + ', ' + shortDate(d);
@@ -127,7 +128,7 @@ export function TicketOrder({
       return c;
     });
   };
-  const setField = (k: 'phone' | 'email', val: string) => {
+  const setField = (k: 'phone' | 'email' | 'code', val: string) => {
     setV((o) => ({ ...o, [k]: val }));
     setBad((b) => {
       const c = { ...b };
@@ -139,18 +140,17 @@ export function TicketOrder({
   const checkPax = () => {
     const e: Record<string, string> = {};
     v.pax.forEach((p, i) => {
-      if (!p.first.trim()) e[`p${i}first`] = 'Впишите имя';
-      else if (!LATIN.test(p.first.trim())) e[`p${i}first`] = 'Латинскими буквами, как в паспорте';
-      if (!p.last.trim()) e[`p${i}last`] = 'Впишите фамилию';
-      else if (!LATIN.test(p.last.trim())) e[`p${i}last`] = 'Латинскими буквами, как в паспорте';
+      // the same rules as step 3 «Гости» (lib/guestRules)
+      const fe = nameError(p.first, 'имя');
+      if (fe) e[`p${i}first`] = fe;
+      const le = nameError(p.last, 'фамилию');
+      if (le) e[`p${i}last`] = le;
       if (!p.birth) e[`p${i}birth`] = 'Выберите дату рождения';
     });
-    if (v.phone.replace(/\D/g, '').length < 6) e.phone = 'Впишите номер телефона';
+    const ph = checkPhone(v.code || '+972 · Израиль', v.phone);
+    if (ph.error) e.phone = ph.error;
     if (!/^\S+@\S+\.\S+$/.test(v.email.trim())) e.email = 'Впишите e-mail, например name@gmail.com';
     setBad(e);
-    // the country code of the phone (the select keeps its own value)
-    const code = (document.querySelector('.tk-tel select') as HTMLSelectElement | null)?.value.split(' ')[0] || '';
-    setV((o) => ({ ...o, code }));
     const first = Object.keys(e)[0];
     if (first) {
       document.getElementById('tk-' + first)?.focus();
@@ -178,6 +178,7 @@ export function TicketOrder({
       const no = 'TK-' + offer.there.date.slice(2).replace(/-/g, '') + '-' + (100 + Math.floor(Math.random() * 900));
       setV((o) => ({ ...o, no }));
       setPaying(false);
+      track('Tickets paid', { passengers: v.pax.length });
       go('done');
     }, 1300);
   };
@@ -262,19 +263,14 @@ export function TicketOrder({
                 {field(
                   'phone',
                   'Телефон (WhatsApp)',
-                  <span className="tk-tel">
-                    <PhoneCodeSelect className="input" />
-                    <input
-                      id="tk-phone"
-                      className="input"
-                      type="tel"
-                      inputMode="numeric"
-                      autoComplete="tel-national"
-                      placeholder="50 123 4567"
-                      value={v.phone}
-                      onChange={(e) => setField('phone', e.target.value)}
-                    />
-                  </span>,
+                  <PhoneField
+                    id="tk-phone"
+                    className="tk-tel"
+                    code={v.code || '+972 · Израиль'}
+                    number={v.phone}
+                    onCode={(c) => setField('code', c)}
+                    onNumber={(n) => setField('phone', n)}
+                  />,
                 )}
                 {field(
                   'email',
@@ -326,7 +322,7 @@ export function TicketOrder({
                 ))}
               </ul>
               <span className="tk-names-to">
-                Билеты пришлём: {v.email} · WhatsApp {v.code} {v.phone}
+                Билеты пришлём: {v.email} · WhatsApp {(v.code || '+972').split(' ')[0]} {v.phone}
               </span>
               <button type="button" className="linkbtn tk-back" onClick={() => go('pax')}>
                 Изменить данные
@@ -364,7 +360,8 @@ export function TicketOrder({
               />
               <span>
                 Имена проверены — как в паспорте. Согласен с правилами перевозчика {FLIGHT_FACTS.airline}: билеты не
-                возвращаются, изменения — за доплату.
+                возвращаются, изменения — за доплату. Данные пассажиров передаём авиакомпании по{' '}
+                <Link to="/privacy">политике конфиденциальности</Link>.
               </span>
             </label>
             {agreeBad && !agree ? (

@@ -1,0 +1,5 @@
+/* «Сообщить, если цена изменится»: the contact field of the share block. */
+.page .share-input {
+  min-height: 48px;
+  font-size: 17px;
+}

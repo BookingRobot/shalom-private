@@ -137,14 +137,25 @@
       0 0 0 6px transparent;
   }
 }
-/* the floating buttons step up while the bar is shown */
+/*
+ * One notification channel (see StepNext.tsx): while the bar is shown, everything fixed at the
+ * bottom of the screen steps up by the bar's height — the «Ваши пожелания» pill, the help
+ * button, the feedback toast. Add a new floating element here, never a bottom offset of its
+ * own.
+ */
 body.has-stepbar .fb-btn,
+body.has-stepbar .fb-toast,
 body.has-stepbar .help-fab {
   translate: 0 calc(-1 * var(--stepbar-h, 76px));
 }
 .fb-btn,
+.fb-toast,
 .help-fab {
   transition: translate 0.3s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+/* «Показать ↑» scrolls to a spot: it lands above the bar, not under it */
+html:has(body.has-stepbar) {
+  scroll-padding-bottom: calc(var(--stepbar-h, 76px) + 16px);
 }
 @media (max-width: 600px) {
   .step-bar-in {

@@ -6,14 +6,13 @@ import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './RulesPage.css';
+import { DemoMark } from '../../components/DemoMark';
 
 const HELP_CTX: HelpContextInfo = {};
 
-class RulesLogic extends PageLogic {
-  renderVals() {
-    return this._rv();
-  }
-  _rv() {
+/** the page keeps no state of its own: the order comes from the shared booking */
+class RulesLogic extends PageLogic<Record<string, never>> {
+  renderVals(): Record<string, never> {
     return {};
   }
 }
@@ -158,7 +157,8 @@ export default function RulesPage() {
                   <div className="row">
                     <b>После даты оплаты остатка</b>
                     <p>
-                      Депозит не возвращается, остаток возвращаем <span className="ph">[ПОДТВЕРДИТЬ УСЛОВИЯ]</span>.
+                      Депозит не возвращается, остаток возвращаем
+                      <DemoMark className="ph"> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                     </p>
                   </div>
                   <div className="row">
@@ -232,8 +232,8 @@ export default function RulesPage() {
                 <h2 style={{ fontSize: '23px' }}>5. Ваши данные</h2>
                 <p>
                   Имена, даты рождения и контакты гостей передаём только санаторию и перевозчику — для регистрации,
-                  лечения и трансфера. Храним их <span className="ph">[срок]</span> и удаляем по вашей просьбе. Данные
-                  карт не храним.
+                  лечения и трансфера. Удаляем по вашей просьбе, данные карт не храним. Подробно — в{' '}
+                  <Link to="/privacy">политике конфиденциальности</Link>.
                 </p>
               </section>
               <section

@@ -1,5 +1,4 @@
-import { Fragment, useState } from 'react';
-import { PHONE_DISPLAY } from '../../data/contacts';
+import { Fragment, useState, type ChangeEvent } from 'react';
 import { IconPath } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
@@ -9,7 +8,7 @@ import { SearchCard } from '../../components/SearchCard';
 import { ChooseCard } from '../../components/ChooseCard';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CalLegend } from '../../components/calendar/CalLegend';
-import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
+import { MonthsCalendar, type CalendarCell, type CalendarMonth } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
@@ -20,9 +19,10 @@ import { api } from '../../api';
 import { RESORTS } from '../../data/search';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
-import { HelpStripBand } from '../../components/layout/HelpStrip';
-import { AgencyBlock, FooterSlot } from '../../components/layout/SiteFooter';
+import { SiteFooter } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
+import { sanatoriumPath } from '../../lib/seo';
+import { CalendarDialog, RangeSummary } from '../../components/calendar/CalendarDialog';
 import './MainPage.css';
 
 const RESORT_CARDS = [
@@ -44,23 +44,62 @@ const RESORT_CARDS = [
 
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
-class MainLogic extends PageLogic {
+/** what the home page remembers: the dates and the state of the calendar window */
+interface MainState {
+  in: string;
+  out: string;
+  /** the dates being picked in the calendar (null while not yet tapped) */
+  sel?: { in: string | null; out: string | null };
+  calOpen?: boolean;
+  flex?: boolean;
+  month?: number;
+  year?: number;
+  /** a note over the calendar ("нет мест" …) */
+  note?: string | null;
+}
+
+/** everything the home page markup needs */
+interface MainVals {
+  flexMode: boolean;
+  setFlex: (flex: boolean) => void;
+  flexPick: (a: string, b: string) => void;
+  hotels: ReturnType<typeof api.getPopularSanatoriums>;
+  dest: string;
+  destOptions: typeof RESORTS;
+  setDest: (e: ChangeEvent<HTMLSelectElement>) => void;
+  inLabel: string;
+  outLabel: string;
+  calOpen: boolean;
+  calNote: string;
+  calNoteClose: () => void;
+  calNoteAsk: () => void;
+  openCal: () => void;
+  closeCal: () => void;
+  calPrev: () => void;
+  calNext: () => void;
+  months: CalendarMonth[];
+  calHint: string;
+  selIn: string;
+  selOut: string;
+  selNights: string;
+  applyOff: boolean;
+  applyCal: () => void;
+}
+
+class MainLogic extends PageLogic<MainState> {
   constructor(props: PageServices) {
     super(props);
     const b = props.booking.booking;
     this.state = { in: b.checkin, out: b.checkout };
   }
-  syncBooking(st) {
+  syncBooking(st: MainState) {
     return st.in && st.out ? { checkin: st.in, checkout: st.out } : null;
   }
-  renderVals() {
-    return this._rv();
-  }
-  _rv() {
+  renderVals(): MainVals {
     const POPULAR_SANATORIUMS = api.getPopularSanatoriums();
 
     // ---- Custom two-month range calendar with price colours ----
-    const st = this.state || {};
+    const st = this.state;
     const inD = toD(st.in || '2026-11-09'),
       outD = toD(st.out || '2026-11-18');
     const sel = st.sel || { in: iso(inD), out: iso(outD) };
@@ -68,8 +107,8 @@ class MainLogic extends PageLogic {
       sOut = sel.out ? toD(sel.out) : null;
     // Average price per person per night across the resort — synthetic season curve [ЗАМЕНИТЬ НА РЕАЛЬНЫЕ ТАРИФЫ]
     const BASE = 100;
-    const dayIdx = (d) => daysBetween(TODAY, d);
-    const priceOf = (d) => {
+    const dayIdx = (d: Date) => daysBetween(TODAY, d);
+    const priceOf = (d: Date) => {
       const n = dayIdx(d),
         wd = d.getUTCDay(),
         m = d.getUTCMonth();
@@ -87,7 +126,7 @@ class MainLogic extends PageLogic {
       y0 = st.year ?? inD.getUTCFullYear();
     // a stay can't cross a "нет мест" night: say so in a pop-up instead of selecting
     const blocked = (d: Date) => isSoldOutEverywhere(iso(d));
-    const pickDay = (date) => () => {
+    const pickDay = (date: Date) => () => {
       const k = iso(date);
       if (sel.in && !sel.out && date > toD(sel.in)) {
         const bad = blockedNights(toD(sel.in), date, blocked);
@@ -101,7 +140,7 @@ class MainLogic extends PageLogic {
       if (blocked(date)) return this.setState({ note: blockedNote([date], true) });
       this.setState({ sel: { in: k, out: null }, note: null });
     };
-    const monthCells = (y, m) => {
+    const monthCells = (y: number, m: number) => {
       const first = new Date(Date.UTC(y, m, 1));
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
@@ -183,10 +222,10 @@ class MainLogic extends PageLogic {
     const { booking, update } = this.props.booking;
     return {
       flexMode: !!st.flex,
-      setFlex: (flex) => this.setState({ flex }),
+      setFlex: (flex: boolean) => this.setState({ flex }),
       // a recommended option is the choice: set the dates and show sanatoriums right away
       // (with the resort not chosen yet the guest stays here: the bubble points at the resort)
-      flexPick: (a, b) => {
+      flexPick: (a: string, b: string) => {
         this.setState({ in: a, out: b, flex: false, calOpen: false });
         this.props.booking.update({ checkin: a, checkout: b, chosenDates: true });
         const place = booking.chosenPlace;
@@ -195,7 +234,7 @@ class MainLogic extends PageLogic {
       hotels: POPULAR_SANATORIUMS,
       dest: booking.dest,
       destOptions: RESORTS,
-      setDest: (e) => update({ dest: e.target.value }),
+      setDest: (e: ChangeEvent<HTMLSelectElement>) => update({ dest: e.target.value }),
       inLabel: longDate(inD),
       outLabel: longDate(outD),
       calOpen: !!st.calOpen,
@@ -343,7 +382,7 @@ export default function MainPage() {
             </Link>
           </div>
           <div className="pop-grid">
-            {(v.hotels || []).map((h: any, _i0: number) => (
+            {v.hotels.map((h, _i0) => (
               <Fragment key={_i0}>
                 <article className="card hcard">
                   <img src={h.img} alt={h.name} />{' '}
@@ -411,7 +450,7 @@ export default function MainPage() {
                       </div>
                       <Link
                         className="btn btn-secondary"
-                        to={'/hotel?h=' + h.id}
+                        to={sanatoriumPath(h.id)}
                         style={{ minHeight: '42px', fontSize: '16px', padding: '0 16px' }}
                       >
                         Посмотреть →
@@ -505,195 +544,52 @@ export default function MainPage() {
             </div>
           </div>
         </section>
-        <HelpStripBand maxWidth={1340} />
-        <footer style={{ background: 'var(--ink)', color: 'var(--green-line)' }}>
-          <div
-            style={{
-              maxWidth: '1340px',
-              margin: '0 auto',
-              padding: '16px 24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '24px',
-              flexWrap: 'wrap',
-              fontSize: '16px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                fontFamily: 'Montserrat,Manrope,sans-serif',
-                fontSize: '16px',
-                fontWeight: '700',
-                color: 'var(--paper)',
-              }}
-            >
-              <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="var(--green)" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="var(--sand)" />
-              </svg>
-              Санатории Литвы
-            </div>
-            <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap' }}>
-              <Link to="/rules#contact" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
-                Контакты
-              </Link>
-              <Link to="/rules" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
-                Условия оплаты
-              </Link>
-              <Link to="/rules" style={{ color: 'var(--green-line)', textDecoration: 'none' }}>
-                Отмена бронирования
-              </Link>
-            </div>
-            <div
-              style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: 'var(--paper)' }}
-            >
-              <span dir="ltr">{PHONE_DISPLAY}</span>
-              <span style={{ fontWeight: '600', color: 'var(--green-line)' }}>RU ▾</span>
-            </div>
-            <FooterSlot />
-          </div>
-          <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 24px 18px' }}>
-            <AgencyBlock />
-          </div>
-        </footer>
+        <SiteFooter maxWidth={1340} />
       </div>{' '}
       {/* Custom date-range calendar (two months, price colours) */}{' '}
       {v.calOpen ? (
-        <>
-          <div
-            style={{
-              position: 'fixed',
-              inset: '0',
-              background: 'rgba(18,34,27,.55)',
-              zIndex: '50',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '16px',
-              overflow: 'auto',
-            }}
-          >
-            <div
-              className="cal-dlg"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="calTitle"
-              style={{
-                background: 'var(--paper)',
-                borderRadius: 'var(--r-field)',
-                width: 'min(1120px,100%)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                padding: '18px 24px 16px',
-                boxShadow: '0 24px 60px rgba(0,0,0,.35)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '24px' }}>
-                    Выберите даты поездки
-                  </h2>
-                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{v.calHint}</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={v.closeCal}
-                  style={{ minHeight: '44px', fontSize: '16px', padding: '0 16px' }}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                  Закрыть
-                </button>
-              </div>
-              <DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />
-              {v.flexMode ? (
-                <FlexDates onPick={v.flexPick} />
-              ) : (
-                <>
-                  <div className="cal-body">
-                    <MonthsCalendar
-                      months={v.months || []}
-                      onPrev={v.calPrev}
-                      onNext={v.calNext}
-                      planeTitle="Рейс из Израиля"
-                    />
-                    <CalLegend />
-                  </div>
-                </>
-              )}
-              <div
-                style={{
-                  display: v.flexMode ? 'none' : 'flex', // a flexible-dates option goes straight to results
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                  borderTop: '1px solid var(--line)',
-                  paddingTop: '12px',
-                }}
-              >
+        <CalendarDialog
+          canvas="main-calendar"
+          title="Выберите даты поездки"
+          hint={v.calHint}
+          tabs={<DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />}
+          onClose={v.closeCal}
+          // a flexible-dates option goes straight to results: no foot then
+          selection={
+            v.flexMode ? null : (
+              <>
                 {v.calNote ? <CalNotice text={v.calNote} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
-                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Заезд</span>
-                    <strong style={{ fontSize: '18px' }}>{v.selIn}</strong>
-                  </div>
-                  <svg
-                    width="26"
-                    height="26"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--green)"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Выезд</span>
-                    <strong style={{ fontSize: '18px' }}>{v.selOut}</strong>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '18px', color: 'var(--green)' }}>{v.selNights}</strong>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button type="button" className="btn btn-secondary" onClick={v.closeCal}>
-                    Отмена
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={v.applyCal}
-                    disabled={!!v.applyOff}
-                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
-                  >
-                    Подтвердить даты
-                  </button>
-                </div>
-              </div>
+                <RangeSummary from={v.selIn} to={v.selOut} total={v.selNights} />
+              </>
+            )
+          }
+          actions={
+            v.flexMode ? null : (
+              <>
+                <button type="button" className="btn btn-secondary" onClick={v.closeCal}>
+                  Отмена
+                </button>
+                <button type="button" className="btn btn-primary" onClick={v.applyCal} disabled={!!v.applyOff}>
+                  Подтвердить даты
+                </button>
+              </>
+            )
+          }
+        >
+          {v.flexMode ? (
+            <FlexDates onPick={v.flexPick} />
+          ) : (
+            <div className="cal-body">
+              <MonthsCalendar
+                months={v.months || []}
+                onPrev={v.calPrev}
+                onNext={v.calNext}
+                planeTitle="Рейс из Израиля"
+              />
+              <CalLegend />
             </div>
-          </div>
-        </>
+          )}
+        </CalendarDialog>
       ) : null}{' '}
       {/* "Какой санаторий подойдёт вам?" — the 3-question wizard opens right here */}
       <ChooseWizard

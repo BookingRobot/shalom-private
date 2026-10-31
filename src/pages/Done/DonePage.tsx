@@ -3,14 +3,13 @@ import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../../data/contacts';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
-import { orderSummary } from '../../lib/orderSummary';
+import { guestNames, orderSummary } from '../../lib/orderSummary';
 import { daysBetween, nightsWord, plural, shortDate, toD } from '../../lib/dates';
 import { fmt } from '../../lib/format';
 import { TODAY } from '../../data/demo';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
-import { HelpStripBand } from '../../components/layout/HelpStrip';
-import { AgencyBlock, FooterSlot } from '../../components/layout/SiteFooter';
+import { SiteFooter } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './DonePage.css';
 
@@ -20,11 +19,9 @@ const HELP_CTX: HelpContextInfo = {
   out: '2026-11-18',
 };
 
-class DoneLogic extends PageLogic {
-  renderVals() {
-    return this._rv();
-  }
-  _rv() {
+/** the page keeps no state of its own: the order comes from the shared booking */
+class DoneLogic extends PageLogic<Record<string, never>> {
+  renderVals(): Record<string, never> {
     return {};
   }
 }
@@ -546,7 +543,7 @@ export default function DonePage() {
                       <circle cx="17" cy="9" r="2.5" />
                       <path d="M2 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3M15 21v-3a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v3" />
                     </svg>
-                    Гости: Mikhail Levin, Irina Levina
+                    Гости: {guestNames(booking) || o.guests}
                   </div>
                   <div className="fact">
                     <VanIcon height={20} />
@@ -635,51 +632,7 @@ export default function DonePage() {
             </aside>
           </div>
         </div>
-        <HelpStripBand />
-        <footer style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
-          <div
-            style={{
-              maxWidth: '1180px',
-              margin: '0 auto',
-              padding: '18px 24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '24px',
-              flexWrap: 'wrap',
-              fontSize: '16px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                fontFamily: 'Montserrat,Manrope,sans-serif',
-                fontSize: '18px',
-                fontWeight: '700',
-              }}
-            >
-              <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="var(--green)" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="var(--sand)" />
-              </svg>
-              Санатории Литвы
-            </div>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <Link to="/rules#contact" style={{ textDecoration: 'none', color: 'var(--ink-2)' }}>
-                Контакты
-              </Link>
-              <Link to="/rules" style={{ textDecoration: 'none', color: 'var(--ink-2)' }}>
-                Оплата и отмена
-              </Link>
-            </div>
-            <FooterSlot />
-          </div>
-          <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '0 24px 18px' }}>
-            <AgencyBlock tone="light" />
-          </div>
-        </footer>
+        <SiteFooter />
       </div>{' '}
       <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
     </div>

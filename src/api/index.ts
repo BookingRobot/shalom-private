@@ -1,11 +1,17 @@
 /**
  * Data access layer.
  *
- * Today every function returns sample data from src/data (synchronously).
- * When the BookingRobot API is connected, replace the bodies here with real
- * requests — pages only talk to `api`, so they don't need to change.
+ * `client` is what pages use: the asynchronous contract (client.ts, docs/openapi.yaml) —
+ * the sample data (mock.ts) until VITE_API_URL points at BookingRobot (http.ts). Every page
+ * renders loading / error / empty through `useApi` and `<AsyncBlock>`.
+ *
+ * `api` below is the synchronous sample data the mock is built from; pure helpers in
+ * src/lib still read it directly. New page code goes through `client`.
  */
 import { POPULAR_SANATORIUMS } from '../data/popular';
+import type { ApiClient } from './client';
+import { httpClient } from './http';
+import { mockClient } from './mock';
 import { EXTRA_PROGRAMS, ROOM_SETS, SANATORIUMS } from '../data/sanatoriums';
 import { EGLE_ABOUT, EGLE_SPECIALIZATIONS, TRANSFER_CARS } from '../data/egleComfort';
 import { hotelInfo } from '../data/hotelInfo';
@@ -55,3 +61,13 @@ export const api = {
     return { places: PICKUP_PLACES, prices: TRANSFER_PRICES, vehicles: VEHICLES };
   },
 };
+
+export type { ApiClient, SearchResult, SanatoriumDetails, RoomPrograms, TransferOptions } from './client';
+export type { Quote, QuoteLine, QuoteRequest, Draft, DraftStep, NightAvailability, FlightDay } from './types';
+export { ApiError } from './types';
+
+/** the API the pages talk to: BookingRobot when VITE_API_URL is set, else the sample data */
+export const client: ApiClient = (() => {
+  const url = import.meta.env.VITE_API_URL as string | undefined;
+  return url ? httpClient(url) : mockClient;
+})();

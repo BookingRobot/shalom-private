@@ -1,0 +1,245 @@
+/* «Уточните выбор»: the filter panel, its tiles, chips and columns. */
+/* Quick filters: meals, procedures per day, room features */
+.pg-results .qf {
+  padding: 14px 0 2px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-results .qf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.pg-results .qf-lbl {
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 104px;
+}
+.pg-results .qf-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pg-results .qf-chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.pg-results .qf-chip:hover {
+  border-color: var(--green);
+}
+.pg-results .qf-chip.on {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
+}
+
+/* ── filter panel ── */
+.pg-results .fp {
+  padding: 22px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-color: var(--green);
+}
+.pg-results .fp-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pg-results .fp-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pg-results .fp-title h2 {
+  font-size: 24px;
+}
+.pg-results .fp-title span {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-results .fp-close {
+  min-height: 40px;
+}
+.pg-results .fp-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.pg-results .fp-ico {
+  flex: none;
+  opacity: 0.85;
+}
+.pg-results .fp-more {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pg-results .fp-more-t {
+  font-size: 18px;
+  font-family: var(--font-head);
+  color: var(--ink);
+  gap: 12px;
+}
+.pg-results .fp-more-t svg {
+  stroke: var(--green);
+}
+.pg-results .fp-more-x {
+  font-size: 16px;
+  color: var(--green);
+  font-family: var(--font);
+}
+.pg-results .fp-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0 28px;
+}
+.pg-results .fp-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pg-results .fp-col:first-child {
+  padding-right: 20px;
+  border-right: 1px solid var(--line);
+}
+.pg-results .fp-col-mid {
+  gap: 4px;
+  padding: 0 20px;
+  border-right: 1px solid var(--line);
+}
+.pg-results .fp-col:last-child {
+  padding-left: 20px;
+}
+.pg-results .fp .ftitle {
+  font-family: var(--font);
+  font-size: 17px;
+  font-weight: 800;
+}
+.pg-results .fp-price {
+  display: flex;
+  gap: 14px;
+}
+.pg-results .fp-price label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.pg-results .fp-price .input {
+  min-height: 48px;
+}
+.pg-results .fp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.pg-results .fp-clear {
+  font-size: 17px;
+}
+.pg-results .fp-count {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-results .fp-apply {
+  min-height: 48px;
+  font-size: 18px;
+  padding: 0 22px;
+}
+@media (max-width: 760px) {
+  .pg-results .fp-tiles,
+  .pg-results .fp-cols {
+    grid-template-columns: 1fr;
+  }
+  .pg-results .fp-col,
+  .pg-results .fp-col-mid {
+    padding: 0;
+    border-right: 0;
+  }
+}
+.pg-results .fchk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--ink);
+}
+.pg-results .fchk input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--green);
+  margin: 0;
+  flex: none;
+  border-radius: var(--r-field);
+}
+.pg-results .ftitle {
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.pg-results .tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 18px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.pg-results .tile:hover {
+  border-color: var(--green);
+}
+.pg-results .tile.on {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.pg-results .tile input {
+  width: 28px;
+  height: 28px;
+  accent-color: var(--green);
+  margin: 0;
+  flex: none;
+}
+.pg-results .morebtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 2px solid var(--line-strong);
+  background: var(--paper);
+  border-radius: var(--r-field);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.pg-results .morebtn:hover {
+  border-color: var(--green);
+}

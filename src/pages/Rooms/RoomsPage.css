@@ -277,6 +277,12 @@
   background: var(--green-soft);
   color: var(--green-deep);
 }
+.pg-rooms .pg-all-chev {
+  transition: transform 0.15s;
+}
+.pg-rooms .pg-all-chev.up {
+  transform: rotate(180deg);
+}
 .pg-rooms .pg-price,
 .pg-rooms .pm-price {
   display: flex;
@@ -298,6 +304,13 @@
   color: var(--ink);
   white-space: nowrap;
   font-size: 17px;
+}
+/* the same price per day — how a sanatorium itself quotes it */
+.pg-rooms .pg-day {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green);
+  margin-top: 2px;
 }
 .pg-rooms .pg-price {
   padding-top: 4px;

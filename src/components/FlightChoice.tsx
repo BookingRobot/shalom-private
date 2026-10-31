@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { InfoTitle } from './InfoTip';
 import { FlightDates } from './FlightDates';
+import { DemoMark } from './DemoMark';
 import { CheckIcon } from './icons';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
@@ -260,7 +261,7 @@ export function FlightChoice() {
                   </div>
                   <span className="ios-foot">
                     Билеты выпишем на имена гостей со следующего шага и пришлём на почту и в WhatsApp. Цена билетов
-                    фиксируется депозитом. [ПРИМЕР ДАННЫХ]
+                    фиксируется депозитом.<DemoMark> [ПРИМЕР ДАННЫХ]</DemoMark>
                   </span>
                 </div>
               </div>

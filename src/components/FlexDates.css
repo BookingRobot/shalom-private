@@ -1,0 +1,7 @@
+/* flexible dates picker: the plane icon in the recommended rows (the base .fd-* rules are in styles/ui.css) */
+.page .fd-plane {
+  vertical-align: -3px;
+}
+.page .fd-plane.back {
+  transform: scaleX(-1);
+}

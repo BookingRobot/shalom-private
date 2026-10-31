@@ -45,7 +45,7 @@ export function RoomGallery({
   const p = photos[i];
   // on top of everything, outside the room card (its animations would trap a fixed layer)
   return createPortal(
-    <div className="rg-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="rg-overlay" data-canvas="room-gallery" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div
         className="rg"
         role="dialog"

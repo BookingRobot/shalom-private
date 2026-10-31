@@ -25,6 +25,8 @@ import { MONTHS, MONTHS_N, WEEKDAYS_SHORT, addD, daysBetween, iso, plural, short
 import { fmt } from '../../lib/format';
 import { usePageTitle } from '../../lib/usePageTitle';
 import { TicketOrder, type OrderStep } from './TicketOrder';
+import { track } from '../../lib/analytics';
+import { CalendarDialog } from '../../components/calendar/CalendarDialog';
 import './TicketsPage.css';
 
 const PLANE = 'M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z';
@@ -317,6 +319,7 @@ export default function TicketsPage() {
                   className="tk-search"
                   onSubmit={(e) => {
                     e.preventDefault();
+                    track('Tickets searched');
                     search();
                   }}
                 >
@@ -613,39 +616,38 @@ export default function TicketsPage() {
 
       {/* the calendar: flight days only, two months side by side */}
       {cal ? (
-        <div className="tk-overlay" onClick={(e) => e.target === e.currentTarget && setCal('')}>
-          <div className="cal-dlg tk-cal" role="dialog" aria-modal="true" aria-labelledby="tkCalT">
-            <div className="tk-cal-h">
-              <span>
-                <h2 id="tkCalT">{cal === 'dep' ? 'Когда летите туда?' : 'Когда обратно?'}</h2>
-                <span>
-                  {COUNTRIES[cal === 'dep' ? from : to].city} → {COUNTRIES[cal === 'dep' ? to : from].city} · отмечены
-                  дни с рейсом, цена с человека
-                </span>
-              </span>
-              <button type="button" className="btn btn-secondary" onClick={() => setCal('')}>
-                ✕ Закрыть
-              </button>
-            </div>
-            <MonthsCalendar
-              months={months}
-              onPrev={() => canPrev && setMonth({ m: (m0 + 11) % 12, y: m0 === 0 ? y0 - 1 : y0 })}
-              onNext={() => canNext && setMonth({ m: m1, y: y1 })}
-              planeTitle="Есть рейс"
-            />
-            <div className="tk-cal-f">
+        <CalendarDialog
+          className="tk-cal"
+          canvas="tickets-calendar"
+          title={cal === 'dep' ? 'Когда летите туда?' : 'Когда обратно?'}
+          hint={
+            <>
+              {COUNTRIES[cal === 'dep' ? from : to].city} → {COUNTRIES[cal === 'dep' ? to : from].city} · отмечены дни с
+              рейсом, цена с человека
+            </>
+          }
+          onClose={() => setCal('')}
+          selection={
+            <span className="tk-cal-f">
               <span className="lg">
-                <i style={{ background: 'var(--green-soft)', border: '1px solid var(--green-line)' }} />
+                <i className="lg-fly" />
                 есть рейс
               </span>
               <span className="lg">
-                <i style={{ background: 'var(--sand)' }} />
+                <i className="lg-none" />
                 рейса нет
               </span>
               {cal === 'ret' && dep ? <span className="tk-cal-dep">Туда: {dayLabel(dep)}</span> : null}
-            </div>
-          </div>
-        </div>
+            </span>
+          }
+        >
+          <MonthsCalendar
+            months={months}
+            onPrev={() => canPrev && setMonth({ m: (m0 + 11) % 12, y: m0 === 0 ? y0 - 1 : y0 })}
+            onNext={() => canNext && setMonth({ m: m1, y: y1 })}
+            planeTitle="Есть рейс"
+          />
+        </CalendarDialog>
       ) : null}
       <HelpWidget ctx={{}} />
     </div>

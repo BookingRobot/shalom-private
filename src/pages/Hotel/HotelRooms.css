@@ -1,0 +1,306 @@
+/* Sanatorium page, «Номера и программы» tab: the dates bar, the rooms and the fold-out rows. */
+.pg-hotel .ht-rooms {
+  flex: 1 1 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── «Ваши даты» ── */
+.pg-hotel .hb {
+  background: var(--green-soft);
+  border: 2px solid var(--green);
+  border-radius: var(--r-field);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pg-hotel .hb-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.pg-hotel .hb-ico {
+  flex: none;
+}
+.pg-hotel .hb-when {
+  display: flex;
+  flex-direction: column;
+}
+.pg-hotel .hb-k,
+.pg-hotel .hr-k {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pg-hotel .hb-range {
+  font-family: var(--font-head);
+  font-size: 22px;
+  line-height: 1.15;
+}
+.pg-hotel .hb-btn {
+  min-height: 50px;
+  font-size: 16px;
+  padding: 0 20px;
+}
+
+/* ── rooms list ── */
+.pg-hotel .hr-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+}
+.pg-hotel .hr-head h2 {
+  font-size: 28px;
+}
+.pg-hotel .hr-sub {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-hotel .hr-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--ink-2);
+  background: var(--green-soft);
+  border-radius: var(--r-field);
+  padding: 10px 16px;
+}
+.pg-hotel .hr-note svg {
+  flex: none;
+}
+.pg-hotel .hr-note-plain {
+  background: none;
+  padding: 0;
+}
+
+/* ── fold-out rows ── */
+.pg-hotel .hr-row-t {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pg-hotel .hr-row-t svg {
+  flex: none;
+}
+.pg-hotel .hr-body {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 var(--r-field) var(--r-field);
+  padding: 18px 18px 16px;
+  margin-top: -8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pg-hotel .hr-facts {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 16px;
+}
+
+/* the transfer film */
+.pg-hotel .hr-film-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: var(--r-field);
+}
+.pg-hotel .hr-film-lead {
+  font-weight: 800;
+  font-size: 17px;
+}
+.pg-hotel .hr-film-k {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-hotel .hr-film {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+.pg-hotel .hr-film-step-wrap {
+  display: contents;
+}
+.pg-hotel .hr-film-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.pg-hotel .hr-film-step img {
+  height: 72px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+.pg-hotel .hr-film-t {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.2;
+}
+.pg-hotel .hr-film-s {
+  font-size: 16px;
+  color: var(--ink-2);
+  text-align: center;
+  line-height: 1.3;
+  max-width: 160px;
+}
+.pg-hotel .hr-film-arrow {
+  flex: none;
+  margin-top: 30px;
+}
+.pg-hotel .hr-film-rules {
+  font-size: 16px;
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--green-line);
+}
+
+/* check-in / check-out */
+.pg-hotel .hr-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.pg-hotel .hr-time {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border-radius: var(--r-field);
+  padding: 14px 16px;
+  background: var(--sand);
+  border: 1px solid var(--line);
+}
+.pg-hotel .hr-time.in {
+  background: var(--green-soft);
+  border-color: var(--green-line);
+}
+.pg-hotel .hr-time-ico {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pg-hotel .hr-time.in .hr-time-ico {
+  border-color: var(--green-line);
+}
+.pg-hotel .hr-time-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pg-hotel .hr-time-big {
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+.pg-hotel .hr-time-date {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-hotel .hr-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-hotel .hr-note-row {
+  color: var(--ink-2);
+  align-items: flex-start;
+}
+.pg-hotel .hr-note-row strong {
+  color: var(--ink);
+}
+.pg-hotel .hr-note-ico {
+  margin-top: 2px;
+}
+
+/* specialisations */
+.pg-hotel .hr-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.pg-hotel .hr-spec {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--sand);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+  padding: 12px 14px;
+}
+.pg-hotel .hr-spec-ico {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: var(--r-field);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pg-hotel .hr-spec-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.pg-hotel .hr-spec-txt strong {
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.pg-hotel .hr-spec-txt span {
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+@media (max-width: 760px) {
+  .pg-hotel .hr-specs,
+  .pg-hotel .hr-times {
+    grid-template-columns: 1fr;
+  }
+  .pg-hotel .hr-film {
+    flex-wrap: wrap;
+  }
+  .pg-hotel .hr-film-step {
+    flex: 1 1 40%;
+  }
+  .pg-hotel .hr-film-arrow {
+    display: none;
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { track } from '../lib/analytics';
 import { useBooking } from '../context/BookingContext';
 import { FlightToggle } from './FlightToggle';
 import { GuestsPicker } from './GuestsPicker';
@@ -155,6 +156,7 @@ export function SearchCard({
       onSubmit={(e) => {
         e.preventDefault();
         if (guide && step !== 'go') return find(e);
+        track('Search', { resort: booking.dest || '' });
         navigate(guide ? goTo : '/results', { state: guide && goTo !== '/results' ? null : TO_LIST });
       }}
     >

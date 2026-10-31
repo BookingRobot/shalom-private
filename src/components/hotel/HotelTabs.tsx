@@ -1,3 +1,4 @@
+import { DemoMark } from '../DemoMark';
 import type { HotelInfo } from '../../data/hotelInfo';
 import { DoctorAvatar, PICTO, pick } from './illustrations';
 import './HotelTabs.css';
@@ -321,7 +322,7 @@ function Reviews({ info, onRooms }: { info: HotelInfo; onRooms: () => void }) {
           </article>
         ))}
       </div>
-      <span className="ht-foot">[ПРИМЕР ОТЗЫВОВ — заменим настоящими отзывами гостей]</span>
+      <DemoMark className="ht-foot">[ПРИМЕР ОТЗЫВОВ — заменим настоящими отзывами гостей]</DemoMark>
       <ToRooms onRooms={onRooms} />
     </div>
   );

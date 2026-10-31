@@ -9,5 +9,7 @@ export const WHATSAPP_URL = 'https://wa.me/97236552522';
 export const EMAIL = 'info@atlantistravel.co.il';
 export const MAILTO = 'mailto:' + EMAIL;
 export const ADDRESS = 'Израиль, г. Бат-Ям, ул. Ротшильд 29, 5938109';
+/** the agency's licence number (Ministry of Tourism); empty until the agency gives it — launch checklist */
+export const AGENCY_LICENSE = '';
 export const SITE_NAME = 'Санатории Литвы';
 export const SITE_URL = 'https://shalom.bookingrobot.eu';

@@ -1,0 +1,33 @@
+/* Compare window: what differs first, the rest folded (the base .cmp-* rules are in styles/ui.css). */
+.page .cmp-title {
+  font-size: 26px;
+}
+.page .cmp-price {
+  font-size: 20px;
+  color: var(--green);
+}
+.page .cmp-same {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--sand);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.page .cmp-same:hover {
+  border-color: var(--green);
+}
+.page .cmp-same svg.open {
+  transform: rotate(180deg);
+}
+.page .cmp-same + .cmp-row {
+  margin-top: 6px;
+}

@@ -24,3 +24,7 @@ body {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
+/* demo-only marks («[ПРИМЕР ДАННЫХ]»): hidden entirely when VITE_DEMO=0 (components/DemoMark) */
+.demo-mark {
+  color: var(--warn-ink);
+}

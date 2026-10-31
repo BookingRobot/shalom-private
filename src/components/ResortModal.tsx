@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { RESORT_STORIES, type FunKind, type ResortIcon, type Sight, type SightPhoto } from '../data/resorts';
+import {
+  RESORT_STORIES,
+  type FunKind,
+  type Resort,
+  type ResortIcon,
+  type Sight,
+  type SightPhoto,
+} from '../data/resorts';
+import { resortPath } from '../lib/seo';
 
 const Ico = ({ d, size }: { d: string; size: number }) => (
   <svg
@@ -124,7 +132,7 @@ export function ResortModal({
   }, [onClose]);
   if (!r) return null;
   return (
-    <div className="rs-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="rs-overlay" data-canvas="resort-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div role="dialog" aria-modal="true" aria-labelledby="rsTitle" className="rs">
         {/* always at hand, whatever is scrolled */}
         <button type="button" className="rs-close" onClick={onClose} aria-label="Закрыть">
@@ -151,186 +159,202 @@ export function ResortModal({
               </button>
             ))}
           </div>
-          <div className="rs-body">
-            <div className="rs-main">
-              {r.story.map((p, i) => (
-                <p key={i} className={i === 0 ? 'rs-lead' : ''}>
-                  {p}
-                </p>
-              ))}
-              <h3>Почему сюда едут</h3>
-              <ul className="rs-why">
-                {r.why.map((w) => (
-                  <li key={w.t}>
-                    <span className="rs-ico" aria-hidden="true">
-                      <Ico d={ICON[w.icon]} size={26} />
-                    </span>
-                    <span>
-                      <strong>{w.t}</strong>
-                      <span>{w.d}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              {r.gallery.length ? (
-                <div className="rs-gallery">
-                  {r.gallery.map((g) => (
-                    <img key={g.src} src={g.src} alt={g.alt} />
-                  ))}
-                </div>
-              ) : null}
-              <h3>Три недели на курорте: как это может быть</h3>
-              <p className="rs-sub">Лечение — в первой половине дня. Остальное время ваше.</p>
-              <ol className="rs-weeks">
-                {r.weeks.map((w, i) => (
-                  <li key={w.t}>
-                    <span className="rs-wk" aria-hidden="true">
-                      {i + 1}
-                    </span>
-                    <span>
-                      <strong>{w.t}</strong>
-                      <span>{w.d}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-              {r.sights.length ? (
-                <>
-                  <h3>Что стоит увидеть</h3>
-                  <p className="rs-sub">Музеи, храмы, парки и окрестности — всё в спокойном темпе.</p>
-                  <ul className="rs-sights">
-                    {r.sights.map((s) => (
-                      <SightRow key={s.t} s={s} />
-                    ))}
-                  </ul>
-                </>
-              ) : null}
-              <h3>{r.sights.length ? 'Ещё чем заняться' : 'Чем заняться вне санатория'}</h3>
-              <div className="rs-fun">
-                {r.fun.map((g) => (
-                  <section key={g.kind} className="rs-fun-g" aria-label={FUN[g.kind].t}>
-                    <h4>
-                      <span className="rs-ico rs-ico-s" aria-hidden="true">
-                        <Ico d={FUN[g.kind].d} size={22} />
-                      </span>
-                      {FUN[g.kind].t}
-                    </h4>
-                    <ul className="rs-list">
-                      {g.items.map((it) => (
-                        <li key={it.t}>
-                          <strong>{it.t}</strong>
-                          <span>{it.d}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-              <p className="rs-rain">
-                <span className="rs-ico rs-ico-s" aria-hidden="true">
-                  <Ico d={RAIN} size={22} />
-                </span>
-                <span>
-                  <strong>Если идёт дождь: </strong>
-                  {r.rain}
-                </span>
-              </p>
-              <h3>Как проходит день на курорте</h3>
-              <ol className="rs-day">
-                {r.day.map((d) => (
-                  <li key={d.time + d.t}>
-                    <time>{d.time}</time>
-                    <span>
-                      <strong>{d.t}</strong>
-                      {d.d ? <span>{d.d}</span> : null}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-              <h3>Полезно знать</h3>
-              <ul className="rs-tips">
-                {r.tips.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </div>
-            <aside className="rs-side">
-              {r.video ? (
-                /* a picture of the film with a link to YouTube (no player on the page) */
-                <a
-                  className="rs-yt"
-                  href={'https://www.youtube.com/watch?v=' + r.video.id}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={'Смотреть видео на YouTube: ' + r.video.title}
-                >
-                  <span className="rs-yt-pic">
-                    {/* the resort's own photo under the YouTube frame: shows if the frame does not load */}
-                    <img className="rs-yt-bg" src={r.hero} alt="" />
-                    <img
-                      className="rs-yt-thumb"
-                      src={'https://i.ytimg.com/vi/' + r.video.id + '/hqdefault.jpg'}
-                      alt=""
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
-                    />
-                    <span className="rs-yt-play" aria-hidden="true">
-                      <svg width="68" height="48" viewBox="0 0 68 48">
-                        <path
-                          d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.4 34 .4 34 .4s-21.2 0-26.5 1.3a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.6 34 47.6 34 47.6s21.2 0 26.5-1.3a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z"
-                          fill="var(--danger)"
-                        />
-                        <path d="M45 24 27 14v20z" fill="var(--paper)" />
-                      </svg>
-                    </span>
-                  </span>
-                  <span className="rs-yt-cap">
-                    <strong>{r.video.title}</strong>
-                    <span>Смотреть на YouTube · на русском · {r.video.by} ↗</span>
-                  </span>
-                </a>
-              ) : null}
-              <dl className="rs-facts">
-                {r.facts.map(([k, v]) => (
-                  <div key={k}>
-                    <dt>{k}</dt>
-                    <dd>{v}</dd>
-                  </div>
-                ))}
-              </dl>
-              {r.sanatoriums.length ? (
-                <div className="rs-sans">
-                  <h3>Санатории</h3>
-                  <div className="rs-san-list">
-                    {r.sanatoriums.map((s) =>
-                      s.id ? (
-                        <Link key={s.name} className="ps-chip" to={'/results?h=' + s.id}>
-                          {s.name}
-                        </Link>
-                      ) : (
-                        <span key={s.name} className="ps-chip rs-chip-off">
-                          {s.name}
-                        </span>
-                      ),
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </aside>
-          </div>
+          <ResortStory r={r} />
         </div>
         <div className="rs-foot">
           <button type="button" className="btn btn-primary rs-go" onClick={() => onChoose(r.id)}>
             Хочу в {r.nameTo}
             <span className="rs-go-more"> — подобрать санаторий</span>
           </button>
-          <span className="rs-foot-note">Курорт подставим в поиск — останется выбрать даты.</span>
+          <span className="rs-foot-note">
+            Курорт подставим в поиск — останется выбрать даты.{' '}
+            <Link to={resortPath(r.id)} onClick={onClose}>
+              Ссылка на эту страницу
+            </Link>
+          </span>
           <button type="button" className="btn btn-secondary rs-close-b" onClick={onClose}>
             Закрыть
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The resort's story — why people come, three weeks told week by week, what to see, a usual
+ * day, good to know, the film, the facts and the sanatoriums. Shown in the «Выберите курорт»
+ * window and on the resort's own page (/kurort/<id>), which search engines can find.
+ */
+export function ResortStory({ r }: { r: Resort }) {
+  return (
+    <div className="rs-body">
+      <div className="rs-main">
+        {r.story.map((p, i) => (
+          <p key={i} className={i === 0 ? 'rs-lead' : ''}>
+            {p}
+          </p>
+        ))}
+        <h3>Почему сюда едут</h3>
+        <ul className="rs-why">
+          {r.why.map((w) => (
+            <li key={w.t}>
+              <span className="rs-ico" aria-hidden="true">
+                <Ico d={ICON[w.icon]} size={26} />
+              </span>
+              <span>
+                <strong>{w.t}</strong>
+                <span>{w.d}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        {r.gallery.length ? (
+          <div className="rs-gallery">
+            {r.gallery.map((g) => (
+              <img key={g.src} src={g.src} alt={g.alt} />
+            ))}
+          </div>
+        ) : null}
+        <h3>Три недели на курорте: как это может быть</h3>
+        <p className="rs-sub">Лечение — в первой половине дня. Остальное время ваше.</p>
+        <ol className="rs-weeks">
+          {r.weeks.map((w, i) => (
+            <li key={w.t}>
+              <span className="rs-wk" aria-hidden="true">
+                {i + 1}
+              </span>
+              <span>
+                <strong>{w.t}</strong>
+                <span>{w.d}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        {r.sights.length ? (
+          <>
+            <h3>Что стоит увидеть</h3>
+            <p className="rs-sub">Музеи, храмы, парки и окрестности — всё в спокойном темпе.</p>
+            <ul className="rs-sights">
+              {r.sights.map((s) => (
+                <SightRow key={s.t} s={s} />
+              ))}
+            </ul>
+          </>
+        ) : null}
+        <h3>{r.sights.length ? 'Ещё чем заняться' : 'Чем заняться вне санатория'}</h3>
+        <div className="rs-fun">
+          {r.fun.map((g) => (
+            <section key={g.kind} className="rs-fun-g" aria-label={FUN[g.kind].t}>
+              <h4>
+                <span className="rs-ico rs-ico-s" aria-hidden="true">
+                  <Ico d={FUN[g.kind].d} size={22} />
+                </span>
+                {FUN[g.kind].t}
+              </h4>
+              <ul className="rs-list">
+                {g.items.map((it) => (
+                  <li key={it.t}>
+                    <strong>{it.t}</strong>
+                    <span>{it.d}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+        <p className="rs-rain">
+          <span className="rs-ico rs-ico-s" aria-hidden="true">
+            <Ico d={RAIN} size={22} />
+          </span>
+          <span>
+            <strong>Если идёт дождь: </strong>
+            {r.rain}
+          </span>
+        </p>
+        <h3>Как проходит день на курорте</h3>
+        <ol className="rs-day">
+          {r.day.map((d) => (
+            <li key={d.time + d.t}>
+              <time>{d.time}</time>
+              <span>
+                <strong>{d.t}</strong>
+                {d.d ? <span>{d.d}</span> : null}
+              </span>
+            </li>
+          ))}
+        </ol>
+        <h3>Полезно знать</h3>
+        <ul className="rs-tips">
+          {r.tips.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </div>
+      <aside className="rs-side">
+        {r.video ? (
+          /* a picture of the film with a link to YouTube (no player on the page) */
+          <a
+            className="rs-yt"
+            href={'https://www.youtube.com/watch?v=' + r.video.id}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={'Смотреть видео на YouTube: ' + r.video.title}
+          >
+            <span className="rs-yt-pic">
+              {/* the resort's own photo under the YouTube frame: shows if the frame does not load */}
+              <img className="rs-yt-bg" src={r.hero} alt="" />
+              <img
+                className="rs-yt-thumb"
+                src={'https://i.ytimg.com/vi/' + r.video.id + '/hqdefault.jpg'}
+                alt=""
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
+              <span className="rs-yt-play" aria-hidden="true">
+                <svg width="68" height="48" viewBox="0 0 68 48">
+                  <path
+                    d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.4 34 .4 34 .4s-21.2 0-26.5 1.3a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.6 34 47.6 34 47.6s21.2 0 26.5-1.3a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z"
+                    fill="var(--danger)"
+                  />
+                  <path d="M45 24 27 14v20z" fill="var(--paper)" />
+                </svg>
+              </span>
+            </span>
+            <span className="rs-yt-cap">
+              <strong>{r.video.title}</strong>
+              <span>Смотреть на YouTube · на русском · {r.video.by} ↗</span>
+            </span>
+          </a>
+        ) : null}
+        <dl className="rs-facts">
+          {r.facts.map(([k, v]) => (
+            <div key={k}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {r.sanatoriums.length ? (
+          <div className="rs-sans">
+            <h3>Санатории</h3>
+            <div className="rs-san-list">
+              {r.sanatoriums.map((s) =>
+                s.id ? (
+                  <Link key={s.name} className="ps-chip" to={'/results?h=' + s.id}>
+                    {s.name}
+                  </Link>
+                ) : (
+                  <span key={s.name} className="ps-chip rs-chip-off">
+                    {s.name}
+                  </span>
+                ),
+              )}
+            </div>
+          </div>
+        ) : null}
+      </aside>
     </div>
   );
 }

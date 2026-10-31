@@ -799,3 +799,242 @@
     max-width: 100%;
   }
 }
+
+/* ── layout of the page (was inline) ── */
+.pg-transfer .tr-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+.pg-transfer .tr-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: start;
+}
+.pg-transfer .tr-main {
+  flex: 999 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.pg-transfer .tr-title h1 {
+  font-size: 32px;
+}
+
+/* ── small helpers shared by the questions ── */
+.pg-transfer .tr-h2 {
+  font-size: 23px;
+}
+.pg-transfer .tr-p {
+  margin: 0;
+  font-size: 17px;
+  color: var(--ink);
+}
+.pg-transfer .tr-p-2 {
+  color: var(--ink-2);
+}
+.pg-transfer .tr-t16 {
+  font-size: 16px;
+}
+.pg-transfer .tr-t18 {
+  font-size: 18px;
+}
+.pg-transfer .tr-ink {
+  color: var(--ink);
+}
+.pg-transfer .tr-price {
+  font-size: 22px;
+}
+.pg-transfer .tr-note {
+  font-size: 16px;
+  color: var(--muted);
+}
+.pg-transfer .tr-note-top {
+  display: block;
+  margin-top: 8px;
+}
+.pg-transfer .tr-req {
+  color: var(--danger);
+}
+.pg-transfer .tr-lbl-16 {
+  font-size: 16px;
+}
+.pg-transfer .tr-lbl-note {
+  font-weight: 400;
+  color: var(--muted);
+}
+.pg-transfer .tr-lbl-opt {
+  font-weight: 600;
+  color: var(--muted);
+}
+.pg-transfer .tr-lbl-q {
+  font-size: 17px;
+  color: var(--ink);
+}
+.pg-transfer .tr-input-44 {
+  min-height: 44px;
+  font-size: 16px;
+}
+.pg-transfer .tr-stack-2,
+.pg-transfer .tr-stack-4,
+.pg-transfer .tr-stack-6,
+.pg-transfer .tr-stack-14,
+.pg-transfer .tr-field {
+  display: flex;
+  flex-direction: column;
+}
+.pg-transfer .tr-stack-2 {
+  gap: 2px;
+}
+.pg-transfer .tr-stack-4 {
+  gap: 4px;
+}
+.pg-transfer .tr-stack-6 {
+  gap: 6px;
+}
+.pg-transfer .tr-field {
+  gap: 8px;
+}
+.pg-transfer .tr-stack-14 {
+  gap: 14px;
+}
+.pg-transfer .tr-w-420 {
+  max-width: 420px;
+}
+.pg-transfer .tr-grid-240,
+.pg-transfer .tr-grid-260 {
+  display: grid;
+  gap: 14px;
+  align-items: end;
+}
+.pg-transfer .tr-grid-240 {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.pg-transfer .tr-grid-260 {
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}
+/* a <select> drawn like an input, with our own arrow */
+.pg-transfer .tr-select {
+  position: relative;
+}
+.pg-transfer .tr-select select {
+  padding-right: 44px;
+}
+.pg-transfer .tr-chevron {
+  position: absolute;
+  right: 14px;
+  top: 17px;
+  pointer-events: none;
+}
+
+/* ── «Нет, доберусь сам»: the window and the quiet card after it ── */
+.pg-transfer .tr-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(20, 28, 24, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.pg-transfer .tr-dialog {
+  max-width: 560px;
+  width: 100%;
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--sh-modal);
+}
+.pg-transfer .tr-dialog-h {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pg-transfer .tr-dialog-ico {
+  flex: none;
+}
+.pg-transfer .tr-dialog-note {
+  padding: 14px 16px;
+  background: var(--green-soft);
+  border-radius: var(--r-field);
+  font-size: 16px;
+}
+.pg-transfer .tr-dialog-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+.pg-transfer .btn.tr-dialog-main {
+  min-height: 52px;
+  font-size: 18px;
+}
+.pg-transfer .tr-none {
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--green-soft);
+  border-color: var(--green-line);
+}
+.pg-transfer .tr-none-t {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* ── «От встречи до санатория» strip ── */
+.pg-transfer .tr-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px 12px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
+  border-radius: var(--r-field);
+}
+.pg-transfer .tr-strip-t {
+  font-weight: 800;
+  font-size: 17px;
+}
+.pg-transfer .tr-more {
+  align-self: flex-start;
+  font-size: 16px;
+  min-height: 36px;
+}
+.pg-transfer .tr-more-list {
+  font-size: 16px;
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+.pg-transfer .tr-warn-ico {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* ── «Какая машина нужна?» ── */
+.pg-transfer .choice.tr-car {
+  justify-content: space-between;
+  min-height: 88px;
+}
+.pg-transfer .tr-car-l {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.pg-transfer .tr-car-price {
+  font-size: 20px;
+  white-space: nowrap;
+}

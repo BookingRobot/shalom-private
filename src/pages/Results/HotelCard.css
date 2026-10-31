@@ -1,0 +1,370 @@
+/* The sanatorium card, its rooms drawer and the «no places» list. */
+/* ── the sanatorium card: short, one primary button ── */
+body .pg-results .hc {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--hc-border, var(--line));
+}
+.pg-results .hc-top {
+  display: flex;
+  flex-wrap: wrap;
+}
+.pg-results .hc-pic {
+  flex: 0 0 300px;
+  max-width: calc(100% - 28px);
+  min-height: 200px;
+  position: relative;
+  display: block;
+  margin: 12px 0 12px 12px;
+  background: var(--ink);
+  border-radius: var(--r-field);
+  overflow: hidden;
+}
+.pg-results .hc-pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pg-results .hc-body {
+  flex: 1 1 280px;
+  min-width: 0;
+  padding: 14px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-results .hc-name {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pg-results .hc-name h2 {
+  font-size: 23px;
+}
+.pg-results .hc-name a {
+  text-decoration: none;
+  color: var(--ink);
+}
+.pg-results .hc-stars {
+  color: var(--warn-ink);
+  font-size: 18px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.pg-results .hc-sub {
+  font-size: 16px;
+  color: var(--ink-2);
+  margin-top: -4px;
+}
+.pg-results .hc-links {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  gap: 8px 22px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 16px;
+}
+.pg-results .hc-short {
+  display: none;
+}
+.pg-results .hc-links .cmp-check {
+  margin: 0 0 0 auto;
+  min-height: 32px;
+}
+.pg-results .hc-links a {
+  font-weight: 700;
+}
+.pg-results .hc-cal {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--green);
+  min-height: 32px;
+}
+.pg-results .hc-buy {
+  flex: 0 0 262px;
+  padding: 10px 18px;
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.pg-results .hc-buy .pbox-total {
+  margin-top: 2px;
+}
+.pg-results .hc-buy .next-tip {
+  margin: 8px 0 10px;
+}
+.pg-results .hc-open .hc-chev {
+  transform: rotate(180deg);
+}
+.pg-results .hc-rooms {
+  min-height: 48px;
+  font-size: 16px;
+  padding: 0 16px;
+  margin-top: 8px;
+  justify-content: space-between;
+}
+
+/* phone: a square photo beside the name, the price and the button under them — two cards fit a screen */
+@media (max-width: 640px) {
+  .pg-results .hc-top {
+    display: grid;
+    /* the photo's own 12px left margin is part of its column */
+    grid-template-columns: 124px minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto auto auto;
+    grid-template-areas:
+      'pic name'
+      'pic sub'
+      'team team'
+      'links links'
+      'buy buy';
+    column-gap: 12px;
+  }
+  /* the body's blocks become grid items: the name and the line beside the photo, the rest under */
+  .pg-results .hc-body {
+    display: contents;
+  }
+  .pg-results .hc-name {
+    grid-area: name;
+    margin: 12px 12px 0 0;
+    align-self: start;
+  }
+  .pg-results .hc-sub {
+    grid-area: sub;
+    margin: 4px 12px 0 0;
+    align-self: start;
+  }
+  .pg-results .hc .res-team {
+    grid-area: team;
+    margin: 8px 12px 0;
+  }
+  .pg-results .hc-links {
+    grid-area: links;
+    margin: 0 12px;
+    gap: 4px 16px;
+    padding-top: 6px;
+  }
+  .pg-results .hc-long {
+    display: none;
+  }
+  .pg-results .hc-short {
+    display: inline;
+  }
+  /* the price calendar is reached from the sanatorium's page on a phone: the row keeps one line */
+  .pg-results .hc-cal {
+    display: none;
+  }
+  .pg-results .hc-links .cmp-check {
+    min-height: 28px;
+  }
+  .pg-results .hc-pic {
+    grid-area: pic;
+    flex: none;
+    width: 112px;
+    max-width: none;
+    min-height: 0;
+    height: 112px;
+    margin: 12px 0 0 12px;
+  }
+  .pg-results .hc-name {
+    gap: 4px 10px;
+  }
+  .pg-results .hc-name h2 {
+    font-size: 20px;
+  }
+  .pg-results .hc-stars {
+    font-size: 16px;
+  }
+  .pg-results .hc-sub {
+    margin-top: 0;
+  }
+  .pg-results .hc .team-heads img {
+    width: 34px;
+    height: 34px;
+  }
+  .pg-results .hc .team-heads img + img {
+    margin-left: -10px;
+  }
+  .pg-results .hc .team-t span {
+    display: none;
+  }
+  .pg-results .hc-links {
+    padding-top: 2px;
+    gap: 4px 16px;
+  }
+  .pg-results .hc-buy {
+    grid-area: buy;
+    flex: none;
+    border-left: 0;
+    margin: 8px 12px 0;
+    padding: 8px 0 12px;
+    border-top: 1px solid var(--line);
+    gap: 0;
+  }
+  .pg-results .hc-buy .pbox {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+  }
+  .pg-results .hc-buy .pbox-big {
+    font-size: 24px;
+  }
+  .pg-results .hc-buy .pbox-total {
+    flex: 1 1 100%;
+    margin-top: 0;
+  }
+  .pg-results .hc-rooms {
+    margin-top: 8px;
+  }
+}
+
+/* ── the rooms of a sanatorium ── */
+.pg-results .rooms-indent {
+  position: relative;
+  padding: 14px 14px 18px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--green-soft);
+  border-top: 1px solid var(--line);
+}
+.pg-results .rooms-guide {
+  position: absolute;
+  left: 44px;
+  top: 0;
+  bottom: 18px;
+  width: 3px;
+  background: var(--green-line);
+}
+.pg-results .rooms-cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pg-results .rooms-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--ink-2);
+  padding: 2px;
+}
+.pg-results .rooms-note svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* the rooms of a sanatorium slide out like a drawer, the cards come in one after another */
+.pg-results .rooms-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  /* the same soft curve as before, twice as slow: slides out and settles, the iPhone way */
+  animation: roomsGrow 1.2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.pg-results .rooms-reveal-in {
+  min-height: 0;
+  /* clipped only while it grows: tips and pop-ups inside are free afterwards */
+  animation: roomsClip 1.2s linear;
+}
+.pg-results .rooms-reveal .rooms-indent > :not(.rooms-guide) {
+  animation: roomsItem 0.9s ease-out both;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(3) {
+  animation-delay: 0.14s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(4) {
+  animation-delay: 0.28s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(5) {
+  animation-delay: 0.42s;
+}
+.pg-results .rooms-reveal .rooms-indent > :nth-child(n + 6) {
+  animation-delay: 0.56s;
+}
+/* «Скрыть варианты»: the rooms fold back up under the card */
+.pg-results .rooms-reveal.closing {
+  animation: roomsShrink 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.pg-results .rooms-reveal.closing .rooms-reveal-in {
+  overflow: hidden;
+  animation: none;
+}
+.pg-results .rooms-reveal.closing .rooms-indent > * {
+  animation: roomsItemOut 0.45s ease-in both;
+}
+@keyframes roomsShrink {
+  from {
+    grid-template-rows: 1fr;
+  }
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes roomsItemOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+/* the bubble over «Номера и программы» (NextTip) sits in the narrow price column */
+.pg-results .rm-tip + .btn {
+  margin-top: 0 !important;
+}
+@keyframes roomsGrow {
+  from {
+    grid-template-rows: 0fr;
+  }
+  to {
+    grid-template-rows: 1fr;
+  }
+}
+@keyframes roomsClip {
+  from,
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes roomsItem {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-results .rooms-reveal,
+  .pg-results .rooms-reveal-in,
+  .pg-results .rooms-reveal .rooms-indent > * {
+    animation: none;
+  }
+}
+
+/* who meets the guest: the heads under the resort line */
+.pg-results .res-team {
+  margin-top: 2px;
+}
+
+@media (max-width: 480px) {
+  /* keep the indent small on phones */
+  .pg-results .rooms-indent {
+    padding-left: 26px;
+  }
+  .pg-results .rooms-guide {
+    left: 10px;
+  }
+}

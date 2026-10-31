@@ -4,25 +4,6 @@ import { SANATORIUMS } from '../data/sanatoriums';
 import { BASKET_OPEN, basketNext } from '../lib/basket';
 import './OrderSummary.css';
 
-const row = {
-  display: 'grid',
-  gridTemplateColumns: 'auto 1fr',
-  alignItems: 'baseline',
-  gap: '16px',
-} as const;
-const label = { color: 'var(--ink-2)', fontSize: '16px' } as const;
-/** order details (room, programme, guests): medium weight, so the money stands out */
-const detailValue = { fontWeight: '600', textAlign: 'right', color: 'var(--ink)', textWrap: 'balance' } as const;
-const priceValue = { fontWeight: '700', textAlign: 'right', whiteSpace: 'nowrap' } as const;
-const section = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  fontSize: '16px',
-  borderTop: '1px solid var(--line)',
-  paddingTop: '12px',
-} as const;
-
 /**
  * Sticky "your order" box on the booking steps: sanatorium, dates, room,
  * programme, guests, prices and the total.
@@ -55,41 +36,32 @@ export function OrderSummary({
   }, []);
   const content = (
     <>
-      <img src={img} alt="" style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />{' '}
-      <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div style={{ fontWeight: '800', fontSize: '18px' }}>{name}</div>
-          <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>{place}</div>
+      <img className="os-img" src={img} alt="" />
+      <div className="os-body">
+        <div className="os-head">
+          <div className="os-name">{name}</div>
+          <div className="os-place">{place}</div>
         </div>
-        <div style={section}>
+        <div className="os-section">
           {details.map(([name, value, sub]) => (
-            <div style={row} key={name}>
-              <span style={label}>{name}</span>
-              <span style={detailValue}>{value}</span>
-              {sub ? <span style={{ ...detailValue, gridColumn: '1 / -1', marginTop: '-12px' }}>{sub}</span> : null}
+            <div className="os-row" key={name}>
+              <span className="os-label">{name}</span>
+              <span className="os-detail">{value}</span>
+              {sub ? <span className="os-detail os-sub">{sub}</span> : null}
             </div>
           ))}
         </div>
-        <div style={section}>
+        <div className="os-section">
           {prices.map(([name, value]) => (
-            <div style={row} key={name}>
-              <span style={label}>{name}</span>
-              <span style={priceValue}>{value}</span>
+            <div className="os-row" key={name}>
+              <span className="os-label">{name}</span>
+              <span className="os-price">{value}</span>
             </div>
           ))}
         </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-            gap: '12px',
-            borderTop: '2px solid var(--ink)',
-            paddingTop: '12px',
-          }}
-        >
-          <span style={{ fontWeight: '800', fontSize: '18px' }}>Итого</span>
-          <span style={{ fontWeight: '800', fontSize: '26px', whiteSpace: 'nowrap' }}>{total}</span>
+        <div className="os-total">
+          <span>Итого</span>
+          <strong>{total}</strong>
         </div>
         {footer}
       </div>
@@ -97,18 +69,7 @@ export function OrderSummary({
   );
   return (
     <>
-      <aside
-        className="card order-aside"
-        aria-label="Ваш заказ"
-        style={{
-          flex: '1 1 300px',
-          maxWidth: '360px',
-          padding: '0',
-          overflow: 'hidden',
-          position: 'sticky',
-          top: '16px',
-        }}
-      >
+      <aside className="card order-aside" aria-label="Ваш заказ">
         {content}
       </aside>
       {open ? (
@@ -176,22 +137,13 @@ export const AdvanceNote = ({
 }: {
   order: { advanceLabel: string; restLabel: string; dueDate: string; fullOnly: boolean };
 }) => (
-  <div
-    style={{
-      fontSize: '16px',
-      color: 'var(--ink-2)',
-      background: 'var(--sand)',
-      borderRadius: 'var(--r-field)',
-      padding: '10px 12px',
-    }}
-  >
+  <div className="os-advance">
     {order.fullOnly ? (
       <>До заезда меньше недели — оплата сразу всей суммы.</>
     ) : (
       <>
         Цена фиксируется после депозита <strong>{order.advanceLabel}</strong>. Остаток{' '}
-        <strong style={{ whiteSpace: 'nowrap' }}>{order.restLabel}</strong> — до {order.dueDate}; до этой даты отмена
-        бесплатная.
+        <strong className="os-nowrap">{order.restLabel}</strong> — до {order.dueDate}; до этой даты отмена бесплатная.
       </>
     )}
   </div>

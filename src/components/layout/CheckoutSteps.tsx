@@ -1,6 +1,12 @@
 import { Fragment, useEffect, useState } from 'react';
+import { StepNotice } from '../StepGuard';
+import { t } from '../../i18n/t';
 import './CheckoutSteps.css';
 
+/** the steps' names in the page's language */
+export const stepLabels = () =>
+  (['rooms', 'transfer', 'guests', 'payment', 'done'] as const).map((k) => t(`steps.labels.${k}`));
+/** kept for older callers */
 export const STEP_LABELS_RU = ['Номер', 'Дорога', 'Гости', 'Оплата', 'Готово'];
 
 /**
@@ -10,7 +16,7 @@ export const STEP_LABELS_RU = ['Номер', 'Дорога', 'Гости', 'Оп
  */
 export function CheckoutSteps({
   current,
-  labels = STEP_LABELS_RU,
+  labels = stepLabels(),
   compact = false,
 }: {
   current: 1 | 2 | 3 | 4 | 5;
@@ -29,25 +35,13 @@ export function CheckoutSteps({
   const tipOf = (i: number) =>
     tip === i ? (
       <span className="step-tip" role="status">
-        {i < steps.length ? `Шаг ${i + 1} · ` : ''}
+        {i < steps.length ? t('steps.step', { n: i + 1 }) + ' · ' : ''}
         {labels[i]}
       </span>
     ) : null;
   return (
-    <div style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
-      <div
-        className={'checkout-steps' + (compact ? ' compact' : '')}
-        aria-label="Шаги оформления"
-        style={{
-          maxWidth: '1180px',
-          margin: '0 auto',
-          padding: compact ? '10px 24px' : '10px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: compact ? '18px' : '22px',
-          flexWrap: 'wrap',
-        }}
-      >
+    <div className="checkout-steps-bar">
+      <div className={'checkout-steps' + (compact ? ' compact' : '')} aria-label={t('steps.aria')}>
         {steps.map((label, i) => {
           const n = i + 1;
           const state = n < current ? 'done' : n === current ? 'on' : '';
@@ -57,7 +51,7 @@ export function CheckoutSteps({
                 type="button"
                 className={'step ' + state}
                 aria-current={state === 'on' ? 'step' : undefined}
-                aria-label={`Шаг ${n}: ${label}`}
+                aria-label={t('steps.step', { n }) + ': ' + label}
                 onClick={() => setTip(tip === i ? -1 : i)}
               >
                 <span className="num">{state === 'done' ? '✓' : n}</span>
@@ -84,7 +78,6 @@ export function CheckoutSteps({
           aria-current={finished ? 'step' : undefined}
           aria-label={labels[labels.length - 1]}
           onClick={() => setTip(tip === steps.length ? -1 : steps.length)}
-          style={{ gap: '8px' }}
         >
           <svg
             width="22"
@@ -103,6 +96,7 @@ export function CheckoutSteps({
           {tipOf(steps.length)}
         </button>
       </div>
+      <StepNotice />
     </div>
   );
 }

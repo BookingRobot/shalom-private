@@ -88,3 +88,97 @@
     animation: none;
   }
 }
+
+/* ── the order box itself ── */
+.page .order-aside {
+  flex: 1 1 300px;
+  max-width: 360px;
+  padding: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 16px;
+}
+.os-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+.os-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.os-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.os-name {
+  font-weight: 800;
+  font-size: 18px;
+}
+.os-place {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.os-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.os-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 16px;
+}
+.os-label {
+  color: var(--ink-2);
+  font-size: 16px;
+}
+/* order details (room, programme, guests): medium weight, so the money stands out */
+.os-detail {
+  font-weight: 600;
+  text-align: right;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.os-sub {
+  grid-column: 1 / -1;
+  margin-top: -12px;
+}
+.os-price {
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+.os-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 2px solid var(--ink);
+  padding-top: 12px;
+  font-weight: 800;
+  font-size: 18px;
+}
+.os-total strong {
+  font-size: 26px;
+  white-space: nowrap;
+}
+/* a small deposit fixes the price, the rest is paid later */
+.os-advance {
+  font-size: 16px;
+  color: var(--ink-2);
+  background: var(--sand);
+  border-radius: var(--r-field);
+  padding: 10px 12px;
+}
+.os-nowrap {
+  white-space: nowrap;
+}

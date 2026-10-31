@@ -1,0 +1,322 @@
+openapi: 3.1.0
+info:
+  title: BookingRobot — Shalom site API
+  version: 0.1.0
+  description: |
+    The contract between the sanatorium booking site (shalom.bookingrobot.eu) and BookingRobot.
+    The site is a static front end; everything that must be true for every device and for the
+    agency — availability, prices, the order draft, payment — comes from this API.
+    Client code: src/api/http.ts (the same shapes in src/api/types.ts and src/api/client.ts).
+    Dates are ISO (YYYY-MM-DD); money is whole euros.
+servers:
+  - url: https://api.bookingrobot.eu/shalom/v1
+paths:
+  /sanatoriums/popular:
+    get:
+      summary: Popular sanatoriums with "from" prices (home page)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PopularSanatorium' }
+  /sanatoriums:
+    get:
+      summary: Search results for a resort
+      parameters:
+        - { name: dest, in: query, required: true, schema: { type: string }, example: druskininkai }
+        - { name: checkin, in: query, required: true, schema: { type: string, format: date } }
+        - { name: nights, in: query, required: true, schema: { type: integer, minimum: 1 } }
+        - { name: adults, in: query, required: true, schema: { type: integer, minimum: 1, maximum: 4 } }
+      responses:
+        '200':
+          description: Sanatoriums, their room sets and extra programmes
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SearchResult' }
+  /sanatoriums/{id}:
+    get:
+      summary: One sanatorium — description, photos, rooms, programmes, transfer cars
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sanatorium' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /sanatoriums/{id}/rooms/{roomId}/programs:
+    get:
+      summary: Programmes available with a room, and the room's price (step 1)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: roomId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RoomPrograms' }
+  /sanatoriums/{id}/availability:
+    get:
+      summary: Nights with places between two dates
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: from, in: query, required: true, schema: { type: string, format: date } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date }, description: exclusive }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/NightAvailability' }
+  /flights/days:
+    get:
+      summary: Days the partner flight Tel Aviv ⇄ Vilnius flies
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FlightDay' }
+  /transfer/options:
+    get:
+      summary: Pick-up places, transfer prices and vehicles (step 2)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransferOptions' }
+  /quotes:
+    post:
+      summary: Price an order — every line, the total, the deposit
+      description: The site only shows what this returns; the same numbers go on the invoice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuoteRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quote' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /drafts:
+    post:
+      summary: Start an order draft; returns its short code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [booking, step]
+              properties:
+                booking: { $ref: '#/components/schemas/Booking' }
+                step: { $ref: '#/components/schemas/DraftStep' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+  /drafts/{code}:
+    get:
+      summary: Open a draft by its code (any device, the consultant too)
+      parameters:
+        - { name: code, in: path, required: true, schema: { type: string, pattern: '^[A-HJ-NP-Z2-9]{5}$' } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      summary: Save what the guest changed
+      parameters:
+        - { name: code, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                booking: { $ref: '#/components/schemas/Booking' }
+                step: { $ref: '#/components/schemas/DraftStep' }
+                details: { type: object, additionalProperties: true }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BadRequest:
+      description: The request is not valid
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+    PopularSanatorium:
+      type: object
+      description: as src/data/popular.ts
+      additionalProperties: true
+    SearchResult:
+      type: object
+      description: as the sample data in src/data/sanatoriums.ts
+      required: [sanatoriums, roomSets, extraPrograms]
+      properties:
+        sanatoriums: { type: array, items: { type: object, additionalProperties: true } }
+        roomSets: { type: object, additionalProperties: true }
+        extraPrograms: { type: array, items: { type: object, additionalProperties: true } }
+    Sanatorium:
+      type: object
+      description: as src/data/hotelInfo.ts + src/data/sanatoriumRooms.ts
+      additionalProperties: true
+    RoomPrograms:
+      type: object
+      required: [programs, roomPrice]
+      properties:
+        programs:
+          type: array
+          items:
+            type: object
+            required: [id, name, price, perDay]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              short: { type: string }
+              perDay: { type: string }
+              price: { type: integer, description: for two adults sharing, whole stay }
+              plus: { type: array, items: { type: string } }
+        roomPrice:
+          type: object
+          required: [add]
+          properties:
+            add: { type: integer, description: room supplement for two, whole stay }
+    NightAvailability:
+      type: object
+      required: [date, free]
+      properties:
+        date: { type: string, format: date }
+        free: { type: boolean }
+    FlightDay:
+      type: object
+      required: [date]
+      properties:
+        date: { type: string, format: date }
+        there: { type: string, example: IZ 2549 }
+        back: { type: string, example: IZ 2550 }
+    TransferOptions:
+      type: object
+      description: as src/data/transfer.ts
+      additionalProperties: true
+    Transfer:
+      type: object
+      properties:
+        mode: { type: [string, 'null'], enum: [group, individual, none, null] }
+        need: { type: [boolean, 'null'] }
+        how: { type: [string, 'null'], enum: [group, individual, null] }
+        back: { type: [boolean, 'null'] }
+        place: { type: string }
+        spot: { type: string }
+        backSame: { type: [boolean, 'null'] }
+        backPlace: { type: string }
+        backSpot: { type: string }
+        vehicle: { type: string }
+    Booking:
+      type: object
+      description: the order as src/data/booking.ts keeps it
+      required: [dest, checkin, checkout, adults, children, hotelId, roomId, programId, transfer, flightPackage]
+      properties:
+        dest: { type: string }
+        checkin: { type: string, format: date }
+        checkout: { type: string, format: date }
+        adults: { type: integer }
+        children: { type: integer }
+        hotelId: { type: string }
+        roomId: { type: string }
+        programId: { type: string }
+        transfer: { $ref: '#/components/schemas/Transfer' }
+        flights: { type: [string, 'null'], enum: [yes, 'no', help, null] }
+        flightPackage: { type: boolean }
+        flightAsked: { type: boolean }
+        chosenPlace: { type: string }
+        chosenDates: { type: boolean }
+    QuoteRequest:
+      type: object
+      required: [hotelId, roomId, programId, checkin, checkout, adults, children, flightPackage, transfer]
+      properties:
+        hotelId: { type: string }
+        roomId: { type: string }
+        programId: { type: string }
+        checkin: { type: string, format: date }
+        checkout: { type: string, format: date }
+        adults: { type: integer }
+        children: { type: integer }
+        flightPackage: { type: boolean }
+        transfer: { $ref: '#/components/schemas/Transfer' }
+    QuoteLine:
+      type: object
+      required: [key, label, qty, unit, amount]
+      properties:
+        key: { type: string, enum: [stay, child, single, flight, transfer-there, transfer-back] }
+        label: { type: string }
+        qty: { type: integer }
+        unit: { type: integer }
+        amount: { type: integer }
+        note: { type: string }
+    Quote:
+      type: object
+      required: [currency, lines, total, perPerson, deposit, rest, dueDate, fullOnly, tariffVersion]
+      properties:
+        currency: { type: string, enum: [EUR] }
+        lines: { type: array, items: { $ref: '#/components/schemas/QuoteLine' } }
+        total: { type: integer }
+        perPerson: { type: integer }
+        deposit: { type: integer }
+        rest: { type: integer }
+        dueDate: { type: string, format: date }
+        fullOnly: { type: boolean }
+        tariffVersion: { type: string }
+    DraftStep:
+      type: string
+      enum: [rooms, transfer, guests, payment, done]
+    Draft:
+      type: object
+      required: [code, booking, step, createdAt, updatedAt]
+      properties:
+        code: { type: string, example: K7F2M }
+        booking: { $ref: '#/components/schemas/Booking' }
+        step: { $ref: '#/components/schemas/DraftStep' }
+        details: { type: object, additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }

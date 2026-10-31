@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BASKET_NEXT, openBasket } from '../lib/basket';
+import { useBooking } from '../context/BookingContext';
+import { stepDoneBefore } from '../lib/steps';
+import { track } from '../lib/analytics';
 import { NextTip } from './NextTip';
 import './StepNext.css';
 
@@ -14,8 +17,19 @@ export interface Missing {
 }
 
 /**
- * A bar fixed at the bottom of the screen: the floating «Ваши пожелания» / «Свяжитесь со мной»
- * buttons step up above it (by its height, which grows with a hint) instead of covering «Далее».
+ * ONE NOTIFICATION CHANNEL on a checkout step — the rule every floating thing follows:
+ *
+ *  1. Only one message lives next to «Далее» at a time, and it sits right above the button:
+ *     the green bubble («Осталось выбрать…» / «Всё готово») — or, after a press with gaps,
+ *     the yellow list in its place. Never both (see `tip` and `hint` below).
+ *  2. Nothing else may stand on the bottom bar. The bar publishes its height as
+ *     `--stepbar-h` and the body gets `has-stepbar` while the bar is shown; every fixed
+ *     element at the bottom of the screen (the «Ваши пожелания» pill, the help button, the
+ *     toasts) reads them and steps up by that height (StepNext.css). The «i» balloons are
+ *     in the page flow, not floating, so they never reach the bar; `scroll-padding-bottom`
+ *     keeps the spot «Показать ↑» scrolls to above the bar.
+ *  3. A new floating element gets the same lift (add its class to the rule in StepNext.css)
+ *     instead of its own position.
  */
 export function useLiftFabs(bar: RefObject<HTMLElement | null>, on: boolean) {
   useEffect(() => {
@@ -93,6 +107,7 @@ export function StepNext({
   big?: boolean;
 }) {
   const navigate = useNavigate();
+  const { booking, update } = useBooking();
   const row = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
   const [rowSeen, setRowSeen] = useState(true);
@@ -150,7 +165,13 @@ export function StepNext({
     setGaps(m);
     // «Далее» with something still missing: the hint comes back and shows what
     setTipX(false);
-    if (!m.length) navigate(next.to);
+    if (!m.length) {
+      // this step is done: the next one may open (StepGuard)
+      const done = stepDoneBefore(next.to);
+      if (done && done > booking.progress) update({ progress: done });
+      if (done) track('Step done', { step: done });
+      navigate(next.to);
+    }
   };
 
   // phone: the order box sits behind a basket here; its «Продолжить» is the same as «Далее»
@@ -218,7 +239,8 @@ export function StepNext({
     </div>
   ) : null;
 
-  // the bubble: one at a time, over the «Далее» the guest can see; not with the yellow hint
+  // the bubble: one at a time, over the «Далее» the guest can see; never together with the
+  // yellow list — the yellow one takes its place (rule 1 above)
   const ready = gaps !== null && gaps.length === 0;
   const tip =
     gaps === null || left.length || tipX ? null : (

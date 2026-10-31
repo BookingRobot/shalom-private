@@ -1,3 +1,23 @@
+/* the steps row under the header: 1 2 3 4 and the flag */
+.checkout-steps-bar {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.checkout-steps {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.checkout-steps.compact {
+  gap: 18px;
+}
+.checkout-steps .step:last-child {
+  gap: 8px;
+}
 .checkout-steps .step {
   position: relative;
   display: flex;

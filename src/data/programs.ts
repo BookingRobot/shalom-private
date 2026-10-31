@@ -40,7 +40,7 @@ export const ROOM_PROGRAMS = [
   {
     id: 'maxi',
     tier: 'recommended' as ProgramTier,
-    /** what it adds to the cheapest one, in a few words */
+    /** what it adds to the cheapest one, in a few words — every card says it the same way */
     plus: '+2 процедуры в день',
     name: 'Программа «Макси»',
     short: '«Макси», 5\u00a0процедур',
@@ -69,6 +69,7 @@ export const ROOM_PROGRAMS = [
   {
     id: 'prem',
     tier: 'premium' as ProgramTier,
+    plus: '+массаж и полный пансион',
     name: 'Программа «Премиум»',
     short: '«Премиум», 5\u00a0процедур +\u00a0массаж',
     perDay: '5 процедур в день + массаж',
@@ -95,6 +96,7 @@ export const ROOM_PROGRAMS = [
   {
     id: 'spine',
     extra: true,
+    plus: '+грязь на спину и суставы',
     name: 'Программа «Здоровая спина»',
     short: '«Здоровая спина», 4\u00a0процедуры',
     perDay: '4 процедуры в день',
@@ -120,6 +122,7 @@ export const ROOM_PROGRAMS = [
   {
     id: 'calm',
     extra: true,
+    plus: '+соляная комната и массаж',
     name: 'Программа «Антистресс»',
     short: '«Антистресс», 3\u00a0процедуры',
     perDay: '3 процедуры в день + соляная комната',
@@ -145,6 +148,7 @@ export const ROOM_PROGRAMS = [
   {
     id: 'heart',
     extra: true,
+    plus: '+минеральные ванны и диета',
     name: 'Программа «Сердце и сосуды»',
     short: '«Сердце и сосуды», 4\u00a0процедуры',
     perDay: '4 процедуры в день',

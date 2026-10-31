@@ -1,3 +1,5 @@
+import { DEMO } from './demo';
+
 /** Shape of the guest's order as it moves through the booking steps. */
 export interface Booking {
   /** resort key, e.g. "druskininkai" */
@@ -49,10 +51,26 @@ export interface Booking {
   chosenPlace: string;
   /** the guest has picked the dates themselves (until then the home page shows empty date fields) */
   chosenDates: boolean;
+  /**
+   * The last step the guest finished with «Далее»: 0 — nothing yet, 1 — room and programme,
+   * 2 — the road, 3 — guests, 4 — paid. A step opens only when the one before it is done
+   * (StepGuard); the sample order in demo mode counts as finished.
+   */
+  progress: 0 | 1 | 2 | 3 | 4;
+  /** step 3's form as the page keeps it (names, dates of birth, phone) */
+  details?: GuestDetails;
 }
 
-/** Defaults = the example order used throughout the prototype. [ПРИМЕР ДАННЫХ] */
-export const DEFAULT_BOOKING: Booking = {
+/** Step 3's form: names as in the passport, dates of birth, the contact phone. */
+export interface GuestDetails {
+  dob: Record<string, { y: number; m: number; d: number }>;
+  names: { g1fn: string; g1ln: string; g2fn: string; g2ln: string };
+  phoneCode: string;
+  phone: string;
+}
+
+/** The sample order the prototype shows in demo mode. [ПРИМЕР ДАННЫХ] */
+export const SAMPLE_BOOKING: Booking = {
   dest: 'druskininkai',
   checkin: '2026-11-09',
   checkout: '2026-11-18',
@@ -78,4 +96,16 @@ export const DEFAULT_BOOKING: Booking = {
   flightAsked: false,
   chosenPlace: '',
   chosenDates: false,
+  progress: 4,
 };
+
+/** Off demo the order starts empty: nothing chosen, no step done. */
+export const EMPTY_BOOKING: Booking = {
+  ...SAMPLE_BOOKING,
+  hotelId: '',
+  roomId: '',
+  programId: '',
+  progress: 0,
+};
+
+export const DEFAULT_BOOKING: Booking = DEMO ? SAMPLE_BOOKING : EMPTY_BOOKING;

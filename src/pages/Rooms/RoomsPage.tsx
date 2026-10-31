@@ -19,6 +19,8 @@ import { NextTip } from '../../components/NextTip';
 import { useLiftFabs } from '../../components/StepNext';
 import { TeamHeads } from '../../components/TeamHeads';
 import { STAFF, teamOf, type StaffRole } from '../../data/team';
+import { track } from '../../lib/analytics';
+import { DemoMark } from '../../components/DemoMark';
 import './RoomsPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -33,21 +35,92 @@ const TIER_ORDER = { base: 0, recommended: 1, premium: 2 } as const;
 /** «Макси» out of «Программа «Макси»» */
 const shortName = (name: string) => (name.match(/«(.+)»/) || [])[1] || name;
 
+/** what step 1 remembers between renders */
+interface RoomsState {
+  /** the chosen programme */
+  prog: string;
+  /** the programme open in «Узнать больше» ('' — none) */
+  more: string;
+  /** «Ещё программы» unfolded */
+  all: boolean;
+}
+
+/** one programme card: name, what it adds and for how much, prices, what is in it */
+export interface ProgramCardVals {
+  id: string;
+  name: string;
+  rec: boolean;
+  on: boolean;
+  /** one formula for every card: what is added · how much more (the cheapest: «включена в цену») */
+  tag: string;
+  tagCls: 'base' | 'rec' | '';
+  /** per person for the whole stay */
+  place: string;
+  note: string;
+  /** the same price per day, the way a sanatorium quotes it */
+  perDay: string;
+  total: string;
+  totalSum: string;
+  facts: { d: string; big: string; label: string; sub: string }[];
+  btnLabel: string;
+  btnCls: 'btn-primary' | 'btn-secondary';
+  pick: () => void;
+  openMore: () => void;
+}
+
+/** a line of the full description in «Узнать больше» */
+interface DetailLine {
+  t: string;
+  head: boolean;
+  dash: boolean;
+  num: boolean;
+}
+
+export interface ProgramModalVals extends ProgramCardVals {
+  prog: Program['prog'];
+  detLines: DetailLine[];
+}
+
+/** everything the step 1 markup needs */
+export interface RoomsVals {
+  guestsLabel: string;
+  baseShort: string;
+  roomName: string;
+  dateRange: string;
+  nightsLabel: string;
+  main: ProgramCardVals[];
+  cols: number;
+  extras: ProgramCardVals[];
+  restCount: number;
+  all: boolean;
+  toggleAll: () => void;
+  more: ProgramModalVals | null;
+  closeMore: () => void;
+  pickMore: () => void;
+  sumLine: string;
+  sumTotal: string;
+  sumParty: string;
+  sumAdv: string;
+  sumFull: boolean;
+  toRoad: () => void;
+  team: StaffRole[];
+}
+
 /**
  * Step 1. At most three programmes side by side, the classic way: the cheapest on the left, the one
  * Atlantis recommends in the middle, the richest on the right. «Узнать больше о программе» opens the
  * full description over the page (the page stays); more programmes of the sanatorium wait under
  * «Ещё программы». Below: the people who will meet the guest.
  */
-class RoomsLogic extends PageLogic {
+class RoomsLogic extends PageLogic<RoomsState> {
   constructor(props: PageServices) {
     super(props);
     this.state = { prog: props.booking.booking.programId, more: '', all: false };
   }
-  syncBooking(st) {
+  syncBooking(st: RoomsState) {
     return { programId: st.prog };
   }
-  renderVals() {
+  renderVals(): RoomsVals {
     const booking = this.props.booking.booking;
     const { programs, roomPrice } = api.getRoomPrograms(booking.hotelId, booking.roomId);
     const st = this.state;
@@ -70,7 +143,7 @@ class RoomsLogic extends PageLogic {
     const place = (p: Program) => placePrice(p.price + roomPrice.add, G);
     const party = partyLabel(G);
 
-    const card = (p: Program) => {
+    const card = (p: Program): ProgramCardVals => {
       const on = p.id === sel.id;
       const rec = tierOf(p) === 'recommended';
       const d = place(p) - place(base);
@@ -80,10 +153,12 @@ class RoomsLogic extends PageLogic {
         name: p.name,
         rec,
         on,
-        tag: p === base ? 'Минимальная цена' : plus ? `${plus} за +${eur(d)}` : `Доплата +${eur(d)} с человека`,
+        // the same shape on every card: what is added · how much more per person
+        tag: p === base ? 'Базовая программа · включена в цену' : `${plus || 'Больше процедур'} · +${eur(d)}`,
         tagCls: p === base ? 'base' : rec ? 'rec' : '',
         place: eur(place(p)),
         note: G.adults === 1 ? 'за одного, за весь заезд' : 'на человека за весь заезд',
+        perDay: eur(Math.round(place(p) / Math.max(1, NIGHTS))) + ' в день',
         total: `Итого ${party}: `,
         totalSum: eur(stayTotal(p.price + roomPrice.add, G)),
         facts: p.value.map(([k, big, label, sub]) => ({ d: ICON_PATHS[k], big, label, sub })),
@@ -133,8 +208,16 @@ class RoomsLogic extends PageLogic {
       sumFull: order.fullOnly,
       // going on to step 2: the guest answers the road questions there themselves — nothing
       // answered earlier (another visit, another sanatorium) stays marked for them
-      toRoad: () =>
-        this.props.booking.update({ flights: null, flightAsked: false, transfer: { ...DEFAULT_BOOKING.transfer } }),
+      // (step 1 is done, the road is not answered yet: guests and payment wait for it — StepGuard)
+      toRoad: () => {
+        track('Programme chosen', { programme: booking.programId || '' });
+        this.props.booking.update({
+          flights: null,
+          flightAsked: false,
+          transfer: { ...DEFAULT_BOOKING.transfer },
+          progress: 1,
+        });
+      },
       // the people of this sanatorium (0–3)
       team: teamOf(booking.hotelId || 'egle-comfort'),
     };
@@ -157,10 +240,8 @@ const Check = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
-type Card = ReturnType<RoomsLogic['renderVals']>['main'][number];
-
 /** one programme: name and what it costs more, the price, the button, what is in it, «Узнать больше» */
-function ProgramCard({ p }: { p: Card }) {
+function ProgramCard({ p }: { p: ProgramCardVals }) {
   return (
     <article className={'pg-card' + (p.on ? ' on' : '') + (p.rec ? ' rec' : '')} aria-label={p.name}>
       {p.rec ? <span className="pg-badge">Рекомендуем Atlantis</span> : null}
@@ -173,6 +254,7 @@ function ProgramCard({ p }: { p: Card }) {
           {p.total}
           <strong>{p.totalSum}</strong>
         </span>
+        <span className="pg-day">{p.perDay}</span>
       </div>
       <button type="button" className={'btn ' + p.btnCls + ' pg-btn'} onClick={p.pick} aria-pressed={p.on}>
         {p.on ? <Check /> : null}
@@ -229,7 +311,7 @@ function ProgramModal({
   onClose,
   onPick,
 }: {
-  m: NonNullable<ReturnType<RoomsLogic['renderVals']>['more']>;
+  m: ProgramModalVals;
   team: StaffRole[];
   onClose: () => void;
   onPick: () => void;
@@ -272,6 +354,7 @@ function ProgramModal({
               {m.total}
               <strong>{m.totalSum}</strong>
             </span>
+            <span className="pg-day">{m.perDay}</span>
           </div>
           <h3>В программу входит</h3>
           <ul className="pm-inc">
@@ -350,7 +433,7 @@ export default function RoomsPage() {
   const toShare = () => document.getElementById('share')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return (
     <div className="page pg-rooms">
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+      <div className="page-col">
         <HeaderBar>
           <Brand />
           <HeaderAside>
@@ -385,7 +468,7 @@ export default function RoomsPage() {
             </Link>
           </section>
           {/* the programmes: cheapest · recommended · premium */}
-          <div className={'pg-grid cols-' + v.cols}>
+          <div className={'pg-grid cols-' + v.cols} data-canvas="rooms-cards">
             {v.main.map((p) => (
               <ProgramCard key={p.id} p={p} />
             ))}
@@ -393,13 +476,19 @@ export default function RoomsPage() {
           {v.restCount ? (
             <>
               {v.all ? (
-                <div className="pg-grid pg-grid-more cols-3">
+                <div className="pg-grid pg-grid-more cols-3" data-canvas="rooms-all">
                   {v.extras.map((p) => (
                     <ProgramCard key={p.id} p={p} />
                   ))}
                 </div>
               ) : null}
-              <button type="button" className="pg-all" onClick={v.toggleAll} aria-expanded={v.all}>
+              <button
+                type="button"
+                className="pg-all"
+                onClick={v.toggleAll}
+                aria-expanded={v.all}
+                data-canvas="rooms-more"
+              >
                 {v.all ? (
                   'Свернуть другие программы'
                 ) : (
@@ -417,7 +506,7 @@ export default function RoomsPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
-                  style={{ transform: v.all ? 'rotate(180deg)' : 'none' }}
+                  className={v.all ? 'pg-all-chev up' : 'pg-all-chev'}
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -459,7 +548,7 @@ export default function RoomsPage() {
                   </li>
                 ))}
               </ul>
-              <span className="rm-people-note">Фото для примера</span>
+              <DemoMark className="rm-people-note">Фото для примера</DemoMark>
             </section>
           ) : null}
           {/* talk it over with the family: send the offer or get told about a price change */}
@@ -522,10 +611,10 @@ export default function RoomsPage() {
             </div>
           </div>
         </div>
-        <SiteFooter padding="24px 24px" pinned={false} />
+        <SiteFooter pinned={false} />
       </div>
       {v.more ? <ProgramModal m={v.more} team={v.team} onClose={v.closeMore} onPick={v.pickMore} /> : null}
-      <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
+      <HelpWidget ctx={HELP_CTX} pageState={{ checkin: logic.props.booking.booking.checkin }} />
     </div>
   );
 }

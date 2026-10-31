@@ -1,0 +1,61 @@
+/* A block waiting for the server: loading, error, empty (AsyncBlock.tsx). */
+.async-load {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.async-load.on {
+  opacity: 1;
+}
+.async-spin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid var(--green-line);
+  border-top-color: var(--green);
+  animation: async-spin 0.8s linear infinite;
+}
+@keyframes async-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.async-err {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 560px;
+}
+.async-err strong {
+  font-size: 18px;
+}
+.async-err p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 16px;
+}
+.async-err-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.async-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .async-spin {
+    animation: none;
+  }
+}
