@@ -45,8 +45,12 @@ export function checkPhone(codeLabel: string, national: string, needWhatsApp = t
   const digits = national.replace(/[^\d]/g, '');
   if (!digits) return { error: 'Впишите номер телефона', note: '', e164: '' };
   const n = parsePhoneNumberFromString(digits, countryOf(codeLabel));
-  if (!n || !n.isValid())
+  // wrong length for that country stops the guest; a number the phone plan does not know only
+  // gets a note — the numbering data can be older than a new operator's numbers
+  if (!n || !n.isPossible())
     return { error: 'Номер не похож на настоящий — проверьте цифры и код страны', note: '', e164: '' };
+  if (!n.isValid())
+    return { error: '', note: 'Проверьте номер: он выглядит необычно для этой страны.', e164: n.number };
   const type = n.getType();
   const mobile = type === 'MOBILE' || type === 'FIXED_LINE_OR_MOBILE' || type === undefined;
   return {

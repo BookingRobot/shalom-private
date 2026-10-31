@@ -30,6 +30,12 @@ jobs:
         env:
           # «Ваши пожелания» endpoint (feedback-worker/README.md); empty = prefilled GitHub issue
           VITE_FEEDBACK_URL: ${{ vars.VITE_FEEDBACK_URL }}
+          # launch switches (docs/launch-checklist.md): '0' turns the demo off
+          VITE_DEMO: ${{ vars.VITE_DEMO }}
+          # funnel analytics (docs/analytics.md); empty = nothing is sent
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
+          # BookingRobot API (docs/openapi.yaml); empty = the sample data
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -55,6 +61,13 @@ jobs:
       - run: npm run test:e2e
         env:
           CI: true
+      # the launch build (VITE_DEMO=0): empty order, step guards on, no sample marks — the
+      # booking flow must still go from the search to the confirmation
+      - run: VITE_DEMO=0 npx vite build --outDir dist-launch && cp dist-launch/index.html dist-launch/404.html
+      - run: npx playwright test booking
+        env:
+          CI: true
+          PW_DIST: dist-launch
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

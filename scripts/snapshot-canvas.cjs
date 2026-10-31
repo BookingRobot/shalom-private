@@ -9,7 +9,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+const { chromium } = require(require('path').join(process.env.NODE_PATH, 'playwright'));
 const IA = require('./canvas-interactive.cjs');
 
 /** sanatorium tags and filter groups, straight from the site's data */
@@ -35,7 +35,7 @@ const SEARCH_LOGIC = fs.readFileSync(path.join(__dirname, 'canvas', 'search-logi
 
 const BASE = process.env.SITE || 'http://localhost:4173';
 const OUT = process.argv[2] || 'canvas-out';
-const DIST = path.join(__dirname, '..', 'dist', 'assets');
+const DIST = path.join(__dirname, '..', process.env.CANVAS_DIST || 'dist', 'assets');
 
 const ROUTE_FILE = {
   '/': 'Main.dc.html',

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SearchCard } from '../../components/SearchCard';
 import type { ResultsVals } from './resultsTypes';
+import { StepNotice } from '../../components/StepGuard';
 
 /** the filter sliders icon */
 export const FILTER_ICON = (
@@ -34,7 +35,11 @@ export function ResultsHeader({ v }: { v: ResultsVals }) {
       <div className="res-crumbs">
         <Link to="/">Главная</Link> › Друскининкай
       </div>
-      <div className="res-head">
+      {/* sent back here from a booking step that needs a sanatorium first */}
+      <div className="res-notice">
+        <StepNotice />
+      </div>
+      <div className="res-head" data-canvas="results-head">
         <div className="res-title">
           <h1>Санатории Друскининкая</h1>
           <div className="res-sub">

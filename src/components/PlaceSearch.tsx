@@ -317,7 +317,7 @@ function PlaceType({ guide = false }: { guide?: boolean }) {
         }}
       />
       {open ? (
-        <ul id={listId} role="listbox" className="ps-list" aria-label="Курорты и санатории">
+        <ul id={listId} role="listbox" className="ps-list" aria-label="Курорты и санатории" data-canvas="place-list">
           {list.length === 0 ? <li className="ps-empty">Не нашли — напишите иначе или спросите консультанта</li> : null}
           {list.map((it, i) => (
             <li

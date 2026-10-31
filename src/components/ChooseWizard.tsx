@@ -114,7 +114,7 @@ export function ChooseWizard({
   };
 
   return (
-    <div className="wz-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="wz-overlay" data-canvas="wizard" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div role="dialog" aria-modal="true" aria-labelledby="wzTitle" className="wz">
         <div className="wz-head">
           <div>

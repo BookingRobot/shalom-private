@@ -116,7 +116,7 @@ export function SiteFooter({
           </span>
         </div>
         {/* «Поможем выбрать»: one button opens the support form (the canvas script finds .help-strip-band / .hs-btn) */}
-        <div className="ft-r help-strip-band">
+        <div className="ft-r help-strip-band" data-canvas="footer-help">
           <HeadsetIcon size={36} color="var(--green-mid)" strokeWidth={1.8} />
           <div className="ft-help-t">
             <strong>{title}</strong>

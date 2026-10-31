@@ -96,6 +96,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
         <div
           dir="ltr"
           lang="ru"
+          data-canvas="help-form"
           onClick={(e) => e.target === e.currentTarget && close()}
           style={{
             position: 'fixed',

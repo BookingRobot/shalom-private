@@ -317,6 +317,7 @@ export default function TicketsPage() {
                 {/* the search: everything the guest picks, nothing chosen for them except the direction */}
                 <form
                   className="tk-search"
+                  data-canvas="tickets-search"
                   onSubmit={(e) => {
                     e.preventDefault();
                     track('Tickets searched');
@@ -463,7 +464,7 @@ export default function TicketsPage() {
             </section>
           ) : offer ? (
             <>
-              <section id="tkRes" className="tk-res ios-in" aria-label="Найденный рейс">
+              <section id="tkRes" className="tk-res ios-in" aria-label="Найденный рейс" data-canvas="tickets-result">
                 <header className="tk-res-h">
                   <span className="tk-ok">
                     <svg
@@ -541,7 +542,7 @@ export default function TicketsPage() {
                 </div>
               </section>
               {/* «Сравнить цены»: the same length of the trip on other flight days */}
-              <section className={'tk-cmp' + (cmpOpen ? ' open' : '')}>
+              <section className={'tk-cmp' + (cmpOpen ? ' open' : '')} data-canvas="tickets-compare">
                 <button type="button" className="tk-cmp-h" aria-expanded={cmpOpen} onClick={() => setCmpOpen(!cmpOpen)}>
                   <span>
                     <strong>Сравнить цены</strong>

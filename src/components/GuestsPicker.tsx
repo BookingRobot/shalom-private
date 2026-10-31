@@ -205,7 +205,7 @@ export function GuestsPicker({
         </>
       )}
       {open ? (
-        <div id={popId} role="dialog" aria-label="Гости" className="gp-pop">
+        <div id={popId} role="dialog" aria-label="Гости" className="gp-pop" data-canvas="guests-pop">
           {row('adults', 'Взрослые', 'от 1 до 4', 'взрослые')}
           <div className="gp-sep" />
           {row('children', 'Дети', 'до 17 лет · до 3', 'дети')}

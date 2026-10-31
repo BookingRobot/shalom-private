@@ -12,13 +12,13 @@ test('tickets: dates, passengers, card, confirmation', async ({ page }) => {
   // dates: a day with our flight there, far enough ahead to buy online (not within 24 hours);
   // the calendar then moves on to the way back
   await page.locator('.tk-date').first().click();
-  const cal = page.locator('.tk-cal');
+  const cal = page.getByRole('dialog');
   await expect(cal).toBeVisible();
   await cal
     .getByRole('button', { name: /есть рейс/ })
     .nth(2)
     .click();
-  await expect(cal.locator('#tkCalT')).toContainText(/обратно/i);
+  await expect(cal.getByRole('heading', { level: 2 })).toContainText(/обратно/i);
   await cal
     .getByRole('button', { name: /есть рейс/ })
     .first()

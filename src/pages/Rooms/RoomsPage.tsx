@@ -210,8 +210,10 @@ class RoomsLogic extends PageLogic<RoomsState> {
       // answered earlier (another visit, another sanatorium) stays marked for them
       // (step 1 is done, the road is not answered yet: guests and payment wait for it — StepGuard)
       toRoad: () => {
-        track('Programme chosen', { programme: booking.programId || '' });
+        track('Programme chosen', { programme: sel.id });
         this.props.booking.update({
+          // the programme on the card marked «Выбрана» (the base one is included in the price)
+          programId: sel.id,
           flights: null,
           flightAsked: false,
           transfer: { ...DEFAULT_BOOKING.transfer },
@@ -334,7 +336,7 @@ function ProgramModal({
     };
   }, []);
   return (
-    <div className="pm-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="pm-overlay" data-canvas="program-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="pm" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
         <div className="pm-head">
           <div className="pm-head-t">

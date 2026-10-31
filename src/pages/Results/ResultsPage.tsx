@@ -43,7 +43,7 @@ export default function ResultsPage() {
         <ResultsHeader v={v} />
         <div className="res-main">
           {/* Filters open under the header from the "Фильтры" button; closed, they take no room */}
-          {v.fClosed ? <span hidden className="f-slot" /> : null}
+          {v.fClosed ? <span hidden className="f-slot" data-canvas="results-filters-slot" /> : null}
           {v.fOpen ? <FiltersPanel v={v} /> : null}
           <ActiveFilters v={v} />
           <ListHead v={v} />

@@ -206,7 +206,7 @@ export function TicketOrder({
   );
 
   return (
-    <section className="tk-flow" ref={top} key={step} aria-label="Покупка билетов">
+    <section className="tk-flow" ref={top} key={step} aria-label="Покупка билетов" data-canvas="tickets-order">
       {step !== 'done' ? <Steps at={step === 'pax' ? 2 : 3} /> : null}
 
       {step === 'pax' ? (

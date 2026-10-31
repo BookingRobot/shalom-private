@@ -93,7 +93,7 @@ export default function HotelPage() {
           {v.lightbox ? <HotelLightbox name={v.info.name} photos={v.allPhotos} onClose={v.closeLb} /> : null}
           <HotelFactsStrip strip={v.strip} />
           <Tabs v={v} />
-          <div className="ht-body">
+          <div className="ht-body" data-canvas="hotel-tab-panel">
             {v.tab === 'rooms' ? (
               <HotelRoomsTab v={v} />
             ) : (

@@ -120,7 +120,7 @@ export function HotelCard({
         </div>
       </div>
       {h.open ? (
-        <div className={'rooms-reveal' + (h.closing ? ' closing' : '')}>
+        <div className={'rooms-reveal' + (h.closing ? ' closing' : '')} data-canvas="results-rooms">
           <div className="rooms-reveal-in">
             <div className="rooms-indent">
               {/* rooms of this sanatorium: indented with a guide line so the next sanatorium is not mistaken for a room */}

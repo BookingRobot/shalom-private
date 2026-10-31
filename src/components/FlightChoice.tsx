@@ -283,7 +283,7 @@ export function FlightChoice() {
                 {pairs.length ? (
                   <div className="ios-sec" id="flyAlt">
                     <span className="ios-cap">Даты с нашим рейсом туда и обратно</span>
-                    <div className="ios-list">
+                    <div className="ios-list" data-canvas="flight-alt-dates">
                       {pairs.map((p) => (
                         <button
                           type="button"

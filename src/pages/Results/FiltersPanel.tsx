@@ -188,7 +188,7 @@ export function FiltersPanel({ v }: { v: ResultsVals }) {
 export function ActiveFilters({ v }: { v: ResultsVals }) {
   if (!v.hasActive) return null;
   return (
-    <div className="af">
+    <div className="af" data-canvas="results-active">
       <span className="af-lbl">Выбрано:</span>
       {v.active.map((a) => (
         <button type="button" key={a.t} onClick={a.off} className="af-chip">
@@ -217,7 +217,7 @@ export function ActiveFilters({ v }: { v: ResultsVals }) {
 /** the heading over the list and the sort select */
 export function ListHead({ v }: { v: ResultsVals }) {
   return (
-    <div id="resList" className="lh">
+    <div id="resList" className="lh" data-canvas="results-list-head">
       <h2>{v.foundLabel}</h2>
       <label className="lh-sort">
         Сортировка:

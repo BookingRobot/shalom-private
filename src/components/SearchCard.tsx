@@ -152,6 +152,7 @@ export function SearchCard({
 
   return (
     <form
+      data-canvas="search-card"
       className={'card search' + (guide ? ' search-guide' : '') + (className ? ' ' + className : '')}
       onSubmit={(e) => {
         e.preventDefault();

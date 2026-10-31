@@ -408,3 +408,10 @@
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231F5F4A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>")
     no-repeat right 12px center;
 }
+
+.pg-results .res-notice:empty {
+  display: none;
+}
+.pg-results .res-notice {
+  margin-top: 12px;
+}
