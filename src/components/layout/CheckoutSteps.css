@@ -1,3 +1,23 @@
+/* the steps row under the header: 1 2 3 4 and the flag */
+.checkout-steps-bar {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.checkout-steps {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.checkout-steps.compact {
+  gap: 18px;
+}
+.checkout-steps .step:last-child {
+  gap: 8px;
+}
 .checkout-steps .step {
   position: relative;
   display: flex;
@@ -9,7 +29,7 @@
   font: inherit;
   font-weight: 700;
   font-size: 16px;
-  color: #5e6862;
+  color: var(--muted);
   cursor: default;
 }
 /* the name of a step after a tap (phone) */
@@ -19,47 +39,47 @@
 .checkout-steps .step .num {
   width: 30px;
   height: 30px;
-  border-radius: var(--r);
-  border: 2px solid #cfc9bb;
+  border-radius: var(--r-field);
+  border: 2px solid var(--line-strong);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  background: #fff;
+  background: var(--paper);
 }
 .checkout-steps .step.on {
-  color: #1f5f4a;
+  color: var(--green);
 }
 .checkout-steps .step.on .num {
-  background: #1f5f4a;
-  border-color: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
 }
 .checkout-steps .step.done {
-  color: #1c2620;
+  color: var(--ink);
 }
 .checkout-steps .step.done .num {
-  background: #eef5f1;
-  border-color: #1f5f4a;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
 }
 
 /* compact: order-confirmation page */
 .checkout-steps.compact .step {
   gap: 8px;
-  font-size: 15px;
-  color: #1c2620;
+  font-size: 16px;
+  color: var(--ink);
 }
 .checkout-steps.compact .step .num {
   width: 28px;
   height: 28px;
-  border: 2px solid #1f5f4a;
-  background: #eef5f1;
-  color: #1f5f4a;
+  border: 2px solid var(--green);
+  background: var(--green-soft);
+  color: var(--green);
   font-weight: inherit;
 }
 .checkout-steps.compact .step.on {
-  color: #1f5f4a;
+  color: var(--green);
 }
 
 /* phone: only the numbers, in one line across the width; a tap shows the step's name */
@@ -98,10 +118,10 @@
     z-index: 30;
     white-space: nowrap;
     padding: 7px 12px;
-    border-radius: 10px;
-    background: #1f5f4a;
-    color: #fff;
-    font-size: 15px;
+    border-radius: var(--r-field);
+    background: var(--green);
+    color: var(--paper);
+    font-size: 16px;
     font-weight: 700;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
     animation: stepTip 0.2s ease both;

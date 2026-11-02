@@ -25,6 +25,8 @@ import { MONTHS, MONTHS_N, WEEKDAYS_SHORT, addD, daysBetween, iso, plural, short
 import { fmt } from '../../lib/format';
 import { usePageTitle } from '../../lib/usePageTitle';
 import { TicketOrder, type OrderStep } from './TicketOrder';
+import { track } from '../../lib/analytics';
+import { CalendarDialog } from '../../components/calendar/CalendarDialog';
 import './TicketsPage.css';
 
 const PLANE = 'M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z';
@@ -44,7 +46,7 @@ const CalIcon = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#1F5F4A"
+    stroke="var(--green)"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -210,11 +212,11 @@ export default function TicketsPage() {
         day: d,
         fly: ok,
         sub: isDep ? 'туда' : isRet ? 'обратно' : ok ? legPrice(date, legFrom) + ' €' : '',
-        bg: isDep || isRet ? '#1F5F4A' : ok ? '#E9F4EC' : '#F4F2EE',
-        border: between ? '#1F5F4A' : isDep || isRet ? '#1F5F4A' : 'transparent',
-        color: isDep || isRet ? '#fff' : ok ? '#1C2620' : '#A3ABA6',
-        subColor: isDep || isRet ? '#D9E2DC' : '#3E4B44',
-        planeColor: isDep || isRet ? '#fff' : '#1F5F4A',
+        bg: isDep || isRet ? 'var(--green)' : ok ? 'var(--green-soft)' : 'var(--sand)',
+        border: between ? 'var(--green)' : isDep || isRet ? 'var(--green)' : 'transparent',
+        color: isDep || isRet ? 'var(--paper)' : ok ? 'var(--ink)' : 'var(--muted-2)',
+        subColor: isDep || isRet ? 'var(--green-line)' : 'var(--ink-2)',
+        planeColor: isDep || isRet ? 'var(--paper)' : 'var(--green)',
         off: !ok,
         cursor: ok ? 'pointer' : 'not-allowed',
         aria: d + ' ' + MONTHS[m] + (ok ? ', есть рейс, ' + legPrice(date, legFrom) + ' € с человека' : ', рейса нет'),
@@ -315,8 +317,10 @@ export default function TicketsPage() {
                 {/* the search: everything the guest picks, nothing chosen for them except the direction */}
                 <form
                   className="tk-search"
+                  data-canvas="tickets-search"
                   onSubmit={(e) => {
                     e.preventDefault();
+                    track('Tickets searched');
                     search();
                   }}
                 >
@@ -339,7 +343,7 @@ export default function TicketsPage() {
                             height="12"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="#fff"
+                            stroke="var(--paper)"
                             strokeWidth="3.4"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -460,7 +464,7 @@ export default function TicketsPage() {
             </section>
           ) : offer ? (
             <>
-              <section id="tkRes" className="tk-res ios-in" aria-label="Найденный рейс">
+              <section id="tkRes" className="tk-res ios-in" aria-label="Найденный рейс" data-canvas="tickets-result">
                 <header className="tk-res-h">
                   <span className="tk-ok">
                     <svg
@@ -538,7 +542,7 @@ export default function TicketsPage() {
                 </div>
               </section>
               {/* «Сравнить цены»: the same length of the trip on other flight days */}
-              <section className={'tk-cmp' + (cmpOpen ? ' open' : '')}>
+              <section className={'tk-cmp' + (cmpOpen ? ' open' : '')} data-canvas="tickets-compare">
                 <button type="button" className="tk-cmp-h" aria-expanded={cmpOpen} onClick={() => setCmpOpen(!cmpOpen)}>
                   <span>
                     <strong>Сравнить цены</strong>
@@ -613,39 +617,38 @@ export default function TicketsPage() {
 
       {/* the calendar: flight days only, two months side by side */}
       {cal ? (
-        <div className="tk-overlay" onClick={(e) => e.target === e.currentTarget && setCal('')}>
-          <div className="cal-dlg tk-cal" role="dialog" aria-modal="true" aria-labelledby="tkCalT">
-            <div className="tk-cal-h">
-              <span>
-                <h2 id="tkCalT">{cal === 'dep' ? 'Когда летите туда?' : 'Когда обратно?'}</h2>
-                <span>
-                  {COUNTRIES[cal === 'dep' ? from : to].city} → {COUNTRIES[cal === 'dep' ? to : from].city} · отмечены
-                  дни с рейсом, цена с человека
-                </span>
-              </span>
-              <button type="button" className="btn btn-secondary" onClick={() => setCal('')}>
-                ✕ Закрыть
-              </button>
-            </div>
-            <MonthsCalendar
-              months={months}
-              onPrev={() => canPrev && setMonth({ m: (m0 + 11) % 12, y: m0 === 0 ? y0 - 1 : y0 })}
-              onNext={() => canNext && setMonth({ m: m1, y: y1 })}
-              planeTitle="Есть рейс"
-            />
-            <div className="tk-cal-f">
+        <CalendarDialog
+          className="tk-cal"
+          canvas="tickets-calendar"
+          title={cal === 'dep' ? 'Когда летите туда?' : 'Когда обратно?'}
+          hint={
+            <>
+              {COUNTRIES[cal === 'dep' ? from : to].city} → {COUNTRIES[cal === 'dep' ? to : from].city} · отмечены дни с
+              рейсом, цена с человека
+            </>
+          }
+          onClose={() => setCal('')}
+          selection={
+            <span className="tk-cal-f">
               <span className="lg">
-                <i style={{ background: '#E9F4EC', border: '1px solid #C8DED3' }} />
+                <i className="lg-fly" />
                 есть рейс
               </span>
               <span className="lg">
-                <i style={{ background: '#F4F2EE' }} />
+                <i className="lg-none" />
                 рейса нет
               </span>
               {cal === 'ret' && dep ? <span className="tk-cal-dep">Туда: {dayLabel(dep)}</span> : null}
-            </div>
-          </div>
-        </div>
+            </span>
+          }
+        >
+          <MonthsCalendar
+            months={months}
+            onPrev={() => canPrev && setMonth({ m: (m0 + 11) % 12, y: m0 === 0 ? y0 - 1 : y0 })}
+            onNext={() => canNext && setMonth({ m: m1, y: y1 })}
+            planeTitle="Есть рейс"
+          />
+        </CalendarDialog>
       ) : null}
       <HelpWidget ctx={{}} />
     </div>

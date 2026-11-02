@@ -487,7 +487,7 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
 
       {stage === 'marking' ? (
         <>
-          <div className="fb-mark-bar" role="status">
+          <div className="fb-mark-bar" role="status" data-canvas="feedback-mark">
             <span className="fb-mark-dot" aria-hidden="true" />
             <span className="fb-mark-t">
               <strong>{adding ? 'Ещё один снимок: покажите место' : 'Покажите место на странице'}</strong>
@@ -519,7 +519,11 @@ export function FeedbackWidget({ bottom = '20px' }: { bottom?: string }) {
       ) : null}
 
       {stage === 'form' || stage === 'sending' || stage === 'done' || stage === 'github' ? (
-        <div className="fb-overlay" onClick={(e) => e.target === e.currentTarget && close()}>
+        <div
+          className="fb-overlay"
+          data-canvas="feedback-form"
+          onClick={(e) => e.target === e.currentTarget && close()}
+        >
           <div className="fb-panel" role="dialog" aria-modal="true" aria-labelledby="fbTitle" onPaste={onPaste}>
             <div className="fb-head">
               <div>

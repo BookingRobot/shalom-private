@@ -9,6 +9,10 @@ import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic'
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import '../../components/BirthDate.css';
+import { PassportName } from '../../components/PassportName';
+import { PhoneField } from '../../components/PhoneField';
+import { checkPhone, nameError } from '../../lib/guestRules';
+import type { GuestDetails } from '../../data/booking';
 import './GuestsPage.css';
 
 const HELP_CTX: HelpContextInfo = {
@@ -20,7 +24,21 @@ const HELP_CTX: HelpContextInfo = {
 class GuestsLogic extends PageLogic {
   constructor(props: PageServices) {
     super(props);
-    this.state = { dob: {}, pk: null };
+    // names and the phone are kept in the order's draft, so another device or the consultant sees them
+    const saved = props.booking.booking.details;
+    this.state = {
+      dob: saved?.dob ?? {},
+      pk: null,
+      names: saved?.names ?? { g1fn: '', g1ln: '', g2fn: '', g2ln: '' },
+      phoneCode: saved?.phoneCode ?? '+972 · Израиль',
+      phone: saved?.phone ?? '',
+      checked: false,
+    };
+  }
+  /** the form goes into the order (and its draft on the server) with every change */
+  syncBooking(st: Record<string, any>) {
+    const details: GuestDetails = { dob: st.dob, names: st.names, phoneCode: st.phoneCode, phone: st.phone };
+    return { details };
   }
   renderVals() {
     return this._rv();
@@ -60,11 +78,20 @@ class GuestsLogic extends PageLogic {
         },
       });
     };
+    const keep = (patch: Partial<GuestDetails>) => this.setState(patch);
     const vals = {
+      names: st.names as GuestDetails['names'],
+      setName: (k: keyof GuestDetails['names']) => (val: string) => keep({ names: { ...st.names, [k]: val } }),
+      phoneCode: st.phoneCode as string,
+      phone: st.phone as string,
+      setPhoneCode: (c: string) => keep({ phoneCode: c }),
+      setPhone: (n: string) => keep({ phone: n }),
+      phoneError: checkPhone(st.phoneCode, st.phone).error,
+      checked: !!st.checked,
       dob1: fmtDob(dob.g1),
       dob2: fmtDob(dob.g2),
-      dob1Color: dob.g1 ? '#1C2620' : '#6B776F',
-      dob2Color: dob.g2 ? '#1C2620' : '#6B776F',
+      dob1Color: dob.g1 ? 'var(--ink)' : 'var(--muted)',
+      dob2Color: dob.g2 ? 'var(--ink)' : 'var(--muted)',
       openDob1: open('g1'),
       openDob2: open('g2'),
       dobOpen: !!pk,
@@ -120,7 +147,7 @@ class GuestsLogic extends PageLogic {
           t: String(d),
           cls: d === pk.d ? 'on' : '',
           off: false,
-          border: '#CFC9BB',
+          border: 'var(--line-strong)',
           // the third tap: the date is saved and the window closes — no «Готово» to press
           pick: () => this.setState({ dob: { ...dob, [pk.g]: { y: pk.y, m: pk.m, d } }, pk: null }),
         });
@@ -197,13 +224,15 @@ export default function GuestsPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              // step 3 is done: the payment step may open (StepGuard)
+              if (logic.props.booking.booking.progress < 3) logic.props.booking.update({ progress: 3 });
               logic.props.navigate('/payment');
             }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
                 Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для
                 карты лечения.
               </p>
@@ -218,9 +247,9 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: 'var(--r)',
-                    background: '#1F5F4A',
-                    color: '#fff',
+                    borderRadius: 'var(--r-field)',
+                    background: 'var(--green)',
+                    color: 'var(--paper)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -239,30 +268,26 @@ export default function GuestsPage() {
                   gap: '18px',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g1fn">
-                    Имя
-                  </label>
-                  <input
-                    id="g1fn"
-                    className="input"
-                    type="text"
-                    placeholder="Например: Mikhail"
-                    autoComplete="given-name"
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g1ln">
-                    Фамилия
-                  </label>
-                  <input
-                    id="g1ln"
-                    className="input"
-                    type="text"
-                    placeholder="Например: Levin"
-                    autoComplete="family-name"
-                  />
-                </div>
+                <PassportName
+                  id="g1fn"
+                  label="Имя"
+                  what="имя"
+                  placeholder="Например: MIKHAIL"
+                  autoComplete="given-name"
+                  value={v.names.g1fn}
+                  onChange={v.setName('g1fn')}
+                  forceCheck={v.checked}
+                />
+                <PassportName
+                  id="g1ln"
+                  label="Фамилия"
+                  what="фамилию"
+                  placeholder="Например: LEVIN"
+                  autoComplete="family-name"
+                  value={v.names.g1ln}
+                  onChange={v.setName('g1ln')}
+                  forceCheck={v.checked}
+                />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label className="lbl" htmlFor="g1dob">
                     Дата рождения
@@ -285,7 +310,7 @@ export default function GuestsPage() {
                       <input type="radio" name="g1sex" defaultChecked={true} />
                       Мужской
                     </label>
-                    <label style={{ borderLeft: '2px solid #CFC9BB' }}>
+                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
                       <input type="radio" name="g1sex" />
                       Женский
                     </label>
@@ -295,54 +320,14 @@ export default function GuestsPage() {
                   <label className="lbl" htmlFor="g1ph">
                     Мобильный телефон
                   </label>
-                  <div className="g-tel">
-                    <div className="g-tel-code">
-                      <select
-                        className="input"
-                        aria-label="Страна и код"
-                        style={{ paddingRight: '40px', fontWeight: '700' }}
-                        defaultValue={'+972 · Израиль'}
-                      >
-                        <option>+972 · Израиль</option>
-                        <option>+370 · Литва</option>
-                        <option>+1 · США и Канада</option>
-                        <option>+49 · Германия</option>
-                        <option>+44 · Великобритания</option>
-                        <option>+33 · Франция</option>
-                        <option>+371 · Латвия</option>
-                        <option>+372 · Эстония</option>
-                        <option>+48 · Польша</option>
-                        <option>+7 · Россия</option>
-                        <option>+380 · Украина</option>
-                        <option>+375 · Беларусь</option>
-                        <option>+7 · Казахстан</option>
-                        <option>+995 · Грузия</option>
-                        <option>+374 · Армения</option>
-                        <option>+373 · Молдова</option>
-                      </select>
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#1F5F4A"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        aria-hidden="true"
-                        style={{ position: 'absolute', right: '12px', top: '19px', pointerEvents: 'none' }}
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    </div>
-                    <input
-                      id="g1ph"
-                      className="input"
-                      type="tel"
-                      placeholder="50 123 4567"
-                      autoComplete="tel-national"
-                      inputMode="numeric"
-                    />
-                  </div>
+                  <PhoneField
+                    id="g1ph"
+                    code={v.phoneCode}
+                    number={v.phone}
+                    onCode={v.setPhoneCode}
+                    onNumber={v.setPhone}
+                    error={v.checked ? v.phoneError : ''}
+                  />
                   <span className="hint">Сюда напишем в WhatsApp подтверждение и детали трансфера</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -364,9 +349,9 @@ export default function GuestsPage() {
                   style={{
                     width: '44px',
                     height: '44px',
-                    borderRadius: 'var(--r)',
-                    background: '#1F5F4A',
-                    color: '#fff',
+                    borderRadius: 'var(--r-field)',
+                    background: 'var(--green)',
+                    color: 'var(--paper)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -385,18 +370,24 @@ export default function GuestsPage() {
                   gap: '18px',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g2fn">
-                    Имя
-                  </label>
-                  <input id="g2fn" className="input" type="text" placeholder="Например: Irina" />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g2ln">
-                    Фамилия
-                  </label>
-                  <input id="g2ln" className="input" type="text" placeholder="Например: Levina" />
-                </div>
+                <PassportName
+                  id="g2fn"
+                  label="Имя"
+                  what="имя"
+                  placeholder="Например: IRINA"
+                  value={v.names.g2fn}
+                  onChange={v.setName('g2fn')}
+                  forceCheck={v.checked}
+                />
+                <PassportName
+                  id="g2ln"
+                  label="Фамилия"
+                  what="фамилию"
+                  placeholder="Например: LEVINA"
+                  value={v.names.g2ln}
+                  onChange={v.setName('g2ln')}
+                  forceCheck={v.checked}
+                />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label className="lbl" htmlFor="g2dob">
                     Дата рождения
@@ -418,7 +409,7 @@ export default function GuestsPage() {
                       <input type="radio" name="g2sex" />
                       Мужской
                     </label>
-                    <label style={{ borderLeft: '2px solid #CFC9BB' }}>
+                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
                       <input type="radio" name="g2sex" defaultChecked={true} />
                       Женский
                     </label>
@@ -432,7 +423,7 @@ export default function GuestsPage() {
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
               <h2 style={{ fontSize: '22px' }}>Пожелания к заезду</h2>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '17px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '17px' }}>
                 Не обязательно, но санаторию полезно знать заранее.
               </p>
               <div
@@ -482,13 +473,18 @@ export default function GuestsPage() {
                 </>
               }
               missing={() => {
-                const empty = (id: string) => !document.querySelector<HTMLInputElement>('#' + id)?.value.trim();
                 const dob = (logic.state.dob || {}) as Record<string, unknown>;
                 const m: Missing[] = [];
-                if (empty('g1fn') || empty('g1ln')) m.push({ label: 'имя и фамилию 1-го гостя', target: '#g1fn' });
+                const n = v.names;
+                const bad = (k: keyof typeof n, what: 'имя' | 'фамилию') => !!nameError(n[k], what);
+                // from now on every field shows what is wrong with it
+                if (!v.checked) logic.setState({ checked: true });
+                if (bad('g1fn', 'имя') || bad('g1ln', 'фамилию'))
+                  m.push({ label: 'имя и фамилию 1-го гостя латиницей, как в паспорте', target: '#g1fn' });
                 if (!dob.g1) m.push({ label: 'дату рождения 1-го гостя', target: '#g1dob' });
-                if (empty('g1ph')) m.push({ label: 'телефон для связи', target: '#g1ph' });
-                if (empty('g2fn') || empty('g2ln')) m.push({ label: 'имя и фамилию 2-го гостя', target: '#g2fn' });
+                if (v.phoneError) m.push({ label: 'телефон для связи', target: '#g1ph' });
+                if (bad('g2fn', 'имя') || bad('g2ln', 'фамилию'))
+                  m.push({ label: 'имя и фамилию 2-го гостя латиницей, как в паспорте', target: '#g2fn' });
                 if (!dob.g2) m.push({ label: 'дату рождения 2-го гостя', target: '#g2dob' });
                 return m;
               }}

@@ -1,4 +1,8 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import type { Quote } from '../../api/types';
+import { useQuote } from '../../api/useQuote';
+import { track } from '../../lib/analytics';
 import { PHONE_TEL } from '../../data/contacts';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
@@ -6,7 +10,8 @@ import { SiteFooter } from '../../components/layout/SiteFooter';
 import { fmt } from '../../lib/format';
 import { orderPriceRows, OrderSummary } from '../../components/OrderSummary';
 import { StepNext } from '../../components/StepNext';
-import { orderSummary } from '../../lib/orderSummary';
+import { guestNames, orderSummary } from '../../lib/orderSummary';
+import { DemoMark } from '../../components/DemoMark';
 import { shortDate } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { DEPOSIT_FLIGHT_PP, persons } from '../../lib/pricing';
@@ -35,7 +40,11 @@ class PaymentLogic extends PageLogic {
     // Agents' terms: a deposit (35 € per person, +100 € per person with flights) fixes the price;
     // the rest is paid before a set date, until which cancellation is free. Close to arrival — pay in full.
     const booking = this.props.booking.booking;
-    const order = orderSummary(booking);
+    // the amounts charged come from the server's quote (the same numbers go on the invoice);
+    // until it arrives the page shows the local estimate and the pay button waits
+    const local = orderSummary(booking);
+    const q: Quote | null = this.state.quote ?? null;
+    const order = q ? { ...local, total: q.total, advance: q.deposit, rest: q.rest, fullOnly: q.fullOnly } : local;
     const plan = order.fullOnly ? 'full' : (this.state.plan ?? 'adv');
     const adv = plan === 'adv';
     const TOTAL = order.total;
@@ -90,7 +99,13 @@ class PaymentLogic extends PageLogic {
       rest: adv
         ? 'Остаток ' + restAmt + '\u00a0€ — до ' + order.dueDate + ', отмена до этой даты бесплатная'
         : 'Всё оплачено. На месте ничего доплачивать не нужно',
-      payLabel: adv ? 'Внести депозит ' + advAmt + '\u00a0€' : 'Оплатить ' + totalAmt + '\u00a0€',
+      payLabel: !q
+        ? 'Считаем сумму…'
+        : adv
+          ? 'Внести депозит ' + advAmt + '\u00a0€'
+          : 'Оплатить ' + totalAmt + '\u00a0€',
+      quoteReady: !!q,
+      quoteFailed: !!this.state.quoteFailed,
     };
   }
 }
@@ -99,6 +114,11 @@ export default function PaymentPage() {
   usePageTitle('Шаг 4 из 4 — оплата');
   const [v, logic] = usePageLogic(PaymentLogic);
   const order = orderSummary(logic.props.booking.booking);
+  const quote = useQuote(logic.props.booking.booking);
+  useEffect(() => {
+    if (quote.data !== (logic.state.quote ?? null) || !!quote.error !== !!logic.state.quoteFailed)
+      logic.setState({ quote: quote.data, quoteFailed: !!quote.error });
+  }, [quote.data, quote.error, logic]);
   return (
     <div className="page pg-payment">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -141,18 +161,22 @@ export default function PaymentPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              // paid: the confirmation may open (StepGuard)
+              if (logic.props.booking.booking.progress < 4) logic.props.booking.update({ progress: 4 });
+              track('Deposit paid', { plan: logic.state.plan ?? 'adv' });
               logic.props.navigate('/done');
             }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Как вам удобнее оплатить?</h1>
-              <p style={{ margin: '0', color: '#3E4B44', fontSize: '18px' }}>
+              <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
                 Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
               </p>
             </div>
             {/* Plan */}
             <section
+              id="payPlan"
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
@@ -247,7 +271,7 @@ export default function PaymentPage() {
                   height="26"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1F5F4A"
+                  stroke="var(--green)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -258,7 +282,7 @@ export default function PaymentPage() {
                   <path d="M2 10h20M6 15h4" />
                 </svg>
                 <h2 style={{ fontSize: '24px' }}>Оплата картой</h2>
-                <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                   Visa, Mastercard, Isracard, Amex · Apple Pay, Google Pay
                 </span>
               </div>
@@ -271,7 +295,7 @@ export default function PaymentPage() {
                     gap: '10px',
                     alignItems: 'flex-start',
                     fontSize: '16px',
-                    color: '#3E4B44',
+                    color: 'var(--ink-2)',
                   }}
                 >
                   <svg
@@ -279,7 +303,7 @@ export default function PaymentPage() {
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -296,7 +320,14 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              <div style={{ fontSize: '16px', color: '#3E4B44', borderTop: '1px solid #E3DED2', paddingTop: '12px' }}>
+              <div
+                style={{
+                  fontSize: '16px',
+                  color: 'var(--ink-2)',
+                  borderTop: '1px solid var(--line)',
+                  paddingTop: '12px',
+                }}
+              >
                 Нужен банковский перевод (например, оплачивает организация)?{' '}
                 <a href={PHONE_TEL} style={{ fontWeight: '700' }}>
                   Позвоните нам
@@ -330,7 +361,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -342,7 +373,8 @@ export default function PaymentPage() {
                   <span>
                     {v.fullOnly ? (
                       <>
-                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория
+                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                       </>
                     ) : (
                       <>
@@ -357,7 +389,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -376,7 +408,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#C9893A"
+                    stroke="var(--accent)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -393,7 +425,8 @@ export default function PaymentPage() {
                       </>
                     ) : (
                       <>
-                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем [ПОДТВЕРДИТЬ УСЛОВИЯ].
+                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем
+                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                       </>
                     )}
                   </span>
@@ -404,7 +437,7 @@ export default function PaymentPage() {
                     height="22"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#1F5F4A"
+                    stroke="var(--green)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -424,8 +457,8 @@ export default function PaymentPage() {
                 className="chk"
                 style={{
                   padding: '14px 16px',
-                  border: '2px solid #CFC9BB',
-                  borderRadius: 'var(--r)',
+                  border: '2px solid var(--line-strong)',
+                  borderRadius: 'var(--r-field)',
                   marginTop: '4px',
                 }}
               >
@@ -440,16 +473,17 @@ export default function PaymentPage() {
                 className="chk"
                 style={{
                   padding: '14px 16px',
-                  border: '2px solid #CFC9BB',
-                  borderRadius: 'var(--r)',
+                  border: '2px solid var(--line-strong)',
+                  borderRadius: 'var(--r-field)',
                   marginTop: '4px',
                 }}
               >
                 {' '}
                 <input type="checkbox" />{' '}
                 <span>
-                  Я ознакомился с <Link to="/rules">условиями бронирования и отмены</Link> и согласен на обработку
-                  персональных данных гостей для оформления заказа.
+                  Я ознакомился с <Link to="/rules#cancel">условиями бронирования и отмены</Link> и согласен на
+                  обработку персональных данных гостей по <Link to="/privacy">политике конфиденциальности</Link> — для
+                  оформления заказа.
                 </span>{' '}
               </label>
             </section>
@@ -482,6 +516,16 @@ export default function PaymentPage() {
                 </>
               }
               missing={() => [
+                ...(v.quoteReady
+                  ? []
+                  : [
+                      {
+                        label: v.quoteFailed
+                          ? 'сумма к оплате — нет связи, позвоните нам'
+                          : 'сумма к оплате (ещё считается)',
+                        target: '#payPlan',
+                      },
+                    ]),
                 // [ТЕСТОВЫЙ РЕЖИМ] any card details are taken, only empty fields are asked for
                 ...cardMissing('pay'),
                 ...(document.querySelector<HTMLInputElement>('#payAgree input')?.checked
@@ -495,7 +539,7 @@ export default function PaymentPage() {
               ['Даты', order.dates],
               ['Номер', order.roomName],
               ['Программа', order.programName, order.programPerDay],
-              ['Гости', 'Mikhail Levin, Irina Levina'],
+              ['Гости', guestNames(logic.props.booking.booking) || order.guests],
               ['Трансфер', order.transferPlaces],
             ]}
             prices={orderPriceRows(order)}
@@ -506,8 +550,8 @@ export default function PaymentPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
-                  background: '#EEF5F1',
-                  borderRadius: 'var(--r)',
+                  background: 'var(--green-soft)',
+                  borderRadius: 'var(--r-field)',
                   padding: '12px 14px',
                 }}
               >
@@ -519,13 +563,13 @@ export default function PaymentPage() {
                     gap: '12px',
                     fontSize: '18px',
                     fontWeight: '700',
-                    color: '#1F5F4A',
+                    color: 'var(--green)',
                   }}
                 >
                   <span>Платите сейчас</span>
                   <strong style={{ fontSize: '24px', fontWeight: '800', whiteSpace: 'nowrap' }}>{v.amount}</strong>
                 </div>
-                <div style={{ fontSize: '16px', lineHeight: '1.5', color: '#3E4B44' }}>{v.rest}</div>
+                <div style={{ fontSize: '16px', lineHeight: '1.5', color: 'var(--ink-2)' }}>{v.rest}</div>
               </div>
             }
           />

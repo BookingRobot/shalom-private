@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,10 +12,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # the build that goes live; the same build is what the tests run against
   build:
     runs-on: ubuntu-latest
     steps:
@@ -28,12 +30,56 @@ jobs:
         env:
           # «Ваши пожелания» endpoint (feedback-worker/README.md); empty = prefilled GitHub issue
           VITE_FEEDBACK_URL: ${{ vars.VITE_FEEDBACK_URL }}
+          # launch switches (docs/launch-checklist.md): '0' turns the demo off
+          VITE_DEMO: ${{ vars.VITE_DEMO }}
+          # funnel analytics (docs/analytics.md); empty = nothing is sent
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
+          # BookingRobot API (docs/openapi.yaml); empty = the sample data
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-  deploy:
+  # end-to-end tests on the built site (tests/e2e): the booking flow, the tickets, every page at
+  # a phone and a laptop width — nothing is deployed when they fail
+  test:
     needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: pages-artifact
+      - run: mkdir -p dist && tar -xf pages-artifact/artifact.tar -C dist
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          CI: true
+      # the launch build (VITE_DEMO=0): empty order, step guards on, no sample marks — the
+      # booking flow must still go from the search to the confirmation
+      - run: VITE_DEMO=0 npx vite build --outDir dist-launch && cp dist-launch/index.html dist-launch/404.html
+      - run: npx playwright test booking
+        env:
+          CI: true
+          PW_DIST: dist-launch
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: [build, test]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

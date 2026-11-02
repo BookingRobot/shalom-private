@@ -6,14 +6,13 @@ import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './RulesPage.css';
+import { DemoMark } from '../../components/DemoMark';
 
 const HELP_CTX: HelpContextInfo = {};
 
-class RulesLogic extends PageLogic {
-  renderVals() {
-    return this._rv();
-  }
-  _rv() {
+/** the page keeps no state of its own: the order comes from the shared booking */
+class RulesLogic extends PageLogic<Record<string, never>> {
+  renderVals(): Record<string, never> {
     return {};
   }
 }
@@ -41,11 +40,11 @@ export default function RulesPage() {
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '800px' }}>
-            <div style={{ fontSize: '16px', color: '#3E4B44' }}>
+            <div style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
               <Link to="/">Главная</Link> › Условия
             </div>
             <h1 style={{ fontSize: '32px' }}>Условия бронирования, оплаты и отмены</h1>
-            <p style={{ color: '#3E4B44', fontSize: '18px' }}>
+            <p style={{ color: 'var(--ink-2)', fontSize: '18px' }}>
               Простыми словами — что происходит после заказа, сколько и когда платить, и что будет, если планы
               изменятся.
             </p>
@@ -141,11 +140,11 @@ export default function RulesPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '14px',
-                  border: '2px solid #1F5F4A',
+                  border: '2px solid var(--green)',
                 }}
               >
                 <h2 style={{ fontSize: '23px' }}>3. Отмена и перенос</h2>
-                <p style={{ color: '#3E4B44' }}>
+                <p style={{ color: 'var(--ink-2)' }}>
                   Сроки считаются от даты заезда. Отменить или перенести можно одним звонком или сообщением.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -158,7 +157,8 @@ export default function RulesPage() {
                   <div className="row">
                     <b>После даты оплаты остатка</b>
                     <p>
-                      Депозит не возвращается, остаток возвращаем <span className="ph">[ПОДТВЕРДИТЬ УСЛОВИЯ]</span>.
+                      Депозит не возвращается, остаток возвращаем
+                      <DemoMark className="ph"> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
                     </p>
                   </div>
                   <div className="row">
@@ -232,8 +232,8 @@ export default function RulesPage() {
                 <h2 style={{ fontSize: '23px' }}>5. Ваши данные</h2>
                 <p>
                   Имена, даты рождения и контакты гостей передаём только санаторию и перевозчику — для регистрации,
-                  лечения и трансфера. Храним их <span className="ph">[срок]</span> и удаляем по вашей просьбе. Данные
-                  карт не храним.
+                  лечения и трансфера. Удаляем по вашей просьбе, данные карт не храним. Подробно — в{' '}
+                  <Link to="/privacy">политике конфиденциальности</Link>.
                 </p>
               </section>
               <section
@@ -244,8 +244,8 @@ export default function RulesPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '14px',
-                  background: '#EEF5F1',
-                  borderColor: '#C8DED3',
+                  background: 'var(--green-soft)',
+                  borderColor: 'var(--green-line)',
                 }}
               >
                 <h2 style={{ fontSize: '23px' }}>6. Как с нами связаться</h2>

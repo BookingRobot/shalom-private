@@ -39,6 +39,17 @@ Vienkartiniai nustatymai:
 
 `public/CNAME` laiko domeną, o `dist/404.html` (kopija `index.html`) leidžia tiesiogiai atverti kelius, pvz. `/rooms`.
 
+## Testai
+
+`tests/e2e` — Playwright testai ant sukompiliuotos svetainės: užsakymo kelias nuo paieškos iki patvirtinimo, bilietų pirkimas, kiekvienas puslapis telefono (390 px) ir nešiojamo (1366 px) pločiu — stiliai įkelti, nėra horizontalaus slinkimo, konsolė švari, telefono meniu.
+
+```
+npm run build          # arba: npx vite build --outDir dist-e  ir  PW_DIST=dist-e
+npm run test:e2e       # pats paleidžia `vite preview` ant dist; PW_BASE_URL=https://… tikrina veikiančią svetainę
+```
+
+Lokaliai naudojamas jau įdiegtas Chromium (`PW_CHROMIUM=/kelias/iki/chrome`, jei nerandamas). CI (`deploy.yml`) testus paleidžia ant to paties build'o, kuris keliaus į Pages — jei testai krenta, diegimo nėra; ataskaita `playwright-report` prikabinama prie nepavykusio paleidimo.
+
 ## Svarbu
 
 - Nenaudoti litva.lt pavadinimų, nuotraukų ar telefonų. Telefonas — tik `+370 600 00000` (`src/data/contacts.ts`).

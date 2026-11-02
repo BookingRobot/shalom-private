@@ -58,7 +58,7 @@ export function MonthsCalendar({
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#1F5F4A"
+          stroke="var(--green)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -109,7 +109,7 @@ export function MonthsCalendar({
                           height="16"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke={c.planeColor || '#1F5F4A'}
+                          stroke={c.planeColor || 'var(--green)'}
                           strokeWidth="1.8"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -132,7 +132,7 @@ export function MonthsCalendar({
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#1F5F4A"
+          stroke="var(--green)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"

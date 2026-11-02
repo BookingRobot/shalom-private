@@ -10,13 +10,14 @@ import {
   WHATSAPP_URL,
 } from '../../data/contacts';
 import { LANGS, useLang } from '../../i18n/LanguageContext';
+import { completeLanguages, useT } from '../../i18n/t';
 import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
 type Tone = 'light' | 'dark';
 
 /** the site's forest green: the header bar is painted with it, so the agency's logo goes white on it */
-export const HEADER_GREEN = '#1F5F4A';
+export const HEADER_GREEN = 'var(--green)';
 
 /** the parts of the header read it: on the green bar the logo, menu and phone are white */
 const OnGreen = createContext(false);
@@ -69,6 +70,7 @@ function MobileMenu() {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
   const { lang, setLang } = useLang();
+  const t = useT();
   const btn = useRef<HTMLLabelElement>(null);
   // a new page closes the menu
   useEffect(() => setOpen(false), [loc.pathname, loc.hash]);
@@ -135,8 +137,8 @@ function MobileMenu() {
           <i />
           <i />
         </span>
-        <span className="hd-burger-m">Меню</span>
-        <span className="hd-burger-x">Закрыть</span>
+        <span className="hd-burger-m">{t('nav.menu')}</span>
+        <span className="hd-burger-x">{t('nav.close')}</span>
       </label>
       {
         <div
@@ -144,12 +146,12 @@ function MobileMenu() {
           style={{ ['--hd-menu-top' as string]: top + 'px' }}
           onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         >
-          <nav id="hdMenu" className="hd-menu" aria-label="Меню">
+          <nav id="hdMenu" className="hd-menu" aria-label={t('nav.menu')}>
             <ul className="hd-menu-list">
               {NAV.map((n) => (
                 <li key={n.key}>
                   <Link to={n.to} aria-current={here(n.to) ? 'page' : undefined} onClick={() => setOpen(false)}>
-                    {n.label}
+                    {t(`nav.${n.key}`)}
                     <svg
                       width="18"
                       height="18"
@@ -168,32 +170,34 @@ function MobileMenu() {
               ))}
             </ul>
             <div className="hd-menu-call">
-              <span className="hd-menu-k">Консультация на русском</span>
+              <span className="hd-menu-k">{t('nav.consult')}</span>
               <a className="hd-menu-tel" href={PHONE_TEL} dir="ltr">
                 <PhoneIcon size={20} color="currentColor" />
                 {PHONE_DISPLAY}
               </a>
               <a className="hd-menu-wa" href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-                Написать в WhatsApp
+                {t('nav.whatsapp')}
               </a>
             </div>
-            <div className="hd-menu-lang">
-              <span className="hd-menu-k">Язык сайта</span>
-              <div className="hd-seg" role="radiogroup" aria-label="Язык сайта">
-                {LANGS.map((l) => (
-                  <button
-                    key={l.code}
-                    type="button"
-                    role="radio"
-                    aria-checked={lang === l.code}
-                    className={lang === l.code ? 'on' : ''}
-                    onClick={() => setLang(l.code)}
-                  >
-                    {l.label}
-                  </button>
-                ))}
+            {SHOW_LANGS ? (
+              <div className="hd-menu-lang">
+                <span className="hd-menu-k">{t('nav.language')}</span>
+                <div className="hd-seg" role="radiogroup" aria-label={t('nav.language')}>
+                  {LANGS.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      role="radio"
+                      aria-checked={lang === l.code}
+                      className={lang === l.code ? 'on' : ''}
+                      onClick={() => setLang(l.code)}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </nav>
         </div>
       }
@@ -233,13 +237,15 @@ export function Brand({
 }
 
 export type NavKey = 'resorts' | 'flights' | 'pay' | 'rules' | 'contacts';
-const NAV: { key: NavKey; label: string; to: string }[] = [
-  { key: 'resorts', label: 'Курорты', to: '/results' },
-  { key: 'flights', label: 'Прямые перелёты', to: '/tickets' },
-  { key: 'pay', label: 'Как оплатить', to: '/rules#pay' },
-  { key: 'rules', label: 'Условия', to: '/rules' },
-  { key: 'contacts', label: 'Контакты', to: '/rules#contact' },
+const NAV: { key: NavKey; to: string }[] = [
+  { key: 'resorts', to: '/results' },
+  { key: 'flights', to: '/tickets' },
+  { key: 'pay', to: '/rules#pay' },
+  { key: 'rules', to: '/rules' },
+  { key: 'contacts', to: '/rules#contact' },
 ];
+/** the language switch shows only when a second language is complete: a switch that changes nothing misleads */
+const SHOW_LANGS = completeLanguages().length > 1;
 
 /** Main navigation: resorts, direct flights, payment, terms, contacts. */
 export function MainNav({
@@ -254,9 +260,10 @@ export function MainNav({
   tone?: Tone;
 }) {
   const tone = useTone(toneProp);
+  const t = useT();
   return (
     <nav
-      aria-label="Основное меню"
+      aria-label={t('nav.mainMenu')}
       style={{ display: 'flex', alignItems: 'center', gap: `${gap}px`, flexWrap: 'wrap' }}
     >
       {NAV.map((n) => (
@@ -267,10 +274,10 @@ export function MainNav({
           aria-current={n.key === active ? 'page' : undefined}
           style={{
             ...(size !== 17 ? { fontSize: `${size}px` } : null),
-            ...(tone === 'dark' ? { color: '#fff' } : n.key === active ? { color: '#1F5F4A' } : null),
+            ...(tone === 'dark' ? { color: 'var(--paper)' } : n.key === active ? { color: 'var(--green)' } : null),
           }}
         >
-          {n.label}
+          {t(`nav.${n.key}`)}
         </Link>
       ))}
     </nav>
@@ -300,14 +307,14 @@ export function PhoneLink({
         alignItems: 'center',
         gap: `${gap}px`,
         textDecoration: 'none',
-        color: tone === 'dark' ? '#fff' : '#1C2620',
+        color: tone === 'dark' ? 'var(--paper)' : 'var(--ink)',
         fontWeight: '800',
         fontSize: `${size}px`,
         padding: '8px 0',
         margin: '-8px 0',
       }}
     >
-      <PhoneIcon size={icon} color={tone === 'dark' ? 'currentColor' : '#1F5F4A'} />
+      <PhoneIcon size={icon} color={tone === 'dark' ? 'currentColor' : 'var(--green)'} />
       {PHONE_DISPLAY}
     </a>
   );

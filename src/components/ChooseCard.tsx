@@ -32,7 +32,7 @@ export function ChooseCard({ onOpen }: { onOpen: () => void }) {
   );
 }
 
-const G = '#1F5F4A';
+const G = 'var(--green)';
 
 /** A folded map and three sanatorium cards, the middle one ticked; a small question mark above. */
 function ChooseArt() {
@@ -54,14 +54,14 @@ function ChooseArt() {
         width="52"
         height="64"
         rx="5"
-        fill={on ? '#E1EFE5' : '#FBF8F1'}
+        fill={on ? 'var(--green-soft)' : 'var(--sand)'}
         stroke={G}
         strokeWidth={on ? 2 : 1.4}
       />
       {building(x + 26, y + 15)}
       <path
         d={`M${x + 12} ${y + 44}h28M${x + 12} ${y + 51}h20`}
-        stroke={on ? G : '#9DB8A9'}
+        stroke={on ? G : 'var(--green-mid)'}
         strokeWidth="1.6"
         strokeLinecap="round"
       />
@@ -71,11 +71,11 @@ function ChooseArt() {
     <svg className="choose-art" viewBox="0 0 326 118" role="img" aria-label="Карта и три санатория на выбор">
       {/* folded map */}
       <g strokeLinejoin="round">
-        <path d="M2 42 50 28 56 102 8 116Z" fill="#F7F1E3" stroke={G} strokeWidth="1.5" />
-        <path d="M50 28 100 42 104 112 56 102Z" fill="#E2EEE4" stroke={G} strokeWidth="1.5" />
-        <path d="M100 42 148 26 152 96 104 112Z" fill="#F7F1E3" stroke={G} strokeWidth="1.5" />
-        <path d="M12 62 38 54 42 84 16 92Z" fill="#CFE3D5" />
-        <path d="M112 62 138 52 141 78 115 86Z" fill="#CFE3D5" />
+        <path d="M2 42 50 28 56 102 8 116Z" fill="var(--warn-bg)" stroke={G} strokeWidth="1.5" />
+        <path d="M50 28 100 42 104 112 56 102Z" fill="var(--green-soft)" stroke={G} strokeWidth="1.5" />
+        <path d="M100 42 148 26 152 96 104 112Z" fill="var(--warn-bg)" stroke={G} strokeWidth="1.5" />
+        <path d="M12 62 38 54 42 84 16 92Z" fill="var(--green-line)" />
+        <path d="M112 62 138 52 141 78 115 86Z" fill="var(--green-line)" />
         <path
           d="M16 104C34 94 50 80 70 76S106 82 122 70 138 52 144 48"
           fill="none"
@@ -89,20 +89,20 @@ function ChooseArt() {
           [33, 68],
           [124, 70],
         ].map(([x, y]) => (
-          <path key={x} d={`M${x} ${y - 11}l6 11h-12Z`} fill="#8FBFA5" stroke={G} strokeWidth="1.2" />
+          <path key={x} d={`M${x} ${y - 11}l6 11h-12Z`} fill="var(--green-mid)" stroke={G} strokeWidth="1.2" />
         ))}
         <path
           d="M80 74c-6-8-10-12-10-18a10 10 0 0 1 20 0c0 6-4 10-10 18Z"
-          fill="#E9B44C"
+          fill="var(--accent)"
           stroke={G}
           strokeWidth="1.5"
         />
-        <circle cx="80" cy="56" r="3.6" fill="#fff" stroke={G} strokeWidth="1.2" />
+        <circle cx="80" cy="56" r="3.6" fill="var(--paper)" stroke={G} strokeWidth="1.2" />
       </g>
       {/* question mark */}
       <path
         d="M178 4h22a14 14 0 0 1 0 28h-12l-8 7v-7.4A14 14 0 0 1 178 4Z"
-        fill="#fff"
+        fill="var(--paper)"
         stroke={G}
         strokeWidth="1.5"
         strokeLinejoin="round"
@@ -122,16 +122,16 @@ function ChooseArt() {
       {card(150, 48, false)}
       {card(272, 48, false)}
       {card(211, 42, true)}
-      <circle cx="237" cy="42" r="10" fill={G} stroke="#fff" strokeWidth="2" />
+      <circle cx="237" cy="42" r="10" fill={G} stroke="var(--paper)" strokeWidth="2" />
       <path
         d="M232.4 42.2l3.2 3.1 5.8-6.2"
         fill="none"
-        stroke="#fff"
+        stroke="var(--paper)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M250 22l4-9M258 27l9-5M259 36h9" stroke="#E3A93B" strokeWidth="2" strokeLinecap="round" />
+      <path d="M250 22l4-9M258 27l9-5M259 36h9" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { InfoTitle } from './InfoTip';
 import { FlightDates } from './FlightDates';
+import { DemoMark } from './DemoMark';
 import { CheckIcon } from './icons';
 import { useBooking } from '../context/BookingContext';
 import { useHelp } from '../context/HelpContext';
@@ -224,7 +225,7 @@ export function FlightChoice() {
       <button type="button" className={'fly-help ' + (askedHelp ? 'on' : '')} onClick={pickHelp}>
         {askedHelp ? (
           <>
-            <CheckIcon size={16} color="#1F5F4A" strokeWidth={2.6} />
+            <CheckIcon size={16} color="var(--green)" strokeWidth={2.6} />
             Консультант подберёт рейс и перезвонит — заказ сохранится, можно продолжать
           </>
         ) : (
@@ -260,7 +261,7 @@ export function FlightChoice() {
                   </div>
                   <span className="ios-foot">
                     Билеты выпишем на имена гостей со следующего шага и пришлём на почту и в WhatsApp. Цена билетов
-                    фиксируется депозитом. [ПРИМЕР ДАННЫХ]
+                    фиксируется депозитом.<DemoMark> [ПРИМЕР ДАННЫХ]</DemoMark>
                   </span>
                 </div>
               </div>
@@ -282,7 +283,7 @@ export function FlightChoice() {
                 {pairs.length ? (
                   <div className="ios-sec" id="flyAlt">
                     <span className="ios-cap">Даты с нашим рейсом туда и обратно</span>
-                    <div className="ios-list">
+                    <div className="ios-list" data-canvas="flight-alt-dates">
                       {pairs.map((p) => (
                         <button
                           type="button"

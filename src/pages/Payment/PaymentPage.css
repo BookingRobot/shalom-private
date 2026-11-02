@@ -1,7 +1,7 @@
 .pg-payment {
   margin: 0;
-  background: #f4f1ea;
-  color: #1c2620;
+  background: var(--sand);
+  color: var(--ink);
   font-family: Manrope, 'Segoe UI', Arial, sans-serif;
   font-size: 18px;
   line-height: 1.5;
@@ -20,7 +20,7 @@
   gap: 10px;
   min-height: 50px;
   padding: 0 22px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
@@ -29,62 +29,62 @@
   white-space: nowrap;
 }
 .pg-payment .btn-primary {
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
 }
 .pg-payment .btn-primary:hover {
-  background: #174b3a;
-  color: #fff;
+  background: var(--green-deep);
+  color: var(--paper);
 }
 .pg-payment .btn-secondary {
-  background: #fff;
-  color: #1f5f4a;
-  border-color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
+  border-color: var(--green);
 }
 .pg-payment .btn-secondary:hover {
-  background: #eef5f1;
-  color: #143f31;
+  background: var(--green-soft);
+  color: var(--green-deep);
 }
 .pg-payment .input {
   min-height: 50px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
   padding: 0 16px;
-  background: #fff;
+  background: var(--paper);
   font-size: 18px;
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
 }
 .pg-payment .input:focus {
-  outline: 3px solid #9cc9b5;
-  border-color: #1f5f4a;
+  outline: 3px solid var(--green-mid);
+  border-color: var(--green);
 }
 .pg-payment .input::placeholder {
-  color: #6b776f;
+  color: var(--muted);
 }
 .pg-payment .lbl {
   font-weight: 700;
   font-size: 16px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .pg-payment .hint {
   font-size: 16px;
-  color: #5e6862;
+  color: var(--muted);
 }
 .pg-payment .card {
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
 }
 .pg-payment .choice {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 18px 20px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
   cursor: pointer;
   text-align: left;
   width: 100%;
@@ -92,34 +92,34 @@
   font-size: 18px;
 }
 .pg-payment .choice:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .pg-payment .choice.on {
-  border-color: #1f5f4a;
-  background: #eef5f1;
-  box-shadow: inset 0 0 0 1px #1f5f4a;
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 0 0 0 1px var(--green);
 }
 .pg-payment .radio {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid #8a968f;
+  border: 2px solid var(--muted-2);
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--paper);
   margin-top: 2px;
 }
 .pg-payment .radio.on {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .pg-payment .radio.on i {
   display: block;
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #1f5f4a;
+  background: var(--green);
 }
 .pg-payment .chk {
   display: flex;
@@ -131,7 +131,7 @@
 .pg-payment .chk input {
   width: 26px;
   height: 26px;
-  accent-color: #1f5f4a;
+  accent-color: var(--green);
   margin: 2px 0 0;
   flex: none;
 }
@@ -192,35 +192,35 @@
   font-size: 20px;
   font-weight: 700;
   line-height: 1.25;
-  color: #1c2620;
+  color: var(--ink);
 }
 .pg-payment .plan-alt .plan-title {
   font-size: 17px;
   font-weight: 600;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .pg-payment .plan-text {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .pg-payment .plan-alt .plan-text {
-  color: #5e6862;
+  color: var(--muted);
 }
 .pg-payment .plan-text strong {
-  color: #1c2620;
+  color: var(--ink);
   white-space: nowrap;
 }
 .pg-payment .nowrap {
   white-space: nowrap;
 }
 .pg-payment .plan-badge {
-  background: #fff1d6;
-  color: #8a5a00;
-  font-size: 14px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 16px;
   font-weight: 800;
   padding: 2px 8px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   white-space: nowrap;
 }
 
@@ -235,15 +235,15 @@
 .pg-payment .pay-steps {
   display: flex;
   flex-direction: column;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
 }
 .pg-payment .pay-steps-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #3e4b44;
+  color: var(--ink-2);
   padding: 10px 16px;
-  background: #f4f1ea;
+  background: var(--sand);
 }
 .pg-payment .pay-step {
   display: grid;
@@ -251,15 +251,15 @@
   gap: 4px 16px;
   align-items: baseline;
   padding: 10px 16px;
-  border-top: 1px solid #e3ded2;
+  border-top: 1px solid var(--line);
   font-size: 16px;
 }
 .pg-payment .pay-when {
   font-weight: 700;
-  color: #1c2620;
+  color: var(--ink);
 }
 .pg-payment .pay-what {
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .pg-payment .pay-sum {
   font-size: 18px;
@@ -281,9 +281,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 16px 18px;
-  border-radius: 12px;
-  background: #eef5f1;
-  border: 1px solid #c8ded3;
+  border-radius: var(--r-field);
+  background: var(--green-soft);
+  border: 1px solid var(--green-line);
 }
 .pg-payment .pay-now-h {
   display: flex;
@@ -293,12 +293,12 @@
 }
 .pg-payment .pay-rest {
   padding-left: 14px;
-  border-left: 3px solid #c8ded3;
+  border-left: 3px solid var(--green-line);
 }
 .pg-payment .pay-more {
-  border: 1px solid #e3ded2;
-  border-radius: 12px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+  background: var(--paper);
 }
 .pg-payment .pay-more > summary {
   list-style: none;
@@ -310,7 +310,7 @@
   padding: 0 16px;
   font-weight: 700;
   font-size: 16px;
-  color: #1f5f4a;
+  color: var(--green);
   cursor: pointer;
 }
 .pg-payment .pay-more > summary::-webkit-details-marker {
@@ -320,8 +320,8 @@
   content: '';
   width: 9px;
   height: 9px;
-  border-right: 2.5px solid #1f5f4a;
-  border-bottom: 2.5px solid #1f5f4a;
+  border-right: 2.5px solid var(--green);
+  border-bottom: 2.5px solid var(--green);
   transform: rotate(45deg) translateY(-3px);
   transition: transform 0.25s;
 }

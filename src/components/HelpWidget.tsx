@@ -34,11 +34,15 @@ const DESTINATIONS: [string, string][] = [
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 const fieldLabel: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '6px' };
-const labelText = (size: number): CSSProperties => ({ fontWeight: '700', fontSize: `${size}px`, color: '#3E4B44' });
+const labelText = (size: number): CSSProperties => ({
+  fontWeight: '700',
+  fontSize: `${size}px`,
+  color: 'var(--ink-2)',
+});
 const textInput: CSSProperties = {
   minHeight: '48px',
-  border: '2px solid #CFC9BB',
-  borderRadius: 'var(--r)',
+  border: '2px solid var(--line-strong)',
+  borderRadius: 'var(--r-field)',
   padding: '0 16px',
   font: '500 18px Manrope,sans-serif',
   width: '100%',
@@ -46,13 +50,13 @@ const textInput: CSSProperties = {
 };
 const smallField: CSSProperties = {
   minHeight: '52px',
-  border: '2px solid #CFC9BB',
-  borderRadius: 'var(--r)',
+  border: '2px solid var(--line-strong)',
+  borderRadius: 'var(--r-field)',
   padding: '0 12px',
   font: '600 17px Manrope,sans-serif',
   width: '100%',
   boxSizing: 'border-box',
-  background: '#fff',
+  background: 'var(--paper)',
 };
 
 /**
@@ -92,6 +96,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
         <div
           dir="ltr"
           lang="ru"
+          data-canvas="help-form"
           onClick={(e) => e.target === e.currentTarget && close()}
           style={{
             position: 'fixed',
@@ -104,7 +109,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
             padding: '40px 16px',
             overflow: 'auto',
             fontFamily: "Manrope,'Segoe UI',Arial,sans-serif",
-            color: '#1C2620',
+            color: 'var(--ink)',
           }}
         >
           <div
@@ -114,8 +119,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
             aria-modal="true"
             aria-labelledby="helpTitle"
             style={{
-              background: '#fff',
-              borderRadius: 'var(--r)',
+              background: 'var(--paper)',
+              borderRadius: 'var(--r-field)',
               width: 'min(720px,100%)',
               display: 'flex',
               flexDirection: 'column',
@@ -132,14 +137,14 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     width: '52px',
                     height: '52px',
                     borderRadius: '50%',
-                    background: '#EEF5F1',
+                    background: 'var(--green-soft)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flex: 'none',
                   }}
                 >
-                  <HeadsetIcon size={28} color="#1F5F4A" strokeWidth={1.8} />
+                  <HeadsetIcon size={28} color="var(--green)" strokeWidth={1.8} />
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h2
@@ -154,7 +159,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   >
                     Свяжитесь со мной
                   </h2>
-                  <span style={{ fontSize: '16px', color: '#3E4B44' }}>
+                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                     Ответим на русском в течение 2 часов (9:00–20:00)
                   </span>
                 </div>
@@ -166,9 +171,9 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                 style={{
                   width: '48px',
                   height: '48px',
-                  border: '2px solid #CFC9BB',
-                  background: '#fff',
-                  borderRadius: 'var(--r)',
+                  border: '2px solid var(--line-strong)',
+                  background: 'var(--paper)',
+                  borderRadius: 'var(--r-field)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -204,11 +209,11 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     <PhoneCodeSelect
                       style={{
                         minHeight: '48px',
-                        border: '2px solid #CFC9BB',
-                        borderRadius: 'var(--r)',
+                        border: '2px solid var(--line-strong)',
+                        borderRadius: 'var(--r-field)',
                         padding: '0 12px',
                         font: '700 17px Manrope,sans-serif',
-                        background: '#fff',
+                        background: 'var(--paper)',
                         flex: 'none',
                         width: '170px',
                       }}
@@ -229,8 +234,8 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?"
                     style={{
                       minHeight: '100px',
-                      border: '2px solid #CFC9BB',
-                      borderRadius: 'var(--r)',
+                      border: '2px solid var(--line-strong)',
+                      borderRadius: 'var(--r-field)',
                       padding: '12px 16px',
                       font: '500 17px Manrope,sans-serif',
                       width: '100%',
@@ -245,9 +250,9 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
-                    background: '#F7F5F0',
-                    border: '1px solid #E3DED2',
-                    borderRadius: 'var(--r)',
+                    background: 'var(--sand)',
+                    border: '1px solid var(--line)',
+                    borderRadius: 'var(--r-field)',
                     padding: '14px 16px',
                   }}
                 >
@@ -261,7 +266,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     }}
                   >
                     <strong style={{ fontSize: '16px' }}>Если уже знаете — так мы поможем быстрее</strong>
-                    <span style={{ fontSize: '14px', color: '#5E6862' }}>не обязательно</span>
+                    <span style={{ fontSize: '16px', color: 'var(--muted)' }}>не обязательно</span>
                   </div>
                   <div
                     style={{
@@ -291,9 +296,15 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   </div>
                   {prefilled && (
                     <span
-                      style={{ fontSize: '14px', color: '#1F5F4A', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      style={{
+                        fontSize: '16px',
+                        color: 'var(--green)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
                     >
-                      <CheckIcon size={16} color="#1F5F4A" strokeWidth={2.5} />
+                      <CheckIcon size={16} color="var(--green)" strokeWidth={2.5} />
                       Заполнили по вашему поиску — можно изменить
                     </span>
                   )}
@@ -308,7 +319,7 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     flexWrap: 'wrap',
                   }}
                 >
-                  <span style={{ fontSize: '14px', color: '#5E6862', maxWidth: '340px' }}>
+                  <span style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: '340px' }}>
                     Нужно указать имя и телефон или e-mail. Данные используем только для ответа.
                   </span>
                   <button
@@ -318,9 +329,9 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                       minHeight: '50px',
                       padding: '0 24px',
                       border: 'none',
-                      borderRadius: 'var(--r)',
-                      background: '#1F5F4A',
-                      color: '#fff',
+                      borderRadius: 'var(--r-field)',
+                      background: 'var(--green)',
+                      color: 'var(--paper)',
                       font: '700 18px Manrope,sans-serif',
                       cursor: 'pointer',
                     }}
@@ -334,16 +345,16 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     alignItems: 'center',
                     gap: '14px',
                     flexWrap: 'wrap',
-                    borderTop: '1px solid #E3DED2',
+                    borderTop: '1px solid var(--line)',
                     paddingTop: '14px',
                     fontSize: '16px',
                   }}
                 >
-                  <span style={{ color: '#3E4B44' }}>Или сразу:</span>
-                  <a href={WHATSAPP_URL} style={{ fontWeight: '700', color: '#1F5F4A' }}>
+                  <span style={{ color: 'var(--ink-2)' }}>Или сразу:</span>
+                  <a href={WHATSAPP_URL} style={{ fontWeight: '700', color: 'var(--green)' }}>
                     WhatsApp
                   </a>
-                  <a href={PHONE_TEL} style={{ fontWeight: '700', color: '#1F5F4A', whiteSpace: 'nowrap' }}>
+                  <a href={PHONE_TEL} style={{ fontWeight: '700', color: 'var(--green)', whiteSpace: 'nowrap' }}>
                     {PHONE_DISPLAY}
                   </a>
                 </div>
@@ -365,18 +376,18 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                     width: '64px',
                     height: '64px',
                     borderRadius: '50%',
-                    background: '#1F5F4A',
+                    background: 'var(--green)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckIcon size={34} color="#fff" strokeWidth={2.6} />
+                  <CheckIcon size={34} color="var(--paper)" strokeWidth={2.6} />
                 </span>
                 <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '23px', fontWeight: '600' }}>
                   Спасибо! Мы скоро свяжемся с вами
                 </strong>
-                <span style={{ fontSize: '17px', color: '#3E4B44' }}>
+                <span style={{ fontSize: '17px', color: 'var(--ink-2)' }}>
                   Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.
                 </span>
                 <button
@@ -385,10 +396,10 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
                   style={{
                     minHeight: '48px',
                     padding: '0 22px',
-                    border: '2px solid #1F5F4A',
-                    borderRadius: 'var(--r)',
-                    background: '#fff',
-                    color: '#1F5F4A',
+                    border: '2px solid var(--green)',
+                    borderRadius: 'var(--r-field)',
+                    background: 'var(--paper)',
+                    color: 'var(--green)',
                     font: '700 18px Manrope,sans-serif',
                     cursor: 'pointer',
                   }}

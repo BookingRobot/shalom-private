@@ -26,7 +26,7 @@
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid #dfe8e2;
+  border-top: 1px solid var(--green-line);
   box-shadow: 0 -8px 24px rgba(28, 38, 32, 0.08);
   transform: translateY(110%);
   visibility: hidden;
@@ -58,10 +58,10 @@
 .step-bar-info {
   min-width: 0;
   font-size: 16px;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .step-bar-info strong {
-  color: #1c2620;
+  color: var(--ink);
   font-size: 20px;
 }
 .page .btn.step-next {
@@ -78,10 +78,10 @@
   gap: 10px 14px;
   flex-wrap: wrap;
   padding: 10px 12px 10px 14px;
-  border-radius: 12px;
-  background: #fff6e3;
-  border: 1px solid #f0ddb8;
-  color: #5a3d00;
+  border-radius: var(--r-field);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  color: var(--warn-ink);
   font-size: 16px;
   line-height: 1.4;
 }
@@ -89,7 +89,7 @@
   flex: 1 1 260px;
 }
 .step-hint-t strong {
-  color: #1c2620;
+  color: var(--ink);
 }
 .step-hint-b {
   display: flex;
@@ -101,9 +101,9 @@
   min-height: 40px;
   padding: 0 14px;
   border: 0;
-  border-radius: 10px;
-  background: #1f5f4a;
-  color: #fff;
+  border-radius: var(--r-field);
+  background: var(--green);
+  color: var(--paper);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -115,21 +115,21 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: #8a5a00;
+  color: var(--warn-ink);
   font-size: 16px;
   cursor: pointer;
 }
 /* the spot to fill in lights up for a moment */
 .step-flash {
   animation: stepFlash 2.4s ease-out;
-  border-radius: 12px;
+  border-radius: var(--r-field);
 }
 @keyframes stepFlash {
   0%,
   30% {
     box-shadow:
-      0 0 0 3px #fff,
-      0 0 0 6px #e3a93b;
+      0 0 0 3px var(--paper),
+      0 0 0 6px var(--accent);
   }
   100% {
     box-shadow:
@@ -137,14 +137,25 @@
       0 0 0 6px transparent;
   }
 }
-/* the floating buttons step up while the bar is shown */
+/*
+ * One notification channel (see StepNext.tsx): while the bar is shown, everything fixed at the
+ * bottom of the screen steps up by the bar's height — the «Ваши пожелания» pill, the help
+ * button, the feedback toast. Add a new floating element here, never a bottom offset of its
+ * own.
+ */
 body.has-stepbar .fb-btn,
+body.has-stepbar .fb-toast,
 body.has-stepbar .help-fab {
   translate: 0 calc(-1 * var(--stepbar-h, 76px));
 }
 .fb-btn,
+.fb-toast,
 .help-fab {
   transition: translate 0.3s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+/* «Показать ↑» scrolls to a spot: it lands above the bar, not under it */
+html:has(body.has-stepbar) {
+  scroll-padding-bottom: calc(var(--stepbar-h, 76px) + 16px);
 }
 @media (max-width: 600px) {
   .step-bar-in {
@@ -152,7 +163,7 @@ body.has-stepbar .help-fab {
     padding-right: 16px;
   }
   .step-bar-info {
-    font-size: 14px;
+    font-size: 16px;
   }
   .step-bar-info strong {
     font-size: 17px;
@@ -174,7 +185,7 @@ body.has-stepbar .help-fab {
   }
   .step-flash {
     animation: none;
-    box-shadow: 0 0 0 3px #e3a93b;
+    box-shadow: 0 0 0 3px var(--accent);
   }
 }
 /* «Далее» carries the bubble «what to do now» above it (NextTip float) */
@@ -213,10 +224,10 @@ body.has-stepbar .help-fab {
     gap: 8px;
     min-height: 48px;
     padding: 0 14px 0 12px;
-    border: 1.5px solid #cfe3d6;
-    border-radius: 12px;
-    background: #eef5f1;
-    color: #1f5f4a;
+    border: 1.5px solid var(--green-line);
+    border-radius: var(--r-field);
+    background: var(--green-soft);
+    color: var(--green);
     font: inherit;
     font-weight: 700;
     cursor: pointer;
@@ -231,7 +242,7 @@ body.has-stepbar .help-fab {
   }
   .step-basket-bar .step-basket-t strong {
     font-size: 17px;
-    color: #1c2620;
+    color: var(--ink);
     white-space: nowrap;
   }
   .step-bar-info.has-basket {
@@ -258,6 +269,6 @@ body.has-stepbar .help-fab {
   }
   .step-basket-row .step-basket-t {
     font-weight: 600;
-    color: #1c2620;
+    color: var(--ink);
   }
 }

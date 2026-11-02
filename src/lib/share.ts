@@ -3,9 +3,11 @@ import type { Booking } from '../data/booking';
 /**
  * A shared offer is a plain link: the booking's key choices in the query string,
  * read back on load (BookingContext), so "посоветоваться с семьёй" opens the same
- * sanatorium, room, programme, dates and guests on any phone.
+ * sanatorium, room, programme, dates and guests on any phone. With an order code the
+ * link is /order/<code> — the draft on the server, where the guest stopped — and the
+ * choices stay in the query as a fallback for a server that does not have it.
  */
-export function offerLink(b: Booking, path = '/rooms') {
+export function offerLink(b: Booking, path = '/rooms', code: string | null = null) {
   const q = new URLSearchParams({
     offer: '1',
     h: b.hotelId,
@@ -17,7 +19,7 @@ export function offerLink(b: Booking, path = '/rooms') {
     c: String(b.children),
     f: b.flightPackage ? '1' : '0',
   });
-  return window.location.origin + path + '?' + q.toString();
+  return window.location.origin + (code ? '/order/' + code : path) + '?' + q.toString();
 }
 
 /** Booking fields from an offer link, or null when the URL is not one. */

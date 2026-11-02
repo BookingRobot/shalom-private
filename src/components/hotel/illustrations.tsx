@@ -8,9 +8,9 @@ import { VanIcon } from '../icons';
  */
 
 const TONES = [
-  { bg: '#E6F2EA', skin: '#F2D3BC', hair: '#5B4636' },
-  { bg: '#EEE9F7', skin: '#E9C3A6', hair: '#2F2A27' },
-  { bg: '#FFF1DC', skin: '#F4D9C4', hair: '#A9A39A' },
+  { bg: 'var(--green-soft)', skin: '#F2D3BC', hair: '#5B4636' },
+  { bg: '#EEE9F7', skin: '#E9C3A6', hair: 'var(--ink)' },
+  { bg: 'var(--warn-bg)', skin: '#F4D9C4', hair: 'var(--muted-2)' },
   { bg: '#E4EEF6', skin: '#E2B897', hair: '#7A5232' },
 ];
 
@@ -22,8 +22,8 @@ export function DoctorAvatar({ variant = 0, size = 72 }: { variant?: number; siz
     <svg width={size} height={size} viewBox="0 0 72 72" aria-hidden="true">
       <circle cx="36" cy="36" r="36" fill={t.bg} />
       {longHair ? <path d="M21 34c0-11 6.5-18 15-18s15 7 15 18v12H21z" fill={t.hair} /> : null}
-      <path d="M14 72c1-13 9.5-20 22-20s21 7 22 20z" fill="#fff" stroke="#D5DED8" />
-      <path d="M31 52l5 9 5-9" fill="none" stroke="#9CC9B5" strokeWidth="2" />
+      <path d="M14 72c1-13 9.5-20 22-20s21 7 22 20z" fill="var(--paper)" stroke="var(--green-line)" />
+      <path d="M31 52l5 9 5-9" fill="none" stroke="var(--green-mid)" strokeWidth="2" />
       <rect x="31" y="42" width="10" height="10" rx="3" fill={t.skin} />
       <circle cx="36" cy="33" r="12" fill={t.skin} />
       {longHair ? (
@@ -31,8 +31,8 @@ export function DoctorAvatar({ variant = 0, size = 72 }: { variant?: number; siz
       ) : (
         <path d="M24.5 30c0-7 5-11.5 11.5-11.5S47.5 23 47.5 30c-3-3.5-7-5-11.5-5S27.5 26.5 24.5 30z" fill={t.hair} />
       )}
-      <path d="M26 54c0 6 3 9 7 9M46 54v6" fill="none" stroke="#1F5F4A" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="46" cy="62" r="2.6" fill="none" stroke="#1F5F4A" strokeWidth="2" />
+      <path d="M26 54c0 6 3 9 7 9M46 54v6" fill="none" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="46" cy="62" r="2.6" fill="none" stroke="var(--green)" strokeWidth="2" />
     </svg>
   );
 }

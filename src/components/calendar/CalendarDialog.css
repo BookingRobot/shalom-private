@@ -1,0 +1,159 @@
+/* The one calendar window (CalendarDialog.tsx): a centred card on a laptop, a full sheet on a phone. */
+.cd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: rgba(18, 34, 27, 0.55);
+  animation: cdFade 0.2s ease both;
+}
+.cal-dlg.cd {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--r-card);
+  width: min(1120px, 100%);
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 24px 16px;
+  box-shadow: var(--sh-modal);
+  animation: cdIn 0.28s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.cd [hidden] {
+  display: none !important;
+}
+.cd-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cd-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.cd-title h2 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 24px;
+  line-height: 1.2;
+}
+.cd-hint {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.cd-note {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--r-field);
+  padding: 6px 12px;
+  font-size: 16px;
+  margin-top: 4px;
+}
+.cd .cd-close {
+  flex: none;
+  min-height: 44px;
+  font-size: 16px;
+  padding: 0 16px;
+  gap: 8px;
+}
+.cd-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.cd-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.cd-sel {
+  display: flex;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+.cd-col {
+  display: flex;
+  flex-direction: column;
+}
+.cd-col strong {
+  font-size: 18px;
+}
+.cd-col strong small {
+  font-size: 16px;
+  font-weight: 700;
+}
+.cd-green {
+  color: var(--green);
+}
+.cd-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cd-btns .btn {
+  min-height: 50px;
+  font-size: 18px;
+  padding: 0 24px;
+}
+@keyframes cdFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cdIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@media (max-width: 640px) {
+  .cd-overlay {
+    padding: 0;
+  }
+  .cal-dlg.cd {
+    min-height: 100%;
+    border-radius: 0;
+    padding: 14px 14px 12px;
+    margin: 0;
+  }
+  .cd .cd-close {
+    padding: 0 12px;
+  }
+  .cd .cd-close-t {
+    display: none;
+  }
+  .cd-btns {
+    width: 100%;
+  }
+  .cd-btns .btn {
+    flex: 1 1 0;
+    padding: 0 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-overlay,
+  .cal-dlg.cd {
+    animation: none;
+  }
+}

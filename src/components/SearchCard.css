@@ -5,7 +5,7 @@
   flex-direction: column;
   gap: 10px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.08),
     0 14px 36px rgba(0, 0, 0, 0.18);
@@ -13,7 +13,10 @@
 .page .search-grid {
   display: grid;
   /* the dates never break onto two lines: «30 сентября 2026» needs about 200px */
-  grid-template-columns: minmax(150px, 1.1fr) minmax(206px, 1fr) minmax(206px, 1fr) minmax(165px, 1fr) minmax(190px, 236px);
+  grid-template-columns: minmax(150px, 1.1fr) minmax(206px, 1fr) minmax(206px, 1fr) minmax(165px, 1fr) minmax(
+      190px,
+      236px
+    );
   gap: 16px;
   align-items: end;
 }
@@ -24,24 +27,24 @@
   min-width: 0;
 }
 .page .search .lbl {
-  font-size: 14.5px;
+  font-size: 16px;
   font-weight: 500;
-  color: #3e4b44;
+  color: var(--ink-2);
 }
 .page .search .input {
   min-height: 51px;
   padding: 0 14px 0 42px;
-  background: #fff;
+  background: var(--paper);
   font-size: 17px;
   font-weight: 500;
-  border: 1px solid #cfc9bb;
-  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-field);
   box-shadow: none;
   width: 100%;
 }
 .page .search .input:focus {
   outline: none;
-  border-color: #1f5f4a;
+  border-color: var(--green);
   box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.14);
 }
 .page .search .datebtn {
@@ -53,7 +56,7 @@
   text-overflow: ellipsis;
 }
 .page .search .datebtn:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .page .search .fieldico {
   position: absolute;
@@ -67,7 +70,7 @@
 .page .search .search-go {
   min-height: 51px;
   font-size: 17px;
-  border-radius: 8px;
+  border-radius: var(--r-field);
 }
 
 /* what to do next: a green bubble over the field to fill (home page) or over «Найти санаторий» */
@@ -78,11 +81,11 @@
   flex-direction: column;
 }
 .page .search .sf-next .input {
-  border-color: #1f5f4a;
+  border-color: var(--green);
   box-shadow: 0 0 0 4px rgba(31, 95, 74, 0.16);
 }
 .page .search .datebtn-ph {
-  color: #6f7873;
+  color: var(--muted);
   font-weight: 400;
 }
 .page .search .go-tip {
@@ -96,9 +99,9 @@
   align-items: flex-start;
   gap: 8px;
   padding: 11px 8px 11px 14px;
-  border-radius: 12px;
-  background: #1f5f4a;
-  color: #fff;
+  border-radius: var(--r-field);
+  background: var(--green);
+  color: var(--paper);
   font-size: 16px;
   line-height: 1.35;
   box-shadow:
@@ -135,7 +138,7 @@
   bottom: -7px;
   width: 14px;
   height: 14px;
-  background: #1f5f4a;
+  background: var(--green);
   border-radius: 0 0 3px 0;
   transform: rotate(45deg);
 }
@@ -152,7 +155,7 @@
   border: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  color: var(--paper);
   font-size: 13px;
   cursor: pointer;
 }
@@ -232,7 +235,7 @@
     width: max-content;
     bottom: calc(100% + 3px);
     padding: 5px 5px 5px 12px;
-    font-size: 15.5px;
+    font-size: 16px;
     white-space: normal;
   }
   .page .search .go-tip-place .go-tip-x,

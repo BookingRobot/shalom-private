@@ -1,0 +1,510 @@
+{
+  "about": "Canvas boards: one entry per board, grouped by page. file = board file on the canvas (never rename: the canvas places boards by it); route = the address opened; viewport = laptop (default) or phone; state = a state of a page rather than a page; targets = site addresses whose links lead to this board in Play; setup = steps run after the page loads; links = what becomes a link to another board; build = a page module that rebuilds the board so it works in Play (home, results, hotel). Elements are named by data-canvas marks and roles (scripts/canvas/find.cjs).",
+  "viewports": {
+    "laptop": { "width": 1280, "height": 900 },
+    "phone": { "width": 390, "height": 844 }
+  },
+  "pages": {
+    "home": [
+      { "file": "Main.dc.html", "title": "1 · Главная и поиск", "route": "/", "targets": ["/"], "build": "home" },
+      {
+        "file": "Help.dc.html",
+        "title": "Справка · Форма «Свяжитесь со мной» (на всех страницах)",
+        "route": "/?help=1"
+      },
+      {
+        "file": "Main-search.dc.html",
+        "title": "Главная · поиск «Курорт или санаторий»",
+        "route": "/",
+        "state": true,
+        "setup": [{ "click": { "id": "city" } }]
+      },
+      {
+        "file": "Main-guests.dc.html",
+        "title": "Главная · гости (+/−)",
+        "route": "/",
+        "state": true,
+        "setup": [{ "click": { "id": "guests" } }]
+      },
+      {
+        "file": "Main-flex.dc.html",
+        "title": "Календарь · «Не знаю точных дат»",
+        "route": "/",
+        "state": true,
+        "setup": [
+          { "click": { "id": "datein" } },
+          { "click": { "canvas": "main-calendar", "role": "tab", "name": "Не знаю точных дат" } }
+        ]
+      },
+      {
+        "file": "Main-dates.dc.html",
+        "title": "Календарь · точные даты",
+        "route": "/",
+        "state": true,
+        "setup": [{ "click": { "id": "datein" } }]
+      },
+      {
+        "file": "Phone-menu.dc.html",
+        "title": "Телефон · меню открыто: страницы, телефон, WhatsApp",
+        "route": "/",
+        "viewport": "phone",
+        "state": true,
+        "setup": [{ "click": { "role": "button", "name": "Меню" } }, { "wait": 300 }]
+      }
+    ],
+    "results": [
+      {
+        "file": "Results-B.dc.html",
+        "title": "2 · Результаты (Друскининкай)",
+        "route": "/results",
+        "targets": ["/results"],
+        "build": "results"
+      },
+      {
+        "file": "Results-filters.dc.html",
+        "title": "Результаты · «Уточните выбор» открыт",
+        "route": "/results",
+        "state": true,
+        "setup": [{ "click": { "canvas": "results-head", "role": "button", "name": "Фильтры" } }],
+        "links": [
+          { "find": { "canvas": "results-filters", "role": "button", "name": "Свернуть" }, "to": "Results-B.dc.html" },
+          { "find": { "canvas": "results-filters", "role": "button", "name": "Показать" }, "to": "Results-B.dc.html" }
+        ]
+      },
+      {
+        "file": "Results-wizard.dc.html",
+        "title": "Результаты · «Помогите выбрать» — вопрос",
+        "route": "/results",
+        "state": true,
+        "setup": [{ "click": { "role": "button", "name": "Помогите выбрать санаторий" } }],
+        "links": [
+          { "find": { "canvas": "wizard", "role": "button", "name": "Закрыть" }, "to": "Results-B.dc.html" },
+          { "find": { "canvas": "wizard", "role": "button" }, "to": "Results-wizard-done.dc.html" }
+        ]
+      },
+      {
+        "file": "Results-wizard-done.dc.html",
+        "title": "Результаты · «Помогите выбрать» — ответ",
+        "route": "/results",
+        "state": true,
+        "setup": [
+          { "click": { "role": "button", "name": "Помогите выбрать санаторий" } },
+          { "click": { "canvas": "wizard", "role": "button", "name": "Спина и суставы" } },
+          { "click": { "canvas": "wizard", "role": "button", "name": "нужен лифт" } },
+          { "click": { "canvas": "wizard", "role": "button", "name": "До 1 000" } }
+        ],
+        "links": [
+          { "find": { "canvas": "wizard", "role": "button", "name": "Посмотреть номера" }, "to": "Results-B.dc.html" },
+          {
+            "find": { "canvas": "wizard", "role": "button", "name": "Ответить заново" },
+            "to": "Results-wizard.dc.html"
+          },
+          { "find": { "canvas": "wizard", "role": "button", "name": "Спросить консультанта" }, "to": "Help.dc.html" },
+          { "find": { "canvas": "wizard", "role": "button", "name": "Закрыть" }, "to": "Results-B.dc.html" }
+        ]
+      },
+      {
+        "file": "Results-compare.dc.html",
+        "title": "Результаты · сравнение санаториев: сначала чем отличаются",
+        "route": "/results",
+        "state": true,
+        "setup": [
+          { "check": { "canvas": "results-card", "role": "checkbox", "name": "Сравнить", "nth": 0 } },
+          { "check": { "canvas": "results-card", "role": "checkbox", "name": "Сравнить", "nth": 1 } },
+          { "click": { "canvas": "results-compare", "role": "button", "name": "Сравнить (2)" } }
+        ],
+        "links": [
+          { "find": { "canvas": "compare-dialog", "role": "button", "name": "Закрыть" }, "to": "Results-B.dc.html" }
+        ]
+      },
+      {
+        "file": "Results-roomdates.dc.html",
+        "title": "Результаты · свободные даты номера",
+        "route": "/results",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "results-card", "role": "button", "name": "Номера и программы", "nth": 0 } },
+          { "wait": 1500 },
+          { "click": { "canvas": "results-card", "role": "button", "name": "Выбрать другие даты", "nth": 0 } }
+        ],
+        "links": [
+          { "find": { "canvas": "results-calendar", "role": "button", "name": "Закрыть" }, "to": "Results-B.dc.html" },
+          { "find": { "canvas": "results-calendar", "role": "button", "name": "Отмена" }, "to": "Results-B.dc.html" },
+          {
+            "find": { "canvas": "results-calendar", "role": "button", "name": "Подтвердить даты" },
+            "to": "Results-B.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Results-solo-flight.dc.html",
+        "title": "Результаты · 1 взрослый, с перелётом",
+        "route": "/results",
+        "state": true,
+        "setup": [
+          { "click": { "id": "guests" } },
+          { "click": { "canvas": "guests-pop", "role": "button", "name": "Меньше: взрослые" } },
+          { "click": { "canvas": "guests-pop", "role": "button", "name": "Готово" } },
+          { "check": { "role": "checkbox", "name": "С перелётом" } },
+          { "click": { "canvas": "results-card", "role": "button", "name": "Номера и программы", "nth": 0 } },
+          { "wait": 1500 }
+        ]
+      },
+      {
+        "file": "Feedback.dc.html",
+        "title": "Ваши пожелания · форма (красная кнопка на всех страницах)",
+        "route": "/results",
+        "state": true,
+        "setup": [{ "run": "results.feedback" }],
+        "links": [
+          { "find": { "canvas": "feedback-form", "role": "button", "name": "Закрыть" }, "to": "Results-B.dc.html" },
+          { "find": { "canvas": "feedback-form", "role": "button", "name": "Отправить" }, "to": "Results-B.dc.html" }
+        ]
+      }
+    ],
+    "hotel": [
+      {
+        "file": "Hotel-B.dc.html",
+        "title": "3 · Санаторий и выбор номера (вкладки работают)",
+        "route": "/sanatoriy/egle-comfort",
+        "targets": ["/hotel", "/sanatoriy/egle-comfort"],
+        "build": "hotel"
+      },
+      {
+        "file": "Hotel-grand.dc.html",
+        "title": "Санаторий · Гранд Спа Лиетува",
+        "route": "/sanatoriy/grand-spa-lietuva",
+        "targets": ["/sanatoriy/grand-spa-lietuva"],
+        "build": "hotel"
+      },
+      {
+        "file": "Hotel-belorus.dc.html",
+        "title": "Санаторий · Беларусь",
+        "route": "/sanatoriy/belorus",
+        "targets": ["/sanatoriy/belorus"],
+        "build": "hotel"
+      },
+      {
+        "file": "Hotel-upa.dc.html",
+        "title": "Санаторий · на ваши даты мест нет (Упа): ближайшие даты и «Свяжитесь со мной»",
+        "route": "/sanatoriy/upa",
+        "targets": ["/sanatoriy/upa"],
+        "build": "hotel"
+      }
+    ],
+    "rooms": [
+      {
+        "file": "Rooms.dc.html",
+        "title": "Шаг 1 · Программа: дешёвая · рекомендуем Atlantis · премиум",
+        "route": "/rooms",
+        "targets": ["/rooms"],
+        "links": [
+          {
+            "find": { "canvas": "rooms-cards", "role": "button", "name": "Узнать больше" },
+            "to": "Rooms-more.dc.html"
+          },
+          { "find": { "canvas": "rooms-more" }, "to": "Rooms-all.dc.html" }
+        ]
+      },
+      {
+        "file": "Rooms-more.dc.html",
+        "title": "Шаг 1 · «Узнать больше о программе» (окно поверх страницы)",
+        "route": "/rooms",
+        "state": true,
+        "setup": [{ "click": { "canvas": "rooms-cards", "role": "button", "name": "Узнать больше", "nth": 1 } }],
+        "links": [{ "find": { "canvas": "program-modal", "role": "button", "name": "Закрыть" }, "to": "Rooms.dc.html" }]
+      },
+      {
+        "file": "Rooms-all.dc.html",
+        "title": "Шаг 1 · «Ещё программы этого санатория» открыто",
+        "route": "/rooms",
+        "state": true,
+        "setup": [{ "click": { "canvas": "rooms-more" } }],
+        "links": [
+          { "find": { "canvas": "rooms-more" }, "to": "Rooms.dc.html" },
+          { "find": { "canvas": "rooms-cards", "role": "button", "name": "Узнать больше" }, "to": "Rooms-more.dc.html" }
+        ]
+      }
+    ],
+    "transfer": [
+      {
+        "file": "Transfer.dc.html",
+        "title": "Шаг 2 · Дорога: перелёт и трансфер — ничего не выбрано за гостя (Эгле: трансфер санатория уже оплачен)",
+        "route": "/transfer",
+        "targets": ["/transfer", "/flights"],
+        "links": [
+          {
+            "find": { "canvas": "transfer-flight", "role": "radio", "name": "Да, добавить" },
+            "to": "Transfer-fly.dc.html"
+          },
+          { "find": { "canvas": "transfer-need", "role": "radio", "name": "Да, нужен" }, "to": "Transfer-yes.dc.html" },
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "Не знаю, как лучше добраться" },
+            "to": "Help.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Transfer-yes.dc.html",
+        "title": "Шаг 2 · «Да» → «Групповой» → Вильнюс: дальше где встретить и обратно — гость выбирает сам",
+        "route": "/transfer",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "transfer-flight", "role": "radio", "name": "Нет, билеты" } },
+          { "click": { "canvas": "transfer-need", "role": "radio", "name": "Да, нужен" } },
+          { "click": { "canvas": "transfer-how", "role": "radio", "nth": 0 } },
+          { "click": { "canvas": "transfer-from", "role": "radio", "nth": 0 } },
+          { "wait": 300 }
+        ],
+        "links": [
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "Не знаю, как лучше добраться" },
+            "to": "Help.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Transfer-other.dc.html",
+        "title": "Шаг 2 · Дорога — другой санаторий: трансфер продаём мы",
+        "route": "/transfer",
+        "state": true,
+        "setup": [
+          { "session": { "key": "br-shalom:booking", "merge": true, "value": { "hotelId": "grand-spa-lietuva" } } }
+        ],
+        "links": [
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "Не знаю, как лучше добраться" },
+            "to": "Help.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Transfer-package.dc.html",
+        "title": "Шаг 2 · Дорога — перелёт добавлен (Эгле, даты с рейсом)",
+        "route": "/transfer",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "transfer-flight", "role": "radio", "name": "Да, добавить" } },
+          { "click": { "canvas": "flight-alt-dates", "role": "button", "nth": 0 } },
+          { "wait": 1300 }
+        ],
+        "links": [
+          { "find": { "canvas": "transfer-flight", "role": "radio", "name": "Нет" }, "to": "Transfer.dc.html" },
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "Не знаю, как лучше добраться" },
+            "to": "Help.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Transfer-fly.dc.html",
+        "title": "Шаг 2 · после нажатия «Да, добавить наш перелёт» (сначала ничего не отмечено): в ваши даты рейса нет — ближайшие даты",
+        "route": "/transfer",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "transfer-flight", "role": "radio", "name": "Да, добавить" } },
+          { "wait": 1300 }
+        ],
+        "links": [
+          { "find": { "canvas": "flight-alt-dates", "role": "button" }, "to": "Transfer-package.dc.html" },
+          { "find": { "canvas": "transfer-flight", "role": "radio", "name": "Нет" }, "to": "Transfer.dc.html" },
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "Не знаю, как лучше добраться" },
+            "to": "Help.dc.html"
+          },
+          {
+            "find": { "canvas": "transfer-flight", "role": "button", "name": "под наш рейс" },
+            "to": "Transfer-flycal.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Transfer-flycal.dc.html",
+        "title": "Шаг 2 · «Выбрать даты под наш рейс»: календарь (✈ — дни рейса)",
+        "route": "/transfer",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "transfer-flight", "role": "radio", "name": "Да, добавить" } },
+          { "wait": 1300 },
+          { "click": { "canvas": "transfer-flight", "role": "button", "name": "под наш рейс" } },
+          { "wait": 400 },
+          { "run": "transfer.flightDates" }
+        ],
+        "links": [
+          {
+            "find": { "canvas": "flight-dates", "role": "button", "name": "Выбрать эти даты" },
+            "to": "Transfer-package.dc.html"
+          },
+          {
+            "find": { "canvas": "flight-dates", "role": "button", "name": "Оставить мои даты" },
+            "to": "Transfer-fly.dc.html"
+          },
+          { "find": { "canvas": "flight-dates", "role": "button", "name": "Закрыть" }, "to": "Transfer-fly.dc.html" }
+        ]
+      }
+    ],
+    "guests": [
+      { "file": "Guests.dc.html", "title": "Шаг 3 · Данные гостей", "route": "/guests", "targets": ["/guests"] }
+    ],
+    "payment": [{ "file": "Payment.dc.html", "title": "Шаг 4 · Оплата", "route": "/payment", "targets": ["/payment"] }],
+    "done": [{ "file": "Done.dc.html", "title": "🏁 Финиш · Заказ принят", "route": "/done", "targets": ["/done"] }],
+    "rules": [
+      { "file": "Rules.dc.html", "title": "Справка · Условия и отмена", "route": "/rules", "targets": ["/rules"] }
+    ],
+    "privacy": [
+      {
+        "file": "Privacy.dc.html",
+        "title": "Справка · Политика конфиденциальности",
+        "route": "/privacy",
+        "targets": ["/privacy"]
+      }
+    ],
+    "resort": [
+      {
+        "file": "Resort.dc.html",
+        "title": "Курорт · Друскининкай — страница курорта (её находит Google)",
+        "route": "/kurort/druskininkai",
+        "targets": ["/kurort/druskininkai"],
+        "links": [
+          { "find": { "canvas": "resort-page", "role": "button", "name": "Хочу в" }, "to": "Results-B.dc.html" }
+        ]
+      },
+      {
+        "file": "Resort-phone.dc.html",
+        "title": "Курорт · Друскининкай на телефоне",
+        "route": "/kurort/druskininkai",
+        "viewport": "phone",
+        "links": [
+          { "find": { "canvas": "resort-page", "role": "button", "name": "Хочу в" }, "to": "Results-B.dc.html" }
+        ]
+      }
+    ],
+    "tickets": [
+      {
+        "file": "Tickets.dc.html",
+        "title": "Меню · Прямые перелёты Тель-Авив ⇄ Вильнюс — поиск",
+        "route": "/tickets",
+        "targets": ["/tickets"],
+        "links": [
+          { "find": { "canvas": "tickets-search", "role": "button", "name": "Туда" }, "to": "Tickets-cal.dc.html" },
+          {
+            "find": { "canvas": "tickets-search", "role": "button", "name": "Найти рейсы" },
+            "to": "Tickets-res.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Tickets-cal.dc.html",
+        "title": "Прямые перелёты · календарь: только дни с рейсом, цена с человека",
+        "route": "/tickets",
+        "state": true,
+        "setup": [{ "click": { "canvas": "tickets-search", "role": "button", "name": "Туда" } }, { "wait": 300 }],
+        "links": [
+          { "find": { "canvas": "tickets-calendar", "role": "button", "days": true }, "to": "Tickets-res.dc.html" },
+          { "find": { "canvas": "tickets-calendar", "role": "button", "name": "Закрыть" }, "to": "Tickets.dc.html" }
+        ]
+      },
+      {
+        "file": "Tickets-res.dc.html",
+        "title": "Прямые перелёты · рейс найден: время, места, цена на всех, заказ и сравнение дат",
+        "route": "/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15",
+        "state": true,
+        "setup": [
+          { "click": { "canvas": "tickets-compare", "role": "button", "name": "Сравнить цены" } },
+          { "wait": 300 }
+        ],
+        "links": [
+          { "find": { "canvas": "tickets-search", "role": "button", "name": "Туда" }, "to": "Tickets-cal.dc.html" },
+          {
+            "find": { "canvas": "tickets-result", "role": "button", "name": "Купить онлайн" },
+            "to": "Tickets-pax.dc.html"
+          },
+          {
+            "find": { "canvas": "tickets-result", "role": "button", "name": "Свяжитесь со мной" },
+            "to": "Help.dc.html"
+          },
+          {
+            "find": { "canvas": "tickets-result", "role": "button", "name": "Подобрать санаторий" },
+            "to": "Results-B.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Tickets-pax.dc.html",
+        "title": "Прямые перелёты · покупка онлайн, шаг 2: имена как в паспорте и куда прислать билеты",
+        "route": "/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=pax",
+        "state": true,
+        "links": [
+          {
+            "find": { "canvas": "tickets-order", "role": "button", "name": "Далее: оплата" },
+            "to": "Tickets-pay.dc.html"
+          },
+          {
+            "find": { "canvas": "tickets-order", "role": "button", "name": "Назад к рейсу" },
+            "to": "Tickets-res.dc.html"
+          }
+        ]
+      },
+      {
+        "file": "Tickets-pay.dc.html",
+        "title": "Прямые перелёты · шаг 3: оплата картой всей суммы",
+        "route": "/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=pay",
+        "state": true,
+        "setup": [
+          {
+            "session": {
+              "key": "br-shalom:tickets",
+              "value": {
+                "pax": [
+                  { "first": "IVAN", "last": "IVANOV", "birth": "1958-03-14" },
+                  { "first": "MARIA", "last": "IVANOVA", "birth": "1960-07-02" }
+                ],
+                "code": "+972 · Израиль",
+                "phone": "50-123-4567",
+                "email": "ivan@gmail.com",
+                "no": "TK-261101-482"
+              }
+            }
+          }
+        ],
+        "links": [
+          { "find": { "canvas": "tickets-order", "role": "button", "name": "Оплатить" }, "to": "Tickets-done.dc.html" },
+          {
+            "find": { "canvas": "tickets-order", "role": "button", "name": "Изменить данные" },
+            "to": "Tickets-pax.dc.html"
+          },
+          { "find": { "canvas": "tickets-order", "role": "button", "name": "Назад" }, "to": "Tickets-pax.dc.html" }
+        ]
+      },
+      {
+        "file": "Tickets-done.dc.html",
+        "title": "Прямые перелёты · спасибо, билеты оплачены — пришлём на почту и в WhatsApp",
+        "route": "/tickets?from=IL&dep=2026-11-01&n=2&type=rt&ret=2026-11-15&step=done",
+        "state": true,
+        "setup": [
+          {
+            "session": {
+              "key": "br-shalom:tickets",
+              "value": {
+                "pax": [
+                  { "first": "IVAN", "last": "IVANOV", "birth": "1958-03-14" },
+                  { "first": "MARIA", "last": "IVANOVA", "birth": "1960-07-02" }
+                ],
+                "code": "+972 · Израиль",
+                "phone": "50-123-4567",
+                "email": "ivan@gmail.com",
+                "no": "TK-261101-482"
+              }
+            }
+          }
+        ],
+        "links": [
+          {
+            "find": { "canvas": "tickets-order", "role": "button", "name": "Подобрать санаторий" },
+            "to": "Results-B.dc.html"
+          }
+        ]
+      }
+    ]
+  }
+}

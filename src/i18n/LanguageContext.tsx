@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { setCurrentLang } from './t';
 
 export type Lang = 'ru' | 'en' | 'he';
 export const LANGS: { code: Lang; label: string }[] = [
@@ -56,6 +57,7 @@ export function usePageLanguage(supported: readonly Lang[] = ['ru']): LangApi & 
   const api = useContext(LangCtx);
   const lang = supported.includes(api.lang) ? api.lang : supported[0];
   const dir = isRtl(lang) ? 'rtl' : 'ltr';
+  setCurrentLang(lang);
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;

@@ -1,7 +1,7 @@
 .pg-done {
   margin: 0;
-  background: #f4f1ea;
-  color: #1c2620;
+  background: var(--sand);
+  color: var(--ink);
   font-family: Manrope, 'Segoe UI', Arial, sans-serif;
   font-size: 17px;
   line-height: 1.5;
@@ -16,7 +16,7 @@
   gap: 10px;
   min-height: 48px;
   padding: 0 24px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 17px;
   cursor: pointer;
@@ -25,44 +25,44 @@
   white-space: nowrap;
 }
 .pg-done .btn-primary {
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
 }
 .pg-done .btn-primary:hover {
-  background: #174b3a;
-  color: #fff;
+  background: var(--green-deep);
+  color: var(--paper);
 }
 .pg-done .btn-secondary {
-  background: #fff;
-  color: #1f5f4a;
-  border-color: #1f5f4a;
+  background: var(--paper);
+  color: var(--green);
+  border-color: var(--green);
 }
 .pg-done .btn-secondary:hover {
-  background: #eef5f1;
-  color: #143f31;
+  background: var(--green-soft);
+  color: var(--green-deep);
 }
 .pg-done .card {
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
 }
 .pg-done .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #eef5f1;
-  color: #1f5f4a;
+  background: var(--green-soft);
+  color: var(--green);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   padding: 5px 10px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
 }
 .pg-done .tl {
   position: relative;
   display: flex;
   gap: 18px;
   padding: 14px 12px;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
 }
 .pg-done .tl .dot {
   width: 40px;
@@ -72,8 +72,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  border: 2px solid #cfc9bb;
+  background: var(--paper);
+  border: 2px solid var(--line-strong);
   position: relative;
   z-index: 1;
 }
@@ -83,7 +83,7 @@
   top: 60px;
   bottom: -14px;
   width: 2px;
-  background: #e3ded2;
+  background: var(--line);
 }
 .pg-done .fact {
   display: flex;

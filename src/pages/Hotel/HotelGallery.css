@@ -1,0 +1,137 @@
+/* Sanatorium page: the photo row under the title and the full-screen gallery. */
+.pg-hotel .hg-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.pg-hotel .hg-tile {
+  position: relative;
+  padding: 0;
+  border: none;
+  background: var(--ink);
+  border-radius: var(--r-field);
+  overflow: hidden;
+  cursor: pointer;
+  height: 250px;
+  min-width: 0;
+}
+.pg-hotel .hg-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pg-hotel .hg-label {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  background: rgba(28, 38, 32, 0.8);
+  color: var(--paper);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: var(--r-field);
+}
+.pg-hotel .hg-label:empty {
+  display: none;
+}
+.pg-hotel .hg-all {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 38, 32, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper);
+  font-weight: 800;
+  font-size: 16px;
+  text-align: center;
+  padding: 8px;
+  line-height: 1.2;
+}
+
+/* ── full gallery ── */
+.pg-hotel .hg-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 28, 24, 0.96);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.pg-hotel .hg-lb-bar {
+  position: sticky;
+  top: 0;
+  background: rgba(20, 28, 24, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.pg-hotel .hg-lb-title {
+  color: var(--paper);
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 600;
+}
+.pg-hotel .hg-lb-close {
+  min-height: 44px;
+  padding: 0 16px;
+  border: none;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: var(--r-field);
+}
+.pg-hotel .hg-lb-list {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.pg-hotel .hg-lb-fig {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-margin-top: 80px;
+}
+.pg-hotel .hg-lb-fig img {
+  width: 100%;
+  height: auto;
+  max-height: 680px;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--r-field);
+}
+.pg-hotel .hg-lb-fig figcaption {
+  color: var(--green-line);
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .pg-hotel .hg-row {
+    flex-wrap: wrap;
+  }
+  .pg-hotel .hg-tile {
+    height: 130px;
+    flex: 1 1 30% !important;
+  }
+  .pg-hotel .hg-tile:first-child {
+    flex-basis: 100% !important;
+    height: 200px;
+  }
+  /* the small tiles have no room for a caption: the full gallery names every photo */
+  .pg-hotel .hg-tile:not(:first-child) .hg-label {
+    display: none;
+  }
+}

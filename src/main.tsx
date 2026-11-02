@@ -10,6 +10,7 @@ import '@fontsource/manrope/500.css';
 import '@fontsource/manrope/600.css';
 import '@fontsource/manrope/700.css';
 import '@fontsource/manrope/800.css';
+import './styles/tokens.css';
 import './styles/global.css';
 import './styles/ui.css';
 import './styles/soft.css';

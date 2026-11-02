@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { track } from '../lib/analytics';
 
 export type HelpStatus = 'closed' | 'form' | 'sent';
 
@@ -14,9 +15,15 @@ const HelpCtx = createContext<HelpApi | null>(null);
 /** Open/closed state of the "Свяжитесь со мной" pop-up, shared by all pages (any button can open it). */
 export function HelpProvider({ children, initial = 'closed' }: { children: ReactNode; initial?: HelpStatus }) {
   const [status, setStatus] = useState<HelpStatus>(initial);
-  const open = useCallback(() => setStatus('form'), []);
+  const open = useCallback(() => {
+    track('Help opened');
+    setStatus('form');
+  }, []);
   const close = useCallback(() => setStatus('closed'), []);
-  const send = useCallback(() => setStatus('sent'), []);
+  const send = useCallback(() => {
+    track('Contact me');
+    setStatus('sent');
+  }, []);
   const api = useMemo(() => ({ status, open, close, send }), [status, open, close, send]);
   return <HelpCtx.Provider value={api}>{children}</HelpCtx.Provider>;
 }

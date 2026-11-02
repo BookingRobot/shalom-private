@@ -4,9 +4,9 @@
   flex-direction: column;
   gap: 14px;
   padding: 18px 20px;
-  border: 1px solid #dfe8e2;
-  border-radius: 14px;
-  background: #fafbf9;
+  border: 1px solid var(--green-line);
+  border-radius: var(--r-card);
+  background: var(--sand);
 }
 .cf-safe {
   display: flex;
@@ -14,7 +14,7 @@
   gap: 8px;
   font-weight: 800;
   font-size: 16px;
-  color: #1c2620;
+  color: var(--ink);
 }
 .cf-safe svg {
   flex: none;
@@ -34,10 +34,10 @@
   width: 100%;
   min-height: 52px;
   padding: 0 14px;
-  border: 2px solid #cfc9bb;
-  border-radius: var(--r);
-  background: #fff;
-  color: #1c2620;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-field);
+  background: var(--paper);
+  color: var(--ink);
   font: inherit;
   font-size: 18px;
   font-weight: 600;
@@ -45,12 +45,12 @@
   box-sizing: border-box;
 }
 .page .cf .input::placeholder {
-  color: #9aa49e;
+  color: var(--muted-2);
   font-weight: 500;
 }
 .page .cf .input:focus {
-  outline: 3px solid #9cc9b5;
-  border-color: #1f5f4a;
+  outline: 3px solid var(--green-mid);
+  border-color: var(--green);
 }
 .page .cf .cf-no .input {
   font-variant-numeric: tabular-nums;
@@ -58,7 +58,7 @@
 }
 .cf-opt {
   font-weight: 500;
-  color: #5e6862;
+  color: var(--muted);
 }
 .cf-pays {
   display: grid;
@@ -70,18 +70,18 @@
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  border-radius: 10px;
+  border-radius: var(--r-field);
   font-weight: 700;
   font-size: 16px;
 }
 .cf-apple {
-  background: #1c2620;
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
 }
 .cf-gpay {
-  background: #fff;
-  border: 2px solid #1c2620;
-  color: #1c2620;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  color: var(--ink);
 }
 @media (max-width: 640px) {
   .cf {

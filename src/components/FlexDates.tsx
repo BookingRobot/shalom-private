@@ -4,6 +4,7 @@ import { TODAY } from '../data/demo';
 import { isFlightDay } from '../data/flights';
 import { MONTHS, MONTHS_N, WEEKDAYS_SHORT, addD, iso, shortDate } from '../lib/dates';
 import { fmt } from '../lib/format';
+import './FlexDates.css';
 
 /** Resort-average price per person per night — the same season curve as the calendar colours. [ЗАМЕНИТЬ ТАРИФАМИ] */
 export function seasonPpn(d: Date) {
@@ -214,12 +215,12 @@ function PlaneIcon({ back = false }: { back?: boolean }) {
       height="16"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#1F5F4A"
+      stroke="var(--green)"
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      style={{ verticalAlign: '-3px', transform: back ? 'scaleX(-1)' : 'none' }}
+      className={'fd-plane' + (back ? ' back' : '')}
     >
       <path d="M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8 4.7-3.6 1.2L3 9l-1.5.5z" />
     </svg>

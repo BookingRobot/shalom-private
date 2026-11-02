@@ -3,7 +3,8 @@
  * Design-canvas holes and handlers, and a small logic class ports the site's
  * calendar (exact + "не знаю точных дат"), guests +/−, search list, room dates,
  * the "Помогите выбрать" wizard, compare and the price calendar.
- * Used by snapshot-canvas.cjs.
+ * Used by scripts/canvas/search.cjs and hotel.cjs. Inside a dialog it reads the dialog's own
+ * structure (month grids, cells, foot); the dialog itself is found by its data-canvas mark.
  */
 
 /* ---------- browser helpers (injected into the page) ---------- */
@@ -30,7 +31,8 @@ window.__dc = {
     const h2 = dialog.querySelector('h2');
     d.text(h2, 'calTitleText');
     const head = h2.parentElement;
-    head.querySelectorAll(':scope > strong').forEach((s) => s.remove());
+    // the room line (CalendarDialog's note) comes from the board's logic instead
+    head.querySelectorAll(':scope > strong, :scope > .cd-note').forEach((s) => s.remove());
     h2.after(d.raw('roomline'));
     const hint = head.querySelector(':scope > span');
     d.text(hint, 'calHint');
@@ -60,7 +62,8 @@ window.__dc = {
     (body || mc).after(d.raw('exact-end'));
     const sel = dialog.querySelectorAll('.lbl + strong');
     d.text(sel[0], 'selIn'); d.text(sel[1], 'selOut'); d.text(sel[2], 'selNights');
-    const footer = sel[0].closest('div[style*="border-top"]') || dialog;
+    // CalendarDialog's foot: what is chosen and the buttons
+    const footer = dialog.querySelector('.cd-foot') || dialog;
     footer.prepend(d.raw('calnote'));
     footer.before(d.raw('foot-start'));
     footer.after(d.raw('foot-end'));

@@ -1,4 +1,150 @@
-/* the agency that sells and answers: its logo on a light plate, address, phone, e-mail */
+/* a page is a column: the footer can be pushed to the bottom of a short page */
+.page-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+/* ── the one footer: agency + contacts | «Свяжитесь со мной»; links in one row under them ── */
+.ft {
+  background: var(--ink);
+  color: var(--green-line);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.ft.pinned {
+  margin-top: auto;
+}
+.ft-in,
+.ft-links-row {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px 40px;
+  flex-wrap: wrap;
+}
+.ft-l {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+.ft-logo {
+  display: block;
+  width: 160px;
+  height: auto;
+  margin-bottom: 8px;
+}
+.ft-who,
+.ft-addr {
+  color: var(--green-line);
+}
+.page .ft .ft-tel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--paper);
+  text-decoration: none;
+}
+.ft-hours {
+  color: var(--green-line);
+}
+.ft-contacts {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 4px 0;
+}
+.page .ft .ft-contacts a,
+.page .ft .ft-links a {
+  color: var(--paper);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.page .ft .ft-contacts a:hover,
+.page .ft .ft-links a:hover {
+  text-decoration: underline;
+}
+/* «Поможем выбрать» */
+.ft-r {
+  flex: 0 1 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-card);
+  background: rgba(255, 255, 255, 0.05);
+}
+.ft-help-t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ft-help-t strong {
+  font-family: var(--font-head);
+  font-size: 20px;
+  color: var(--paper);
+}
+.page .ft .btn.ft-help-btn {
+  min-height: 50px;
+  font-size: 17px;
+  width: 100%;
+}
+/* the links row */
+.ft-links-row {
+  padding: 0 24px 22px;
+  align-items: center;
+  gap: 12px 24px;
+}
+.ft-links {
+  display: flex;
+  gap: 8px 24px;
+  flex-wrap: wrap;
+}
+.ft-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+}
+
+/* «Ваши пожелания» lives in the footer (not floating over the page) */
+.ft-slot:empty {
+  display: none;
+}
+.fb-btn.in-ft {
+  position: static;
+  translate: none !important;
+  box-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .ft-in {
+    padding: 22px 16px 16px;
+    gap: 18px;
+  }
+  .ft-links-row {
+    padding: 0 16px 18px;
+  }
+  .ft-r {
+    flex-basis: 100%;
+    padding: 16px;
+  }
+  .ft-logo {
+    width: 140px;
+  }
+}
+
+/* the agency on a light plate (older callers) */
 .ft-agency {
   display: flex;
   align-items: center;
@@ -20,7 +166,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.4;
 }
 .ft-agency-t a {
@@ -33,5 +179,5 @@
   text-decoration: underline;
 }
 .ft-agency.light .ft-agency-t {
-  color: #3e4b44;
+  color: var(--ink-2);
 }

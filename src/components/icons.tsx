@@ -43,7 +43,7 @@ export const CheckIcon = (p: IconProps) => (
   </Svg>
 );
 
-export const CloseIcon = ({ color = '#1C2620', strokeWidth = 2.5, ...p }: IconProps) => (
+export const CloseIcon = ({ color = 'var(--ink)', strokeWidth = 2.5, ...p }: IconProps) => (
   <Svg color={color} strokeWidth={strokeWidth} join={false} {...p}>
     <path d="M6 6l12 12M18 6L6 18" />
   </Svg>
@@ -64,8 +64,8 @@ export const PhoneIcon = (p: IconProps) => (
 /** Brand mark: green square with a stylised fir tree. */
 export const LogoMark = ({ size = 38, round = 0 }: { size?: number; round?: number }) => (
   <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-    <rect x="1" y="1" width="38" height="38" rx={round} fill="#1F5F4A" />
-    <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
+    <rect x="1" y="1" width="38" height="38" rx={round} fill="var(--green)" />
+    <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="var(--sand)" />
   </svg>
 );
 
@@ -96,20 +96,26 @@ export function DoctorMark() {
   return (
     <>
       <mask id={id} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
-        <circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="1.5" />
-        <ellipse cx="12" cy="7.9" rx="3.1" ry="3.6" fill="#fff" stroke="none" />
+        <circle cx="12" cy="12" r="10.6" fill="none" stroke="var(--paper)" strokeWidth="1.5" />
+        <ellipse cx="12" cy="7.9" rx="3.1" ry="3.6" fill="var(--paper)" stroke="none" />
         <path
           d="M5.6 18.04V16.4A3.4 3.4 0 0 1 9 13h6a3.4 3.4 0 0 1 3.4 3.4v1.64a8.8 8.8 0 0 1-12.8 0z"
-          fill="#fff"
+          fill="var(--paper)"
           stroke="none"
         />
         {/* V collar with the tie */}
-        <path d="M10.2 13 12 16.3l1.8-3.3z" fill="#000" stroke="none" />
-        <path d="M12 14.1l.55.9-.55 1.55-.55-1.55z" fill="#fff" stroke="none" />
+        <path d="M10.2 13 12 16.3l1.8-3.3z" fill="var(--ink)" stroke="none" />
+        <path d="M12 14.1l.55.9-.55 1.55-.55-1.55z" fill="var(--paper)" stroke="none" />
         {/* stethoscope over the left shoulder */}
-        <path d="M8.4 13.3c-1 1.1-1.1 2.8-.1 3.7.9.8 2.2.3 2.3-.9" fill="none" stroke="#000" strokeWidth=".9" />
+        <path d="M8.4 13.3c-1 1.1-1.1 2.8-.1 3.7.9.8 2.2.3 2.3-.9" fill="none" stroke="var(--ink)" strokeWidth=".9" />
         {/* cross */}
-        <path d="M15.9 15.5v2.8M14.5 16.9h2.8" fill="none" stroke="#000" strokeWidth="1.05" strokeLinecap="butt" />
+        <path
+          d="M15.9 15.5v2.8M14.5 16.9h2.8"
+          fill="none"
+          stroke="var(--ink)"
+          strokeWidth="1.05"
+          strokeLinecap="butt"
+        />
       </mask>
       <path d="M0 12h24" strokeWidth="24" strokeLinecap="butt" mask={`url(#${id})`} />
     </>

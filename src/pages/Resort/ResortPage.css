@@ -1,0 +1,64 @@
+/* /kurort/<id>: the resort's story as a page; the story's own parts use the .rs-* styles (ui.css) */
+.pg-resort .rp-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 24px 56px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pg-resort .rp-crumbs {
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.pg-resort .rp-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  overflow: hidden;
+}
+.pg-resort .rs-hero-text h1 {
+  font-family: var(--font-head);
+  font-size: 56px;
+  line-height: 1.05;
+  color: var(--paper);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+}
+.pg-resort .rp-tabs a {
+  padding: 10px 14px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.pg-resort .rp-tabs a.on {
+  color: var(--green);
+  border-bottom-color: var(--green);
+}
+.pg-resort .rp-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  padding: 20px 32px 28px;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .pg-resort .rp-main {
+    padding: 16px 12px 40px;
+  }
+  .pg-resort .rs-hero-text h1 {
+    font-size: 36px;
+  }
+  .pg-resort .rp-foot {
+    padding: 16px 16px 20px;
+  }
+  .pg-resort .rp-foot .btn {
+    width: 100%;
+  }
+}

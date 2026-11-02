@@ -1,7 +1,8 @@
 import { api } from '../api';
 import type { Booking } from '../data/booking';
 import { TODAY } from '../data/demo';
-import { MONTHS, daysBetween, nightsWord, plural, shortDate, toD } from './dates';
+import { DEMO } from '../data/demo';
+import { MONTHS, daysBetween, iso, nightsWord, plural, shortDate, toD } from './dates';
 import { fmt } from './format';
 import { transferBySanatorium } from '../data/transferPolicy';
 import { transferLegs } from './transferCost';
@@ -21,6 +22,19 @@ export function stayRange(checkin: string, checkout: string) {
 export function guestsLabel(b: Pick<Booking, 'adults' | 'children'>) {
   const adults = b.adults === 1 ? '1 взрослый' : `${b.adults} взрослых`;
   return b.children ? `${adults}, ${b.children} ${plural(b.children, ['ребёнок', 'ребёнка', 'детей'])}` : adults;
+}
+
+/** «MIKHAIL LEVIN, IRINA LEVINA» from step 3; the sample names only in demo mode. */
+export function guestNames(b: Booking): string {
+  const n = b.details?.names;
+  const one = (f?: string, l?: string) =>
+    [f, l]
+      .map((x) => (x || '').trim().toUpperCase())
+      .filter(Boolean)
+      .join(' ');
+  const list = n ? [one(n.g1fn, n.g1ln), one(n.g2fn, n.g2ln)].filter(Boolean) : [];
+  if (list.length) return list.join(', ');
+  return DEMO ? 'MIKHAIL LEVIN, IRINA LEVINA' : '';
 }
 
 /** Transfer price for the guest (see lib/transferCost: free / in the package / our tariff). */
@@ -120,6 +134,7 @@ export function orderSummary(b: Booking) {
     restLabel: eur(plan.rest),
     /** the rest is due by this date; free cancellation until then */
     dueDate: shortDate(plan.due),
+    dueISO: iso(plan.due),
     fullOnly: plan.fullOnly,
   };
 }

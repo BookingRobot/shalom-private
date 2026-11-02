@@ -1,5 +1,4 @@
-import { Fragment, useState } from 'react';
-import { PHONE_DISPLAY } from '../../data/contacts';
+import { Fragment, useState, type ChangeEvent } from 'react';
 import { IconPath } from '../../components/icons';
 import { Link } from 'react-router-dom';
 import { DateModeTabs, FlexDates } from '../../components/FlexDates';
@@ -9,7 +8,7 @@ import { SearchCard } from '../../components/SearchCard';
 import { ChooseCard } from '../../components/ChooseCard';
 import { HeaderBar, Brand, MainNav, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CalLegend } from '../../components/calendar/CalLegend';
-import { MonthsCalendar, type CalendarCell } from '../../components/calendar/MonthsCalendar';
+import { MonthsCalendar, type CalendarCell, type CalendarMonth } from '../../components/calendar/MonthsCalendar';
 import { MONTHS, MONTHS_N, daysBetween, iso, longDate, nightsWord, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { isSoldOutEverywhere } from '../../data/availability';
@@ -20,9 +19,10 @@ import { api } from '../../api';
 import { RESORTS } from '../../data/search';
 import { PageLogic, usePageLogic, type PageServices } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
-import { HelpStripBand } from '../../components/layout/HelpStrip';
-import { AgencyBlock, FooterSlot } from '../../components/layout/SiteFooter';
+import { SiteFooter } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
+import { sanatoriumPath } from '../../lib/seo';
+import { CalendarDialog, RangeSummary } from '../../components/calendar/CalendarDialog';
 import './MainPage.css';
 
 const RESORT_CARDS = [
@@ -44,23 +44,62 @@ const RESORT_CARDS = [
 
 const HELP_CTX: HelpContextInfo = { dest: 'druskininkai', in: '2026-11-09', out: '2026-11-18' };
 
-class MainLogic extends PageLogic {
+/** what the home page remembers: the dates and the state of the calendar window */
+interface MainState {
+  in: string;
+  out: string;
+  /** the dates being picked in the calendar (null while not yet tapped) */
+  sel?: { in: string | null; out: string | null };
+  calOpen?: boolean;
+  flex?: boolean;
+  month?: number;
+  year?: number;
+  /** a note over the calendar ("нет мест" …) */
+  note?: string | null;
+}
+
+/** everything the home page markup needs */
+interface MainVals {
+  flexMode: boolean;
+  setFlex: (flex: boolean) => void;
+  flexPick: (a: string, b: string) => void;
+  hotels: ReturnType<typeof api.getPopularSanatoriums>;
+  dest: string;
+  destOptions: typeof RESORTS;
+  setDest: (e: ChangeEvent<HTMLSelectElement>) => void;
+  inLabel: string;
+  outLabel: string;
+  calOpen: boolean;
+  calNote: string;
+  calNoteClose: () => void;
+  calNoteAsk: () => void;
+  openCal: () => void;
+  closeCal: () => void;
+  calPrev: () => void;
+  calNext: () => void;
+  months: CalendarMonth[];
+  calHint: string;
+  selIn: string;
+  selOut: string;
+  selNights: string;
+  applyOff: boolean;
+  applyCal: () => void;
+}
+
+class MainLogic extends PageLogic<MainState> {
   constructor(props: PageServices) {
     super(props);
     const b = props.booking.booking;
     this.state = { in: b.checkin, out: b.checkout };
   }
-  syncBooking(st) {
+  syncBooking(st: MainState) {
     return st.in && st.out ? { checkin: st.in, checkout: st.out } : null;
   }
-  renderVals() {
-    return this._rv();
-  }
-  _rv() {
+  renderVals(): MainVals {
     const POPULAR_SANATORIUMS = api.getPopularSanatoriums();
 
     // ---- Custom two-month range calendar with price colours ----
-    const st = this.state || {};
+    const st = this.state;
     const inD = toD(st.in || '2026-11-09'),
       outD = toD(st.out || '2026-11-18');
     const sel = st.sel || { in: iso(inD), out: iso(outD) };
@@ -68,8 +107,8 @@ class MainLogic extends PageLogic {
       sOut = sel.out ? toD(sel.out) : null;
     // Average price per person per night across the resort — synthetic season curve [ЗАМЕНИТЬ НА РЕАЛЬНЫЕ ТАРИФЫ]
     const BASE = 100;
-    const dayIdx = (d) => daysBetween(TODAY, d);
-    const priceOf = (d) => {
+    const dayIdx = (d: Date) => daysBetween(TODAY, d);
+    const priceOf = (d: Date) => {
       const n = dayIdx(d),
         wd = d.getUTCDay(),
         m = d.getUTCMonth();
@@ -87,7 +126,7 @@ class MainLogic extends PageLogic {
       y0 = st.year ?? inD.getUTCFullYear();
     // a stay can't cross a "нет мест" night: say so in a pop-up instead of selecting
     const blocked = (d: Date) => isSoldOutEverywhere(iso(d));
-    const pickDay = (date) => () => {
+    const pickDay = (date: Date) => () => {
       const k = iso(date);
       if (sel.in && !sel.out && date > toD(sel.in)) {
         const bad = blockedNights(toD(sel.in), date, blocked);
@@ -101,7 +140,7 @@ class MainLogic extends PageLogic {
       if (blocked(date)) return this.setState({ note: blockedNote([date], true) });
       this.setState({ sel: { in: k, out: null }, note: null });
     };
-    const monthCells = (y, m) => {
+    const monthCells = (y: number, m: number) => {
       const first = new Date(Date.UTC(y, m, 1));
       const lead = (first.getUTCDay() + 6) % 7;
       const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
@@ -113,8 +152,8 @@ class MainLogic extends PageLogic {
           sub: '',
           bg: 'transparent',
           border: 'transparent',
-          color: '#1C2620',
-          subColor: '#3E4B44',
+          color: 'var(--ink)',
+          subColor: 'var(--ink-2)',
           off: true,
           cursor: 'default',
           aria: '',
@@ -126,9 +165,9 @@ class MainLogic extends PageLogic {
         const full = !past && isSoldOutEverywhere(iso(date)); /* [ПРИМЕР] нет мест ни в одном объекте */
         const p = priceOf(date),
           r = p / BASE;
-        let bg = r < 0.97 ? '#E9F4EC' : r <= 1.05 ? '#FFF6E3' : '#FCEDE9';
-        let color = '#1C2620',
-          subColor = '#3E4B44',
+        let bg = r < 0.97 ? 'var(--green-soft)' : r <= 1.05 ? 'var(--warn-bg)' : 'var(--danger-bg)';
+        let color = 'var(--ink)',
+          subColor = 'var(--ink-2)',
           border = 'transparent';
         const isIn = sIn && iso(date) === iso(sIn),
           isOut = sOut && iso(date) === iso(sOut);
@@ -136,21 +175,21 @@ class MainLogic extends PageLogic {
         // the first "нет мест" day after check-in still works as the check-out day
         const canOut = full && !!sIn && !sOut && date > sIn && !blockedNights(sIn, date, blocked).length;
         if (past) {
-          bg = '#E8E6E1';
-          color = '#9AA39E';
-          subColor = '#9AA39E';
+          bg = 'var(--line)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--muted-2)';
         }
         if (full) {
-          bg = 'repeating-linear-gradient(135deg,#F3F0EA 0 6px,#E4DFD5 6px 12px)';
-          color = '#8A968F';
-          subColor = '#8A5A00';
+          bg = 'repeating-linear-gradient(135deg,var(--sand) 0 6px,var(--line-strong) 6px 12px)';
+          color = 'var(--muted-2)';
+          subColor = 'var(--warn-ink)';
         }
-        if (between) border = '#1F5F4A';
+        if (between) border = 'var(--green)';
         if (isIn || isOut) {
-          bg = '#1F5F4A';
-          color = '#fff';
-          subColor = '#D9E2DC';
-          border = '#1F5F4A';
+          bg = 'var(--green)';
+          color = 'var(--paper)';
+          subColor = 'var(--green-line)';
+          border = 'var(--green)';
         }
         cells.push({
           day: d,
@@ -183,10 +222,10 @@ class MainLogic extends PageLogic {
     const { booking, update } = this.props.booking;
     return {
       flexMode: !!st.flex,
-      setFlex: (flex) => this.setState({ flex }),
+      setFlex: (flex: boolean) => this.setState({ flex }),
       // a recommended option is the choice: set the dates and show sanatoriums right away
       // (with the resort not chosen yet the guest stays here: the bubble points at the resort)
-      flexPick: (a, b) => {
+      flexPick: (a: string, b: string) => {
         this.setState({ in: a, out: b, flex: false, calOpen: false });
         this.props.booking.update({ checkin: a, checkout: b, chosenDates: true });
         const place = booking.chosenPlace;
@@ -195,7 +234,7 @@ class MainLogic extends PageLogic {
       hotels: POPULAR_SANATORIUMS,
       dest: booking.dest,
       destOptions: RESORTS,
-      setDest: (e) => update({ dest: e.target.value }),
+      setDest: (e: ChangeEvent<HTMLSelectElement>) => update({ dest: e.target.value }),
       inLabel: longDate(inD),
       outLabel: longDate(outD),
       calOpen: !!st.calOpen,
@@ -257,25 +296,7 @@ export default function MainPage() {
           </div>
           <HeaderAside gap={20} wrap={false}>
             <PhoneLink size={18} icon={20} gap={8} />
-            <div className="lang">
-              <select aria-label="Язык">
-                <option>RU</option>
-                <option>LT</option>
-                <option>EN</option>
-              </select>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </div>
+            {/* no language switch until a second language is complete (src/i18n/t.ts) */}
           </HeaderAside>
         </HeaderBar>
         {/* Hero: lakes and forests of Lithuania, the heading, and the search card lying over the photo's lower edge */}
@@ -343,7 +364,7 @@ export default function MainPage() {
             </Link>
           </div>
           <div className="pop-grid">
-            {(v.hotels || []).map((h: any, _i0: number) => (
+            {v.hotels.map((h, _i0) => (
               <Fragment key={_i0}>
                 <article className="card hcard">
                   <img src={h.img} alt={h.name} />{' '}
@@ -352,18 +373,25 @@ export default function MainPage() {
                       style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}
                     >
                       <h3 style={{ fontSize: '18px' }}>{h.name}</h3>
-                      <span style={{ color: '#8A6500', fontSize: '14px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                      <span
+                        style={{
+                          color: 'var(--warn-ink)',
+                          fontSize: '16px',
+                          letterSpacing: '1px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {h.stars}
                       </span>
                     </div>
-                    <div style={{ fontSize: '14px', color: '#3E4B44', marginTop: '-4px' }}>{h.sub}</div>
+                    <div style={{ fontSize: '16px', color: 'var(--ink-2)', marginTop: '-4px' }}>{h.sub}</div>
                     <div className="feat">
                       <svg
                         width="18"
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -379,7 +407,7 @@ export default function MainPage() {
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke="#1F5F4A"
+                        stroke="var(--green)"
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -400,12 +428,12 @@ export default function MainPage() {
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.15' }}>
                         <span style={{ fontSize: '20px', fontWeight: '800' }}>от {h.price}&nbsp;€</span>
-                        <span style={{ fontSize: '14px', color: '#5E6862' }}>за человека в сутки</span>
+                        <span style={{ fontSize: '16px', color: 'var(--muted)' }}>за человека в сутки</span>
                       </div>
                       <Link
                         className="btn btn-secondary"
-                        to={'/hotel?h=' + h.id}
-                        style={{ minHeight: '42px', fontSize: '15px', padding: '0 16px' }}
+                        to={sanatoriumPath(h.id)}
+                        style={{ minHeight: '42px', fontSize: '16px', padding: '0 16px' }}
                       >
                         Посмотреть →
                       </Link>
@@ -438,7 +466,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -448,8 +476,8 @@ export default function MainPage() {
                 <circle cx="17" cy="17" r="3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Выберите санаторий</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>Сравните программы и стоимость.</span>
+                <strong style={{ fontSize: '16px' }}>Выберите санаторий</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Сравните программы и стоимость.</span>
               </div>
             </div>
             <div className="step">
@@ -459,7 +487,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -470,8 +498,8 @@ export default function MainPage() {
                 <path d="M2 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3M15 21v-3a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Укажите данные гостей</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>При необходимости добавьте трансфер.</span>
+                <strong style={{ fontSize: '16px' }}>Укажите данные гостей</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>При необходимости добавьте трансфер.</span>
               </div>
             </div>
             <div className="step">
@@ -481,7 +509,7 @@ export default function MainPage() {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1F5F4A"
+                stroke="var(--green)"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -490,201 +518,60 @@ export default function MainPage() {
                 <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '15px' }}>Внесите депозит</strong>
-                <span style={{ fontSize: '14px', color: '#3E4B44' }}>
+                <strong style={{ fontSize: '16px' }}>Внесите депозит</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                   35 € с человека, остаток — за 3 месяца до заезда.
                 </span>
               </div>
             </div>
           </div>
         </section>
-        <HelpStripBand maxWidth={1340} />
-        <footer style={{ background: '#1C2620', color: '#D9E2DC' }}>
-          <div
-            style={{
-              maxWidth: '1340px',
-              margin: '0 auto',
-              padding: '16px 24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '24px',
-              flexWrap: 'wrap',
-              fontSize: '14px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                fontFamily: 'Montserrat,Manrope,sans-serif',
-                fontSize: '16px',
-                fontWeight: '700',
-                color: '#fff',
-              }}
-            >
-              <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true">
-                <rect x="1" y="1" width="38" height="38" fill="#1F5F4A" />
-                <path d="M20 9 L27 21 H23.5 L28 30 H12 L16.5 21 H13 Z" fill="#F4F1EA" />
-              </svg>
-              Санатории Литвы
-            </div>
-            <div style={{ display: 'flex', gap: '22px', flexWrap: 'wrap' }}>
-              <Link to="/rules#contact" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Контакты
-              </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Условия оплаты
-              </Link>
-              <Link to="/rules" style={{ color: '#D9E2DC', textDecoration: 'none' }}>
-                Отмена бронирования
-              </Link>
-            </div>
-            <div style={{ display: 'flex', gap: '18px', alignItems: 'center', fontWeight: '700', color: '#fff' }}>
-              <span dir="ltr">{PHONE_DISPLAY}</span>
-              <span style={{ fontWeight: '600', color: '#D9E2DC' }}>RU ▾</span>
-            </div>
-            <FooterSlot />
-          </div>
-          <div style={{ maxWidth: '1340px', margin: '0 auto', padding: '0 24px 18px' }}>
-            <AgencyBlock />
-          </div>
-        </footer>
+        <SiteFooter maxWidth={1340} />
       </div>{' '}
       {/* Custom date-range calendar (two months, price colours) */}{' '}
       {v.calOpen ? (
-        <>
-          <div
-            style={{
-              position: 'fixed',
-              inset: '0',
-              background: 'rgba(18,34,27,.55)',
-              zIndex: '50',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '16px',
-              overflow: 'auto',
-            }}
-          >
-            <div
-              className="cal-dlg"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="calTitle"
-              style={{
-                background: '#fff',
-                borderRadius: 'var(--r)',
-                width: 'min(1120px,100%)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                padding: '18px 24px 16px',
-                boxShadow: '0 24px 60px rgba(0,0,0,.35)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h2 id="calTitle" style={{ fontSize: '24px' }}>
-                    Выберите даты поездки
-                  </h2>
-                  <span style={{ fontSize: '15px', color: '#3E4B44' }}>{v.calHint}</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={v.closeCal}
-                  style={{ minHeight: '44px', fontSize: '16px', padding: '0 16px' }}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                  Закрыть
-                </button>
-              </div>
-              <DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />
-              {v.flexMode ? (
-                <FlexDates onPick={v.flexPick} />
-              ) : (
-                <>
-                  <div className="cal-body">
-                    <MonthsCalendar
-                      months={v.months || []}
-                      onPrev={v.calPrev}
-                      onNext={v.calNext}
-                      planeTitle="Рейс из Израиля"
-                    />
-                    <CalLegend />
-                  </div>
-                </>
-              )}
-              <div
-                style={{
-                  display: v.flexMode ? 'none' : 'flex', // a flexible-dates option goes straight to results
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                  borderTop: '1px solid #E3DED2',
-                  paddingTop: '12px',
-                }}
-              >
+        <CalendarDialog
+          canvas="main-calendar"
+          title="Выберите даты поездки"
+          hint={v.calHint}
+          tabs={<DateModeTabs flex={!!v.flexMode} onChange={v.setFlex} />}
+          onClose={v.closeCal}
+          // a flexible-dates option goes straight to results: no foot then
+          selection={
+            v.flexMode ? null : (
+              <>
                 {v.calNote ? <CalNotice text={v.calNote} onClose={v.calNoteClose} onAsk={v.calNoteAsk} /> : null}
-                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Заезд</span>
-                    <strong style={{ fontSize: '18px' }}>{v.selIn}</strong>
-                  </div>
-                  <svg
-                    width="26"
-                    height="26"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#1F5F4A"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Выезд</span>
-                    <strong style={{ fontSize: '18px' }}>{v.selOut}</strong>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span className="lbl">Итого</span>
-                    <strong style={{ fontSize: '18px', color: '#1F5F4A' }}>{v.selNights}</strong>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button type="button" className="btn btn-secondary" onClick={v.closeCal}>
-                    Отмена
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={v.applyCal}
-                    disabled={!!v.applyOff}
-                    style={{ minHeight: '50px', fontSize: '18px', padding: '0 32px' }}
-                  >
-                    Подтвердить даты
-                  </button>
-                </div>
-              </div>
+                <RangeSummary from={v.selIn} to={v.selOut} total={v.selNights} />
+              </>
+            )
+          }
+          actions={
+            v.flexMode ? null : (
+              <>
+                <button type="button" className="btn btn-secondary" onClick={v.closeCal}>
+                  Отмена
+                </button>
+                <button type="button" className="btn btn-primary" onClick={v.applyCal} disabled={!!v.applyOff}>
+                  Подтвердить даты
+                </button>
+              </>
+            )
+          }
+        >
+          {v.flexMode ? (
+            <FlexDates onPick={v.flexPick} />
+          ) : (
+            <div className="cal-body">
+              <MonthsCalendar
+                months={v.months || []}
+                onPrev={v.calPrev}
+                onNext={v.calNext}
+                planeTitle="Рейс из Израиля"
+              />
+              <CalLegend />
             </div>
-          </div>
-        </>
+          )}
+        </CalendarDialog>
       ) : null}{' '}
       {/* "Какой санаторий подойдёт вам?" — the 3-question wizard opens right here */}
       <ChooseWizard

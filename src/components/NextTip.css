@@ -7,10 +7,10 @@
   gap: 8px;
   margin: 10px 0 12px;
   padding: 9px 6px 9px 12px;
-  border-radius: 12px;
-  background: #1f5f4a;
-  color: #fff;
-  font-size: 15px;
+  border-radius: var(--r-field);
+  background: var(--green);
+  color: var(--paper);
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.35;
   text-align: left;
@@ -32,7 +32,7 @@
   bottom: -7px;
   width: 14px;
   height: 14px;
-  background: #1f5f4a;
+  background: var(--green);
   border-radius: 0 0 3px 0;
   transform: rotate(45deg);
 }
@@ -60,8 +60,8 @@
   border: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-size: 12px;
+  color: var(--paper);
+  font-size: 13px;
   cursor: pointer;
 }
 /* a link-like action inside the bubble («Показать ↑») */
@@ -71,7 +71,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: #fff;
+  color: var(--paper);
   font: inherit;
   font-weight: 800;
   text-decoration: underline;

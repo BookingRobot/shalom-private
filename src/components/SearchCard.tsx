@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { track } from '../lib/analytics';
 import { useBooking } from '../context/BookingContext';
 import { FlightToggle } from './FlightToggle';
 import { GuestsPicker } from './GuestsPicker';
@@ -18,7 +19,7 @@ const calIcon = (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#1F5F4A"
+    stroke="var(--green)"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -151,10 +152,12 @@ export function SearchCard({
 
   return (
     <form
+      data-canvas="search-card"
       className={'card search' + (guide ? ' search-guide' : '') + (className ? ' ' + className : '')}
       onSubmit={(e) => {
         e.preventDefault();
         if (guide && step !== 'go') return find(e);
+        track('Search', { resort: booking.dest || '' });
         navigate(guide ? goTo : '/results', { state: guide && goTo !== '/results' ? null : TO_LIST });
       }}
     >

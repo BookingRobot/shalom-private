@@ -17,7 +17,7 @@
   margin: 34px 0 12px;
 }
 .screens p {
-  color: #3e4b44;
+  color: var(--ink-2);
   max-width: 760px;
 }
 .screens .grid {
@@ -29,33 +29,33 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: #fff;
-  border: 1px solid #e3ded2;
-  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
   padding: 16px 18px;
   text-decoration: none;
-  color: #1c2620;
+  color: var(--ink);
   min-height: 44px;
 }
 .screens .card:hover {
-  border-color: #1f5f4a;
+  border-color: var(--green);
 }
 .screens .name {
   font-weight: 800;
 }
 .screens .url {
-  font-size: 15px;
-  color: #5e6862;
+  font-size: 16px;
+  color: var(--muted);
 }
 .screens .start {
   display: inline-flex;
   align-items: center;
   min-height: 54px;
   padding: 0 26px;
-  background: #1f5f4a;
-  color: #fff;
+  background: var(--green);
+  color: var(--paper);
   font-weight: 800;
   text-decoration: none;
-  border-radius: var(--r);
+  border-radius: var(--r-field);
   margin-top: 10px;
 }

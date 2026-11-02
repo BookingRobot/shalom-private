@@ -1,0 +1,4 @@
+/* «Помогите выбрать» wizard (the base .wz-* rules are in styles/ui.css) */
+.page .wz-title {
+  font-size: 26px;
+}

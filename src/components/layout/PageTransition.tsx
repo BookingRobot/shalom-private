@@ -2,9 +2,13 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './PageTransition.css';
 
-/** how long the short «loading» shows between pages (the real site will load data here) */
-const LOAD_MS = 480;
-const STEP_MS = 70;
+/** «Загружаем…» shows only when the next page's code is still on its way for longer than this */
+const SHOW_AFTER_MS = 200;
+/** how often we look whether the new page has rendered */
+const POLL_MS = 30;
+/** give up waiting for the page's code after this (it renders anyway when it comes) */
+const MAX_WAIT_MS = 4000;
+const STEP_MS = 50;
 
 /**
  * The visible blocks of the new page, top to bottom: big wrappers are opened up so their
@@ -52,9 +56,11 @@ function reveal(root: HTMLElement) {
 }
 
 /**
- * Between pages: a short soft «loading» with a spinner, then the new page's blocks come in
- * one after another from the top. A link may ask to glide down to a part of the page
- * afterwards (state.scrollTo = element id), e.g. the search → the list of sanatoriums.
+ * Between pages: the new page's blocks come in one after another from the top. There is no
+ * waiting on purpose — «Загружаем…» appears only when the next page's code really is not
+ * here yet (a slow connection), and only after a moment, so it never flashes. Data a page
+ * waits for shows its own state inside the page (AsyncBlock). A link may ask to glide down
+ * to a part of the page afterwards (state.scrollTo = element id).
  */
 export function PageTransition() {
   const loc = useLocation();
@@ -69,14 +75,17 @@ export function PageTransition() {
     let alive = true;
     const timers: number[] = [];
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
-    setPhase('load');
     const started = Date.now();
+    // the old page is gone the moment the route changes; the new one renders when its code is here
+    const pageRoot = () => document.querySelector<HTMLElement>('#root .page');
+    later(() => {
+      if (alive && !pageRoot()) setPhase('load');
+    }, SHOW_AFTER_MS);
     const finish = () => {
       if (!alive) return;
-      const root = document.querySelector<HTMLElement>('#root .page');
-      // the page's code may still be on its way: wait for it (at most a few seconds)
-      if (!root && Date.now() - started < 4000) return later(finish, 50);
-      setPhase('out');
+      const root = pageRoot();
+      if (!root && Date.now() - started < MAX_WAIT_MS) return later(finish, POLL_MS);
+      setPhase((p) => (p === 'load' ? 'out' : ''));
       if (root) reveal(root);
       later(() => setPhase(''), 260);
       const to = (loc.state as { scrollTo?: string } | null)?.scrollTo;
@@ -88,7 +97,7 @@ export function PageTransition() {
           window.scrollTo({ top: y, behavior: 'smooth' });
         }, 520);
     };
-    later(finish, LOAD_MS);
+    later(finish, 0);
     return () => {
       alive = false;
       timers.forEach((t) => window.clearTimeout(t));

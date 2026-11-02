@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useBooking } from '../context/BookingContext';
 import { orderSummary } from '../lib/orderSummary';
 import { offerLink } from '../lib/share';
+import { track } from '../lib/analytics';
+import './ShareOffer.css';
 
 /**
  * "Посоветоваться с семьёй": send the offer (sanatorium, dates, guests, price, link)
@@ -9,14 +11,23 @@ import { offerLink } from '../lib/share';
  * The most common reasons not to book were "подумаю" and "посоветуюсь с женой".
  */
 export function ShareOffer({ hotelName = 'Санаторий Эгле Комфорт, Друскининкай' }: { hotelName?: string }) {
-  const { booking } = useBooking();
+  const { booking, draftCode, ensureDraft } = useBooking();
   const [open, setOpen] = useState<'' | 'share' | 'alert'>('');
   const [copied, setCopied] = useState(false);
   const [contact, setContact] = useState('');
   const [agree, setAgree] = useState(false);
   const [sent, setSent] = useState(false);
   const o = orderSummary(booking);
-  const link = offerLink(booking);
+  // the link opens the same draft on any phone once the order has a code
+  const link = offerLink(booking, '/rooms', draftCode);
+  const openShare = () => {
+    setOpen(open === 'share' ? '' : 'share');
+    if (open !== 'share') track('Share offer');
+    if (!draftCode)
+      ensureDraft().catch(() => {
+        /* no server: the link carries the choices themselves */
+      });
+  };
   const text =
     `${hotelName}\n${o.dates} · ${o.guests}\nНомер: ${o.roomName.toLowerCase()}, программа ${o.programName} (${o.programPerDay})\n` +
     `${o.placeLabel} ${o.placeNote}` +
@@ -37,7 +48,7 @@ export function ShareOffer({ hotelName = 'Санаторий Эгле Комфо
           type="button"
           className={`btn btn-secondary share-btn ${open === 'share' ? 'on' : ''}`}
           aria-expanded={open === 'share'}
-          onClick={() => setOpen(open === 'share' ? '' : 'share')}
+          onClick={openShare}
         >
           <svg
             width="20"
@@ -114,12 +125,11 @@ export function ShareOffer({ hotelName = 'Санаторий Эгле Комфо
               </label>
               <input
                 id="alertContact"
-                className="input"
+                className="input share-input"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
                 placeholder="+972 … или имя@почта"
                 autoComplete="email"
-                style={{ minHeight: '48px', fontSize: '17px' }}
               />
               <label className="share-agree">
                 <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
