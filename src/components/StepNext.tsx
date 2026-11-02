@@ -95,10 +95,13 @@ export function StepNext({
   info,
   big = true,
   verb = 'не выбрали',
+  onAttempt,
 }: {
   /** «не выбрали» / «не заполнили» / «не отметили» */
   verb?: string;
   back?: { to: string; label: string };
+  /** «Далее» was pressed (not the hint's own check): forms may now show every field's error */
+  onAttempt?: () => void;
   next: { to: string; label: ReactNode; icon?: ReactNode };
   /** what is still not chosen (checked on every change on the page) */
   missing?: () => Missing[];
@@ -160,6 +163,7 @@ export function StepNext({
   }, [gaps]);
 
   const go = () => {
+    onAttempt?.();
     const m = missing();
     setLeft(m);
     setGaps(m);
