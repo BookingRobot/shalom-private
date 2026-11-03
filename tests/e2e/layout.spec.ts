@@ -68,7 +68,7 @@ const KNOWN_ISSUES: { route: string; widths: number[]; check: Check; reason: str
   },
   {
     route: '/privacy',
-    widths: [320, 360, 390],
+    widths: [320, 360],
     check: 'words',
     reason: 'the heading «Политика конфиденциальности» breaks «конфиденциальности» in the middle',
   },
