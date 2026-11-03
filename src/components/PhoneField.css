@@ -26,9 +26,68 @@
 .phone-msg.bad {
   color: var(--danger);
 }
-@media (max-width: 420px) {
-  .phone-row .phone-code {
-    flex-basis: 132px;
-    width: 132px;
+/* the code shown over the closed list — phones only (laptop shows «+972 · Израиль» as before) */
+.phone-code-v {
+  display: none;
+}
+/* Phone: the closed list shows only «+972» (a cut «+972 · Изра» squeezed the number);
+   the native select stays underneath, so iOS / Android still list «+972 · Израиль». */
+@media (max-width: 760px) {
+  .phone-row {
+    position: relative;
+  }
+  /* 4 classes: wins over a page's own select width (the tickets form sets 172 px) */
+  .phone-field .phone-row select.input.phone-code {
+    flex: 0 0 92px;
+    width: 92px;
+    padding: 0 28px 0 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+  /* the open list on Android / desktop browsers inherits the colour — keep it readable */
+  .phone-field .phone-row select.input.phone-code option {
+    color: var(--ink);
+    -webkit-text-fill-color: var(--ink);
+    background: var(--paper);
+  }
+  .phone-row .phone-code-v {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px 0 14px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  /* a small chevron: this is a choice */
+  .phone-row .phone-code-v::after {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--green);
+    border-bottom: 2px solid var(--green);
+    transform: translateY(-2px) rotate(45deg);
+  }
+}
+/* high-contrast mode repaints the select's own text: show only that one */
+@media (max-width: 760px) and (forced-colors: active) {
+  .phone-field .phone-row select.input.phone-code {
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+  .phone-row .phone-code-v {
+    display: none;
   }
 }
