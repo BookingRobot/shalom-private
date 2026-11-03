@@ -163,7 +163,8 @@ class RoomsLogic extends PageLogic<RoomsState> {
         totalSum: eur(stayTotal(p.price + roomPrice.add, G)),
         facts: p.value.map(([k, big, label, sub]) => ({ d: ICON_PATHS[k], big, label, sub })),
         btnLabel: on ? 'Выбрана' : 'Выбрать ' + shortName(p.name),
-        btnCls: on || rec ? 'btn-primary' : 'btn-secondary',
+        // filled green only for the chosen one: the recommended card is marked by its badge alone
+        btnCls: on ? 'btn-primary' : 'btn-secondary',
         pick: () => this.setState({ prog: p.id }),
         openMore: () => this.setState({ more: p.id }),
       };

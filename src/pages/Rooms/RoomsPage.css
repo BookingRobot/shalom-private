@@ -230,11 +230,12 @@
     border-color 0.2s,
     box-shadow 0.2s;
 }
+/* light green means «выбрано» and nothing else: the recommended card is white, its badge says why */
 .pg-rooms .pg-card.rec {
-  background: linear-gradient(180deg, var(--green-soft) 0, var(--green-soft) 140px, var(--paper) 100%);
-  border-color: var(--green-line);
+  background: var(--paper);
 }
 .pg-rooms .pg-card.on {
+  background: var(--sel-bg);
   border: 2px solid var(--green);
   padding: 21px 21px 15px;
   box-shadow: 0 6px 22px rgba(31, 95, 74, 0.14);
