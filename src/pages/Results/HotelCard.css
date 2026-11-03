@@ -69,9 +69,6 @@ body .pg-results .hc {
   align-items: center;
   font-size: 16px;
 }
-.pg-results .hc-short {
-  display: none;
-}
 .pg-results .hc-links .cmp-check {
   margin: 0 0 0 auto;
   min-height: 32px;
@@ -96,6 +93,16 @@ body .pg-results .hc {
 }
 .pg-results .hc-buy .pbox-total {
   margin-top: 2px;
+}
+/* the party total stays one piece («2 138 €») */
+.pg-results .hc-buy .pbox-total strong {
+  white-space: nowrap;
+}
+/* laptop: a wider price column, so the total and the nights fit in two lines */
+@media (min-width: 1081px) {
+  .pg-results .hc-buy {
+    flex-basis: 290px;
+  }
 }
 .pg-results .hc-buy .next-tip {
   margin: 8px 0 10px;
@@ -149,12 +156,6 @@ body .pg-results .hc {
     margin: 0 12px;
     gap: 4px 16px;
     padding-top: 6px;
-  }
-  .pg-results .hc-long {
-    display: none;
-  }
-  .pg-results .hc-short {
-    display: inline;
   }
   /* the price calendar is reached from the sanatorium's page on a phone: the row keeps one line */
   .pg-results .hc-cal {

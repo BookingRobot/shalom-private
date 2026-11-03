@@ -103,6 +103,11 @@ function MobileMenu() {
   };
   return (
     <>
+      {/* phone: one tap to call — the consultant is the guest's safety net on every page */}
+      <a className="hd-call" href={PHONE_TEL} aria-label={'Позвонить: ' + PHONE_DISPLAY}>
+        <PhoneIcon size={20} color="currentColor" />
+        <span className="hd-call-t">Позвонить</span>
+      </a>
       {/* a checkbox under the label keeps the menu working even without scripts (the canvas boards) */}
       <input
         type="checkbox"

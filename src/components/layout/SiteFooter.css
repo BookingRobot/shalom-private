@@ -144,6 +144,121 @@
   }
 }
 
+/* the parts only a phone shows: «Позвонить», «Написать в», the row chevrons */
+.ft-tel-k,
+.ft-wa-k,
+.ft-chev {
+  display: none;
+}
+
+/* ── Phone: big call and WhatsApp buttons, the links as a list of 48 px rows (like the menu) ── */
+@media (max-width: 760px) {
+  /* who sells → call → WhatsApp and e-mail → opening hours → address and licence */
+  .ft-tel {
+    order: 1;
+  }
+  .ft-contacts {
+    order: 2;
+  }
+  .ft-hours {
+    order: 3;
+  }
+  .ft-addr {
+    order: 4;
+  }
+  .page .ft .ft-tel {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    min-height: 52px;
+    margin: 14px 0 4px;
+    padding: 8px 16px;
+    border-radius: var(--r-field);
+    background: var(--paper);
+    color: var(--green);
+    font-size: 19px;
+    line-height: 1.25;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  }
+  .page .ft .ft-tel:active {
+    background: var(--green-soft);
+  }
+  .ft-tel-k {
+    display: inline;
+  }
+  .ft-tel-n {
+    white-space: nowrap;
+  }
+  .ft-contacts {
+    flex-direction: column;
+    gap: 6px;
+    margin: 4px 0 10px;
+  }
+  .page .ft .ft-contacts a.ft-wa {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 0.3em;
+    min-height: 52px;
+    padding: 6px 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--r-field);
+    font-size: 18px;
+    white-space: normal;
+    text-align: center;
+    text-decoration: none;
+  }
+  .page .ft .ft-contacts a.ft-wa:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .ft-wa-k {
+    display: inline;
+  }
+  .page .ft .ft-contacts a {
+    font-size: 18px;
+  }
+  .ft-who,
+  .ft-hours,
+  .ft-addr {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  /* the links: a list of rows with chevrons, the whole row is the link */
+  .ft-links-row {
+    gap: 14px;
+  }
+  .ft-links {
+    flex: 1 1 100%;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .page .ft .ft-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 18px;
+    font-weight: 600;
+    white-space: normal;
+  }
+  .page .ft .ft-links a:hover {
+    text-decoration: none;
+  }
+  .page .ft .ft-links a:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .ft-chev {
+    display: block;
+    flex: none;
+    color: var(--green-mid);
+  }
+}
+
 /* the agency on a light plate (older callers) */
 .ft-agency {
   display: flex;

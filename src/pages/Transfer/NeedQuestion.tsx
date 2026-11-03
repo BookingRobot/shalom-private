@@ -29,64 +29,19 @@ export function NeedQuestion({ v }: { v: TransferVals }) {
           onClick={v.sayNo}
         >
           <Radio cls={v.noCls} />
-          <InfoTitle title="Нет, доберусь сам" info={v.noSub} />
+          <InfoTitle title="Нет, трансфер не нужен" info={v.noSub} />
         </button>
       </div>
-      {v.askNo ? <NoTransferDialog v={v} /> : null}
+      {/* a calm note under the answer, no «are you sure?» window: the two facts that matter */}
       {v.noNeed ? (
-        <div className="card ios-in tr-none">
+        <div className="card ios-in tr-none" role="status">
           <div className="tr-none-t">Хорошо, трансфер не добавляем</div>
           <p className="tr-p">
-            Адрес санатория и как доехать на машине или автобусе пришлём в подтверждении. Трансфер можно добавить позже
-            — просто позвоните.
+            Учтите: от аэропорта Вильнюса до санатория 130 км, прямого автобуса нет. Адрес и как доехать пришлём в
+            подтверждении. Передумаете — трансфер можно добавить позже, просто позвоните.
           </p>
         </div>
       ) : null}
     </>
-  );
-}
-
-/** «Вы уверены?» — the window after «Нет, доберусь сам»: how far it is without a transfer */
-function NoTransferDialog({ v }: { v: TransferVals }) {
-  return (
-    <div className="tr-dim">
-      <div role="dialog" aria-modal="true" aria-labelledby="noTitle" className="card tr-dialog">
-        <div className="tr-dialog-h">
-          <svg
-            className="tr-dialog-ico"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-          </svg>
-          <h2 id="noTitle" className="tr-h2">
-            Вы уверены, что доберётесь сами?
-          </h2>
-        </div>
-        <p className="tr-p">
-          От аэропорта Вильнюса до санатория — 130 км. Прямого автобуса из аэропорта нет: нужно доехать до автовокзала,
-          купить билет, затем 2 часа в пути и такси до санатория — с чемоданами.
-        </p>
-        <div className="tr-dialog-note">
-          <strong>С трансфером:</strong> водитель встречает с табличкой, помогает с багажом и довозит до стойки
-          санатория. {v.withNote}
-        </div>
-        <div className="tr-dialog-btns">
-          <button type="button" className="btn btn-secondary" onClick={v.confirmNo}>
-            Да, доберусь сам
-          </button>
-          <button type="button" className="btn btn-primary tr-dialog-main" onClick={v.keepTransfer}>
-            Нет, добавить трансфер
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

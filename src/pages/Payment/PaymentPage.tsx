@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Quote } from '../../api/types';
 import { useQuote } from '../../api/useQuote';
 import { track } from '../../lib/analytics';
-import { PHONE_TEL } from '../../data/contacts';
+import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../../data/contacts';
 import { HeaderBar, Brand, PhoneLink, HeaderAside } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { SiteFooter } from '../../components/layout/SiteFooter';
@@ -66,7 +66,28 @@ class PaymentLogic extends PageLogic {
           'Санаторий: остаток ' + eur(sanRest) + ' оплачиваете на месте, при заезде.',
         ]
       : ['Остаток ' + eur(order.rest) + ' — до ' + order.dueDate + ': ' + HOW + '.'];
+    // one plain sentence right above the pay button: what is paid now and what is left.
+    // Built from the same numbers as the button (the server quote once it arrives).
+    // Free cancellation is said only as the rules page says it: free until the rest is due.
+    const FREE_CANCEL = 'До ' + order.dueDate + ' отмена бесплатная.';
+    const paySentence = order.fullOnly
+      ? 'Сейчас вы платите всю сумму — ' +
+        eur(TOTAL) +
+        '. До заезда меньше недели, поэтому нужна полная оплата. На месте ничего доплачивать не нужно.'
+      : adv
+        ? 'Сейчас вы платите депозит ' +
+          eur(order.advance) +
+          '. ' +
+          (atSan
+            ? (flightRest ? 'Остаток за перелёт ' + eur(flightRest) + ' — до ' + order.dueDate + '. ' : '') +
+              'Остаток за санаторий ' +
+              eur(sanRest) +
+              ' — на месте, при заезде. '
+            : 'Остаток ' + eur(order.rest) + ' — до ' + order.dueDate + '. ') +
+          FREE_CANCEL
+        : 'Сейчас вы платите всю сумму — ' + eur(TOTAL) + '. На месте ничего доплачивать не нужно. ' + FREE_CANCEL;
     return {
+      paySentence,
       restLines,
       advAmt,
       restAmt,
@@ -86,18 +107,46 @@ class PaymentLogic extends PageLogic {
       pickAdv: () => this.setState({ plan: 'adv' }),
       pickFull: () => this.setState({ plan: 'full' }),
       amount: adv ? advAmt + '\u00a0€' : totalAmt + '\u00a0€',
+      // one rule for every line on the page:
+      // deposit + sanatorium paid on arrival → the sanatorium rest at check-in (the flight rest by the due date);
+      // deposit elsewhere → the rest by the due date, nothing at check-in; the whole sum → nothing later
       steps: adv
-        ? [
-            { when: TODAY_LABEL, what: 'депозит — цена зафиксирована', sum: eur(order.advance) },
-            { when: 'до ' + order.dueDate, what: 'остаток, до этой даты отмена бесплатная', sum: eur(order.rest) },
-            { when: 'при заезде', what: 'ничего не доплачиваете', sum: '0\u00a0€' },
-          ]
-        : [
-            { when: TODAY_LABEL, what: 'вся сумма', sum: eur(TOTAL) },
-            { when: 'при заезде', what: 'ничего не доплачиваете', sum: '0\u00a0€' },
-          ],
+        ? atSan
+          ? [
+              { when: TODAY_LABEL, what: 'депозит — цена зафиксирована', sum: eur(order.advance) },
+              ...(flightRest
+                ? [
+                    {
+                      when: 'до ' + order.dueDate,
+                      what: 'остаток за перелёт, до этой даты отмена бесплатная',
+                      sum: eur(flightRest),
+                    },
+                  ]
+                : []),
+              { when: 'при заезде', what: 'остаток за санаторий — на месте, в санатории', sum: eur(sanRest) },
+            ]
+          : [
+              { when: TODAY_LABEL, what: 'депозит — цена зафиксирована', sum: eur(order.advance) },
+              { when: 'до ' + order.dueDate, what: 'остаток, до этой даты отмена бесплатная', sum: eur(order.rest) },
+              { when: 'при заезде', what: 'ничего не доплачиваете', sum: '0\u00a0€' },
+            ]
+        : [{ when: TODAY_LABEL, what: 'вся сумма, больше ничего не платите', sum: eur(TOTAL) }],
+      // the deposit option in the fold: when the rest is paid
+      advLater: atSan
+        ? flightRest
+          ? 'За перелёт — до ' + order.dueDate + ', за санаторий — на месте, при заезде.'
+          : 'Остальное — на месте, в санатории, при заезде.'
+        : 'Остальное — позже, до ' + order.dueDate + '.',
       rest: adv
-        ? 'Остаток ' + restAmt + '\u00a0€ — до ' + order.dueDate + ', отмена до этой даты бесплатная'
+        ? atSan
+          ? 'Остаток за санаторий ' +
+            eur(sanRest) +
+            ' — на месте, при заезде' +
+            (flightRest ? '; за перелёт ' + eur(flightRest) + ' — до ' + order.dueDate : '') +
+            '. Отмена до ' +
+            order.dueDate +
+            ' бесплатная'
+          : 'Остаток ' + restAmt + '\u00a0€ — до ' + order.dueDate + ', отмена до этой даты бесплатная'
         : 'Всё оплачено. На месте ничего доплачивать не нужно',
       payLabel: !q
         ? 'Считаем сумму…'
@@ -162,14 +211,16 @@ export default function PaymentPage() {
             onSubmit={(e) => {
               e.preventDefault();
               // paid: the confirmation may open (StepGuard)
-              if (logic.props.booking.booking.progress < 4) logic.props.booking.update({ progress: 4 });
-              track('Deposit paid', { plan: logic.state.plan ?? 'adv' });
+              // what was really paid (the deposit or the whole sum), for the confirmation page
+              const paid: 'adv' | 'full' = v.fullCls ? 'full' : 'adv';
+              logic.props.booking.update(logic.props.booking.booking.progress < 4 ? { paid, progress: 4 } : { paid });
+              track('Deposit paid', { plan: paid });
               logic.props.navigate('/done');
             }}
             style={{ flex: '999 1 560px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '24px' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '32px' }}>Как вам удобнее оплатить?</h1>
+              <h1 className="pay-h1">Последний шаг — оплата</h1>
               <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
                 Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
               </p>
@@ -229,7 +280,7 @@ export default function PaymentPage() {
                           <strong className="plan-title">
                             Депозит — <span className="nowrap">{v.advAmt}&nbsp;€</span>
                           </strong>
-                          <span className="plan-text">Остальное — позже, до {v.dueDate}.</span>
+                          <span className="plan-text">{v.advLater}</span>
                         </span>
                       </button>
                       <button type="button" className={`choice plan plan-alt ${v.fullCls ?? ''}`} onClick={v.pickFull}>
@@ -451,42 +502,17 @@ export default function PaymentPage() {
                   </span>
                 </div>
               </div>
-              {/* the newsletter: optional, not ticked for the guest */}
-              <label
-                id="payNews"
-                className="chk"
-                style={{
-                  padding: '14px 16px',
-                  border: '2px solid var(--line-strong)',
-                  borderRadius: 'var(--r-field)',
-                  marginTop: '4px',
-                }}
-              >
+              {/* the required consent: a plain row under a hairline (no box inside the card) */}
+              <label id="payAgree" className="chk chk-row">
                 <input type="checkbox" />
                 <span>
-                  Подписаться на новости о санаториях Литвы — новые программы, скидки и даты с прямым рейсом. Не чаще
-                  раза в месяц, отписаться можно в любой момент.
+                  Принимаю <Link to="/rules#cancel">условия бронирования и отмены</Link> и даю согласие на{' '}
+                  <Link to="/privacy">обработку данных гостей</Link> для этого заказа.
                 </span>
               </label>
-              <label
-                id="payAgree"
-                className="chk"
-                style={{
-                  padding: '14px 16px',
-                  border: '2px solid var(--line-strong)',
-                  borderRadius: 'var(--r-field)',
-                  marginTop: '4px',
-                }}
-              >
-                {' '}
-                <input type="checkbox" />{' '}
-                <span>
-                  Я ознакомился с <Link to="/rules#cancel">условиями бронирования и отмены</Link> и согласен на
-                  обработку персональных данных гостей по <Link to="/privacy">политике конфиденциальности</Link> — для
-                  оформления заказа.
-                </span>{' '}
-              </label>
             </section>
+            {/* what is paid now and what is left — said once, right above the pay button */}
+            <p className="pay-sentence">{v.paySentence}</p>
             <StepNext
               verb="не отметили"
               back={{ to: '/guests', label: '← Назад к гостям' }}
@@ -533,6 +559,26 @@ export default function PaymentPage() {
                   : [{ label: 'согласие с условиями бронирования', target: '#payAgree' }]),
               ]}
             />
+            {/* a person to ask, right under the pay button */}
+            <p className="pay-help">
+              Есть вопрос? Позвоните{' '}
+              <a href={PHONE_TEL} className="pay-help-a nowrap">
+                {PHONE_DISPLAY}
+              </a>{' '}
+              или напишите в{' '}
+              <a href={WHATSAPP_URL} className="pay-help-a" target="_blank" rel="noopener noreferrer">
+                WhatsApp
+              </a>
+              .
+            </p>
+            {/* the newsletter: optional, not ticked for the guest, apart from the consent and after the button */}
+            <label id="payNews" className="chk pay-news">
+              <input type="checkbox" />
+              <span>
+                По желанию: присылать новости о санаториях Литвы — не чаще раза в месяц, отписаться можно в любой
+                момент.
+              </span>
+            </label>
           </form>
           <OrderSummary
             details={[

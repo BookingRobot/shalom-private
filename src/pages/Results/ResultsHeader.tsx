@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchCard } from '../../components/SearchCard';
 import type { ResultsVals } from './resultsTypes';
@@ -23,13 +24,38 @@ export const FILTER_ICON = (
   </svg>
 );
 
-/** Search band (the same card as on the home page), breadcrumbs, the title and the two tools. */
+/**
+ * Search band (the same card as on the home page), breadcrumbs, the title and the two tools.
+ * Below 1081 px the band is one line «what was searched» with «Изменить», which opens the
+ * full form in place, so the first sanatorium shows on the first screen (CSS hides the parts).
+ */
 export function ResultsHeader({ v }: { v: ResultsVals }) {
+  const [edit, setEdit] = useState(false);
   return (
     <>
-      <section className="res-band" data-canvas="results-search">
+      <section className={'res-band' + (edit ? ' res-band-edit' : '')} data-canvas="results-search">
         <div className="res-band-in">
-          <SearchCard inLabel={v.sInLabel} outLabel={v.sOutLabel} onOpenCal={v.sOpenCal} />
+          <div className="res-sum">
+            <div className="res-sum-t">
+              <strong>Друскининкай</strong>
+              <span>
+                {v.dateRange} · {v.nightsLabel} · {v.guestsLine}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="res-sum-btn"
+              onClick={() => setEdit(!edit)}
+              aria-expanded={edit}
+              aria-controls="res-form"
+            >
+              {edit ? 'Свернуть' : 'Изменить'}
+            </button>
+          </div>
+          {/* a new search goes to this same list, so the form folds back to the line */}
+          <div className="res-form" id="res-form" onSubmit={() => setEdit(false)}>
+            <SearchCard inLabel={v.sInLabel} outLabel={v.sOutLabel} onOpenCal={v.sOpenCal} />
+          </div>
         </div>
       </section>
       <div className="res-crumbs">

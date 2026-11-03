@@ -6,7 +6,17 @@ import { MONTHS, daysBetween, iso, nightsWord, plural, shortDate, toD } from './
 import { fmt } from './format';
 import { transferBySanatorium } from '../data/transferPolicy';
 import { transferLegs } from './transferCost';
-import { flightPackage, partyLabel, paymentPlan, perPersonOf, placeLabel, placePrice, stayTotal } from './pricing';
+import {
+  DEPOSIT_FLIGHT_PP,
+  flightPackage,
+  partyLabel,
+  paymentPlan,
+  perPersonOf,
+  persons,
+  placeLabel,
+  placePrice,
+  stayTotal,
+} from './pricing';
 
 const eur = (n: number) => fmt(n) + ' €';
 
@@ -64,6 +74,8 @@ export function orderSummary(b: Booking) {
   const total = stay + transfer + flight;
   const plan = paymentPlan(b.checkin, g, b.flightPackage, total, TODAY);
   const advance = plan.deposit;
+  // the flight part of the rest is always paid to us by the due date
+  const flightRest = flight ? Math.max(0, flight - DEPOSIT_FLIGHT_PP * persons(g)) : 0;
   return {
     dates: stayRange(b.checkin, b.checkout) + ' · ' + nights + ' ' + nightsWord(nights),
     nights,
@@ -99,7 +111,7 @@ export function orderSummary(b: Booking) {
     transferKind: noTransfer
       ? 'Трансфер не нужен'
       : tr.allFree
-        ? 'Трансфер санатория — уже оплачен'
+        ? 'Трансфер санатория — входит в цену'
         : tr.allPackage
           ? 'Групповой трансфер — в пакете с перелётом'
           : `Трансфер ${b.transfer.mode === 'group' ? 'групповой' : 'индивидуальный'}, ${b.transfer.back ? 'туда и обратно' : 'в одну сторону'}` +
@@ -109,7 +121,7 @@ export function orderSummary(b: Booking) {
       ? 'не нужен'
       : (b.transfer.place === 'vilnius' ? 'из аэропорта Вильнюса' : placeFrom(b.transfer.place).toLowerCase()) +
         (b.transfer.back ? ', туда и обратно' : ', в одну сторону') +
-        (tr.allFree ? ' — уже оплачен, организует санаторий' : ''),
+        (tr.allFree ? ' — организует санаторий, входит в цену' : ''),
     /** line on the confirmation page */
     transferLine: noTransfer
       ? 'Без трансфера'
@@ -117,14 +129,14 @@ export function orderSummary(b: Booking) {
         (b.transfer.place === 'vilnius' ? 'аэропорт Вильнюса' : placeName(b.transfer.place)) +
         (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
         'санаторий' +
-        (tr.allFree ? ' — организует санаторий, уже оплачен' : ''),
+        (tr.allFree ? ' — организует санаторий, входит в цену' : ''),
     /** route for the payment step */
     transferPlaces: noTransfer
       ? 'не нужен'
       : (b.transfer.place === 'vilnius' ? 'Вильнюс, аэропорт' : placeName(b.transfer.place)) +
         (b.transfer.back ? ' ⇄\u00a0' : ' →\u00a0') +
         'санаторий' +
-        (tr.allFree ? ' · уже оплачен' : ''),
+        (tr.allFree ? ' · входит в цену' : ''),
     total,
     totalLabel: eur(total),
     /** deposit that fixes the price (35 € per person, +100 € per person with flights) */
@@ -136,5 +148,12 @@ export function orderSummary(b: Booking) {
     dueDate: shortDate(plan.due),
     dueISO: iso(plan.due),
     fullOnly: plan.fullOnly,
+    /**
+     * the sanatorium takes the rest itself on check-in (the same rule as the payment step:
+     * sanatoriums that also meet the guests, e.g. Eglė) — nothing for the stay is paid to us later
+     */
+    restAtSan: bySan && !plan.fullOnly,
+    sanRestLabel: eur(plan.rest - flightRest),
+    flightRestLabel: flightRest ? eur(flightRest) : '',
   };
 }

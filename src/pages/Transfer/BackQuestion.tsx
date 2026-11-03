@@ -13,7 +13,7 @@ export function BackQuestion({ v }: { v: TransferVals }) {
           info={
             'Заберём из санатория ' +
             v.hotelShort +
-            ' и отвезём к самолёту, поезду или в отель. К самолёту выезжаем за 3 часа до вылета, время подтвердим за день.'
+            ' так, чтобы вы были в аэропорту за 3 часа до вылета. Точное время сообщим за день.'
           }
         />
       </div>
@@ -40,7 +40,7 @@ export function BackQuestion({ v }: { v: TransferVals }) {
           onClick={v.pickBackNo}
         >
           <Radio cls={v.backNoCls} />
-          <strong>Нет, обратно сам</strong>
+          <strong>Нет, обратно доберёмся сами</strong>
         </button>
       </div>
       {v.backOn ? <BackWhere v={v} /> : null}
@@ -132,7 +132,7 @@ function BackWhere({ v }: { v: TransferVals }) {
         <div className="ios-in tr-w-420">
           <BackFlight v={v} id="backflight2" />
           <span className="tr-note tr-note-top">
-            Заберём из санатория за 3 часа до вылета. Точное время подтвердим за день до отъезда.
+            Заберём из санатория так, чтобы вы были в аэропорту за 3 часа до вылета. Точное время сообщим за день.
           </span>
         </div>
       ) : null}

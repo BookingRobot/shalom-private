@@ -32,12 +32,20 @@ class GuestsLogic extends PageLogic {
       names: saved?.names ?? { g1fn: '', g1ln: '', g2fn: '', g2ln: '' },
       phoneCode: saved?.phoneCode ?? '+972 · Израиль',
       phone: saved?.phone ?? '',
+      // gender: nothing is chosen for the guest (two friends or sisters often travel together)
+      sex: saved?.sex ?? {},
       checked: false,
     };
   }
   /** the form goes into the order (and its draft on the server) with every change */
   syncBooking(st: Record<string, any>) {
-    const details: GuestDetails = { dob: st.dob, names: st.names, phoneCode: st.phoneCode, phone: st.phone };
+    const details: GuestDetails = {
+      dob: st.dob,
+      names: st.names,
+      phoneCode: st.phoneCode,
+      phone: st.phone,
+      sex: st.sex,
+    };
     return { details };
   }
   renderVals() {
@@ -87,7 +95,11 @@ class GuestsLogic extends PageLogic {
       setPhoneCode: (c: string) => keep({ phoneCode: c }),
       setPhone: (n: string) => keep({ phone: n }),
       phoneError: checkPhone(st.phoneCode, st.phone).error,
+      sex: (st.sex || {}) as NonNullable<GuestDetails['sex']>,
+      setSex: (g: 'g1' | 'g2') => (s: 'm' | 'f') => keep({ sex: { ...st.sex, [g]: s } }),
       checked: !!st.checked,
+      hasDob1: !!dob.g1,
+      hasDob2: !!dob.g2,
       dob1: fmtDob(dob.g1),
       dob2: fmtDob(dob.g2),
       dob1Color: dob.g1 ? 'var(--ink)' : 'var(--muted)',
@@ -194,6 +206,93 @@ class GuestsLogic extends PageLogic {
   }
 }
 
+const SEXES = [
+  ['m', 'Мужской'],
+  ['f', 'Женский'],
+] as const;
+
+/** Gender as a segmented control: empty until the guest taps; after «Далее» an empty one says so. */
+function SexChoice({
+  g,
+  value,
+  onPick,
+  showError,
+}: {
+  g: 'g1' | 'g2';
+  value?: 'm' | 'f';
+  onPick: (s: 'm' | 'f') => void;
+  showError: boolean;
+}) {
+  const err = showError && !value;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <span className="lbl" id={g + 'sex-lbl'}>
+        Пол
+      </span>
+      <div
+        id={g + 'sex'}
+        className={'seg g-sex' + (err ? ' is-err' : '')}
+        role="radiogroup"
+        aria-labelledby={g + 'sex-lbl'}
+        aria-describedby={err ? g + 'sex-err' : undefined}
+      >
+        {SEXES.map(([s, t]) => (
+          <label key={s} className={value === s ? 'on' : undefined}>
+            <input type="radio" name={g + 'sex'} value={s} checked={value === s} onChange={() => onPick(s)} />
+            {t}
+          </label>
+        ))}
+      </div>
+      {err ? (
+        <span id={g + 'sex-err'} className="g-err">
+          Выберите пол
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** The date-of-birth button (opens the picker); after «Далее» an empty one says what to do. */
+function DobField({
+  g,
+  text,
+  color,
+  onOpen,
+  showError,
+  hint,
+}: {
+  g: 'g1' | 'g2';
+  text: string;
+  color: string;
+  onOpen: () => void;
+  showError: boolean;
+  hint?: string;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <label className="lbl" htmlFor={g + 'dob'}>
+        Дата рождения
+      </label>
+      <button
+        type="button"
+        id={g + 'dob'}
+        className={'input datebtn' + (showError ? ' is-err' : '')}
+        onClick={onOpen}
+        style={{ color }}
+        aria-describedby={showError ? g + 'dob-err' : undefined}
+      >
+        {text}
+      </button>
+      {showError ? (
+        <span id={g + 'dob-err'} className="g-err">
+          Выберите дату рождения
+        </span>
+      ) : null}
+      {hint ? <span className="hint">{hint}</span> : null}
+    </div>
+  );
+}
+
 export default function GuestsPage() {
   usePageTitle('Шаг 3 из 4 — данные гостей');
   const [v, logic] = usePageLogic(GuestsLogic);
@@ -233,8 +332,8 @@ export default function GuestsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
               <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
-                Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для
-                карты лечения.
+                Имя и фамилия — английскими буквами, точно как в паспорте, по которому летите. Они нужны санаторию для
+                регистрации и врачу для карты лечения.
               </p>
             </div>
             {/* Guest 1 */}
@@ -242,25 +341,7 @@ export default function GuestsPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: 'var(--r-field)',
-                    background: 'var(--green)',
-                    color: 'var(--paper)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '800',
-                    fontSize: '18px',
-                  }}
-                >
-                  1
-                </span>
-                <h2 style={{ fontSize: '22px' }}>Первый гость — он же контактное лицо</h2>
-              </div>
+              <h2 style={{ fontSize: '22px' }}>Гость 1 — контактное лицо</h2>
               <div
                 style={{
                   display: 'grid',
@@ -288,34 +369,15 @@ export default function GuestsPage() {
                   onChange={v.setName('g1ln')}
                   forceCheck={v.checked}
                 />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g1dob">
-                    Дата рождения
-                  </label>
-                  <button
-                    type="button"
-                    id="g1dob"
-                    className="input datebtn"
-                    onClick={v.openDob1}
-                    style={{ color: v.dob1Color }}
-                  >
-                    {v.dob1}
-                  </button>
-                  <span className="hint">Нужна врачу санатория</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span className="lbl">Пол</span>
-                  <div className="seg">
-                    <label>
-                      <input type="radio" name="g1sex" defaultChecked={true} />
-                      Мужской
-                    </label>
-                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
-                      <input type="radio" name="g1sex" />
-                      Женский
-                    </label>
-                  </div>
-                </div>
+                <DobField
+                  g="g1"
+                  text={v.dob1}
+                  color={v.dob1Color}
+                  onOpen={v.openDob1}
+                  showError={v.checked && !v.hasDob1}
+                  hint="Нужна врачу санатория"
+                />
+                <SexChoice g="g1" value={v.sex.g1} onPick={v.setSex('g1')} showError={v.checked} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label className="lbl" htmlFor="g1ph">
                     Мобильный телефон
@@ -332,10 +394,20 @@ export default function GuestsPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label className="lbl" htmlFor="g1em">
-                    Электронная почта
+                    Электронная почта <span className="g-opt">(не обязательно)</span>
                   </label>
-                  <input id="g1em" className="input" type="email" placeholder="name@gmail.com" autoComplete="email" />
-                  <span className="hint">Пришлём подтверждение и ссылку на оплату</span>
+                  <input
+                    id="g1em"
+                    className="input"
+                    type="email"
+                    inputMode="email"
+                    placeholder="name@gmail.com"
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                  />
+                  <span className="hint">Копию подтверждения пришлём и сюда</span>
                 </div>
               </div>
             </section>
@@ -344,25 +416,7 @@ export default function GuestsPage() {
               className="card"
               style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: 'var(--r-field)',
-                    background: 'var(--green)',
-                    color: 'var(--paper)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '800',
-                    fontSize: '18px',
-                  }}
-                >
-                  2
-                </span>
-                <h2 style={{ fontSize: '22px' }}>Второй гость</h2>
-              </div>
+              <h2 style={{ fontSize: '22px' }}>Гость 2</h2>
               <div
                 style={{
                   display: 'grid',
@@ -388,33 +442,14 @@ export default function GuestsPage() {
                   onChange={v.setName('g2ln')}
                   forceCheck={v.checked}
                 />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label className="lbl" htmlFor="g2dob">
-                    Дата рождения
-                  </label>
-                  <button
-                    type="button"
-                    id="g2dob"
-                    className="input datebtn"
-                    onClick={v.openDob2}
-                    style={{ color: v.dob2Color }}
-                  >
-                    {v.dob2}
-                  </button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span className="lbl">Пол</span>
-                  <div className="seg">
-                    <label>
-                      <input type="radio" name="g2sex" />
-                      Мужской
-                    </label>
-                    <label style={{ borderLeft: '2px solid var(--line-strong)' }}>
-                      <input type="radio" name="g2sex" defaultChecked={true} />
-                      Женский
-                    </label>
-                  </div>
-                </div>
+                <DobField
+                  g="g2"
+                  text={v.dob2}
+                  color={v.dob2Color}
+                  onOpen={v.openDob2}
+                  showError={v.checked && !v.hasDob2}
+                />
+                <SexChoice g="g2" value={v.sex.g2} onPick={v.setSex('g2')} showError={v.checked} />
               </div>
             </section>
             {/* Wishes */}
@@ -476,16 +511,19 @@ export default function GuestsPage() {
               onAttempt={() => !v.checked && logic.setState({ checked: true })}
               missing={() => {
                 const dob = (logic.state.dob || {}) as Record<string, unknown>;
+                const sex = (logic.state.sex || {}) as Record<string, unknown>;
                 const m: Missing[] = [];
                 const n = v.names;
                 const bad = (k: keyof typeof n, what: 'имя' | 'фамилию') => !!nameError(n[k], what);
                 if (bad('g1fn', 'имя') || bad('g1ln', 'фамилию'))
-                  m.push({ label: 'имя и фамилию 1-го гостя латиницей, как в паспорте', target: '#g1fn' });
+                  m.push({ label: 'имя и фамилию 1-го гостя английскими буквами, как в паспорте', target: '#g1fn' });
                 if (!dob.g1) m.push({ label: 'дату рождения 1-го гостя', target: '#g1dob' });
+                if (!sex.g1) m.push({ label: 'пол 1-го гостя', target: '#g1sex' });
                 if (v.phoneError) m.push({ label: 'телефон для связи', target: '#g1ph' });
                 if (bad('g2fn', 'имя') || bad('g2ln', 'фамилию'))
-                  m.push({ label: 'имя и фамилию 2-го гостя латиницей, как в паспорте', target: '#g2fn' });
+                  m.push({ label: 'имя и фамилию 2-го гостя английскими буквами, как в паспорте', target: '#g2fn' });
                 if (!dob.g2) m.push({ label: 'дату рождения 2-го гостя', target: '#g2dob' });
+                if (!sex.g2) m.push({ label: 'пол 2-го гостя', target: '#g2sex' });
                 return m;
               }}
             />

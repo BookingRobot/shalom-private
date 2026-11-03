@@ -1,15 +1,17 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, useRef } from 'react';
 import { FeedbackWidget } from './feedback/FeedbackWidget';
 import { useHelp } from '../context/HelpContext';
 import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../data/contacts';
+import { addD, iso, shortDate, toD } from '../lib/dates';
 import { PhoneCodeSelect } from './PhoneCodeSelect';
 import { CheckIcon, CloseIcon, HeadsetIcon } from './icons';
+import './HelpWidget.css';
 
-/** What the current page already knows about the guest's plans (used to prefill the form). */
+/** What the current page already knows about the guest's plans (sent along with the request). */
 export interface HelpContextInfo {
   /** sanatorium the guest is looking at, e.g. "Санаторий Эгле Комфорт, Друскининкай" */
   hotel?: string;
-  /** resort key when no specific sanatorium is chosen yet */
+  /** resort key when no specific sanatorium is chosen yet (kept for callers) */
   dest?: string;
   in?: string;
   out?: string;
@@ -23,64 +25,50 @@ interface Props {
   pageState?: { in?: string; out?: string; checkin?: string; nights?: number };
 }
 
-const DESTINATIONS: [string, string][] = [
-  ['', 'Ещё не знаю — подскажите'],
-  ['druskininkai', 'Друскининкай'],
-  ['birstonas', 'Бирштонас'],
-  ['palanga', 'Паланга'],
-  ['anyksciai', 'Аникщяй'],
-];
-
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-
-const fieldLabel: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '6px' };
-const labelText = (size: number): CSSProperties => ({
-  fontWeight: '700',
-  fontSize: `${size}px`,
-  color: 'var(--ink-2)',
-});
-const textInput: CSSProperties = {
-  minHeight: '48px',
-  border: '2px solid var(--line-strong)',
-  borderRadius: 'var(--r-field)',
-  padding: '0 16px',
-  font: '500 18px Manrope,sans-serif',
-  width: '100%',
-  boxSizing: 'border-box',
+/** resort keys of HelpContextInfo.dest */
+const DEST_NAMES: Record<string, string> = {
+  druskininkai: 'Друскининкай',
+  birstonas: 'Бирштонас',
+  palanga: 'Паланга',
+  anyksciai: 'Аникщяй',
 };
-const smallField: CSSProperties = {
-  minHeight: '52px',
-  border: '2px solid var(--line-strong)',
-  borderRadius: 'var(--r-field)',
-  padding: '0 12px',
-  font: '600 17px Manrope,sans-serif',
-  width: '100%',
-  boxSizing: 'border-box',
-  background: 'var(--paper)',
-};
+
+/** «9–18 ноября» or «28 ноября – 5 декабря»; empty when a date is missing or broken. */
+function stayText(a: string, b: string): string {
+  if (!a || !b) return '';
+  const d1 = toD(a);
+  const d2 = toD(b);
+  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return '';
+  return d1.getUTCMonth() === d2.getUTCMonth()
+    ? `${d1.getUTCDate()}–${shortDate(d2)}`
+    : `${shortDate(d1)} – ${shortDate(d2)}`;
+}
 
 /**
  * The «Свяжитесь со мной» support pop-up (opened from the help band above the footer and from
- * page buttons). Same on every page; dates and destination are prefilled from what the page knows.
+ * page buttons). Four fields only: name, phone, e-mail (optional), question. What the page already
+ * knows (sanatorium or resort, dates) goes with the request and is shown as one quiet line.
  */
 export function HelpWidget({ ctx, pageState = {} }: Props) {
   const { status, close, send } = useHelp();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
 
-  let helpIn = pageState.in || pageState.checkin || ctx.in || '';
+  const helpIn = pageState.in || pageState.checkin || ctx.in || '';
   let helpOut = pageState.out || ctx.out || '';
-  if (!pageState.out && pageState.checkin) {
-    const d = new Date(pageState.checkin + 'T00:00:00Z');
-    helpOut = iso(new Date(d.getTime() + (pageState.nights || 9) * 86400000));
-  }
-  const dests = [...DESTINATIONS];
-  if (ctx.hotel) dests.splice(2, 0, ['hotel', ctx.hotel]);
-  const selected = ctx.hotel ? 'hotel' : ctx.dest || '';
-  const prefilled = !!(helpIn || selected);
+  if (!pageState.out && pageState.checkin) helpOut = iso(addD(toD(pageState.checkin), pageState.nights || 9));
+  const stay = stayText(helpIn, helpOut);
+  const place = ctx.hotel || (ctx.dest ? DEST_NAMES[ctx.dest] : '') || '';
+  const known = [place, stay].filter(Boolean).join(', ');
 
-  // keyboard: Esc closes, focus moves into the dialog
+  // keyboard: focus moves into the window when it opens, Esc closes, focus returns to the opener
   useEffect(() => {
-    if (status === 'closed') return;
+    if (status === 'closed') {
+      openerRef.current?.focus({ preventScroll: true });
+      openerRef.current = null;
+      return;
+    }
+    if (!openerRef.current && document.activeElement instanceof HTMLElement) openerRef.current = document.activeElement;
     dialogRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
     window.addEventListener('keydown', onKey);
@@ -94,316 +82,112 @@ export function HelpWidget({ ctx, pageState = {} }: Props) {
 
       {status !== 'closed' && (
         <div
+          className="hw-overlay"
           dir="ltr"
           lang="ru"
           data-canvas="help-form"
           onClick={(e) => e.target === e.currentTarget && close()}
-          style={{
-            position: 'fixed',
-            inset: '0',
-            background: 'rgba(18,34,27,.55)',
-            zIndex: '70',
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            padding: '40px 16px',
-            overflow: 'auto',
-            fontFamily: "Manrope,'Segoe UI',Arial,sans-serif",
-            color: 'var(--ink)',
-          }}
         >
           <div
             ref={dialogRef}
+            className="hw-dialog"
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="helpTitle"
-            style={{
-              background: 'var(--paper)',
-              borderRadius: 'var(--r-field)',
-              width: 'min(720px,100%)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '18px',
-              padding: '26px 28px 24px',
-              boxShadow: '0 24px 60px rgba(0,0,0,.35)',
-              outline: 'none',
-            }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-              <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                <span
-                  style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '50%',
-                    background: 'var(--green-soft)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flex: 'none',
-                  }}
-                >
+            <div className="hw-head">
+              <div className="hw-head-main">
+                <span className="hw-head-icon" aria-hidden="true">
                   <HeadsetIcon size={28} color="var(--green)" strokeWidth={1.8} />
                 </span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h2
-                    id="helpTitle"
-                    style={{
-                      fontFamily: 'Montserrat,Manrope,sans-serif',
-                      fontSize: '24px',
-                      fontWeight: '600',
-                      margin: '0',
-                      lineHeight: '1.2',
-                    }}
-                  >
+                <div>
+                  <h2 id="helpTitle" className="hw-title">
                     Свяжитесь со мной
                   </h2>
-                  <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                    Ответим на русском в течение 2 часов (9:00–20:00)
-                  </span>
+                  <p className="hw-sub">Ответим на русском в течение 2 часов, ежедневно 9:00–20:00</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={close}
-                aria-label="Закрыть"
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  border: '2px solid var(--line-strong)',
-                  background: 'var(--paper)',
-                  borderRadius: 'var(--r-field)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 'none',
-                }}
-              >
-                <CloseIcon size={20} />
+              <button type="button" className="hw-close" onClick={close} aria-label="Закрыть">
+                <CloseIcon size={22} />
               </button>
             </div>
 
             {status === 'form' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit,minmax(min(260px,100%),1fr))',
-                    gap: '14px',
-                  }}
-                >
-                  <label style={fieldLabel}>
-                    <span style={labelText(16)}>Имя</span>
-                    <input type="text" placeholder="Например: Михаил" autoComplete="name" style={textInput} />
+              <div className="hw-direct">
+                <span className="hw-direct-label">Можно сразу:</span>
+                <a className="hw-link" href={WHATSAPP_URL}>
+                  WhatsApp
+                </a>
+                <a className="hw-link" href={PHONE_TEL} dir="ltr">
+                  {PHONE_DISPLAY}
+                </a>
+              </div>
+            )}
+
+            {status === 'form' && (
+              <div className="hw-form">
+                <div className="hw-two">
+                  <label className="hw-field">
+                    <span className="hw-label">Имя</span>
+                    <input type="text" className="hw-input" placeholder="Например: Михаил" autoComplete="name" />
                   </label>
-                  <label style={fieldLabel}>
-                    <span style={labelText(16)}>E-mail</span>
-                    <input type="email" placeholder="name@gmail.com" autoComplete="email" style={textInput} />
+                  <label className="hw-field">
+                    <span className="hw-label">Телефон</span>
+                    <span className="hw-phone">
+                      <PhoneCodeSelect className="hw-input hw-code" />
+                      <input
+                        type="tel"
+                        className="hw-input"
+                        inputMode="numeric"
+                        placeholder="50 123 4567"
+                        autoComplete="tel-national"
+                      />
+                    </span>
                   </label>
                 </div>
-                <label style={fieldLabel}>
-                  <span style={labelText(16)}>Телефон</span>
-                  <span style={{ display: 'flex', gap: '8px' }}>
-                    <PhoneCodeSelect
-                      style={{
-                        minHeight: '48px',
-                        border: '2px solid var(--line-strong)',
-                        borderRadius: 'var(--r-field)',
-                        padding: '0 12px',
-                        font: '700 17px Manrope,sans-serif',
-                        background: 'var(--paper)',
-                        flex: 'none',
-                        width: '170px',
-                      }}
-                    />
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="50 123 4567"
-                      autoComplete="tel-national"
-                      style={textInput}
-                    />
+
+                <label className="hw-field">
+                  <span className="hw-label">
+                    E-mail <span className="hw-opt">не обязательно</span>
                   </span>
+                  <input type="email" className="hw-input" placeholder="name@gmail.com" autoComplete="email" />
                 </label>
-                <label style={fieldLabel}>
-                  <span style={labelText(16)}>Ваш вопрос</span>
+
+                <label className="hw-field">
+                  <span className="hw-label">Ваш вопрос</span>
                   <textarea
                     rows={3}
+                    className="hw-input hw-textarea"
                     placeholder="Например: какой санаторий лучше для суставов? Можно ли приехать с внуком?"
-                    style={{
-                      minHeight: '100px',
-                      border: '2px solid var(--line-strong)',
-                      borderRadius: 'var(--r-field)',
-                      padding: '12px 16px',
-                      font: '500 17px Manrope,sans-serif',
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      resize: 'vertical',
-                    }}
                   />
                 </label>
+                {known && (
+                  <p className="hw-known">
+                    <CheckIcon size={18} color="var(--green)" strokeWidth={2.5} />
+                    <span>К заявке приложим ваш поиск: {known}</span>
+                  </p>
+                )}
 
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    background: 'var(--sand)',
-                    border: '1px solid var(--line)',
-                    borderRadius: 'var(--r-field)',
-                    padding: '14px 16px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      justifyContent: 'space-between',
-                      gap: '10px',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <strong style={{ fontSize: '16px' }}>Если уже знаете — так мы поможем быстрее</strong>
-                    <span style={{ fontSize: '16px', color: 'var(--muted)' }}>не обязательно</span>
-                  </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(min(190px,100%),1fr))',
-                      gap: '12px',
-                    }}
-                  >
-                    <label style={fieldLabel}>
-                      <span style={labelText(15)}>Заезд, примерно</span>
-                      <input type="date" defaultValue={helpIn} key={helpIn} style={smallField} />
-                    </label>
-                    <label style={fieldLabel}>
-                      <span style={labelText(15)}>Выезд, примерно</span>
-                      <input type="date" defaultValue={helpOut} key={helpOut} style={smallField} />
-                    </label>
-                    <label style={{ ...fieldLabel, gridColumn: '1 / -1' }}>
-                      <span style={labelText(15)}>Куда хотите поехать</span>
-                      <select defaultValue={selected} key={selected} style={{ ...smallField, boxSizing: undefined }}>
-                        {dests.map(([value, text]) => (
-                          <option key={value} value={value}>
-                            {text}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
-                  {prefilled && (
-                    <span
-                      style={{
-                        fontSize: '16px',
-                        color: 'var(--green)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                      }}
-                    >
-                      <CheckIcon size={16} color="var(--green)" strokeWidth={2.5} />
-                      Заполнили по вашему поиску — можно изменить
-                    </span>
-                  )}
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '14px',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <span style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: '340px' }}>
-                    Нужно указать имя и телефон или e-mail. Данные используем только для ответа.
-                  </span>
-                  <button
-                    type="button"
-                    onClick={send}
-                    style={{
-                      minHeight: '50px',
-                      padding: '0 24px',
-                      border: 'none',
-                      borderRadius: 'var(--r-field)',
-                      background: 'var(--green)',
-                      color: 'var(--paper)',
-                      font: '700 18px Manrope,sans-serif',
-                      cursor: 'pointer',
-                    }}
-                  >
+                <div className="hw-foot">
+                  <p className="hw-note">Нужно указать имя и телефон. Используем их только для ответа.</p>
+                  <button type="button" className="hw-send" onClick={send}>
                     Отправить
                   </button>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    flexWrap: 'wrap',
-                    borderTop: '1px solid var(--line)',
-                    paddingTop: '14px',
-                    fontSize: '16px',
-                  }}
-                >
-                  <span style={{ color: 'var(--ink-2)' }}>Или сразу:</span>
-                  <a href={WHATSAPP_URL} style={{ fontWeight: '700', color: 'var(--green)' }}>
-                    WhatsApp
-                  </a>
-                  <a href={PHONE_TEL} style={{ fontWeight: '700', color: 'var(--green)', whiteSpace: 'nowrap' }}>
-                    {PHONE_DISPLAY}
-                  </a>
                 </div>
               </div>
             )}
 
             {status === 'sent' && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  padding: '6px 0 4px',
-                }}
-              >
-                <span
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    background: 'var(--green)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
+              <div className="hw-sent">
+                <span className="hw-sent-icon">
                   <CheckIcon size={34} color="var(--paper)" strokeWidth={2.6} />
                 </span>
-                <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '23px', fontWeight: '600' }}>
-                  Спасибо! Мы скоро свяжемся с вами
-                </strong>
-                <span style={{ fontSize: '17px', color: 'var(--ink-2)' }}>
+                <strong className="hw-sent-title">Спасибо! Мы скоро свяжемся с вами</strong>
+                <p className="hw-sent-text">
                   Консультант ответит в течение 2 часов в рабочее время. Ваш поиск и выбор на этой странице сохранены.
-                </span>
-                <button
-                  type="button"
-                  onClick={close}
-                  style={{
-                    minHeight: '48px',
-                    padding: '0 22px',
-                    border: '2px solid var(--green)',
-                    borderRadius: 'var(--r-field)',
-                    background: 'var(--paper)',
-                    color: 'var(--green)',
-                    font: '700 18px Manrope,sans-serif',
-                    cursor: 'pointer',
-                  }}
-                >
+                </p>
+                <button type="button" className="hw-back" onClick={close}>
                   Вернуться
                 </button>
               </div>

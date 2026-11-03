@@ -48,15 +48,18 @@ test('booking: home search to the order confirmation', async ({ page }) => {
   await answerRoadQuestions(page, '/guests');
   await expect(page).toHaveURL(/\/guests/);
 
-  // step 3: both guests, a date of birth each, the phone
+  // step 3: both guests, a date of birth and gender each, the phone
   await page.locator('#g1fn').fill('Mikhail');
   await page.locator('#g1ln').fill('Levin');
   await pickBirthDate(page, '#g1dob');
+  // gender is never pre-chosen: the guest taps it
+  await page.locator('#g1sex').getByText('Мужской').click();
   await page.locator('#g1ph').fill('50 123 4567');
   await page.locator('#g1em').fill('levin@example.com');
   await page.locator('#g2fn').fill('Irina');
   await page.locator('#g2ln').fill('Levina');
   await pickBirthDate(page, '#g2dob', '1962', '3');
+  await page.locator('#g2sex').getByText('Женский').click();
   await clickNext(page, '/payment');
   await expect(page).toHaveURL(/\/payment/);
 

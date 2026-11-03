@@ -213,6 +213,67 @@ html:has(body.has-stepbar) {
   }
 }
 
+/* phone: the quiet line «Осталось выбрать: … · Показать ↑» inside the bar (StepNext.tsx);
+   a laptop keeps the green bubble over «Далее» instead */
+.step-left {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+.step-left-t {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* at most two lines: the bar stays low, the full list comes with «Далее» */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.step-left-t strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.page .step-left-go,
+.step-left-go {
+  flex: none;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--green-line);
+  border-radius: var(--r-field);
+  background: var(--green-soft);
+  color: var(--green);
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (min-width: 761px) {
+  .step-left {
+    display: none;
+  }
+}
+/* phone: while the guest types, the keyboard is up — the bar slides away (and the floating
+   buttons it lifted come down); it is back as soon as the field loses the focus */
+@media (max-width: 760px) {
+  body.kb-open .step-bar.on {
+    transform: translateY(110%);
+    visibility: hidden;
+    transition:
+      transform 0.3s cubic-bezier(0.22, 0.8, 0.24, 1),
+      visibility 0s linear 0.3s;
+  }
+  body.kb-open.has-stepbar .fb-btn,
+  body.kb-open.has-stepbar .fb-toast,
+  body.kb-open.has-stepbar .help-fab {
+    translate: none;
+  }
+}
+
 /* the basket (phone): the order box opens from here; on a laptop the box is beside the page */
 .step-basket {
   display: none;

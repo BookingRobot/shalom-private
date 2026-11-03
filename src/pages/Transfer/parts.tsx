@@ -1,6 +1,6 @@
 import type { TransferVals } from './transferLogic';
 
-/** «Уже оплачено»: what the sanatorium or the flight package pays — a stamp, not a choice */
+/** «Входит в цену»: what the sanatorium or the flight package covers — a plain note, not a choice */
 export function PaidStamp({ children }: { children: string }) {
   return (
     <span className="paid-stamp">

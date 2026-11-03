@@ -303,3 +303,11 @@
   flex: 1 1 100%;
   min-width: 0;
 }
+@media (max-width: 760px) {
+  /* the date bar's «Гости» label: plain 16 px words instead of small capitals */
+  body .page.pg-hotel .gp-inline-l {
+    font-size: 16px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}

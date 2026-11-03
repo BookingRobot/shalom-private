@@ -20,6 +20,8 @@ export interface CalendarCell {
   pick?: () => void;
   /** price-calendar variant: main text instead of the day number */
   text?: string;
+  /** a chosen day (check-in / check-out): gets a check mark; by default a full green fill means chosen */
+  sel?: boolean;
 }
 
 export interface CalendarMonth {
@@ -91,14 +93,40 @@ export function MonthsCalendar({
                 <Fragment key={j}>
                   <button
                     type="button"
-                    className="cell"
+                    className={'cell' + ((c.sel ?? c.bg === 'var(--green)') ? ' on' : '')}
                     onClick={c.pick}
                     disabled={!!c.off}
                     aria-label={c.aria}
                     style={{ background: c.bg, borderColor: c.border, color: c.color, cursor: c.cursor }}
                   >
+                    {(c.sel ?? c.bg === 'var(--green)') && (
+                      <span className="mc-check" aria-hidden="true">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="m5 12.5 4.5 4.5L19 7.5" />
+                        </svg>
+                      </span>
+                    )}
                     <span>{c.day}</span>
-                    <small style={{ color: c.subColor }}>{c.sub}</small>
+                    <small style={{ color: c.subColor }}>
+                      {/* the « €» hides on a phone so the price fits; the legend says the prices are in € */}
+                      {typeof c.sub === 'string' && /\s€$/.test(c.sub) ? (
+                        <>
+                          {c.sub.slice(0, -2)}
+                          <span className="mc-cur"> €</span>
+                        </>
+                      ) : (
+                        c.sub
+                      )}
+                    </small>
                     {c.fly && (
                       <span
                         style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}

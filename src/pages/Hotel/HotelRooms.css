@@ -290,6 +290,11 @@
 }
 
 @media (max-width: 760px) {
+  /* block heading by the owner's phone scale (22–24 px) */
+  .pg-hotel .hr-head h2 {
+    font-size: 24px;
+    line-height: 1.2;
+  }
   .pg-hotel .hr-specs,
   .pg-hotel .hr-times {
     grid-template-columns: 1fr;

@@ -89,7 +89,11 @@ export function quoteOf(req: QuoteRequest): Quote {
       unit: there.price,
       amount: there.price,
       note:
-        there.kind === 'free' ? 'организует санаторий, уже оплачен' : there.kind === 'package' ? 'в пакете' : undefined,
+        there.kind === 'free'
+          ? 'организует санаторий, входит в цену'
+          : there.kind === 'package'
+            ? 'в пакете'
+            : undefined,
     });
     if (t.back && t.backPlace) {
       const back = legOf(b, t.backPlace);
@@ -100,7 +104,11 @@ export function quoteOf(req: QuoteRequest): Quote {
         unit: back.price,
         amount: back.price,
         note:
-          back.kind === 'free' ? 'организует санаторий, уже оплачен' : back.kind === 'package' ? 'в пакете' : undefined,
+          back.kind === 'free'
+            ? 'организует санаторий, входит в цену'
+            : back.kind === 'package'
+              ? 'в пакете'
+              : undefined,
       });
     }
   }

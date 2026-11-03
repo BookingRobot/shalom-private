@@ -296,22 +296,15 @@
   background: var(--green);
   color: var(--paper);
 }
-/* «Уже оплачено»: a stamp, slightly tilted, so it does not read as a button or a choice */
+/* «Входит в цену»: plain green words with a tick — no frame, no tilt, so it reads as a fact, not a button */
 .pg-transfer .paid-stamp {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 2px 9px 2px 7px;
-  border: 2px solid var(--green);
-  border-radius: 6px;
   color: var(--green);
-  background: rgba(230, 242, 234, 0.7);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   white-space: nowrap;
-  transform: rotate(-3deg);
 }
 .pg-transfer .tr-how {
   display: flex;
@@ -826,6 +819,12 @@
 .pg-transfer .tr-title h1 {
   font-size: 32px;
 }
+/* «Оплата — только на последнем шаге»: one quiet line under the step title */
+.pg-transfer .tr-pay-note {
+  margin: 6px 0 0;
+  font-size: 17px;
+  color: var(--ink-2);
+}
 
 /* ── small helpers shared by the questions ── */
 .pg-transfer .tr-h2 {
@@ -934,51 +933,7 @@
   pointer-events: none;
 }
 
-/* ── «Нет, доберусь сам»: the window and the quiet card after it ── */
-.pg-transfer .tr-dim {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: rgba(20, 28, 24, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.pg-transfer .tr-dialog {
-  max-width: 560px;
-  width: 100%;
-  padding: 28px 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: var(--sh-modal);
-}
-.pg-transfer .tr-dialog-h {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.pg-transfer .tr-dialog-ico {
-  flex: none;
-}
-.pg-transfer .tr-dialog-note {
-  padding: 14px 16px;
-  background: var(--green-soft);
-  border-radius: var(--r-field);
-  font-size: 16px;
-}
-.pg-transfer .tr-dialog-btns {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding-top: 4px;
-}
-.pg-transfer .btn.tr-dialog-main {
-  min-height: 52px;
-  font-size: 18px;
-}
+/* ── «Нет, трансфер не нужен»: the calm note under the answer ── */
 .pg-transfer .tr-none {
   padding: 22px 26px;
   display: flex;

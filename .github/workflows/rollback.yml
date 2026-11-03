@@ -1,0 +1,55 @@
+name: Rollback — publish an earlier version
+
+# Puts an earlier version of the site back online without touching main:
+# Actions → «Rollback — publish an earlier version» → Run workflow → «ref» = a branch, tag or
+# commit (default: pries-60plus, the site as it was before the 60+ readability work).
+# The next push to main publishes main again.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Version to publish: branch, tag or commit (e.g. pries-60plus)'
+        required: true
+        default: pries-60plus
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-rollback
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_FEEDBACK_URL: ${{ vars.VITE_FEEDBACK_URL }}
+          VITE_DEMO: ${{ vars.VITE_DEMO }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

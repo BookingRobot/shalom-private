@@ -284,6 +284,70 @@
   padding: 16px 24px 18px;
 }
 .pg-results .res-main,
+/* the one-line search summary: only below 1081 px (see the media rule below) */
+.pg-results .res-sum {
+  display: none;
+}
+@media (max-width: 1080px) {
+  .pg-results .res-sum {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+    color: #fff;
+  }
+  .pg-results .res-sum-t {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    min-width: 0;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  .pg-results .res-sum-t strong {
+    font-size: 18px;
+  }
+  .pg-results .res-sum-btn {
+    flex: none;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: var(--r-field);
+    background: #fff;
+    color: var(--green);
+    font: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+  .pg-results .res-sum-btn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+  }
+  .pg-results .res-band:not(.res-band-edit) .res-form {
+    display: none;
+  }
+  .pg-results .res-band-edit .res-form {
+    margin-top: 14px;
+  }
+  /* the summary already says the dates and the guests */
+  .pg-results .res-sub {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .pg-results .res-band-in {
+    padding: 10px 16px 12px;
+  }
+  .pg-results .res-sum-t {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 16px;
+  }
+}
 .pg-results .res-crumbs,
 .pg-results .res-head {
   max-width: 1180px;

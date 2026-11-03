@@ -126,7 +126,7 @@ class RoomsLogic extends PageLogic<RoomsState> {
     const st = this.state;
     const NIGHTS = daysBetween(toD(booking.checkin), toD(booking.checkout));
     const G = { adults: booking.adults, children: booking.children };
-    const eur = (n: number) => fmt(n) + ' €';
+    const eur = (n: number) => fmt(n) + '\u00a0€';
     const tierOf = (p: Program) => ('tier' in p ? p.tier : undefined);
     const isExtra = (p: Program) => 'extra' in p && !!p.extra;
 
@@ -163,7 +163,8 @@ class RoomsLogic extends PageLogic<RoomsState> {
         totalSum: eur(stayTotal(p.price + roomPrice.add, G)),
         facts: p.value.map(([k, big, label, sub]) => ({ d: ICON_PATHS[k], big, label, sub })),
         btnLabel: on ? 'Выбрана' : 'Выбрать ' + shortName(p.name),
-        btnCls: on || rec ? 'btn-primary' : 'btn-secondary',
+        // filled green only for the chosen one: the recommended card is marked by its badge alone
+        btnCls: on ? 'btn-primary' : 'btn-secondary',
         pick: () => this.setState({ prog: p.id }),
         openMore: () => this.setState({ more: p.id }),
       };
@@ -246,7 +247,7 @@ const Check = ({ size = 18 }: { size?: number }) => (
 function ProgramCard({ p }: { p: ProgramCardVals }) {
   return (
     <article className={'pg-card' + (p.on ? ' on' : '') + (p.rec ? ' rec' : '')} aria-label={p.name}>
-      {p.rec ? <span className="pg-badge">Рекомендуем Atlantis</span> : null}
+      {p.rec ? <span className="pg-badge">Советуем</span> : null}
       <h2 className="pg-name">{p.name}</h2>
       <span className={'pg-tag ' + p.tagCls}>{p.tag}</span>
       <div className="pg-price">
@@ -340,7 +341,7 @@ function ProgramModal({
       <div className="pm" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
         <div className="pm-head">
           <div className="pm-head-t">
-            {m.rec ? <span className="pg-badge pm-badge">Рекомендуем Atlantis</span> : null}
+            {m.rec ? <span className="pg-badge pm-badge">Советуем</span> : null}
             <h2 id="pmTitle">{m.name}</h2>
             <span className={'pg-tag ' + m.tagCls}>{m.tag}</span>
           </div>

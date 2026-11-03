@@ -135,11 +135,30 @@ function BasketWindow({ children, onClose, onNext }: { children: ReactNode; onCl
 export const AdvanceNote = ({
   order,
 }: {
-  order: { advanceLabel: string; restLabel: string; dueDate: string; fullOnly: boolean };
+  order: {
+    advanceLabel: string;
+    restLabel: string;
+    dueDate: string;
+    fullOnly: boolean;
+    restAtSan?: boolean;
+    sanRestLabel?: string;
+    flightRestLabel?: string;
+  };
 }) => (
   <div className="os-advance">
     {order.fullOnly ? (
       <>До заезда меньше недели — оплата сразу всей суммы.</>
+    ) : order.restAtSan ? (
+      <>
+        Цена фиксируется после депозита <strong>{order.advanceLabel}</strong>.{' '}
+        {order.flightRestLabel ? (
+          <>
+            Остаток за перелёт <strong className="os-nowrap">{order.flightRestLabel}</strong> — до {order.dueDate}.{' '}
+          </>
+        ) : null}
+        Остаток за санаторий <strong className="os-nowrap">{order.sanRestLabel}</strong> оплачиваете в санатории при
+        заезде.
+      </>
     ) : (
       <>
         Цена фиксируется после депозита <strong>{order.advanceLabel}</strong>. Остаток{' '}
@@ -167,6 +186,6 @@ export function orderPriceRows(order: {
       ? [[order.flightName || 'Перелёт Тель-Авив ⇄ Вильнюс и трансфер', order.flightLabel] as [string, string]]
       : []),
     ...(order.transfer ? [[order.transferKind, order.transferLabel] as [string, string]] : []),
-    ...(order.sanTransfer ? [['Трансфер санатория', 'уже оплачен'] as [string, string]] : []),
+    ...(order.sanTransfer ? [['Трансфер санатория', 'входит в цену'] as [string, string]] : []),
   ];
 }

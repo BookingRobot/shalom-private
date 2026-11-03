@@ -233,3 +233,38 @@ button.dob-crumb {
     animation: none;
   }
 }
+/* phone: the window slides up from the bottom, under the thumb, with large years / months / days */
+@media (max-width: 760px) {
+  .page .dob-back {
+    align-items: flex-end;
+    padding: 24px 0 0;
+  }
+  .page .dob {
+    width: 100%;
+    max-height: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
+    animation-name: dobSheet;
+  }
+  .page .dob-crumb {
+    min-height: 44px;
+  }
+  .page .dob .pick {
+    min-height: 52px;
+    font-size: 18px;
+  }
+  .page .dob-grid-d .pick {
+    min-height: 48px;
+    font-size: 18px;
+  }
+  .page .dob-wd {
+    font-size: 16px;
+  }
+}
+@keyframes dobSheet {
+  from {
+    transform: translateY(100%);
+  }
+}

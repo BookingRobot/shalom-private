@@ -105,3 +105,113 @@
 .pg-done .row strong {
   white-space: nowrap;
 }
+/* hero: title, the order number on its own line, one money line, one «now» line */
+.pg-done .dn-h1 {
+  font-size: 36px;
+  line-height: 1.15;
+  margin: 0;
+}
+.pg-done .dn-order {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.pg-done .dn-order-text {
+  font-size: 22px;
+}
+.pg-done .dn-order-text strong {
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+.pg-done .dn-copy {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--r-field);
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--green);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.pg-done .dn-copy.is-done {
+  background: var(--sel-bg);
+  border-color: var(--green);
+}
+.pg-done .dn-money {
+  font-family: Montserrat, Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+.pg-done .dn-now {
+  font-size: 18px;
+  color: var(--ink-2);
+}
+.pg-done .dn-h2 {
+  font-size: 26px;
+  margin: 0;
+}
+.pg-done .dn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 4px;
+}
+/* «Что взять с собой»: a short list in body size */
+.pg-done .dn-bring {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pg-done .dn-bring ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg-done .dn-bring li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 18px;
+}
+.pg-done .dn-bring li svg {
+  flex: none;
+  margin-top: 4px;
+}
+.pg-done .dn-home {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  font-weight: 700;
+  font-size: 18px;
+}
+@media (max-width: 760px) {
+  .pg-done .dn-h1 {
+    font-size: 28px;
+  }
+  .pg-done .dn-money {
+    font-size: 18px;
+  }
+  .pg-done .dn-h2 {
+    font-size: 24px;
+  }
+  .pg-done .dn-bring {
+    padding: 20px 16px;
+  }
+  .pg-done .btn {
+    white-space: normal;
+    text-align: center;
+  }
+}

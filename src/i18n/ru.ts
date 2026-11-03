@@ -20,6 +20,7 @@ export const ru = {
   steps: {
     aria: 'Шаги оформления',
     step: 'Шаг {n}',
+    stepOf: 'Шаг {n} из {total}',
     labels: {
       rooms: 'Номер',
       transfer: 'Дорога',
