@@ -59,6 +59,8 @@ export interface Booking {
   progress: 0 | 1 | 2 | 3 | 4;
   /** step 3's form as the page keeps it (names, dates of birth, phone) */
   details?: GuestDetails;
+  /** what the guest paid on step 4: the deposit or the whole sum (set on «Оплатить») */
+  paid?: 'adv' | 'full';
 }
 
 /** Step 3's form: names as in the passport, dates of birth, gender, the contact phone. */

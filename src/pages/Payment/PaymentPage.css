@@ -275,15 +275,15 @@
   }
 }
 
-/* what is paid today; the full sum and the schedule fold out */
+/* what is paid today; the full sum and the schedule fold out.
+   One level of boxes: plain lines inside the card, no tinted inner box (reviewer D #10). */
 .pg-payment .pay-now {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px 18px;
-  border-radius: var(--r-field);
-  background: var(--green-soft);
-  border: 1px solid var(--green-line);
+}
+.pg-payment .pay-now .plan-title {
+  font-size: 22px;
 }
 .pg-payment .pay-now-h {
   display: flex;
@@ -291,14 +291,51 @@
   flex-wrap: wrap;
   gap: 8px 12px;
 }
-.pg-payment .pay-rest {
-  padding-left: 14px;
-  border-left: 3px solid var(--green-line);
-}
 .pg-payment .pay-more {
-  border: 1px solid var(--line);
-  border-radius: var(--r-field);
-  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+.pg-payment .pay-h1 {
+  font-size: 32px;
+}
+@media (max-width: 760px) {
+  .pg-payment .pay-h1 {
+    font-size: 30px;
+  }
+}
+/* the consent: a plain row under a hairline, the whole row is the tap target */
+.pg-payment .chk-row {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 4px;
+  min-height: 48px;
+}
+/* one plain sentence right above the pay button */
+.pg-payment .pay-sentence {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+/* a person to ask, right under the pay button */
+.pg-payment .pay-help {
+  margin: -8px 0 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.pg-payment .pay-help-a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+}
+/* the newsletter: optional, after the button, set apart from the consent */
+.pg-payment .pay-news {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  min-height: 48px;
+  font-size: 16px;
+  color: var(--ink-2);
 }
 .pg-payment .pay-more > summary {
   list-style: none;
@@ -307,7 +344,7 @@
   justify-content: space-between;
   gap: 10px;
   min-height: 50px;
-  padding: 0 16px;
+  padding: 0;
   font-weight: 700;
   font-size: 16px;
   color: var(--green);
@@ -332,7 +369,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 4px 16px 16px;
+  padding: 4px 0 0;
   animation: payMoreIn 0.4s cubic-bezier(0.22, 0.8, 0.24, 1) both;
 }
 @keyframes payMoreIn {
