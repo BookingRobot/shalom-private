@@ -61,6 +61,46 @@ export function useLiftFabs(bar: RefObject<HTMLElement | null>, on: boolean) {
   }, [bar, on]);
 }
 
+// focusing these opens no on-screen keyboard
+const NO_KEYBOARD = /^(checkbox|radio|button|submit|reset|range|color|file|image|hidden)$/;
+const opensKeyboard = (el: EventTarget | null) =>
+  el instanceof HTMLTextAreaElement ||
+  el instanceof HTMLSelectElement ||
+  (el instanceof HTMLInputElement && !NO_KEYBOARD.test(el.type));
+
+/**
+ * Phone: while the guest types, the on-screen keyboard is up and the bar would sit right on it
+ * (or jump around with the scroll). The body gets `kb-open` while a text field has the focus;
+ * StepNext.css slides the bar away for that time on phones only (never on a laptop). It comes
+ * back 150 ms after the field loses the focus — moving on to the next field keeps it away.
+ */
+export function useKeyboardOpen() {
+  useEffect(() => {
+    const body = document.body;
+    let t = 0;
+    const on = (e: FocusEvent) => {
+      if (!opensKeyboard(e.target)) return;
+      window.clearTimeout(t);
+      body.classList.add('kb-open');
+    };
+    const off = (e: FocusEvent) => {
+      if (!opensKeyboard(e.target)) return;
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        if (!opensKeyboard(document.activeElement)) body.classList.remove('kb-open');
+      }, 150);
+    };
+    document.addEventListener('focusin', on);
+    document.addEventListener('focusout', off);
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener('focusin', on);
+      document.removeEventListener('focusout', off);
+      body.classList.remove('kb-open');
+    };
+  }, []);
+}
+
 /** Scroll to a spot on the page and light it up for a moment. */
 export function showSpot(target: string) {
   const el = document.querySelector<HTMLElement>(target);
@@ -132,6 +172,7 @@ export function StepNext({
   }, []);
 
   useLiftFabs(bar, !rowSeen);
+  useKeyboardOpen();
 
   // forms on the steps are plain inputs: look again after every change, typing or click
   useEffect(() => {
@@ -264,6 +305,23 @@ export function StepNext({
       </NextTip>
     );
 
+  // phone (≤ 760 px, where the bubble is hidden): one quiet line inside the bar instead —
+  // the first thing still missing and «Показать ↑». Never together with the yellow list
+  // (rule 1 above); when all is in, nothing extra — «Далее» itself is the cue (StepNext.css
+  // hides the line on a laptop, which keeps the bubble)
+  const gap = gaps?.[0];
+  const line =
+    gap && !left.length ? (
+      <div className="step-left" role="status">
+        <span className="step-left-t">
+          Осталось {gap.todo || TODO[verb] || 'выбрать'}: <strong>{gap.label}</strong>
+        </span>
+        <button type="button" className="step-left-go" onClick={() => show(gap)}>
+          Показать ↑
+        </button>
+      </div>
+    ) : null;
+
   const nextBtn = (cls: string) => (
     <button
       type="button"
@@ -280,6 +338,7 @@ export function StepNext({
     <>
       <div className="step-row" ref={row}>
         {rowSeen ? hint : null}
+        {rowSeen ? line : null}
         {basket('step-basket-row')}
         <div className="step-row-btns">
           {back ? (
@@ -298,6 +357,7 @@ export function StepNext({
       <div className={'step-bar' + (rowSeen ? '' : ' on')} aria-hidden={rowSeen} ref={bar}>
         <div className="step-bar-in">
           {!rowSeen ? hint : null}
+          {!rowSeen ? line : null}
           <div className="step-bar-row">
             <span className={'step-bar-info' + (hasBasket ? ' has-basket' : '')}>{info}</span>
             {basket('step-basket-bar')}
