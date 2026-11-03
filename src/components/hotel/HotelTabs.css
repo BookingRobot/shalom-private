@@ -454,6 +454,13 @@
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
+  position: relative;
+}
+/* «26 отзывов»: a finger-sized (44 px) hit area without changing how the line looks */
+.page .ht-reviews-link::after {
+  content: '';
+  position: absolute;
+  inset: -10px -4px;
 }
 .page .ht-wiz svg {
   width: 28px;
@@ -483,7 +490,12 @@
   .pg-hotel div[style*='nowrap'] > button:nth-child(3) > span {
     display: none;
   }
+  /* «Все N фото →» stays readable (nothing under 16 px) */
   .pg-hotel div[style*='nowrap'] > button:nth-child(4) > span {
-    font-size: 13px !important;
+    font-size: 16px !important;
+  }
+  /* photo captions in the tabs: 16 px */
+  .page .ht-photos span {
+    font-size: 16px;
   }
 }

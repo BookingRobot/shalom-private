@@ -48,17 +48,70 @@
   font-size: 16px;
   color: var(--muted);
 }
+/* the main button: this page had no button styles, so «Хочу в …» showed as a grey 13 px browser
+   button — now the same green button as on the sanatorium page */
+.pg-resort .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: var(--r-field);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.25;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+}
+.pg-resort .btn-primary {
+  background: var(--green);
+  color: var(--paper);
+}
+.pg-resort .btn-primary:hover {
+  background: var(--green-deep);
+  color: var(--paper);
+}
 @media (max-width: 760px) {
   .pg-resort .rp-main {
     padding: 16px 12px 40px;
   }
+  /* headings by the owner's phone scale: page 28–32, blocks 22–24 */
   .pg-resort .rs-hero-text h1 {
-    font-size: 36px;
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .pg-resort .rs-main h3 {
+    font-size: 23px;
+    line-height: 1.25;
+  }
+  /* resort switcher: finger-sized links that wrap instead of squeezing */
+  .pg-resort .rp-tabs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+  }
+  /* photo captions (painting names, authors) are read, not squinted at: 16 px, finger-sized links */
+  .pg-resort .rs-pic figcaption {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .pg-resort .rs-pic figcaption a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  /* the sanatorium chips under the story */
+  .pg-resort .ps-chip {
+    min-height: 44px;
   }
   .pg-resort .rp-foot {
     padding: 16px 16px 20px;
   }
   .pg-resort .rp-foot .btn {
     width: 100%;
+    padding: 10px 16px;
+    text-align: center;
   }
 }
