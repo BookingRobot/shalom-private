@@ -137,6 +137,10 @@
 .pg-main .step + .step {
   border-left: 1px solid var(--line);
 }
+/* the step icons keep their size next to longer text */
+.pg-main .step > svg {
+  flex: none;
+}
 .pg-main .num {
   width: 32px;
   height: 32px;
