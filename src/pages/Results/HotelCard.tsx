@@ -9,8 +9,8 @@ import { sanatoriumPath } from '../../lib/seo';
 import { track } from '../../lib/analytics';
 
 /**
- * The rooms of a sanatorium slide out (CSS .rooms-reveal); the page follows them a little so
- * the guest sees them open: the start of the rooms comes up to about a third of the screen.
+ * The rooms of a sanatorium slide out (CSS .rooms-reveal). When they open below the screen,
+ * the page brings their start up to about a third of the screen; in view, nothing moves.
  */
 function revealRooms(id: string) {
   const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -19,18 +19,19 @@ function revealRooms(id: string) {
       const box = document.querySelector('#h-' + id + ' .rooms-reveal');
       if (!box) return;
       const top = box.getBoundingClientRect().top;
-      const want = window.innerHeight * 0.38;
-      const by = top > want ? Math.min(top - want, window.innerHeight * 0.5) : 0;
-      // even when the rooms are already in view, move a little so the opening is noticed
-      window.scrollBy({ top: by || 60, behavior: still ? 'auto' : 'smooth' });
+      // the page moves only when the opened rooms start out of sight; otherwise it stays still
+      if (top < window.innerHeight * 0.8) return;
+      const by = Math.min(top - window.innerHeight * 0.38, window.innerHeight * 0.5);
+      window.scrollBy({ top: by, behavior: still ? 'auto' : 'smooth' });
     }),
   );
 }
 
 /**
  * One sanatorium on the list, short: photo, name and stars, the resort line, who meets the
- * guest, the price, «Номера и программы» and the compare tick. The facts, the procedures and
- * «Когда дешевле?» live on the sanatorium's own page; two cards fit a phone screen.
+ * guest, the price, «Номера и программы» and the compare tick. The one way to the rooms is
+ * that button; the photo, the name and «О санатории» lead to the sanatorium's own page.
+ * Two cards fit a phone screen.
  */
 export function HotelCard({
   h,
@@ -44,6 +45,8 @@ export function HotelCard({
   onTipClose: () => void;
 }) {
   const page = sanatoriumPath(h.id);
+  // «9 ночей» never breaks between the number and the word in the narrow price column
+  const nights = nightsLabel.replace(/ /g, '\u00a0');
   return (
     <article
       className={'card hc' + (h.open ? ' hc-open' : '')}
@@ -69,10 +72,7 @@ export function HotelCard({
             </div>
           ) : null}
           <div className="hc-links">
-            <Link to={page}>
-              <span className="hc-long">Подробнее о санатории →</span>
-              <span className="hc-short">О санатории</span>
-            </Link>
+            <Link to={page}>О санатории</Link>
             <button type="button" className="linkbtn hc-cal" onClick={h.openCal}>
               Когда дешевле?
             </button>
@@ -83,7 +83,7 @@ export function HotelCard({
           </div>
         </div>
         <div className="hc-buy">
-          <PriceBox forTwo={h.price} nightsLabel={nightsLabel} hotelId={h.id} />
+          <PriceBox forTwo={h.price} nightsLabel={nights} hotelId={h.id} />
           {h.tipOn ? (
             <NextTip onClose={onTipClose} className="rm-tip">
               Следующий шаг: <strong>посмотрите номера</strong>
@@ -142,7 +142,7 @@ export function HotelCard({
                 Номера · {h.name}
               </div>
               {h.offers.map((o) => (
-                <RoomCard o={o} nightsLabel={nightsLabel} key={o.id || o.room} />
+                <RoomCard o={o} nightsLabel={nights} key={o.id || o.room} />
               ))}
               <div className="rooms-note">
                 <svg
