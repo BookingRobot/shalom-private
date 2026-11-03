@@ -332,8 +332,8 @@ export default function GuestsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
               <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
-                Имя и фамилия — латиницей, точно как в паспорте, по которому летите. Они нужны санаторию для регистрации
-                и врачу для карты лечения.
+                Имя и фамилия — английскими буквами, точно как в паспорте, по которому летите. Они нужны санаторию для
+                регистрации и врачу для карты лечения.
               </p>
             </div>
             {/* Guest 1 */}
@@ -516,12 +516,12 @@ export default function GuestsPage() {
                 const n = v.names;
                 const bad = (k: keyof typeof n, what: 'имя' | 'фамилию') => !!nameError(n[k], what);
                 if (bad('g1fn', 'имя') || bad('g1ln', 'фамилию'))
-                  m.push({ label: 'имя и фамилию 1-го гостя латиницей, как в паспорте', target: '#g1fn' });
+                  m.push({ label: 'имя и фамилию 1-го гостя английскими буквами, как в паспорте', target: '#g1fn' });
                 if (!dob.g1) m.push({ label: 'дату рождения 1-го гостя', target: '#g1dob' });
                 if (!sex.g1) m.push({ label: 'пол 1-го гостя', target: '#g1sex' });
                 if (v.phoneError) m.push({ label: 'телефон для связи', target: '#g1ph' });
                 if (bad('g2fn', 'имя') || bad('g2ln', 'фамилию'))
-                  m.push({ label: 'имя и фамилию 2-го гостя латиницей, как в паспорте', target: '#g2fn' });
+                  m.push({ label: 'имя и фамилию 2-го гостя английскими буквами, как в паспорте', target: '#g2fn' });
                 if (!dob.g2) m.push({ label: 'дату рождения 2-го гостя', target: '#g2dob' });
                 if (!sex.g2) m.push({ label: 'пол 2-го гостя', target: '#g2sex' });
                 return m;
