@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { DemoMark } from '../../components/DemoMark';
 import { PhoneField } from '../../components/PhoneField';
 import { track } from '../../lib/analytics';
 import { checkPhone, nameError } from '../../lib/guestRules';
@@ -214,7 +215,7 @@ export function TicketOrder({
           <div className="tk-flow-main">
             <h2>Данные пассажиров</h2>
             <p className="tk-flow-lead">
-              Имена и фамилии — как в загранпаспорте, латинскими буквами. Билеты выпишем на эти имена.
+              Имена и фамилии английскими буквами — точно как в паспорте. Билеты выпишем на эти имена.
             </p>
             {v.pax.map((p, i) => (
               <fieldset className="tk-box" key={i}>
@@ -338,7 +339,8 @@ export function TicketOrder({
                 </span>
               ) : null}
               <span className="tk-card-note">
-                Данные карты вводятся в защищённой форме платёжной системы — мы их не видим и не храним. [ПРИМЕР]
+                Данные карты вводятся в защищённой форме платёжной системы — мы их не видим и не храним.
+                <DemoMark> [ПРИМЕР]</DemoMark>
               </span>
             </div>
             {/* the newsletter: optional, not ticked for the guest */}
@@ -359,7 +361,7 @@ export function TicketOrder({
                 }}
               />
               <span>
-                Имена проверены — как в паспорте. Согласен с правилами перевозчика {FLIGHT_FACTS.airline}: билеты не
+                Имена проверены — как в паспорте. Я принимаю правила перевозчика {FLIGHT_FACTS.airline}: билеты не
                 возвращаются, изменения — за доплату. Данные пассажиров передаём авиакомпании по{' '}
                 <Link to="/privacy">политике конфиденциальности</Link>.
               </span>
