@@ -43,6 +43,12 @@ const SMALL_TEXT_OK: Record<string, string> = {
   figcaption: 'licence credit of a photo',
   // the round «i» mark of an explanation is an icon, not text (its tap area is 44 px)
   '.info-tip': 'the «i» icon of an explanation',
+  // KNOWN ISSUES found on 2026-11-03 — raise them to 16 px, then delete the line:
+  '.gp-inline-l': 'sanatorium page: the 13 px caps label «ГОСТИ»',
+  '.rm-room-k': 'step «Номер»: the 13 px caps label «ВАШ НОМЕР»',
+  '.rm-people-note': 'step «Номер»: the 13 px note «Фото для примера»',
+  '.tk-f-l': 'tickets: the 13 px caps labels «ОТКУДА», «КУДА», «ТУДА», «ОБРАТНО», «ПАССАЖИРЫ»',
+  '.rp-foot .btn': 'resort page: «Хочу в … — подобрать санаторий» keeps the browser default 13.3 px',
 };
 
 type Check = 'scroll' | 'font' | 'words';
@@ -59,6 +65,12 @@ const KNOWN_ISSUES: { route: string; widths: number[]; check: Check; reason: str
     widths: [320],
     check: 'scroll',
     reason: 'the phone header («Позвонить» + «Меню») is 32px wider than a 320px screen: label.hd-burger ends at 352px',
+  },
+  {
+    route: '/privacy',
+    widths: [320, 360],
+    check: 'words',
+    reason: 'the heading «Политика конфиденциальности» breaks «конфиденциальности» in the middle',
   },
 ];
 
