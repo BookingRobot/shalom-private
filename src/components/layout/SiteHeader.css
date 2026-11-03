@@ -330,3 +330,19 @@
     display: none;
   }
 }
+/* small phones (320–400 px): logo, «Позвонить» and «Меню» fit in one row without pushing the page sideways */
+@media (max-width: 400px) {
+  .site-header.on-green > div {
+    gap: 8px !important;
+    padding: 0 4px 0 12px !important;
+  }
+  .site-header.on-green .brand img {
+    height: 30px !important;
+  }
+  .site-header .hd-burger {
+    padding: 0 8px;
+  }
+  .site-header .hd-call {
+    padding: 0 10px;
+  }
+}
