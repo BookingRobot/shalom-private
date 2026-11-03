@@ -10,17 +10,17 @@ D — skeptikas, saugo kompiuterio versiją), teisėjo išvada, tekstų peržiū
 
 ## 1. Reikia jūsų sprendimo (be jo keisti negalime)
 
-| # | Klausimas | Kaip dabar | Kodėl svarbu |
-|---|---|---|---|
-| 1 | **Avanso taisyklė.** | Svetainė: 35 € žmogui (+100 € žmogui su skrydžiu). Jūsų anksčiau nurodyta taisyklė — 4 % užsakymo sumos. | Visi tekstai ir skaičiavimai turi rodyti vieną taisyklę. |
-| 2 | **Kur ir kada mokamas likutis kiekvienoje sanatorijoje.** | Dabar visur suvienodinta pagal kode esančią taisyklę: Eglė (ji pati pasitinka svečius) — likutis sanatorijoje atvykus; kitos — mums iki termino (3 mėn. iki atvykimo). | Svečias neturi gauti skirtingų atsakymų. Patvirtinkite arba pataisykite taisyklę kiekvienai sanatorijai. |
-| 3 | **Patvirtinimo terminas ir ką darome, jei sanatorija atsako „ne“.** | Mokėjimo puslapis: „perduodame užsakymą sanatorijai“; patvirtinimas — iki kitos dienos. | Recenzentas C siūlo pažadą „jei vietų nebus — grąžinsime avansą per N dienų“. Reikia jūsų žodžio. |
-| 4 | **Tarpinės reikšmės taisyklėse.** | `[N часов]`, `[N дней]`, `[первых суток]`, `[уточнить по санаториям]` (`src/pages/Rules/RulesPage.tsx`). | Su `VITE_DEMO=0` jos vis tiek matysis — reikia tikrų skaičių. |
-| 5 | **Darbo laikas.** | „Ежедневно с 9:00 до 20:00“. | Ar tikrai dirbate ir šeštadienį (šabą)? Jei ne — parašyti tikslų grafiką. |
-| 6 | **Nuotraukų bankų veidai kaip personalas.** | Tie patys 3 „gydytojai“ prie visų sanatorijų (rezultatai, palyginimas, 1 žingsnis). | Pastebėjęs netikrą veidą, 60+ svečias nustoja tikėti ir kitais dalykais (C). Reikia tikrų nuotraukų arba keisti į ženkliukus. |
-| 7 | **YouTube nuoroda kurorto lange.** | Yra. | Jūsų taisyklė — be YouTube nuorodų. Palikti ar išimti? |
-| 8 | **„С медицинской справкой депозит возвращаем полностью в любой срок“.** | Taisyklėse ir mokėjimo puslapyje. | Pažadas be sąlygų per stiprus; neaišku, kas nutinka su likusia suma. Patikrinti su sanatorijomis. |
-| 9 | **Užsakymo numeris.** | Patvirtinime demonstracinis „12345“. | Tikras numeris turi ateiti iš užsakymų sistemos (API). |
+| #   | Klausimas                                                               | Kaip dabar                                                                                                                                                             | Kodėl svarbu                                                                                                                  |
+| --- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Avanso taisyklė.**                                                    | Svetainė: 35 € žmogui (+100 € žmogui su skrydžiu). Jūsų anksčiau nurodyta taisyklė — 4 % užsakymo sumos.                                                               | Visi tekstai ir skaičiavimai turi rodyti vieną taisyklę.                                                                      |
+| 2   | **Kur ir kada mokamas likutis kiekvienoje sanatorijoje.**               | Dabar visur suvienodinta pagal kode esančią taisyklę: Eglė (ji pati pasitinka svečius) — likutis sanatorijoje atvykus; kitos — mums iki termino (3 mėn. iki atvykimo). | Svečias neturi gauti skirtingų atsakymų. Patvirtinkite arba pataisykite taisyklę kiekvienai sanatorijai.                      |
+| 3   | **Patvirtinimo terminas ir ką darome, jei sanatorija atsako „ne“.**     | Mokėjimo puslapis: „perduodame užsakymą sanatorijai“; patvirtinimas — iki kitos dienos.                                                                                | Recenzentas C siūlo pažadą „jei vietų nebus — grąžinsime avansą per N dienų“. Reikia jūsų žodžio.                             |
+| 4   | **Tarpinės reikšmės taisyklėse.**                                       | `[N часов]`, `[N дней]`, `[первых суток]`, `[уточнить по санаториям]` (`src/pages/Rules/RulesPage.tsx`).                                                               | Su `VITE_DEMO=0` jos vis tiek matysis — reikia tikrų skaičių.                                                                 |
+| 5   | **Darbo laikas.**                                                       | „Ежедневно с 9:00 до 20:00“.                                                                                                                                           | Ar tikrai dirbate ir šeštadienį (šabą)? Jei ne — parašyti tikslų grafiką.                                                     |
+| 6   | **Nuotraukų bankų veidai kaip personalas.**                             | Tie patys 3 „gydytojai“ prie visų sanatorijų (rezultatai, palyginimas, 1 žingsnis).                                                                                    | Pastebėjęs netikrą veidą, 60+ svečias nustoja tikėti ir kitais dalykais (C). Reikia tikrų nuotraukų arba keisti į ženkliukus. |
+| 7   | **YouTube nuoroda kurorto lange.**                                      | Yra.                                                                                                                                                                   | Jūsų taisyklė — be YouTube nuorodų. Palikti ar išimti?                                                                        |
+| 8   | **„С медицинской справкой депозит возвращаем полностью в любой срок“.** | Taisyklėse ir mokėjimo puslapyje.                                                                                                                                      | Pažadas be sąlygų per stiprus; neaišku, kas nutinka su likusia suma. Patikrinti su sanatorijomis.                             |
+| 9   | **Užsakymo numeris.**                                                   | Patvirtinime demonstracinis „12345“.                                                                                                                                   | Tikras numeris turi ateiti iš užsakymų sistemos (API).                                                                        |
 
 ---
 
@@ -61,6 +61,29 @@ Skliaustuose — darbo apimtis ir kas siūlė (A, B, C, D — recenzentai).
 21. **Patvirtinimo `.ics` failas** naudoja `TZID=Europe/Vilnius` be laiko zonos aprašo — patikrinti Outlook. (mažas)
 22. **Svečių skaitiklis** pagrindiniame puslapyje iš pradžių rodo „2 взрослых“. Tai pradinė reikšmė, ne atsakymas,
     bet jei norite visiškai tuščio lauko — reikia jūsų sprendimo.
+23. **„Далее“ su neužpildytais laukais** — iškart nuslinkti prie pirmo trūkstamo lauko ir jį fokusuoti (dabar tai
+    daro mygtukas „Показать ↑“). Keičia žingsnių elgseną ir testus, todėl atskiras darbas. (vidutinis; A, B)
+24. **„Далее“ pulsavimas** (4 kartus, kai viskas užpildyta) — teisėjas siūlo išjungti visai, nes jūsų taisyklė
+    „jokio mirksėjimo“; užtenka eilutės „✓ Всё заполнено“. (mažas)
+25. **Android:** uždarius klaviatūrą „atgal“ gestu, apatinė juosta grįžta tik palietus kitur — pridėti
+    `visualViewport` patikrą. (mažas)
+26. **Raudonas „Ваши пожелания“** — žingsniuose palikti poraštėje vietos, kad mygtukas neuždengtų nuorodų
+    (išvaizda nekeičiama). (mažas; A)
+27. **Patikrinti atidarytas būsenas automatiškai** (meniu, kalendoriai, filtrai) — naujas `tests/e2e/layout.spec.ts`
+    dabar tikrina tik puslapius be atidarytų langų. (mažas)
+
+### Kas jau matuojama
+
+Ta pati patikra prieš ir po (visi puslapiai ir atidaryti langai, 320 / 390 / 1366 px pločiai):
+
+| Rodiklis                         | Prieš | Po                                          |
+| -------------------------------- | ----- | ------------------------------------------- |
+| Puslapiai su šoniniu slinkimu    | 8     | 0                                           |
+| Vieni prielinksniai eilutės gale | 485   | 41                                          |
+| Nukirpti tekstai                 | 75    | 0                                           |
+| Per vidurį perskelti žodžiai     | 24    | 19 (daugiausia atidarytuose languose)       |
+| Paspaudimo vietos < 44 px        | 1037  | 370 (daugiausia kompiuterio pelės nuorodos) |
+| Silpno kontrasto vietos          | 157   | 112                                         |
 
 ---
 
@@ -88,8 +111,8 @@ Didžiausia žala — ne žodžiai, o skirtingi faktai skirtinguose puslapiuose.
 
 ## 4. Kaip grąžinti ankstesnę versiją
 
-- **Greičiausia:** GitHub → *Actions* → „Rollback — publish an earlier version“ → *Run workflow* → laukelyje
-  `ref` palikite `pries-60plus` → *Run*. Po ~3 min svetainė vėl bus tokia, kokia buvo prieš šiuos darbus.
+- **Greičiausia:** GitHub → _Actions_ → „Rollback — publish an earlier version“ → _Run workflow_ → laukelyje
+  `ref` palikite `pries-60plus` → _Run_. Po ~3 min svetainė vėl bus tokia, kokia buvo prieš šiuos darbus.
   Kitas pakeitimas į `main` vėl publikuos naujausią versiją.
-- **Visam laikui:** GitHub → *Pull requests* → šio darbo PR → *Revert* → sujungti naują PR.
+- **Visam laikui:** GitHub → _Pull requests_ → šio darbo PR → _Revert_ → sujungti naują PR.
 - Atsarginė šaka `pries-60plus` = būsena prieš darbus (commit `72f2c24`).
