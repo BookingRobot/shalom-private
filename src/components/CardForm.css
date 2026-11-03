@@ -1,18 +1,15 @@
-/* the card form: one field per line on a phone, the date and CVV side by side */
+/* the card form: one field per line on a phone, the date and CVV side by side.
+   The fields sit directly in the «Оплата картой» card — no extra box inside a box. */
 .cf {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px 20px;
-  border: 1px solid var(--green-line);
-  border-radius: var(--r-card);
-  background: var(--sand);
+  gap: 16px;
 }
 .cf-safe {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 16px;
   color: var(--ink);
 }
@@ -24,6 +21,19 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+/* labels a 60+ guest reads without glasses: 17 px, bold */
+.cf-f .lbl {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.cf-hint {
+  margin-top: -2px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--muted);
 }
 .cf-row {
   display: grid;
@@ -56,36 +66,12 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.06em;
 }
-.cf-opt {
-  font-weight: 500;
-  color: var(--muted);
-}
-.cf-pays {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.cf-pays > span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  border-radius: var(--r-field);
-  font-weight: 700;
-  font-size: 16px;
-}
-.cf-apple {
-  background: var(--ink);
-  color: var(--paper);
-}
-.cf-gpay {
-  background: var(--paper);
-  border: 2px solid var(--ink);
-  color: var(--ink);
-}
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .cf {
-    padding: 14px;
-    gap: 12px;
+    gap: 14px;
+  }
+  /* a finger-sized field on a phone */
+  .page .cf .input {
+    min-height: 54px;
   }
 }
