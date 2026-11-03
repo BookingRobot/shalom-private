@@ -222,7 +222,7 @@ export default function PaymentPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 className="pay-h1">Последний шаг — оплата</h1>
               <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
-                Заказ подтверждается после оплаты. Санаторий бронирует номер за вами сразу.
+                После оплаты сразу передаём заказ в санаторий и пришлём подтверждение в WhatsApp.
               </p>
             </div>
             {/* Plan */}
