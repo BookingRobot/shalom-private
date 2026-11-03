@@ -472,13 +472,13 @@ export default function GuestsPage() {
                   Итого: <strong>{order.totalLabel}</strong>
                 </>
               }
+              // after «Далее» every field shows what is wrong with it (not before the guest typed)
+              onAttempt={() => !v.checked && logic.setState({ checked: true })}
               missing={() => {
                 const dob = (logic.state.dob || {}) as Record<string, unknown>;
                 const m: Missing[] = [];
                 const n = v.names;
                 const bad = (k: keyof typeof n, what: 'имя' | 'фамилию') => !!nameError(n[k], what);
-                // from now on every field shows what is wrong with it
-                if (!v.checked) logic.setState({ checked: true });
                 if (bad('g1fn', 'имя') || bad('g1ln', 'фамилию'))
                   m.push({ label: 'имя и фамилию 1-го гостя латиницей, как в паспорте', target: '#g1fn' });
                 if (!dob.g1) m.push({ label: 'дату рождения 1-го гостя', target: '#g1dob' });
