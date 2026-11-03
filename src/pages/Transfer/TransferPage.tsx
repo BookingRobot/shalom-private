@@ -61,8 +61,10 @@ export default function TransferPage() {
               <InfoTitle
                 tag="h1"
                 title="Дорога до санатория"
-                info="Сначала перелёт, затем трансфер — от аэропорта до стойки регистрации санатория."
+                info="От аэропорта Вильнюса до санатория — около 2 часов на машине. Не знаете, как лучше? Консультант позвонит и подскажет."
               />
+              {/* a common fear: «Далее» already takes money */}
+              <p className="tr-pay-note">Оплата — только на последнем шаге.</p>
             </div>
             <div data-canvas="transfer-flight">
               <FlightChoice />
