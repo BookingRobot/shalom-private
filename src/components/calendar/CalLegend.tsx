@@ -10,6 +10,8 @@ const PLANE = 'M2 20h20M3.5 15.5l16-5.5a2 2 0 0 0-1.3-3.8l-4.7 1.6L7 4 5 4.7l3.8
 export function CalLegend() {
   return (
     <div className="cal-legend">
+      {/* phone only: the days show the price without « €» */}
+      <span className="lg lg-cur">Цифра под числом — цена в € с человека за сутки</span>
       <span className="lg">
         <i style={{ background: 'var(--green-soft)', border: '1px solid var(--green-line)' }} />
         дешевле
