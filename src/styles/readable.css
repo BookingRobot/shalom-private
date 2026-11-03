@@ -145,9 +145,9 @@ body .pg-transfer .fly-help {
   min-height: 44px;
   color: var(--green);
 }
-/* «Уже оплачено»: normal case, readable size */
+/* «Входит в цену»: normal case, readable size */
 body .pg-transfer .paid-stamp {
-  font-size: 15px;
+  font-size: 16px;
   text-transform: none;
   letter-spacing: 0;
 }
