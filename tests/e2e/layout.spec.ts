@@ -41,6 +41,8 @@ const MIN_FONT_PX = 15;
 const SMALL_TEXT_OK: Record<string, string> = {
   // photo credits under the resort photos (author · licence · Wikimedia Commons): legal attribution
   figcaption: 'licence credit of a photo',
+  // the round «i» mark of an explanation is an icon, not text (its tap area is 44 px)
+  '.info-tip': 'the «i» icon of an explanation',
 };
 
 type Check = 'scroll' | 'font' | 'words';
@@ -110,7 +112,8 @@ function analyse({ minFont, okSmall }: { minFont: number; okSmall: string[] }): 
     );
     if (!own || !shown(el)) continue;
     const size = parseFloat(getComputedStyle(el).fontSize);
-    if (size >= minFont || okSmall.some((s) => el.closest(s))) continue;
+    // font-size 0 hides the text on purpose (the children carry their own size)
+    if (!size || size >= minFont || okSmall.some((s) => el.closest(s))) continue;
     small.add(`${size}px ${say(el)}`);
   }
 
