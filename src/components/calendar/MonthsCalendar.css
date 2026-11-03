@@ -53,3 +53,69 @@
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 18px 28px;
 }
+/* a day that cannot be chosen: still readable (4.5:1), but plainly crossed out */
+.months-calendar .cell:disabled {
+  color: var(--muted) !important;
+  font-weight: 500;
+  cursor: default;
+}
+.months-calendar .cell:disabled > span:not([title]) {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.months-calendar .cell:disabled:hover {
+  border-color: transparent;
+}
+/* a chosen day: the full green fill plus a check mark */
+.months-calendar .cell .mc-check {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  line-height: 0;
+  color: var(--paper);
+}
+@media (max-width: 760px) {
+  /* the price without « €» so it fits at a readable size; the legend says the prices are in € */
+  .cal-dlg .months-calendar .cell .mc-cur {
+    display: none;
+  }
+  /* finger-sized days: the grid gets the full width, the ‹ › buttons sit beside the month name */
+  .cal-dlg.cd .months-calendar {
+    position: relative;
+  }
+  .cal-dlg.cd .months-calendar .navbtn {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .cal-dlg.cd .months-calendar .navbtn:first-child {
+    left: 0;
+  }
+  .cal-dlg.cd .months-calendar .navbtn:last-child {
+    right: 0;
+  }
+  .cal-dlg.cd .months-calendar .mc-months > div > div:first-child {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 48px;
+  }
+  .cal-dlg.cd .months-calendar .cell {
+    min-height: 54px;
+    font-size: 18px;
+    gap: 3px;
+    padding: 4px 0;
+  }
+  .cal-dlg.cd .months-calendar .cell small {
+    font-size: 13px;
+    line-height: 1.1;
+    white-space: normal;
+    text-align: center;
+  }
+  .cal-dlg.cd .months-calendar .wd {
+    font-size: 16px;
+  }
+}

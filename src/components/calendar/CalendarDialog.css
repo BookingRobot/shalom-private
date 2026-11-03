@@ -157,3 +157,27 @@
     animation: none;
   }
 }
+/* phone: what the colours mean in a readable size; the prices in the days are in € */
+@media (max-width: 760px) {
+  .page .cal-dlg.cd .cal-legend .lg {
+    font-size: 16px;
+  }
+  .cal-legend .lg-cur {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 761px) {
+  .cal-legend .lg-cur {
+    display: none !important;
+  }
+}
+/* small phones: a narrower frame so each day is about 40 px wide */
+@media (max-width: 400px) {
+  .cal-dlg.cd {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .cal-dlg.cd .months-calendar [style*='repeat(7'] {
+    gap: 2px !important;
+  }
+}
