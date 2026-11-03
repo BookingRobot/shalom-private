@@ -38,7 +38,10 @@ const MIN_FONT_PX = 15;
  * Text that may stay under 15 px, as CSS selectors matched with `closest()`. Keep it short and give
  * the reason: only legal fine print and tiny badges belong here, never body text.
  */
-const SMALL_TEXT_OK: Record<string, string> = {};
+const SMALL_TEXT_OK: Record<string, string> = {
+  // photo credits under the resort photos (author · licence · Wikimedia Commons): legal attribution
+  figcaption: 'licence credit of a photo',
+};
 
 type Check = 'scroll' | 'font' | 'words';
 
