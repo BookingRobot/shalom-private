@@ -3,10 +3,19 @@ import { PHONE_CODES_FULL } from '../data/phoneCodes';
 import { checkPhone, formatAsTyped } from '../lib/guestRules';
 import './PhoneField.css';
 
+/** «+972 · Израиль» → the code «+972» and the country «Израиль». */
+function splitLabel(label: string) {
+  // \s also matches the no-break space the build-time typography may put around «·»
+  const [dial = '', country = ''] = label.split(/\s*·\s*/);
+  return { dial, country };
+}
+
 /**
  * Country code + number, the same in every form: the number is spaced the way that country
  * writes it while typing, checked when the guest leaves the field, and a landline gets a
  * gentle note (WhatsApp needs a mobile). `error` from the form's own check wins.
+ * On a phone the closed list shows only the code (`.phone-code-v` over the native select,
+ * whose own text is hidden), so the number gets the width; the open list keeps the countries.
  */
 export function PhoneField({
   id,
@@ -28,12 +37,13 @@ export function PhoneField({
   const [touched, setTouched] = useState(false);
   const check = touched && number ? checkPhone(code, number) : null;
   const shown = error || check?.error || '';
+  const { dial, country } = splitLabel(code);
   return (
     <span className={'phone-field ' + className}>
       <span className="phone-row">
         <select
           className="input phone-code"
-          aria-label="Код страны"
+          aria-label={country ? 'Код страны: ' + country : 'Код страны'}
           value={code}
           onChange={(e) => {
             onCode(e.target.value);
@@ -46,6 +56,9 @@ export function PhoneField({
             </option>
           ))}
         </select>
+        <span className="phone-code-v" aria-hidden="true">
+          {dial}
+        </span>
         <input
           id={id}
           className="input phone-num"
