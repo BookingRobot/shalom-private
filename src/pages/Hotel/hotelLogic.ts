@@ -13,8 +13,12 @@ import { buildOffers } from './hotelOffers';
 import { priceProgramsFor, rangeLabel } from './hotelPricing';
 import type { HotelProgram, HotelRoom, HotelState, HotelVals, NearDate, Specialization, StayTimes } from './hotelTypes';
 
-/** Check-in / check-out: per-sanatorium parameters (come from the hotel record). */
-const stayTimes = (checkin: Date, checkout: Date): StayTimes => ({
+/**
+ * Check-in / check-out: per-sanatorium parameters (come from the hotel record). The rest of the
+ * price is collected at the desk only where the sanatorium itself takes the guest from the
+ * airport (transferBySanatorium); everywhere else it is paid before arrival.
+ */
+const stayTimes = (checkin: Date, checkout: Date, restAtDesk: boolean): StayTimes => ({
   checkin: '14:00',
   checkinDate: WEEKDAYS_FULL[checkin.getUTCDay()] + ', ' + shortDate(checkin),
   checkout: '12:00',
@@ -32,7 +36,7 @@ const stayTimes = (checkin: Date, checkout: Date): StayTimes => ({
     },
     {
       t: 'Регистрация',
-      s: 'паспорт каждого гостя; остаток оплачивается на стойке',
+      s: restAtDesk ? 'паспорт каждого гостя; остаток оплачивается на стойке' : 'паспорт каждого гостя',
       d: 'M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6',
     },
   ],
@@ -187,7 +191,7 @@ export class HotelLogic extends PageLogic<HotelState> {
         ? 'Как добраться — трансфер от санатория'
         : 'Как добраться и заказать трансфер',
       specs,
-      times: stayTimes(checkin, checkout),
+      times: stayTimes(checkin, checkout, transferBySanatorium(info.id)),
       specOpen: !!sec.spec,
       toggleSpec: secT('spec'),
       timeOpen: !!sec.time,
