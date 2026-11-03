@@ -240,12 +240,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
+    min-height: 52px;
     border-radius: var(--r-field);
     border: 1.5px solid var(--green);
     background: var(--paper);
     color: var(--green);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     text-decoration: none;
   }
@@ -261,7 +261,7 @@
   }
   .site-header .hd-seg button {
     flex: 1 1 0;
-    min-height: 42px;
+    min-height: 48px;
     border: 0;
     border-radius: var(--r-field);
     background: transparent;
