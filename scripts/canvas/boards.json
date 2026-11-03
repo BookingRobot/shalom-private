@@ -505,6 +505,41 @@
           }
         ]
       }
+    ],
+    "phone": [
+      { "file": "Phone-home.dc.html", "title": "Телефон · 1 · Главная и поиск", "route": "/", "viewport": "phone" },
+      {
+        "file": "Phone-results.dc.html",
+        "title": "Телефон · 2 · Результаты",
+        "route": "/results",
+        "viewport": "phone"
+      },
+      {
+        "file": "Phone-hotel.dc.html",
+        "title": "Телефон · 3 · Санаторий",
+        "route": "/sanatoriy/egle-comfort",
+        "viewport": "phone"
+      },
+      {
+        "file": "Phone-rooms.dc.html",
+        "title": "Телефон · Шаг 1 · Номер и программа",
+        "route": "/rooms",
+        "viewport": "phone"
+      },
+      {
+        "file": "Phone-transfer.dc.html",
+        "title": "Телефон · Шаг 2 · Дорога",
+        "route": "/transfer",
+        "viewport": "phone"
+      },
+      { "file": "Phone-guests.dc.html", "title": "Телефон · Шаг 3 · Гости", "route": "/guests", "viewport": "phone" },
+      {
+        "file": "Phone-payment.dc.html",
+        "title": "Телефон · Шаг 4 · Оплата",
+        "route": "/payment",
+        "viewport": "phone"
+      },
+      { "file": "Phone-done.dc.html", "title": "Телефон · Заказ принят", "route": "/done", "viewport": "phone" }
     ]
   }
 }
