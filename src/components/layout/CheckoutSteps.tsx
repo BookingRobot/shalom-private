@@ -40,7 +40,20 @@ export function CheckoutSteps({
       </span>
     ) : null;
   return (
-    <div className="checkout-steps-bar">
+    <div className={'checkout-steps-bar' + (finished ? ' fin' : '')}>
+      {/* phone: one line in words — «Шаг 2 из 4 · Дорога» — and four short bars */}
+      {finished ? null : (
+        <div className="steps-phone">
+          <span className="steps-phone-t">
+            {t('steps.stepOf', { n: current, total: steps.length })} · <strong>{labels[current - 1]}</strong>
+          </span>
+          <span className="steps-phone-bar" aria-hidden="true">
+            {steps.map((_, i) => (
+              <i key={i} className={i + 1 < current ? 'done' : i + 1 === current ? 'on' : ''} />
+            ))}
+          </span>
+        </div>
+      )}
       <div className={'checkout-steps' + (compact ? ' compact' : '')} aria-label={t('steps.aria')}>
         {steps.map((label, i) => {
           const n = i + 1;

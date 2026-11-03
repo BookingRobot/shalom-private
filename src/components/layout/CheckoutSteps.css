@@ -142,3 +142,46 @@
     translate: 0 -4px;
   }
 }
+
+/* phone: «Шаг 2 из 4 · Дорога» in words instead of bare numbers (laptop keeps the row above) */
+.steps-phone {
+  display: none;
+}
+@media (max-width: 760px) {
+  .checkout-steps-bar .checkout-steps {
+    display: none !important;
+  }
+  .checkout-steps-bar.fin {
+    border-bottom: 0;
+  }
+  .steps-phone {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 8px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .steps-phone strong {
+    color: var(--green);
+    font-weight: 800;
+  }
+  .steps-phone-bar {
+    display: flex;
+    gap: 4px;
+    flex: none;
+  }
+  .steps-phone-bar i {
+    width: 22px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--line-strong);
+  }
+  .steps-phone-bar i.done,
+  .steps-phone-bar i.on {
+    background: var(--green);
+  }
+}
