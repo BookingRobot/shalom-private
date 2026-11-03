@@ -439,27 +439,33 @@ body .pg-main .card.resort:hover {
   }
 }
 @media (max-width: 760px) {
+  /* phone: a compact hero, so «Найти санаторий» is on the first iPhone screen (390×664) */
   .pg-main .hero-in {
-    padding-top: 40px;
+    padding: 16px 16px 0;
   }
   .pg-main .hero h1 {
-    font-size: 33px;
+    font-size: 30px;
+    line-height: 1.12;
+    letter-spacing: -0.3px;
   }
   .pg-main .hero-sub {
+    margin-top: 8px;
     font-size: 17px;
+    line-height: 1.35;
   }
   .pg-main .hero-search {
-    margin-top: 40px;
+    margin-top: 14px;
   }
   .pg-main .hero-bg {
     object-position: 62% 40%;
   }
+  /* a calm, even shade: the white text stays readable over the whole photo */
   .pg-main .hero-shade {
     background: linear-gradient(
       180deg,
-      rgba(14, 38, 28, 0.52) 0,
-      rgba(14, 38, 28, 0.26) 40%,
-      rgba(14, 38, 28, 0.1) 100%
+      rgba(14, 38, 28, 0.56) 0,
+      rgba(14, 38, 28, 0.36) 45%,
+      rgba(14, 38, 28, 0.2) 100%
     );
   }
   .pg-main .sec-head h2 {
@@ -475,6 +481,14 @@ body .pg-main .card.resort:hover {
 @media (max-width: 520px) {
   .pg-main .resorts {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 374px) {
+  /* small phones (320–374 px): a slightly smaller logo keeps «Позвонить» and «Меню» on the
+     screen, so the page never moves sideways */
+  .page.pg-main .site-header .brand img {
+    height: 28px !important;
+    width: auto;
   }
 }
 @media (prefers-reduced-motion: reduce) {

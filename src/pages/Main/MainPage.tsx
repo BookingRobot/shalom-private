@@ -445,7 +445,7 @@ export default function MainPage() {
           </div>
           <p className="pop-note">Цены ориентировочные — точную стоимость покажем после поиска.</p>
         </section>
-        {/* Three steps */}
+        {/* The four booking steps, named as in the steps row: Номер · Дорога · Гости · Оплата */}
         <section
           style={{
             maxWidth: '1340px',
@@ -457,7 +457,7 @@ export default function MainPage() {
             gap: '12px',
           }}
         >
-          <h2 style={{ fontSize: '22px' }}>Как забронировать — три шага</h2>
+          <h2 style={{ fontSize: '22px' }}>Как забронировать — 4 шага</h2>
           <div className="card" style={{ display: 'flex', flexWrap: 'wrap' }}>
             <div className="step">
               <span className="num">1</span>
@@ -476,12 +476,36 @@ export default function MainPage() {
                 <circle cx="17" cy="17" r="3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '16px' }}>Выберите санаторий</strong>
-                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Сравните программы и стоимость.</span>
+                <strong style={{ fontSize: '16px' }}>Номер</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
+                  Выберите санаторий и номер — сравните программы и цены.
+                </span>
               </div>
             </div>
             <div className="step">
               <span className="num">2</span>
+              <svg
+                width="34"
+                height="34"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--green)"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
+              </svg>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <strong style={{ fontSize: '16px' }}>Дорога</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
+                  Перелёт и трансфер — добавьте, если нужно.
+                </span>
+              </div>
+            </div>
+            <div className="step">
+              <span className="num">3</span>
               <svg
                 width="34"
                 height="34"
@@ -498,12 +522,12 @@ export default function MainPage() {
                 <path d="M2 21v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v3M15 21v-3a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v3" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '16px' }}>Укажите данные гостей</strong>
-                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>При необходимости добавьте трансфер.</span>
+                <strong style={{ fontSize: '16px' }}>Гости</strong>
+                <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Укажите данные гостей, как в паспорте.</span>
               </div>
             </div>
             <div className="step">
-              <span className="num">3</span>
+              <span className="num">4</span>
               <svg
                 width="34"
                 height="34"
@@ -518,9 +542,9 @@ export default function MainPage() {
                 <path d="M2 6h20v12H2zM2 10h20M6 15h4" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <strong style={{ fontSize: '16px' }}>Внесите депозит</strong>
+                <strong style={{ fontSize: '16px' }}>Оплата</strong>
                 <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                  35 € с человека, остаток — за 3 месяца до заезда.
+                  Депозит 35 € с человека, остаток — в срок, указанный при оплате.
                 </span>
               </div>
             </div>
