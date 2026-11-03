@@ -61,6 +61,29 @@ Skliaustuose — darbo apimtis ir kas siūlė (A, B, C, D — recenzentai).
 21. **Patvirtinimo `.ics` failas** naudoja `TZID=Europe/Vilnius` be laiko zonos aprašo — patikrinti Outlook. (mažas)
 22. **Svečių skaitiklis** pagrindiniame puslapyje iš pradžių rodo „2 взрослых“. Tai pradinė reikšmė, ne atsakymas,
     bet jei norite visiškai tuščio lauko — reikia jūsų sprendimo.
+23. **„Далее“ su neužpildytais laukais** — iškart nuslinkti prie pirmo trūkstamo lauko ir jį fokusuoti (dabar tai
+    daro mygtukas „Показать ↑“). Keičia žingsnių elgseną ir testus, todėl atskiras darbas. (vidutinis; A, B)
+24. **„Далее“ pulsavimas** (4 kartus, kai viskas užpildyta) — teisėjas siūlo išjungti visai, nes jūsų taisyklė
+    „jokio mirksėjimo“; užtenka eilutės „✓ Всё заполнено“. (mažas)
+25. **Android:** uždarius klaviatūrą „atgal“ gestu, apatinė juosta grįžta tik palietus kitur — pridėti
+    `visualViewport` patikrą. (mažas)
+26. **Raudonas „Ваши пожелания“** — žingsniuose palikti poraštėje vietos, kad mygtukas neuždengtų nuorodų
+    (išvaizda nekeičiama). (mažas; A)
+27. **Patikrinti atidarytas būsenas automatiškai** (meniu, kalendoriai, filtrai) — naujas `tests/e2e/layout.spec.ts`
+    dabar tikrina tik puslapius be atidarytų langų. (mažas)
+
+### Kas jau matuojama
+
+Ta pati patikra prieš ir po (visi puslapiai ir atidaryti langai, 320 / 390 / 1366 px pločiai):
+
+| Rodiklis | Prieš | Po |
+|---|---|---|
+| Puslapiai su šoniniu slinkimu | 8 | 0 |
+| Vieni prielinksniai eilutės gale | 485 | 41 |
+| Nukirpti tekstai | 75 | 0 |
+| Per vidurį perskelti žodžiai | 24 | 19 (daugiausia atidarytuose languose) |
+| Paspaudimo vietos < 44 px | 1037 | 370 (daugiausia kompiuterio pelės nuorodos) |
+| Silpno kontrasto vietos | 157 | 112 |
 
 ---
 
