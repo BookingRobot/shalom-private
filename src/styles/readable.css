@@ -246,3 +246,14 @@ body .page .tk-step button {
     font-size: clamp(22px, 7vw, 30px);
   }
 }
+
+/* small capital labels («ГОСТИ», «ВАШ НОМЕР») read as plain 16 px words */
+body .page .gp-inline-l,
+body .pg-rooms .rm-room-k {
+  font-size: 16px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+body .pg-rooms .rm-people-note {
+  font-size: 16px;
+}
