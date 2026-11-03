@@ -1,23 +1,136 @@
+import { useEffect, useState } from 'react';
 import { VanIcon } from '../../components/icons';
 import { PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from '../../data/contacts';
 import { Link } from 'react-router-dom';
 import { HeaderBar, Brand, PhoneLink } from '../../components/layout/SiteHeader';
 import { CheckoutSteps } from '../../components/layout/CheckoutSteps';
 import { guestNames, orderSummary } from '../../lib/orderSummary';
-import { daysBetween, nightsWord, plural, shortDate, toD } from '../../lib/dates';
-import { fmt } from '../../lib/format';
+import { MONTHS, addD, daysBetween, nightsWord, plural, shortDate, toD } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
+import type { Booking } from '../../data/booking';
+import { transferBySanatorium } from '../../data/transferPolicy';
+import { DEPOSIT_FLIGHT_PP, persons } from '../../lib/pricing';
+import { fmt } from '../../lib/format';
 import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { SiteFooter } from '../../components/layout/SiteFooter';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './DonePage.css';
 
-const HELP_CTX: HelpContextInfo = {
-  hotel: 'Санаторий Эгле Комфорт, Друскининкай',
-  in: '2026-11-09',
-  out: '2026-11-18',
-};
+/** The order number: shown big in the hero and read out to the consultant. [ПРИМЕР ДАННЫХ] */
+const ORDER_NO = '12345';
+const HOTEL_NAME = 'Эгле Комфорт';
+const HOTEL_ADDRESS = 'Eglės g. 1, Druskininkai';
+
+/** What to pack — the same for every sanatorium until each one gets its own list. */
+const BRING = [
+  'Паспорт',
+  'Медицинская страховка',
+  'Выписки и назначения врача',
+  'Удобная обувь',
+  'Купальник и шапочка для бассейна',
+];
+
+/**
+ * What is paid and what is still due — the same rule as step 4: where the sanatorium meets its
+ * guests itself (Eglė), its rest is paid at the sanatorium on arrival; only the flight rest comes to us.
+ */
+function payState(b: Booking, o: ReturnType<typeof orderSummary>) {
+  const eur = (n: number) => fmt(n) + ' €';
+  const full = (b.paid ?? (o.fullOnly ? 'full' : 'adv')) === 'full';
+  const atSan = transferBySanatorium(b.hotelId);
+  const flightRest = o.flight ? Math.max(0, o.flight - DEPOSIT_FLIGHT_PP * persons(b)) : 0;
+  const before = full ? 0 : atSan ? flightRest : o.rest; // paid to us by the due date
+  const onArrival = full ? 0 : atSan ? o.rest - flightRest : 0; // paid at the sanatorium
+  const restText = [
+    before ? (atSan ? 'Перелёт: остаток ' : 'Остаток ') + eur(before) + ' — до ' + o.dueDate + '.' : '',
+    onArrival
+      ? (before ? 'Санаторий: остаток ' : 'Остаток ') + eur(onArrival) + ' оплачиваете в санатории при заезде.'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return {
+    full,
+    paidLabel: full ? o.totalLabel : o.advanceLabel,
+    before,
+    beforeLabel: eur(before),
+    beforeTitle: atSan ? 'Оплата перелёта' : 'Оплата остатка',
+    onArrival,
+    onArrivalLabel: eur(onArrival),
+    line: full
+      ? `Оплачено ${o.totalLabel} — больше ничего платить не нужно.`
+      : `Депозит ${o.advanceLabel} внесён — цена зафиксирована. ${restText}`,
+  };
+}
+
+/** "2–6 ноября" / "30 октября – 3 ноября" */
+function dayRange(a: Date, b: Date): string {
+  if (a.getTime() >= b.getTime()) return shortDate(a);
+  if (a.getUTCMonth() === b.getUTCMonth()) return a.getUTCDate() + '–' + b.getUTCDate() + ' ' + MONTHS[b.getUTCMonth()];
+  return shortDate(a) + ' – ' + shortDate(b);
+}
+
+/** Dates of the «Что дальше» timeline, counted from today and the check-in day. */
+function timelineDates(today: Date, checkin: Date) {
+  // the sanatorium answers by the next day; the memo goes out 7–3 days before arrival
+  const confirmBy = addD(today, 1);
+  const memoFrom = new Date(Math.max(addD(checkin, -7).getTime(), confirmBy.getTime()));
+  const memoTo = new Date(Math.max(addD(checkin, -3).getTime(), memoFrom.getTime()));
+  return { today: shortDate(today), confirmBy: shortDate(confirmBy), memo: dayRange(memoFrom, memoTo) };
+}
+
+/** "+972 50 123 4567" from step 3, or '' when the guest has not given a phone */
+function guestPhone(b: Booking): string {
+  const d = b.details;
+  if (!d || !d.phone.trim()) return '';
+  return [d.phoneCode.split('·')[0].trim(), d.phone.trim()].filter(Boolean).join(' ');
+}
+
+/** Copies text; older browsers without the Clipboard API get the copy command. */
+function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+  const t = document.createElement('textarea');
+  t.value = text;
+  t.setAttribute('readonly', '');
+  t.style.position = 'fixed';
+  t.style.opacity = '0';
+  document.body.appendChild(t);
+  t.select();
+  const ok = document.execCommand('copy');
+  t.remove();
+  return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+}
+
+/** Saves the stay as a calendar file: check-in 14:00, check-out 12:00, Lithuanian time. */
+function saveCalendar(b: Booking) {
+  const at = (isoDay: string, hm: string) => isoDay.replace(/-/g, '') + 'T' + hm + '00';
+  const esc = (s: string) => s.replace(/[\\,;]/g, (c) => '\\' + c);
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//BookingRobot//Shalom//RU',
+    'BEGIN:VEVENT',
+    'UID:order-' + ORDER_NO + '@shalom.bookingrobot.eu',
+    'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z',
+    'DTSTART;TZID=Europe/Vilnius:' + at(b.checkin, '1400'),
+    'DTEND;TZID=Europe/Vilnius:' + at(b.checkout, '1200'),
+    'SUMMARY:' + esc('Санаторий ' + HOTEL_NAME + ' — заказ № ' + ORDER_NO),
+    'LOCATION:' + esc(HOTEL_ADDRESS),
+    'DESCRIPTION:' +
+      esc('Заказ № ' + ORDER_NO + '. Заезд с 14:00, выезд до 12:00. Вопросы: ' + PHONE_DISPLAY + ' (WhatsApp).'),
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'zakaz-' + ORDER_NO + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 /** the page keeps no state of its own: the order comes from the shared booking */
 class DoneLogic extends PageLogic<Record<string, never>> {
@@ -34,7 +147,33 @@ export default function DonePage() {
   const inDay = shortDate(toD(booking.checkin));
   const outDay = shortDate(toD(booking.checkout));
   const daysLeft = daysBetween(TODAY, toD(booking.checkin));
-  const eur = (n: number) => fmt(n) + '\u00a0€';
+  const tl = timelineDates(TODAY, toD(booking.checkin));
+  const phone = guestPhone(booking);
+  const withTransfer = !!booking.transfer.mode && booking.transfer.mode !== 'none';
+  const helpCtx: HelpContextInfo = {
+    hotel: 'Санаторий ' + HOTEL_NAME + ', Друскининкай',
+    in: booking.checkin,
+    out: booking.checkout,
+  };
+  // one honest money line, used in the hero, the timeline and the payment box
+  const pay = payState(booking, o);
+  const paidLabel = pay.paidLabel;
+  const moneyLine = pay.line;
+  const askUrl = WHATSAPP_URL + '?text=' + encodeURIComponent('Здравствуйте! Мой заказ № ' + ORDER_NO + '. Вопрос: ');
+
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const t = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(t);
+  }, [copied]);
+  const copy = () => {
+    copyText(ORDER_NO).then(
+      () => setCopied(true),
+      () => undefined,
+    );
+  };
+
   return (
     <div className="page pg-done">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -83,80 +222,35 @@ export default function DonePage() {
                 <path d="m5 12 5 5L20 7" />
               </svg>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h1 style={{ fontSize: '32px' }}>Спасибо! Заказ № 12345 принят</h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px' }}>
-                  Депозит {o.advanceLabel} внесён — цена зафиксирована.
+            <div className="dn-hero" style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '0' }}>
+              <h1 className="dn-h1">Спасибо! Заказ принят</h1>
+              <div className="dn-order">
+                <span className="dn-order-text">
+                  Номер заказа <strong>{ORDER_NO}</strong>
                 </span>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: 'var(--warn-bg)',
-                    color: 'var(--warn-ink)',
-                    fontWeight: '700',
-                    fontSize: '16px',
-                    padding: '7px 12px',
-                    borderRadius: 'var(--r-field)',
-                  }}
+                <button
+                  type="button"
+                  className={'dn-copy' + (copied ? ' is-done' : '')}
+                  onClick={copy}
+                  aria-live="polite"
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 7v5l3 2" />
-                  </svg>
-                  Ожидаем подтверждение санатория
-                </span>
+                  {copied ? 'Скопировано ✓' : 'Скопировать'}
+                </button>
               </div>
-              <p style={{ fontSize: '17px', color: 'var(--ink-2)' }}>
-                Детали заказа отправлены на <strong style={{ color: 'var(--ink)' }}>name@gmail.com</strong> и в
-                WhatsApp.
+              <p className="dn-money">{moneyLine}</p>
+              <p className="dn-now">
+                Заказ передан в санаторий. Подтверждение пришлём до {tl.confirmBy}
+                {phone ? (
+                  <>
+                    {' '}
+                    в WhatsApp на номер{' '}
+                    <span dir="ltr" style={{ whiteSpace: 'nowrap' }}>
+                      {phone}
+                    </span>
+                  </>
+                ) : null}
+                . Сейчас от вас ничего не требуется.
               </p>
-            </div>
-          </div>
-          {/* Next step band */}
-          <div
-            style={{
-              background: 'var(--green-line)',
-              borderRadius: 'var(--r-field)',
-              padding: '18px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '18px',
-            }}
-          >
-            <svg
-              width="44"
-              height="44"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--green)"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              style={{ flex: 'none' }}
-            >
-              <path d="M3 6h18v12H3zM3 6l9 7 9-7" />
-              <circle cx="18" cy="17" r="4.5" fill="var(--green-line)" />
-              <path d="M18 15v2l1.5 1" />
-            </svg>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <strong style={{ fontSize: '18px', color: 'var(--green)' }}>
-                Следующий шаг — подтверждение санатория до 28 октября.
-              </strong>
-              <span style={{ fontSize: '16px', color: 'var(--ink)' }}>Сейчас от вас ничего не требуется.</span>
             </div>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'start' }}>
@@ -166,8 +260,16 @@ export default function DonePage() {
                 className="card"
                 style={{ padding: '24px 24px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
-                  <h2 style={{ fontSize: '26px' }}>Что дальше</h2>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    gap: '4px 12px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <h2 className="dn-h2">Что дальше</h2>
                   <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                     До заезда {daysLeft} {plural(daysLeft, ['день', 'дня', 'дней'])}
                   </span>
@@ -191,42 +293,13 @@ export default function DonePage() {
                       </svg>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip">27 октября · сегодня</span>
+                      <span className="chip">{tl.today} · сегодня</span>
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
-                        Депозит получен
+                        {pay.full ? 'Оплата получена' : 'Депозит получен'}
                       </strong>
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                        Оплата {o.advanceLabel} прошла успешно. Цена больше не изменится.
-                      </span>
-                    </div>
-                  </div>
-                  <div className="tl" style={{ background: 'var(--warn-bg)' }}>
-                    <div className="line" />
-                    <div className="dot" style={{ borderColor: 'var(--accent)' }}>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="var(--accent)"
-                        strokeWidth="2.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <circle cx="12" cy="12" r="9" />
-                        <path d="M12 7v5l3 2" />
-                      </svg>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip" style={{ background: 'var(--warn-bg)', color: 'var(--warn-ink)' }}>
-                        До 28 октября
-                      </span>
-                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
-                        Подтверждение санатория
-                      </strong>
-                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                        Отправим ваучер с номером брони на почту и в WhatsApp.
+                        Оплата {paidLabel} прошла успешно.{' '}
+                        {pay.full ? 'Больше ничего платить не нужно.' : 'Цена больше не изменится.'}
                       </span>
                     </div>
                   </div>
@@ -234,12 +307,42 @@ export default function DonePage() {
                     <div className="line" />
                     <div className="dot" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="chip">2–6 ноября</span>
+                      <span className="chip">До {tl.confirmBy}</span>
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
-                        Памятка и встреча
+                        Подтверждение санатория
                       </strong>
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                        Пришлём время встречи, контакты водителя и список вещей.
+                        Пришлём ваучер с номером брони{phone ? ' в WhatsApp' : ''}.
+                      </span>
+                    </div>
+                  </div>
+                  {!pay.before ? null : (
+                    <div className="tl">
+                      <div className="line" />
+                      <div className="dot" />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span className="chip">До {o.dueDate}</span>
+                        <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
+                          {pay.beforeTitle} — {pay.beforeLabel}
+                        </strong>
+                        <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
+                          Пришлём ссылку на оплату и напомним за неделю. До этой даты отмена бесплатная.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="tl">
+                    <div className="line" />
+                    <div className="dot" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span className="chip">{tl.memo}</span>
+                      <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
+                        {withTransfer ? 'Памятка и встреча' : 'Памятка'}
+                      </strong>
+                      <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
+                        {withTransfer
+                          ? 'Пришлём время встречи, контакты водителя и подробную памятку.'
+                          : 'Пришлём подробную памятку о поездке.'}
                       </span>
                     </div>
                   </div>
@@ -252,7 +355,11 @@ export default function DonePage() {
                         Заезд в санаторий
                       </strong>
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                        Всё оплачено заранее — на месте доплачивать ничего не нужно.
+                        {pay.full
+                          ? 'Всё оплачено — на месте доплачивать ничего не нужно.'
+                          : pay.onArrival
+                            ? `Остаток ${pay.onArrivalLabel} оплачиваете в санатории при заезде.`
+                            : `Если остаток оплачен до ${o.dueDate}, на месте доплачивать ничего не нужно.`}
                       </span>
                     </div>
                   </div>
@@ -261,53 +368,59 @@ export default function DonePage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span className="chip">{outDay} · до 12:00</span>
                       <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '18px' }}>
-                        Выезд и обратный трансфер
+                        {withTransfer && booking.transfer.back ? 'Выезд и обратный трансфер' : 'Выезд'}
                       </strong>
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
-                        Время подачи автомобиля согласуем отдельно.
+                        {withTransfer && booking.transfer.back
+                          ? 'Время подачи автомобиля согласуем отдельно.'
+                          : 'Номер нужно освободить до 12:00.'}
                       </span>
                     </div>
                   </div>
                 </div>
+                <div className="dn-actions">
+                  <button type="button" className="btn btn-secondary" onClick={() => saveCalendar(booking)}>
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <path d="M16 2v4M8 2v4M3 10h18" />
+                    </svg>
+                    Добавить в календарь
+                  </button>
+                </div>
               </section>
-              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <Link className="btn btn-primary" to="/done">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
-                  </svg>
-                  Скачать детали заказа
-                </Link>
-                <Link className="btn btn-secondary" to="/done">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <path d="M16 2v4M8 2v4M3 10h18" />
-                  </svg>
-                  Добавить в календарь
-                </Link>
-              </div>
-              <Link to="/" style={{ fontWeight: '700', fontSize: '16px' }}>
-                На главную
-              </Link>
+              <section className="card dn-bring">
+                <h2 className="dn-h2">Что взять с собой</h2>
+                <ul>
+                  {BRING.map((item) => (
+                    <li key={item}>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--green)"
+                        strokeWidth="2.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="m5 12 5 5L20 7" />
+                      </svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
               <section
                 style={{
                   background: 'var(--green-soft)',
@@ -334,7 +447,9 @@ export default function DonePage() {
                 >
                   <path d="M4 13a8 8 0 0 1 16 0M4 13v5a2 2 0 0 0 2 2h2v-7H4zM20 13v5a2 2 0 0 1-2 2h-2v-7h4" />
                 </svg>
-                <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div
+                  style={{ flex: '1 1 240px', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <strong style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '20px' }}>
                       Нужна помощь? Мы на связи
@@ -342,11 +457,11 @@ export default function DonePage() {
                     <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>
                       Отвечаем на русском языке.
                       <br />
-                      Назовите номер заказа <strong style={{ color: 'var(--ink)' }}>12345</strong>.
+                      Назовите номер заказа <strong style={{ color: 'var(--ink)' }}>{ORDER_NO}</strong>.
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <a className="btn btn-secondary" href={WHATSAPP_URL}>
+                    <a className="btn btn-secondary" href={askUrl}>
                       <svg
                         width="22"
                         height="22"
@@ -389,10 +504,20 @@ export default function DonePage() {
                   </div>
                 </div>
               </section>
+              <Link className="dn-home" to="/">
+                На главную
+              </Link>
             </div>
             {/* Right: trip + payment */}
             <aside
-              style={{ flex: '1 1 300px', maxWidth: '360px', display: 'flex', flexDirection: 'column', gap: '16px' }}
+              style={{
+                flex: '1 1 300px',
+                minWidth: '0',
+                maxWidth: '360px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
             >
               <div className="card" style={{ overflow: 'hidden' }}>
                 <img
@@ -403,7 +528,7 @@ export default function DonePage() {
                 <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ fontFamily: 'Montserrat,Manrope,sans-serif', fontSize: '22px', fontWeight: '600' }}>
-                      Эгле Комфорт
+                      {HOTEL_NAME}
                     </div>
                     <span style={{ color: 'var(--warn-ink)', fontSize: '16px', letterSpacing: '1px' }}>★★★★</span>
                   </div>
@@ -580,33 +705,64 @@ export default function DonePage() {
                   <strong style={{ fontSize: '20px' }}>{o.totalLabel}</strong>
                 </div>
                 <div className="row">
-                  <span style={{ color: 'var(--ink-2)' }}>Оплачено</span>
-                  <strong style={{ color: 'var(--green)' }}>{o.advanceLabel} ✓</strong>
+                  <span style={{ color: 'var(--ink-2)' }}>{pay.full ? 'Оплачено полностью' : 'Депозит оплачен'}</span>
+                  <strong style={{ color: 'var(--green)' }}>{paidLabel} ✓</strong>
                 </div>
+                {!pay.onArrival ? null : (
+                  <div
+                    style={{
+                      background: 'var(--green-soft)',
+                      borderRadius: 'var(--r-field)',
+                      padding: '12px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ color: 'var(--green)', fontSize: '16px', fontWeight: '700' }}>
+                      Оплачиваете в санатории при заезде
+                    </span>
+                    <strong
+                      style={{ fontSize: '28px', lineHeight: '1.1', color: 'var(--green)', whiteSpace: 'nowrap' }}
+                    >
+                      {pay.onArrivalLabel}
+                    </strong>
+                  </div>
+                )}
+                {pay.full ? null : (
+                  <>
+                    {!pay.before ? null : (
+                      <div
+                        style={{
+                          background: 'var(--green-soft)',
+                          borderRadius: 'var(--r-field)',
+                          padding: '12px 16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                        }}
+                      >
+                        <span style={{ color: 'var(--green)', fontSize: '16px', fontWeight: '700' }}>
+                          Осталось оплатить до {o.dueDate}
+                        </span>
+                        <strong
+                          style={{ fontSize: '28px', lineHeight: '1.1', color: 'var(--green)', whiteSpace: 'nowrap' }}
+                        >
+                          {pay.beforeLabel}
+                        </strong>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '16px' }}>
+                      {pay.before ? (
+                        <span>Картой или переводом — пришлём ссылку на оплату и напомним за неделю.</span>
+                      ) : null}
+                      <span>До {o.dueDate} отмена бесплатная.</span>
+                    </div>
+                  </>
+                )}
                 <div
                   style={{
-                    background: 'var(--green-soft)',
-                    borderRadius: 'var(--r-field)',
-                    padding: '12px 16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px',
-                  }}
-                >
-                  <span style={{ color: 'var(--green)', fontSize: '16px', fontWeight: '700' }}>
-                    Осталось оплатить до {o.dueDate}
-                  </span>
-                  <strong style={{ fontSize: '28px', lineHeight: '1.1', color: 'var(--green)', whiteSpace: 'nowrap' }}>
-                    {eur(o.total - o.advance)}
-                  </strong>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '16px' }}>
-                  <span>Картой или переводом — пришлём ссылку на оплату и напомним за неделю.</span>
-                  <span>До {o.dueDate} отмена бесплатная.</span>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
+                    display: pay.onArrival ? 'none' : 'flex',
                     gap: '8px',
                     alignItems: 'flex-start',
                     fontSize: '16px',
@@ -627,7 +783,9 @@ export default function DonePage() {
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 16v-4M12 8h.01" />
                   </svg>
-                  При заезде доплачивать ничего не нужно.
+                  {pay.full
+                    ? 'При заезде доплачивать ничего не нужно.'
+                    : 'Когда остаток оплачен, при заезде доплачивать ничего не нужно.'}
                 </div>
               </div>
             </aside>
@@ -635,7 +793,7 @@ export default function DonePage() {
         </div>
         <SiteFooter />
       </div>{' '}
-      <HelpWidget ctx={HELP_CTX} pageState={logic.state} />
+      <HelpWidget ctx={helpCtx} pageState={logic.state} />
     </div>
   );
 }
