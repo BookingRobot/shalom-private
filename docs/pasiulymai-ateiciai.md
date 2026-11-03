@@ -26,7 +26,41 @@ D — skeptikas, saugo kompiuterio versiją), teisėjo išvada, tekstų peržiū
 
 ## 2. Nespėta įgyvendinti — eilė pagal naudą 60+ svečiui
 
-_(papildoma po agentų ataskaitų — žr. žemiau)_
+Skliaustuose — darbo apimtis ir kas siūlė (A, B, C, D — recenzentai).
+
+1. **Viena kaina nuo 1 žingsnio iki mokėjimo mygtuko** — visa suma „за двоих, 9 ночей“ didelė, „с человека“ —
+   antra eilutė; kaina per dieną — tik išsamiau. Dabar programos kortelėje trys skaičiai. (vidutinis; A, C, D)
+2. **Telefone eilutė „Ваш заказ“** po žingsnių juosta vietoj krepšelio ženkliuko (atsidaro paspaudus). (vidutinis; A)
+3. **„i“ ženkliukai:** raidė 16 px, atsidaro tik paspaudus (dabar ir užėjus Tab klavišu — `InfoTip.tsx`),
+   pašalinti „i“ iš puslapio antraščių, kur jis kartoja matomą tekstą. (mažas; C, D)
+4. **Tikri Apple Pay / Google Pay mygtukai** per Tranzila: rodyti tik tą, kurį palaiko telefonas, po to „или картой“.
+   (vidutinis; A, B, D — reikia Tranzila nustatymų)
+5. **Filtrai rezultatuose — langas iš apačios** su mygtuku „Показать N санаториев“ ir automatiniu nuslinkimu į sąrašą.
+   Dabar mygtukas tik prilimpa prie ekrano apačios. (vidutinis; B)
+6. **Rezultatų kainų kalendorius** (`src/pages/Results/PriceCalendar.tsx`) telefone vis dar rodo 10 px kainas; žyma
+   „šiandien“ visuose kalendoriuose. (mažas; A, B)
+7. **Datos pagrindiniame puslapyje telefone** — vienas laukas „Даты поездки“ vietoj dviejų (~90 px mažiau). (mažas; B)
+8. **1 žingsnio programos** — trumpos 72–88 px eilutės vietoj didelių kortelių, kad visas būtų galima palyginti
+   viename ekrane. (vidutinis; A — teisėjas pritarė)
+9. **Skrydžio paketui** — po kiekvienu vardu eilutė „На это имя выпишем билет — проверьте каждую букву“. (mažas; C)
+10. **Naujienlaiškis** — perkelti iš mokėjimo puslapio į patvirtinimo puslapį. (mažas; C)
+11. **„Осталось вписать: номер карты“** rodyti tik po pirmo „Оплатить“ paspaudimo. (mažas; C)
+12. **„CVV“** → „Код CVV“ su užuomina „3 цифры на обороте карты“. (mažas)
+13. **Vienodi dydžiai visame tinklapyje:** vienas puslapio plotis, kompiuterio H1 38 px, teksto eilutė ne platesnė nei
+    ~68 ženklai; pagrindinis tekstas 18 px visur (dabar dalyje vietų 16–17 px). (vidutinis; D, jūsų dydžių skalė)
+14. **Žingsniuose — tik plona poraštė** (telefonas, sąlygos, privatumas), pilnas sąrašas — kituose puslapiuose. (mažas; D)
+15. **Rezultatų kortelė paprastesnė**, kambariai — tik sanatorijos puslapyje. (vidutinis; D)
+16. **Kelio žingsnyje** pašalinti žalius numeruotus kvadratėlius prieš „Перелёт“ ir „Трансфер“ (numeriai — tik žingsnių
+    juostoje). Svečių žingsnyje jau pašalinta. (mažas; D)
+17. **„ГОСТИ“ 13 px didžiosiomis** (`soft.css`, `.gp-inline-l`) dar liko kai kuriuose puslapiuose. (mažas)
+18. **Svečių žingsnis turi savo gimimo datos lango kopiją** — sujungti su bendru `BirthDateField`. (mažas, techninė skola)
+19. **Seni statiniai prototipai** (`guests.html`, `payment.html`, `transfer.html`, `rooms.html`, `hotel.html`,
+    `results.html` projekto šaknyje) kūrimo serveryje užgožia tikrus puslapius — juos verta perkelti į `prototype/`.
+    (mažas, techninė skola; svetainei įtakos neturi)
+20. **Pagalbos lange** Tab neturi išeiti už lango ribų; siunčiant užklausą pridėti ir paieškos eilutę. (mažas)
+21. **Patvirtinimo `.ics` failas** naudoja `TZID=Europe/Vilnius` be laiko zonos aprašo — patikrinti Outlook. (mažas)
+22. **Svečių skaitiklis** pagrindiniame puslapyje iš pradžių rodo „2 взрослых“. Tai pradinė reikšmė, ne atsakymas,
+    bet jei norite visiškai tuščio lauko — reikia jūsų sprendimo.
 
 ---
 
