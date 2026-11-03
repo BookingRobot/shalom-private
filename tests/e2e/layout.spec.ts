@@ -47,7 +47,15 @@ type Check = 'scroll' | 'font' | 'words';
  * (with an annotation), every other check of the page still runs. Remove an entry once it is fixed —
  * the test then says so in its annotations.
  */
-const KNOWN_ISSUES: { route: string; widths: number[]; check: Check; reason: string }[] = [];
+const KNOWN_ISSUES: { route: string; widths: number[]; check: Check; reason: string }[] = [
+  // found by the first run on 2026-11-03 (route '*' = every page: the header is shared)
+  {
+    route: '*',
+    widths: [320],
+    check: 'scroll',
+    reason: 'the phone header («Позвонить» + «Меню») is 32px wider than a 320px screen: label.hd-burger ends at 352px',
+  },
+];
 
 type Findings = { overflowPx: number; sticking: string[]; small: string[]; broken: string[] };
 
@@ -170,7 +178,9 @@ for (const vp of VIEWPORTS) {
         const f = await page.evaluate(analyse, { minFont: MIN_FONT_PX, okSmall: Object.keys(SMALL_TEXT_OK) });
 
         const known = (check: Check) => {
-          const k = KNOWN_ISSUES.find((i) => i.route === route && i.check === check && i.widths.includes(vp.width));
+          const k = KNOWN_ISSUES.find(
+            (i) => (i.route === route || i.route === '*') && i.check === check && i.widths.includes(vp.width),
+          );
           if (k) testInfo.annotations.push({ type: `known issue (${check})`, description: k.reason });
           return !!k;
         };
