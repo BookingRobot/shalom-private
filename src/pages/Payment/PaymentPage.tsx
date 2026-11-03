@@ -481,9 +481,8 @@ export default function PaymentPage() {
                 {' '}
                 <input type="checkbox" />{' '}
                 <span>
-                  Я ознакомился с <Link to="/rules#cancel">условиями бронирования и отмены</Link> и согласен на
-                  обработку персональных данных гостей по <Link to="/privacy">политике конфиденциальности</Link> — для
-                  оформления заказа.
+                  Принимаю <Link to="/rules#cancel">условия бронирования и отмены</Link> и даю согласие на{' '}
+                  <Link to="/privacy">обработку данных гостей</Link> для этого заказа.
                 </span>{' '}
               </label>
             </section>

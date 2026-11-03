@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { SITE_ORIGIN, allSeoPages, headTags } from './src/lib/seo';
+import { typographPlugin } from './scripts/typograph.mjs';
 
 /**
  * Static pages for search engines and link previews: every page in lib/seo gets its own
@@ -50,5 +51,5 @@ function seoPages(): Plugin {
 // Site is served from its own domain (https://shalom.bookingrobot.eu), so base is '/'.
 export default defineConfig({
   base: '/',
-  plugins: [react(), seoPages()],
+  plugins: [typographPlugin(), react(), seoPages()],
 });

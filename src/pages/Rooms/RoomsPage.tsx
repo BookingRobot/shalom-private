@@ -126,7 +126,7 @@ class RoomsLogic extends PageLogic<RoomsState> {
     const st = this.state;
     const NIGHTS = daysBetween(toD(booking.checkin), toD(booking.checkout));
     const G = { adults: booking.adults, children: booking.children };
-    const eur = (n: number) => fmt(n) + ' €';
+    const eur = (n: number) => fmt(n) + '\u00a0€';
     const tierOf = (p: Program) => ('tier' in p ? p.tier : undefined);
     const isExtra = (p: Program) => 'extra' in p && !!p.extra;
 

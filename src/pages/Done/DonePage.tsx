@@ -44,6 +44,7 @@ export default function DonePage() {
         </HeaderBar>
         <CheckoutSteps current={5} compact />
         <div
+          className="dn-wrap"
           style={{
             maxWidth: '1180px',
             margin: '0 auto',
@@ -55,7 +56,7 @@ export default function DonePage() {
           }}
         >
           {/* Status */}
-          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+          <div className="dn-status" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
             <div
               style={{
                 width: '96px',

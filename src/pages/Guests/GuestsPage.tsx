@@ -233,8 +233,8 @@ export default function GuestsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h1 style={{ fontSize: '32px' }}>Кто едет в санаторий?</h1>
               <p style={{ margin: '0', color: 'var(--ink-2)', fontSize: '18px' }}>
-                Имена и фамилии — как в паспорте, латинскими буквами. Они нужны санаторию для регистрации и врачу для
-                карты лечения.
+                Имя и фамилия — латиницей, точно как в паспорте, по которому летите. Они нужны санаторию для
+                регистрации и врачу для карты лечения.
               </p>
             </div>
             {/* Guest 1 */}
@@ -332,10 +332,10 @@ export default function GuestsPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label className="lbl" htmlFor="g1em">
-                    Электронная почта
+                    Электронная почта <span className="g-opt">(не обязательно)</span>
                   </label>
                   <input id="g1em" className="input" type="email" placeholder="name@gmail.com" autoComplete="email" />
-                  <span className="hint">Пришлём подтверждение и ссылку на оплату</span>
+                  <span className="hint">Копию подтверждения пришлём и сюда</span>
                 </div>
               </div>
             </section>

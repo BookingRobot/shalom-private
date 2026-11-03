@@ -1,0 +1,181 @@
+/*
+ * Readability layer for the 60+ guest (loaded last, after soft.css):
+ * text wraps calmly, nothing is too small to tap, placeholders are readable, and nothing pushes
+ * the page sideways on a small or zoomed phone (320 px).
+ */
+
+/* headings and button labels: lines of even length, no lone word on the last line */
+body .page :is(h1, h2, h3, h4, .btn, legend) {
+  text-wrap: balance;
+}
+/* running text: no single word left on the last line */
+body .page :is(p, li, dd, .hint, .muted) {
+  text-wrap: pretty;
+}
+/* long words never push out of their box (e-mails, «Опорно-двигательный») */
+body .page :is(p, li, dd, span, strong, a, label, h1, h2, h3) {
+  overflow-wrap: break-word;
+}
+
+/* placeholders and «Выберите дату» read like text, not like a disabled field (4.5:1) */
+body .page ::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+body .page .datebtn-ph {
+  color: var(--muted);
+}
+
+/* ── tap targets: at least 44×44 px for a finger, without changing how things look ── */
+body .page .info-tip {
+  position: relative;
+}
+body .page .info-tip::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+body .page :is(.next-tip-x, .go-tip-x, .next-tip-go) {
+  position: relative;
+}
+body .page :is(.next-tip-x, .go-tip-x)::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+body .page .next-tip-go::after {
+  content: '';
+  position: absolute;
+  inset: -11px -6px;
+}
+/* breadcrumbs and footer links: the whole line height is the link */
+body .page :is(.res-crumbs, .rm-crumbs, .hh-crumbs, .pv-crumbs, .rp-crumbs) a {
+  display: inline-block;
+  padding: 11px 0;
+  margin: -11px 0;
+}
+body .page :is(.ft-links, .ft-contacts) a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+body .page .ft-tel {
+  min-height: 44px;
+}
+
+/* ── small and zoomed phones: nothing wider than the screen ── */
+@media (max-width: 400px) {
+  /* the sticky «Далее» bar: the button label may take two lines instead of pushing the bar out */
+  body .page .step-bar .btn.step-next,
+  body .page .btn.step-next-big,
+  body .page .rooms-bar .btn {
+    white-space: normal;
+    min-width: 0;
+    line-height: 1.2;
+    text-align: center;
+  }
+  body .page .step-bar .step-next-at,
+  body .page .step-bar-in,
+  body .page .step-bar-row {
+    min-width: 0;
+  }
+  body .page .btn.step-next-big {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  /* step 1 bottom bar: the sum over the buttons */
+  body .pg-rooms .rooms-bar-in {
+    flex-wrap: wrap;
+    padding-left: 16px;
+    padding-right: 16px;
+    gap: 8px;
+  }
+  body .pg-rooms .rooms-bar-btns {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  body .pg-rooms .rooms-bar-btns .btn {
+    flex: 1 1 auto;
+  }
+  /* the search hint bubble keeps inside the card */
+  body .page .search .go-tip-place,
+  body .page .search .go-tip-dates {
+    white-space: normal;
+    max-width: calc(100vw - 48px);
+  }
+  /* results: «Сортировка» over a full-width select */
+  body .pg-results .lh-sort {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  body .pg-results .lh-select {
+    width: 100%;
+    min-width: 0;
+  }
+  /* the road: 16 px page margins like every other step */
+  body .pg-transfer .tr-wrap {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  body .pg-transfer .choice {
+    min-width: 0;
+  }
+  /* confirmation: the big check above the title, not beside it */
+  body .pg-done .dn-status {
+    flex-direction: column;
+    gap: 14px !important;
+  }
+  body .pg-done .dn-status > div:first-child {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  body .pg-done .dn-wrap {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* «Не знаю, как лучше добраться?» reads and taps like a link, not like a footnote */
+body .pg-transfer .fly-help {
+  font-size: 17px;
+  min-height: 44px;
+  color: var(--green);
+}
+/* «Уже оплачено»: normal case, readable size */
+body .pg-transfer .paid-stamp {
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+@media (max-width: 560px) {
+  /* terms: the question over its answer, not two narrow columns */
+  body .pg-rules .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+@media (max-width: 400px) {
+  body .pg-resort .rs-hero-text h1 {
+    font-size: 30px;
+  }
+}
+@media (max-width: 400px) {
+  /* the road: answers wrap inside the screen */
+  body .pg-transfer .tr-q > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  body .pg-transfer .choice {
+    white-space: normal;
+  }
+}
+
+/* «(не обязательно)» next to a label */
+body .page .g-opt {
+  font-weight: 500;
+  color: var(--muted);
+}

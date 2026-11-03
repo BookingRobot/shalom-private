@@ -294,3 +294,39 @@
     animation: none;
   }
 }
+
+/* phone: «Позвонить» beside «Меню» (laptop shows the number itself) */
+.site-header .hd-call {
+  display: none;
+}
+@media (max-width: 760px) {
+  .site-header .hd-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    min-width: 44px;
+    justify-content: center;
+    padding: 0 12px;
+    margin-left: auto;
+    border-radius: var(--r-field);
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--paper);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .site-header .hd-call + .hd-toggle + .hd-burger,
+  .site-header .hd-call ~ .hd-burger {
+    margin-left: 6px;
+  }
+  .site-header .hd-call:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+@media (max-width: 370px) {
+  .site-header .hd-call-t {
+    display: none;
+  }
+}

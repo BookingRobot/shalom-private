@@ -288,7 +288,7 @@ export class TransferLogic extends PageLogic<TransferState> {
     const seatPP = Math.round(seat.price / GUESTS);
     const carLeg = (vid: string) => legOf(booking, city || 'vilnius', { ...tNow, mode: 'individual', vehicle: vid });
     // the stamp «Уже оплачено»: the sanatorium meets guests itself / the flight package
-    const paidBy = bySanH ? 'Уже оплачено' : inPkg ? 'Оплачено в пакете' : '';
+    const paidBy = bySanH ? 'Входит в цену' : inPkg ? 'Входит в пакет' : '';
     const ourFlight = pkg;
     const flVal = (typed: string | undefined, line: string) => typed ?? (ourFlight ? line : '');
     const cityFree = (id: string) => bySanH && freeCities.includes(id);
@@ -329,7 +329,7 @@ export class TransferLogic extends PageLogic<TransferState> {
           on: c.id === city,
           cls: c.id === city ? 'on' : '',
           // the sanatorium's own shuttle is a group one: a car of your own is paid as usual
-          paid: how === 'individual' ? '' : cityFree(c.id) ? 'уже оплачено' : g.kind === 'package' ? 'в пакете' : '',
+          paid: how === 'individual' ? '' : cityFree(c.id) ? 'входит в цену' : g.kind === 'package' ? 'в пакете' : '',
           pick: pick({ city: c.id, spot: '' }),
         };
       }),
@@ -348,12 +348,12 @@ export class TransferLogic extends PageLogic<TransferState> {
       pickIndHow: pick({ how: 'individual' }),
       isGroup: how === 'group',
       isInd: how === 'individual',
-      seatPaid: seat.kind === 'free' ? 'Уже оплачено' : seat.kind === 'package' ? 'Оплачено в пакете' : '',
-      seatPrice: (inPkg ? '+' : '') + fmt(seatPP) + ' €',
+      seatPaid: seat.kind === 'free' ? 'Входит в цену' : seat.kind === 'package' ? 'Входит в пакет' : '',
+      seatPrice: (inPkg ? '+' : '') + fmt(seatPP) + '\u00a0€',
       seatNote: T.seatNote(setting, !!city, seat.kind),
-      seatTotal: seat.kind === 'paid' ? fmt(seat.price) + ' €' : '',
+      seatTotal: seat.kind === 'paid' ? fmt(seat.price) + '\u00a0€' : '',
       guestsLabel: GUESTS + ' гостей',
-      indFrom: (inPkg ? '+' : '') + fmt(carLeg('car').price) + ' €',
+      indFrom: (inPkg ? '+' : '') + fmt(carLeg('car').price) + '\u00a0€',
       vehicles: VEHICLES.map((vh) => ({
         ...vh,
         price: (inPkg ? '+' : '') + fmt(carLeg(vh.id).price),
@@ -369,7 +369,7 @@ export class TransferLogic extends PageLogic<TransferState> {
       pickBackYes: pick({ back: true }),
       pickBackNo: pick({ back: false }),
       backOn: back === true,
-      backPaid: how === 'individual' ? '' : bySanH ? 'Уже оплачено' : inPkg ? 'Оплачено в пакете' : '',
+      backPaid: how === 'individual' ? '' : bySanH ? 'Входит в цену' : inPkg ? 'Входит в пакет' : '',
       backSub: T.backSub(setting, how === 'individual'),
       sameCls: backSame === true ? 'on' : '',
       otherCls: backSame === false ? 'on' : '',
@@ -385,7 +385,7 @@ export class TransferLogic extends PageLogic<TransferState> {
       backCities: PICKUP_PLACES.map((c) => ({
         ...c,
         cls: c.id === backCity ? 'on' : '',
-        paid: how !== 'individual' && cityFree(c.id) ? 'уже оплачено' : '',
+        paid: how !== 'individual' && cityFree(c.id) ? 'входит в цену' : '',
         pick: pick({ backCity: c.id, backSpot: '' }),
       })),
       backCityChosen: !!backCity && backSame === false,
@@ -395,7 +395,7 @@ export class TransferLogic extends PageLogic<TransferState> {
       moreOpen: !!this.state.more,
       moreLabel: this.state.more ? 'Свернуть' : 'Подробнее о встрече и поездке',
       toggleMore: () => this.setState({ more: !this.state.more }),
-      total: fmt(order.stay + order.flight + tr.total) + ' €',
+      total: fmt(order.stay + order.flight + tr.total) + '\u00a0€',
     };
   }
 }
