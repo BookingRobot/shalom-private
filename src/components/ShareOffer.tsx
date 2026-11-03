@@ -133,7 +133,7 @@ export function ShareOffer({ hotelName = 'Санаторий Эгле Комфо
               />
               <label className="share-agree">
                 <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-                Согласен(на) получить одно сообщение об изменении цены
+                Да, пришлите мне одно сообщение, если цена изменится
               </label>
               <button type="submit" className="btn btn-primary share-btn" disabled={!contact.trim() || !agree}>
                 Сообщить мне

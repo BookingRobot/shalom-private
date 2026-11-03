@@ -6,7 +6,17 @@ import { MONTHS, daysBetween, iso, nightsWord, plural, shortDate, toD } from './
 import { fmt } from './format';
 import { transferBySanatorium } from '../data/transferPolicy';
 import { transferLegs } from './transferCost';
-import { flightPackage, partyLabel, paymentPlan, perPersonOf, placeLabel, placePrice, stayTotal } from './pricing';
+import {
+  DEPOSIT_FLIGHT_PP,
+  flightPackage,
+  partyLabel,
+  paymentPlan,
+  perPersonOf,
+  persons,
+  placeLabel,
+  placePrice,
+  stayTotal,
+} from './pricing';
 
 const eur = (n: number) => fmt(n) + ' €';
 
@@ -64,6 +74,8 @@ export function orderSummary(b: Booking) {
   const total = stay + transfer + flight;
   const plan = paymentPlan(b.checkin, g, b.flightPackage, total, TODAY);
   const advance = plan.deposit;
+  // the flight part of the rest is always paid to us by the due date
+  const flightRest = flight ? Math.max(0, flight - DEPOSIT_FLIGHT_PP * persons(g)) : 0;
   return {
     dates: stayRange(b.checkin, b.checkout) + ' · ' + nights + ' ' + nightsWord(nights),
     nights,
@@ -136,5 +148,12 @@ export function orderSummary(b: Booking) {
     dueDate: shortDate(plan.due),
     dueISO: iso(plan.due),
     fullOnly: plan.fullOnly,
+    /**
+     * the sanatorium takes the rest itself on check-in (the same rule as the payment step:
+     * sanatoriums that also meet the guests, e.g. Eglė) — nothing for the stay is paid to us later
+     */
+    restAtSan: bySan && !plan.fullOnly,
+    sanRestLabel: eur(plan.rest - flightRest),
+    flightRestLabel: flightRest ? eur(flightRest) : '',
   };
 }

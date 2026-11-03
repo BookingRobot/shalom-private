@@ -247,7 +247,7 @@ const Check = ({ size = 18 }: { size?: number }) => (
 function ProgramCard({ p }: { p: ProgramCardVals }) {
   return (
     <article className={'pg-card' + (p.on ? ' on' : '') + (p.rec ? ' rec' : '')} aria-label={p.name}>
-      {p.rec ? <span className="pg-badge">Рекомендуем Atlantis</span> : null}
+      {p.rec ? <span className="pg-badge">Советуем</span> : null}
       <h2 className="pg-name">{p.name}</h2>
       <span className={'pg-tag ' + p.tagCls}>{p.tag}</span>
       <div className="pg-price">
@@ -341,7 +341,7 @@ function ProgramModal({
       <div className="pm" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
         <div className="pm-head">
           <div className="pm-head-t">
-            {m.rec ? <span className="pg-badge pm-badge">Рекомендуем Atlantis</span> : null}
+            {m.rec ? <span className="pg-badge pm-badge">Советуем</span> : null}
             <h2 id="pmTitle">{m.name}</h2>
             <span className={'pg-tag ' + m.tagCls}>{m.tag}</span>
           </div>
