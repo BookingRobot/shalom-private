@@ -5,12 +5,16 @@
  * Personal data (e-mails, phone numbers) in the picture become dots.
  */
 import type { Options } from 'modern-screenshot';
+import { EMAIL, PHONE_TEL } from '../../data/contacts';
 
 export const IGNORE = '[data-feedback-ignore]';
 const MAX_BYTES = 1.5 * 1024 * 1024;
 const PERSONAL = /[^\s@<>"'(),;:]+@[^\s@<>"'(),;:]+\.[a-z]{2,}|(?:\+\d[\d\s-]{7,14}\d)/gi;
 /** our own public phone and e-mail stay readable in the picture */
-const PLACEHOLDER_PHONE = /\+972\s?3\s?655\s?25\s?22|info@atlantistravel\.co\.il/;
+const OWN_DIGITS = PHONE_TEL.replace(/\D/g, '');
+const PLACEHOLDER_PHONE = new RegExp(
+  '\\+' + OWN_DIGITS.split('').join('[\\s-]?') + '|' + EMAIL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+);
 
 function redactClone(root: Node) {
   const doc = root.ownerDocument ?? document;

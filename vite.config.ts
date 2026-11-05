@@ -1,6 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { SITE_ORIGIN, allSeoPages, headTags } from './src/lib/seo';
 import { typographPlugin } from './scripts/typograph.mjs';
@@ -48,8 +48,43 @@ function seoPages(): Plugin {
   };
 }
 
+/**
+ * Favicons follow the brand switch (src/data/contacts.ts): the invented demo brand keeps its icons
+ * in public/brand/demo/, Atlantis uses the ones in public/.
+ */
+function brandIcons(brand: string): Plugin {
+  let outDir = 'dist';
+  return {
+    name: 'brand-icons',
+    transformIndexHtml(html) {
+      if (brand === 'atlantis') return html; // (empty = the default demo brand)
+      return html.replace(
+        /href="\/(favicon-32\.png|favicon-192\.png|apple-touch-icon\.png|favicon\.ico)"/g,
+        'href="/brand/demo/$1"',
+      );
+    },
+    // the demo build also replaces the root icons (browsers ask for /favicon.ico by themselves)
+    // and leaves the Atlantis logo files out of the site
+    configResolved(c) {
+      outDir = c.build.outDir;
+    },
+    closeBundle() {
+      if (brand === 'atlantis' || !existsSync(join(outDir, 'index.html'))) return;
+      for (const f of ['favicon.ico', 'favicon-32.png', 'favicon-192.png', 'apple-touch-icon.png'])
+        copyFileSync(join('public/brand/demo', f), join(outDir, f));
+      for (const f of ATLANTIS_FILES) rmSync(join(outDir, 'img', f), { force: true });
+    },
+  };
+}
+/** the Atlantis logos in public/img (data/contacts → ATLANTIS_BRAND) */
+const ATLANTIS_FILES = ['5df2efd7b5bab4d4a08d500848a30611.png', '9149f20f562e42cf5db1520edc7ab6e8.png'];
+
 // Site is served from its own domain (https://shalom.bookingrobot.eu), so base is '/'.
-export default defineConfig({
-  base: '/',
-  plugins: [typographPlugin(), react(), seoPages()],
+export default defineConfig(({ mode }) => {
+  const brand = (loadEnv(mode, process.cwd(), 'VITE_').VITE_BRAND || '').trim();
+  return {
+    base: '/',
+    define: { __BRAND__: JSON.stringify(brand) },
+    plugins: [typographPlugin(), react(), brandIcons(brand), seoPages()],
+  };
 });

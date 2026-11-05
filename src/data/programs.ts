@@ -1,7 +1,7 @@
 import { amenity } from './iconPaths';
 /**
  * Treatment programmes offered with the chosen room (step 1). [ПРИМЕР ДАННЫХ]
- * Step 1 shows at most three side by side: the cheapest (`base`), the one Atlantis recommends
+ * Step 1 shows at most three side by side: the cheapest (`base`), the one the agency recommends
  * (`recommended`, in the middle) and the richest (`premium`). Programmes marked `extra` wait under
  * «Ещё программы этого санатория».
  */
