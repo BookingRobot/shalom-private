@@ -210,7 +210,7 @@ function MobileMenu() {
   );
 }
 
-/** The agency's logo (Atlantis travel & tourism), links to the home page; white on the green bar. */
+/** The agency's logo (data/contacts: the demo brand or Atlantis), links to the home page; white on the green bar. */
 export function Brand({
   logo = 32,
   tone = 'light',

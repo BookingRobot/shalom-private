@@ -36,6 +36,7 @@ jobs:
           VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
           # BookingRobot API (docs/openapi.yaml); empty = the sample data
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_BRAND: ${{ vars.VITE_BRAND }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -108,7 +108,7 @@ export interface RoomsVals {
 
 /**
  * Step 1. At most three programmes side by side, the classic way: the cheapest on the left, the one
- * Atlantis recommends in the middle, the richest on the right. «Узнать больше о программе» opens the
+ * the agency recommends in the middle, the richest on the right. «Узнать больше о программе» opens the
  * full description over the page (the page stays); more programmes of the sanatorium wait under
  * «Ещё программы». Below: the people who will meet the guest.
  */

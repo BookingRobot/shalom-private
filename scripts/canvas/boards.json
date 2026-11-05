@@ -195,7 +195,7 @@
     "rooms": [
       {
         "file": "Rooms.dc.html",
-        "title": "Шаг 1 · Программа: дешёвая · рекомендуем Atlantis · премиум",
+        "title": "Шаг 1 · Программа: дешёвая · советуем · премиум",
         "route": "/rooms",
         "targets": ["/rooms"],
         "links": [
