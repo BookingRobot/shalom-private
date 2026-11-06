@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { setCurrentLang } from './t';
+import { BUILD_LANG } from './buildLang';
 
 export type Lang = 'ru' | 'en' | 'he';
 export const LANGS: { code: Lang; label: string }[] = [
@@ -55,7 +56,8 @@ export const useLang = () => useContext(LangCtx);
  */
 export function usePageLanguage(supported: readonly Lang[] = ['ru']): LangApi & { dir: 'ltr' | 'rtl' } {
   const api = useContext(LangCtx);
-  const lang = supported.includes(api.lang) ? api.lang : supported[0];
+  // the Hebrew build is Hebrew everywhere: its texts were translated at build time
+  const lang: Lang = BUILD_LANG === 'he' ? 'he' : supported.includes(api.lang) ? api.lang : supported[0];
   const dir = isRtl(lang) ? 'rtl' : 'ltr';
   setCurrentLang(lang);
   useEffect(() => {
