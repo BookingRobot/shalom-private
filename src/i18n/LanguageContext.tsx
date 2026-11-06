@@ -56,8 +56,8 @@ export const useLang = () => useContext(LangCtx);
  */
 export function usePageLanguage(supported: readonly Lang[] = ['ru']): LangApi & { dir: 'ltr' | 'rtl' } {
   const api = useContext(LangCtx);
-  // the Hebrew build is Hebrew everywhere: its texts were translated at build time
-  const lang: Lang = BUILD_LANG === 'he' ? 'he' : supported.includes(api.lang) ? api.lang : supported[0];
+  // a translated build (Hebrew, English) is in that language everywhere: its texts were translated at build time
+  const lang: Lang = BUILD_LANG !== 'ru' ? BUILD_LANG : supported.includes(api.lang) ? api.lang : supported[0];
   const dir = isRtl(lang) ? 'rtl' : 'ltr';
   setCurrentLang(lang);
   useEffect(() => {

@@ -1,5 +1,5 @@
 import type { Plugin } from 'vite';
-export function translatePlugin(dictPath: string, missingPath?: string): Plugin;
+export function translatePlugin(dictPath: string, missingPath?: string, rtl?: boolean): Plugin;
 export function russianTexts(
   code: string,
   id: string,

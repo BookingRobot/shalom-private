@@ -129,7 +129,7 @@ export function MonthsCalendar({
                     </small>
                     {c.fly && (
                       <span
-                        style={{ position: 'absolute', top: '4px', right: '5px', lineHeight: '0' }}
+                        style={{ position: 'absolute', top: '4px', insetInlineEnd: '5px', lineHeight: '0' }}
                         title={planeTitle}
                       >
                         <svg

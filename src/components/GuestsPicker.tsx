@@ -159,7 +159,7 @@ export function GuestsPicker({
             aria-controls={popId}
             title={guestsLabel(adults, children)}
             onClick={() => setOpen(!open)}
-            style={{ paddingRight: '34px', lineHeight: '1.15' }}
+            style={{ paddingInlineEnd: '34px', lineHeight: '1.15' }}
           >
             {/* children go on a small second line so the narrow field never wraps mid-phrase */}
             <span style={{ display: 'block', whiteSpace: 'nowrap' }}>
@@ -194,7 +194,7 @@ export function GuestsPicker({
             aria-hidden="true"
             style={{
               position: 'absolute',
-              right: '12px',
+              insetInlineEnd: '12px',
               top: '16px',
               pointerEvents: 'none',
               transform: open ? 'rotate(180deg)' : 'none',

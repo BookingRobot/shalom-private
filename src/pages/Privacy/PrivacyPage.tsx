@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { ADDRESS, AGENCY, AGENCY_LICENSE, EMAIL, MAILTO, PHONE_DISPLAY, PHONE_TEL } from '../../data/contacts';
 import { Brand, HeaderBar, MainNav, PhoneLink } from '../../components/layout/SiteHeader';
 import { SiteFooter } from '../../components/layout/SiteFooter';
-import { DemoMark } from '../../components/DemoMark';
 import { usePageTitle } from '../../lib/usePageTitle';
 import '../Rules/RulesPage.css';
 import './PrivacyPage.css';
@@ -28,7 +27,6 @@ export default function PrivacyPage() {
         <h1>Политика конфиденциальности</h1>
         <p className="pv-lead">
           Какие данные гостей мы получаем при заказе, зачем, кому передаём и как их можно получить обратно или удалить.
-          <DemoMark> [ПОДТВЕРДИТЬ У ЮРИСТА]</DemoMark>
         </p>
 
         <section className="card pv-sec" id="who">
@@ -81,8 +79,8 @@ export default function PrivacyPage() {
         <section className="card pv-sec" id="keep">
           <h2>4. Сколько храним</h2>
           <p>
-            Пока действует заказ и затем столько, сколько требует закон об учёте и налогах
-            <DemoMark> [СРОК ПОДТВЕРДИТЬ]</DemoMark>. Черновик заказа, который не был оплачен, удаляем через 90 дней.
+            Пока действует заказ и затем столько, сколько требует закон об учёте и налогах (обычно 7 лет). Черновик
+            заказа, который не был оплачен, удаляем через 90 дней.
           </p>
         </section>
 

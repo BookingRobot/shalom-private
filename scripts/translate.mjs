@@ -1,7 +1,7 @@
 /**
- * Hebrew build (vite build --mode he): every Russian text in our sources — string literals, the
+ * Translated builds (vite build --mode he|en): every Russian text in our sources — string literals, the
  * text parts of template strings and JSX text — is swapped for its translation from
- * src/i18n/he.texts.json ({ "<Russian>": "<Hebrew>" }) before the code is compiled. Code, ids and
+ * src/i18n/<lang>.texts.json ({ "<Russian>": "<translation>" }) before the code is compiled. Code, ids and
  * logic stay the same; a text without a translation stays Russian (listed in dist/he/missing-texts.json).
  * Keys: string literals as written (escapes decoded), JSX text with its spaces collapsed and trimmed —
  * scripts/i18n-extract.mjs lists them the same way.
@@ -42,17 +42,17 @@ export function russianTexts(code, id, onText) {
   return sf;
 }
 
-export function translatePlugin(dictPath, missingPath) {
+export function translatePlugin(dictPath, missingPath, rtl = false) {
   const dict = existsSync(dictPath) ? JSON.parse(readFileSync(dictPath, 'utf8')) : {};
   const missing = new Set();
   return {
-    name: 'he-translate',
+    name: 'translate',
     enforce: 'pre',
     transform(code, id) {
       if (!/\/src\/.*\.(tsx|ts)$/.test(id) || id.includes('node_modules') || !CYR.test(code)) return null;
       const edits = [];
       russianTexts(code, id, (key, n, kind) => {
-        const he = ARROWS.test(key) ? flip(key) : dict[key];
+        const he = ARROWS.test(key) ? (rtl ? flip(key) : key) : dict[key];
         if (typeof he !== 'string') {
           missing.add(key);
           return;
@@ -86,7 +86,7 @@ export function translatePlugin(dictPath, missingPath) {
       mkdirSync(dirname(missingPath), { recursive: true });
       writeFileSync(missingPath, JSON.stringify([...missing], null, 1));
       if (missing.size)
-        console.warn(`he-translate: ${missing.size} texts without a translation stay Russian (${missingPath})`);
+        console.warn(`translate: ${missing.size} texts without a translation stay Russian (${missingPath})`);
     },
   };
 }

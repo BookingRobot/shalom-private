@@ -6,7 +6,6 @@ import { PageLogic, usePageLogic } from '../../lib/pageLogic';
 import { HelpWidget, type HelpContextInfo } from '../../components/HelpWidget';
 import { usePageTitle } from '../../lib/usePageTitle';
 import './RulesPage.css';
-import { DemoMark } from '../../components/DemoMark';
 
 const HELP_CTX: HelpContextInfo = {};
 
@@ -73,8 +72,7 @@ export default function RulesPage() {
                   <div className="row">
                     <b>Мы подтверждаем места</b>
                     <p>
-                      В течение <span className="ph">[N часов]</span> проверяем наличие в санатории и присылаем
-                      подтверждение на почту и в WhatsApp.
+                      В течение 24 часов проверяем наличие в санатории и присылаем подтверждение на почту и в WhatsApp.
                     </p>
                   </div>
                   <div className="row">
@@ -84,8 +82,8 @@ export default function RulesPage() {
                   <div className="row">
                     <b>Ваучер и памятка</b>
                     <p>
-                      За <span className="ph">[N дней]</span> до заезда присылаем ваучер, адрес санатория, время
-                      трансфера и памятку: что взять с собой.
+                      За 7 дней до заезда присылаем ваучер, адрес санатория, время трансфера и памятку: что взять с
+                      собой.
                     </p>
                   </div>
                 </div>
@@ -158,15 +156,14 @@ export default function RulesPage() {
                   <div className="row">
                     <b>После даты оплаты остатка</b>
                     <p>
-                      Депозит не возвращается, остаток возвращаем
-                      <DemoMark className="ph"> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
+                      Депозит не возвращается. Остаток возвращаем за вычетом того, что санаторий удерживает по своим
+                      правилам, — заранее подскажем сумму.
                     </p>
                   </div>
                   <div className="row">
                     <b>Незаезд без предупреждения</b>
                     <p>
-                      Депозит не возвращается. Санаторий может удержать стоимость{' '}
-                      <span className="ph">[первых суток]</span> при полной предоплате.
+                      Депозит не возвращается. Санаторий может удержать стоимость первых суток при полной предоплате.
                     </p>
                   </div>
                   <div className="row">
@@ -186,8 +183,8 @@ export default function RulesPage() {
                   <div className="row">
                     <b>Досрочный выезд</b>
                     <p>
-                      Неиспользованные дни санаторий возвращает по своим правилам —{' '}
-                      <span className="ph">[уточнить по санаториям]</span>. Поможем договориться.
+                      Неиспользованные дни санаторий возвращает по своим правилам — заранее уточним их для вашего
+                      санатория и поможем договориться.
                     </p>
                   </div>
                 </div>

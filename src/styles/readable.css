@@ -276,3 +276,19 @@ body .pg-rooms .rm-people-note {
 :root[lang='he'] * {
   font-family: Rubik, 'Segoe UI', Arial, sans-serif !important;
 }
+
+/* right-to-left (Hebrew): arrows and chevrons that mean «forward / next / back» point the other way */
+[dir='rtl'] svg:has(> path[d='M5 12h14M13 6l6 6-6 6']),
+[dir='rtl'] svg:has(> path[d='m15 6-6 6 6 6']),
+[dir='rtl'] svg:has(> path[d='m9 18 6-6-6-6']),
+[dir='rtl'] svg:has(> path[d='m9 6 6 6-6 6']) {
+  transform: scaleX(-1);
+}
+
+/* the search hint sits above the field's label, not on it (it covered «Курорт или санаторий») */
+@media (min-width: 761px) {
+  body .page .search .go-tip-place,
+  body .page .search .go-tip-dates {
+    bottom: calc(100% + 34px);
+  }
+}
