@@ -267,8 +267,12 @@ body .pg-rooms .rm-people-note {
   }
 }
 
-/* Hebrew: a font with Hebrew letters (Rubik, loaded by the Hebrew page shell) */
+/* Hebrew: one font with Hebrew letters everywhere (Rubik, loaded by the Hebrew page shell; the
+   site's Manrope / Montserrat have no Hebrew) */
 :root[lang='he'] {
   --font: Rubik, 'Segoe UI', Arial, sans-serif;
   --font-head: Rubik, 'Segoe UI', Arial, sans-serif;
+}
+:root[lang='he'] * {
+  font-family: Rubik, 'Segoe UI', Arial, sans-serif !important;
 }
