@@ -266,3 +266,9 @@ body .pg-rooms .rm-people-note {
     padding-right: 12px;
   }
 }
+
+/* Hebrew: a font with Hebrew letters (Rubik, loaded by the Hebrew page shell) */
+:root[lang='he'] {
+  --font: Rubik, 'Segoe UI', Arial, sans-serif;
+  --font-head: Rubik, 'Segoe UI', Arial, sans-serif;
+}

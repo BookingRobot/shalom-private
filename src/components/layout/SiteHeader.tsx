@@ -9,8 +9,8 @@ import {
   SITE_NAME,
   WHATSAPP_URL,
 } from '../../data/contacts';
-import { LANGS, useLang } from '../../i18n/LanguageContext';
-import { completeLanguages, useT } from '../../i18n/t';
+import { useT } from '../../i18n/t';
+import { BUILD_LANG, langHref } from '../../i18n/buildLang';
 import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
@@ -56,6 +56,7 @@ export function HeaderBar({
         }}
       >
         <OnGreen.Provider value={true}>{children}</OnGreen.Provider>
+        <LangLink />
         <MobileMenu />
       </div>
     </header>
@@ -69,7 +70,6 @@ export function HeaderBar({
 function MobileMenu() {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
-  const { lang, setLang } = useLang();
   const t = useT();
   const btn = useRef<HTMLLabelElement>(null);
   // a new page closes the menu
@@ -184,25 +184,25 @@ function MobileMenu() {
                 {t('nav.whatsapp')}
               </a>
             </div>
-            {SHOW_LANGS ? (
-              <div className="hd-menu-lang">
-                <span className="hd-menu-k">{t('nav.language')}</span>
-                <div className="hd-seg" role="radiogroup" aria-label={t('nav.language')}>
-                  {LANGS.map((l) => (
-                    <button
-                      key={l.code}
-                      type="button"
-                      role="radio"
-                      aria-checked={lang === l.code}
-                      className={lang === l.code ? 'on' : ''}
-                      onClick={() => setLang(l.code)}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
+            <div className="hd-menu-lang">
+              <span className="hd-menu-k">Язык · שפה</span>
+              <div className="hd-seg">
+                <a
+                  className={BUILD_LANG === 'ru' ? 'on' : ''}
+                  href={langHref('ru', loc.pathname, loc.search)}
+                  lang="ru"
+                >
+                  Русский
+                </a>
+                <a
+                  className={BUILD_LANG === 'he' ? 'on' : ''}
+                  href={langHref('he', loc.pathname, loc.search)}
+                  lang="he"
+                >
+                  עברית
+                </a>
               </div>
-            ) : null}
+            </div>
           </nav>
         </div>
       }
@@ -250,7 +250,16 @@ const NAV: { key: NavKey; to: string }[] = [
   { key: 'contacts', to: '/rules#contact' },
 ];
 /** the language switch shows only when a second language is complete: a switch that changes nothing misleads */
-const SHOW_LANGS = completeLanguages().length > 1;
+/** laptop: «עברית» / «Русский» in the bar — the same page in the other language */
+function LangLink() {
+  const loc = useLocation();
+  const to = BUILD_LANG === 'he' ? 'ru' : 'he';
+  return (
+    <a className="hd-lang" href={langHref(to, loc.pathname, loc.search)} lang={to}>
+      {to === 'he' ? 'עברית' : 'Русский'}
+    </a>
+  );
+}
 
 /** Main navigation: resorts, direct flights, payment, terms, contacts. */
 export function MainNav({
@@ -268,6 +277,7 @@ export function MainNav({
   const t = useT();
   return (
     <nav
+      className="hd-nav"
       aria-label={t('nav.mainMenu')}
       style={{ display: 'flex', alignItems: 'center', gap: `${gap}px`, flexWrap: 'wrap' }}
     >
