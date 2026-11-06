@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { DemoMark } from '../DemoMark';
 import { useHelp } from '../../context/HelpContext';
 import {
   ADDRESS,
@@ -116,7 +115,7 @@ export function SiteFooter({
           </span>
           <span className="ft-addr">
             {ADDRESS}
-            {AGENCY_LICENSE ? ' · лицензия № ' + AGENCY_LICENSE : <DemoMark> · лицензия № [УТОЧНИТЬ]</DemoMark>}
+            {AGENCY_LICENSE ? ' · лицензия № ' + AGENCY_LICENSE : null}
           </span>
         </div>
         {/* «Поможем выбрать»: one button opens the support form (the canvas script finds .help-strip-band / .hs-btn) */}

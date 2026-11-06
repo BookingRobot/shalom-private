@@ -1711,7 +1711,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
 }
 .cal-dlg .months-calendar .cell > span[title] {
   top: 3px !important;
-  right: 3px !important;
+  inset-inline-end: 3px !important;
 }
 .cal-dlg .months-calendar .cell > span[title] svg {
   width: 13px;
@@ -1821,7 +1821,7 @@ body .page :is(.lang, .acc, .linkbtn, .btn)::after {
   }
   .cal-dlg .months-calendar .cell > span[title] {
     top: 2px !important;
-    right: 2px !important;
+    inset-inline-end: 2px !important;
   }
   .cal-dlg .months-calendar .cell > span[title] svg {
     width: 11px;

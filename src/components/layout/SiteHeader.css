@@ -353,24 +353,36 @@
   }
 }
 
-/* laptop: the other language, a quiet white link in the bar (the phone menu has its own switch) */
+/* laptop: RU · EN · עב — a small segmented switch in the bar (the phone menu has its own) */
+.site-header .hd-langs {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--r-field);
+}
 .site-header .hd-lang {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
-  border-radius: var(--r-field);
+  justify-content: center;
+  min-width: 44px;
+  min-height: 38px;
+  padding: 0 8px;
+  border-radius: calc(var(--r-field) - 3px);
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   text-decoration: none;
 }
 .site-header .hd-lang:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
+}
+.site-header .hd-lang.on {
+  background: #fff;
+  color: var(--green);
 }
 @media (max-width: 760px) {
-  .site-header .hd-lang {
+  .site-header .hd-langs {
     display: none;
   }
 }

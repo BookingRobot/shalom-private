@@ -563,8 +563,8 @@ export default function DonePage() {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '2px',
-                        paddingRight: '12px',
-                        borderRight: '1px solid var(--line)',
+                        paddingInlineEnd: '12px',
+                        borderInlineEnd: '1px solid var(--line)',
                       }}
                     >
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Заезд</span>
@@ -585,7 +585,13 @@ export default function DonePage() {
                       </span>
                     </div>
                     <div
-                      style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '12px' }}
+                      style={{
+                        flex: '1',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                        paddingInlineStart: '12px',
+                      }}
                     >
                       <span style={{ fontSize: '16px', color: 'var(--ink-2)' }}>Выезд</span>
                       <span className="fact" style={{ fontWeight: '700' }}>

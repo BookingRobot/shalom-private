@@ -11,7 +11,6 @@ import { fmt } from '../../lib/format';
 import { orderPriceRows, OrderSummary } from '../../components/OrderSummary';
 import { StepNext } from '../../components/StepNext';
 import { guestNames, orderSummary } from '../../lib/orderSummary';
-import { DemoMark } from '../../components/DemoMark';
 import { shortDate } from '../../lib/dates';
 import { TODAY } from '../../data/demo';
 import { DEPOSIT_FLIGHT_PP, persons } from '../../lib/pricing';
@@ -424,8 +423,8 @@ export default function PaymentPage() {
                   <span>
                     {v.fullOnly ? (
                       <>
-                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория
-                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
+                        <b>До заезда меньше недели</b> — условия отмены по правилам санатория, подскажем их перед
+                        оплатой.
                       </>
                     ) : (
                       <>
@@ -476,8 +475,8 @@ export default function PaymentPage() {
                       </>
                     ) : (
                       <>
-                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем
-                        <DemoMark> [ПОДТВЕРДИТЬ УСЛОВИЯ]</DemoMark>.
+                        <b>После {v.dueDate}</b> — удерживаем депозит, остаток возвращаем за вычетом того, что
+                        удерживает санаторий.
                       </>
                     )}
                   </span>

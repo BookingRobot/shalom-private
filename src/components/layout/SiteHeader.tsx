@@ -10,7 +10,7 @@ import {
   WHATSAPP_URL,
 } from '../../data/contacts';
 import { useT } from '../../i18n/t';
-import { BUILD_LANG, langHref } from '../../i18n/buildLang';
+import { BUILD_LANG, SITE_LANGS, langHref } from '../../i18n/buildLang';
 import { PhoneIcon } from '../icons';
 import './SiteHeader.css';
 
@@ -185,22 +185,19 @@ function MobileMenu() {
               </a>
             </div>
             <div className="hd-menu-lang">
-              <span className="hd-menu-k">Язык · שפה</span>
+              <span className="hd-menu-k">Язык · Language · שפה</span>
               <div className="hd-seg">
-                <a
-                  className={BUILD_LANG === 'ru' ? 'on' : ''}
-                  href={langHref('ru', loc.pathname, loc.search)}
-                  lang="ru"
-                >
-                  Русский
-                </a>
-                <a
-                  className={BUILD_LANG === 'he' ? 'on' : ''}
-                  href={langHref('he', loc.pathname, loc.search)}
-                  lang="he"
-                >
-                  עברית
-                </a>
+                {SITE_LANGS.map((l) => (
+                  <a
+                    key={l.code}
+                    className={BUILD_LANG === l.code ? 'on' : ''}
+                    href={langHref(l.code, loc.pathname, loc.search)}
+                    lang={l.code}
+                    aria-current={BUILD_LANG === l.code ? 'true' : undefined}
+                  >
+                    {l.label}
+                  </a>
+                ))}
               </div>
             </div>
           </nav>
@@ -250,14 +247,24 @@ const NAV: { key: NavKey; to: string }[] = [
   { key: 'contacts', to: '/rules#contact' },
 ];
 /** the language switch shows only when a second language is complete: a switch that changes nothing misleads */
-/** laptop: «עברית» / «Русский» in the bar — the same page in the other language */
+/** laptop: RU · EN · עב in the bar — the same page in another language */
 function LangLink() {
   const loc = useLocation();
-  const to = BUILD_LANG === 'he' ? 'ru' : 'he';
   return (
-    <a className="hd-lang" href={langHref(to, loc.pathname, loc.search)} lang={to}>
-      {to === 'he' ? 'עברית' : 'Русский'}
-    </a>
+    <nav className="hd-langs" aria-label="Язык · Language · שפה">
+      {SITE_LANGS.map((l) => (
+        <a
+          key={l.code}
+          className={'hd-lang' + (BUILD_LANG === l.code ? ' on' : '')}
+          href={langHref(l.code, loc.pathname, loc.search)}
+          lang={l.code}
+          title={l.label}
+          aria-current={BUILD_LANG === l.code ? 'true' : undefined}
+        >
+          {l.short}
+        </a>
+      ))}
+    </nav>
   );
 }
 

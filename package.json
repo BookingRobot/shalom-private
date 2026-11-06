@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --mode he && node scripts/postbuild.mjs",
+    "build": "tsc -b && vite build && vite build --mode he && vite build --mode en && node scripts/postbuild.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "canvas:snapshot": "node scripts/snapshot-canvas.cjs canvas-out",

@@ -137,7 +137,7 @@ export function RoomDetails({ o, nightsLabel }: { o: RoomOfferVM; nightsLabel: s
       <div className="rd-full">
         <div className="rd-cap">Подробно о программе</div>
         {(o.detLines || []).map((l, i) => (
-          <div key={i} className="rd-line" style={{ fontWeight: l.fw, paddingLeft: l.pl, marginTop: l.mt }}>
+          <div key={i} className="rd-line" style={{ fontWeight: l.fw, paddingInlineStart: l.pl, marginTop: l.mt }}>
             {l.t}
           </div>
         ))}
